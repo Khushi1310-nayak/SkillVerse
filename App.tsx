@@ -13,6 +13,7 @@ import { CoursesList } from './components/CoursesList';
 import { CertificationsList } from './components/CertificationsList';
 import { CareerMode } from './components/CareerMode';
 import { Onboarding } from './components/Onboarding';
+import { CredentialVerification } from './components/CredentialVerification';
 import { storageService } from './services/storageService';
 import { User } from './types';
 
@@ -75,6 +76,7 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path="/docs" element={<DocumentationPage />} />
+        <Route path="/credential/:token" element={<CredentialVerification />} />
         <Route path="/*" element={
           !user && !showAuth ? (
             <LandingPage onGetStarted={() => setShowAuth(true)} />

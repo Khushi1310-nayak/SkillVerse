@@ -10,7 +10,16 @@ const BadgeCard: React.FC<{ course: Course, progress: any, user: any }> = ({ cou
   const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0,3).toUpperCase()}-${progress.score}`;
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/credential/${credentialId}`;
+    const tokenData = {
+       u: user.username,
+       c: course.title,
+       s: progress.score,
+       d: progress.completedDate,
+       i: credentialId
+    };
+    const token = btoa(JSON.stringify(tokenData));
+    const url = `${window.location.origin}/#/credential/${token}`;
+
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

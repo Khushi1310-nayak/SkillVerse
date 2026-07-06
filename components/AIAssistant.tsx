@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { MessageCircle, X, Send, Sparkles, Bot, User, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AIAssistantProps {
@@ -39,35 +38,61 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const systemInstruction = `You are a highly intelligent and friendly AI Tutor for the course "${courseTitle}".
       
-      const chat = ai.chats.create({
-        model: 'gemini-3-flash-preview',
-        config: {
-            systemInstruction: `You are a highly intelligent and friendly AI Tutor for the course "${courseTitle}".
-            
-            Course Context:
-            "${courseContext.substring(0, 5000)}..."
-            
-            YOUR RULES:
-            1. **Answer directly and simply.** Do not use complex jargon unless you explain it.
-            2. **NO MARKDOWN.** Do not use markdown symbols like hashtags (#) for headers or triple backticks for code blocks unless absolutely necessary for a single line of code. Write in natural, plain text paragraphs. 
-            3. **Formatting:** Use paragraphs to separate ideas. You can use bullet points like "•" or "-" for lists. You can use single asterisks (*) to emphasize important words.
-            4. **Be helpful.** If the user asks for a quiz, give them one question at a time. If they ask for examples, provide clear, concise text-based examples or very short code snippets.
-            5. **Contextual awareness.** Use the provided course context to answer specific questions about the material.
-            
-            Goal: Make the user feel like they are chatting with a knowledgeable human tutor, not a robot reading a manual.
-            `
-        }
+      Course Context:
+      "${courseContext.substring(0, 5000)}..."
+      
+      YOUR RULES:
+      1. **Answer directly and simply.** Do not use complex jargon unless you explain it.
+      2. **NO MARKDOWN.** Do not use markdown symbols like hashtags (#) for headers or triple backticks for code blocks unless absolutely necessary for a single line of code. Write in natural, plain text paragraphs. 
+      3. **Formatting:** Use paragraphs to separate ideas. You can use bullet points like "•" or "-" for lists. You can use single asterisks (*) to emphasize important words.
+      4. **Be helpful.** If the user asks for a quiz, give them one question at a time. If they ask for examples, provide clear, concise text-based examples or very short code snippets.
+      5. **Contextual awareness.** Use the provided course context to answer specific questions about the material.
+      
+      Goal: Make the user feel like they are chatting with a knowledgeable human tutor, not a robot reading a manual.`;
+
+      // Map local state messages to OpenRouter format
+      const apiMessages = [
+        { role: 'system', content: systemInstruction },
+        ...messages.map(m => ({
+          role: m.role === 'model' ? 'assistant' : 'user',
+          content: m.text
+        })),
+        { role: 'user', content: userMessage }
+      ];
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: apiMessages,
+          max_tokens: 1000
+        })
       });
 
-      const response = await chat.sendMessage({ message: userMessage });
-      const text = response.text || "I couldn't generate a response. Please try again.";
+      if (!res.ok) {
+        throw new Error(`OpenRouter API error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
       
       setMessages(prev => [...prev, { role: 'model', text }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Sorry, I'm having trouble connecting right now. Please check your connection." }]);
+      
+      let errorMessage = "Sorry, I'm having trouble connecting right now. Please check your connection or API key.";
+      
+      if (error?.message?.includes('401') || error?.message?.includes('429')) {
+         errorMessage = `Whoops! There was an issue with your OpenRouter API key (billing or authentication). \n\n*Mock Response Fallback*:\nYou asked about: "${userMessage}". Since the API is down, I can see you're currently in the context of "${courseTitle || 'your dashboard'}". Keep practicing!`;
+      }
+      
+      setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -90,10 +115,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
               <span className="font-bold">Learning Assistant</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
-              <button onClick={() => setIsExpanded(!isExpanded)} className="hover:text-white transition-colors p-1">
+              <button onClick={() => setIsExpanded(!isExpanded)} className="hover:text-white transition-colors p-1" title={isExpanded ? "Collapse" : "Expand"} aria-label={isExpanded ? "Collapse" : "Expand"}>
                 {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </button>
-              <button onClick={() => setIsOpen(false)} className="hover:text-white transition-colors p-1">
+              <button onClick={() => setIsOpen(false)} className="hover:text-white transition-colors p-1" title="Close AI Assistant" aria-label="Close AI Assistant">
                 <X size={18} />
               </button>
             </div>
@@ -161,6 +186,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                  title="Send message"
+                  aria-label="Send message"
                 >
                   <Send size={16} />
                 </button>
@@ -183,8 +210,11 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       {/* Toggle Button */}
       {!isOpen && (
         <button
+            id="ai-assistant-toggle"
             onClick={() => setIsOpen(true)}
             className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-main text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-fade-in-up"
+            title="Open AI Assistant"
+            aria-label="Open AI Assistant"
         >
             <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 animate-pulse"></div>
             <Sparkles size={28} className="animate-pulse-slow" />

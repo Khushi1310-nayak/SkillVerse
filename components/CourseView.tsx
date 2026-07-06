@@ -10,6 +10,8 @@ export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const course = COURSES.find(c => c.id === id);
+  const user = storageService.getUser();
+  const settings = user?.settings;
   
   const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -26,14 +28,31 @@ export const CourseView: React.FC = () => {
             setPassed(true);
             setScore(existing.score);
             setQuizSubmitted(true);
+        } else if (settings?.autoSave) {
+            const saved = localStorage.getItem(`quizState_${id}`);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.selectedAnswers) setSelectedAnswers(parsed.selectedAnswers);
+                    if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
+                    if (parsed.selectedAnswers && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
+                } catch(e) {}
+            }
         }
     }
-  }, [id]);
+  }, [id, settings?.autoSave]);
+
+  useEffect(() => {
+     if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
+         localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
+     }
+  }, [selectedAnswers, currentQuestion, id, settings?.autoSave, quizSubmitted]);
 
   if (!course) return <div>Course not found</div>;
 
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
+    if (settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined) return;
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuestion] = optionIndex;
     setSelectedAnswers(newAnswers);
@@ -67,6 +86,16 @@ export const CourseView: React.FC = () => {
     setCurrentQuestion(0);
     setScore(0);
     setPassed(false);
+    if (id) localStorage.removeItem(`quizState_${id}`);
+  };
+
+  const getProgressWidthClass = (current: number, total: number) => {
+     const percent = Math.round((current / total) * 100);
+     const rounded = Math.max(0, Math.min(100, Math.round(percent / 5) * 5));
+     const wMap: Record<number, string> = {
+      0: 'w-0', 5: 'w-[5%]', 10: 'w-[10%]', 15: 'w-[15%]', 20: 'w-[20%]', 25: 'w-[25%]', 30: 'w-[30%]', 35: 'w-[35%]', 40: 'w-[40%]', 45: 'w-[45%]', 50: 'w-[50%]', 55: 'w-[55%]', 60: 'w-[60%]', 65: 'w-[65%]', 70: 'w-[70%]', 75: 'w-[75%]', 80: 'w-[80%]', 85: 'w-[85%]', 90: 'w-[90%]', 95: 'w-[95%]', 100: 'w-full'
+    };
+    return wMap[rounded];
   };
 
   // Remove HTML tags for raw context for AI
@@ -144,7 +173,7 @@ export const CourseView: React.FC = () => {
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-textMain">Question {currentQuestion + 1} <span className="text-textMuted text-lg">/ {course.quiz.length}</span></h2>
                     <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
-                       <div className="h-full bg-primaryLight rounded-full transition-all duration-300" style={{ width: `${((currentQuestion + 1) / course.quiz.length) * 100}%` }} />
+                       <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
                     </div>
                   </div>
 
@@ -155,24 +184,42 @@ export const CourseView: React.FC = () => {
                   </div>
 
                   <div className="space-y-4 mb-10">
-                    {course.quiz[currentQuestion].options.map((option, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleOptionSelect(idx)}
-                        className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-4
-                          ${selectedAnswers[currentQuestion] === idx 
-                            ? 'bg-primary/20 border-primaryLight text-textMain' 
-                            : 'bg-white/50 dark:bg-white/5 border-black/5 dark:border-white/10 text-textMuted hover:bg-white/80 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20'}
-                        `}
-                      >
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
-                          ${selectedAnswers[currentQuestion] === idx ? 'border-primaryLight' : 'border-black/20 dark:border-white/20'}
-                        `}>
-                          {selectedAnswers[currentQuestion] === idx && <div className="w-3 h-3 bg-primaryLight rounded-full" />}
-                        </div>
-                        {option}
-                      </button>
-                    ))}
+                    {course.quiz[currentQuestion].options.map((option, idx) => {
+                      const isSelected = selectedAnswers[currentQuestion] === idx;
+                      const isCorrect = idx === course.quiz[currentQuestion].correctAnswer;
+                      const showInstant = settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined;
+
+                      let btnClass = isSelected 
+                        ? 'bg-primary/20 border-primaryLight text-textMain' 
+                        : 'bg-white/50 dark:bg-white/5 border-black/5 dark:border-white/10 text-textMuted hover:bg-white/80 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20';
+                      let iconBorder = isSelected ? 'border-primaryLight' : 'border-black/20 dark:border-white/20';
+
+                      if (showInstant) {
+                         if (isCorrect) {
+                            btnClass = 'bg-success/20 border-success text-success';
+                            iconBorder = 'border-success';
+                         } else if (isSelected) {
+                            btnClass = 'bg-red-500/20 border-red-500 text-red-500';
+                            iconBorder = 'border-red-500';
+                         } else {
+                            btnClass = 'bg-white/5 dark:bg-white/5 border-transparent opacity-50';
+                         }
+                      }
+
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleOptionSelect(idx)}
+                          disabled={showInstant}
+                          className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-4 ${btnClass}`}
+                        >
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${iconBorder}`}>
+                            {isSelected && <div className={`w-3 h-3 rounded-full ${showInstant ? (isCorrect ? 'bg-success' : 'bg-red-500') : 'bg-primaryLight'}`} />}
+                          </div>
+                          {option}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <div className="flex justify-between">
@@ -222,14 +269,45 @@ export const CourseView: React.FC = () => {
                          <Download size={20} /> View Certificate
                        </Link>
                     ) : (
-                       <button 
-                         onClick={resetQuiz}
-                         className="flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 text-textMain px-8 py-3 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                       >
-                         <RefreshCcw size={20} /> Retry Quiz
-                       </button>
+                       settings?.retryQuiz !== false ? (
+                           <button 
+                             onClick={resetQuiz}
+                             className="flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 text-textMain px-8 py-3 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                           >
+                             <RefreshCcw size={20} /> Retry Quiz
+                           </button>
+                       ) : (
+                           <p className="text-textMuted italic mt-4 w-full">Retrying quizzes is disabled in your settings.</p>
+                       )
                     )}
                   </div>
+                  
+                  {settings?.showAnswers && (
+                    <div className="mt-16 space-y-6 text-left border-t border-black/5 dark:border-white/10 pt-10">
+                       <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Answers</h3>
+                       {course.quiz.map((q, qIdx) => (
+                          <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10">
+                             <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
+                             <div className="space-y-3">
+                               {q.options.map((opt, oIdx) => {
+                                  const isCorrect = oIdx === q.correctAnswer;
+                                  const isSelected = selectedAnswers[qIdx] === oIdx;
+                                  let colorClass = "text-textMuted";
+                                  if (isCorrect) colorClass = "text-success font-bold bg-success/10 p-2 rounded-lg";
+                                  else if (isSelected) colorClass = "text-red-500 line-through bg-red-500/10 p-2 rounded-lg";
+
+                                  return (
+                                    <div key={oIdx} className={`flex items-center gap-3 ${colorClass} ${(!isCorrect && !isSelected) ? 'p-2' : ''}`}>
+                                       {isCorrect ? <CheckCircle size={18} /> : isSelected ? <XCircle size={18} /> : <div className="w-[18px]" />}
+                                       <span>{opt}</span>
+                                    </div>
+                                  )
+                               })}
+                             </div>
+                          </div>
+                       ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

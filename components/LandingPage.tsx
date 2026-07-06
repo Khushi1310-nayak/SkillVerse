@@ -1,42 +1,43 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, CheckCircle, Award, Zap, BarChart, Shield, 
   PlayCircle, BookOpen, Lock, X, Trophy, Briefcase, 
   Bot, FileCheck, Fingerprint, Download, Sparkles, Check,
   ChevronDown, HelpCircle, Mail, FileText, Globe, Server, 
-  HardDrive, Users, Eye, Heart
+  HardDrive, Users, Eye, Heart, Layout
 } from 'lucide-react';
 import { GoldSnow } from './GoldSnow';
+import { AIAssistant } from './AIAssistant';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
-// --- STYLISH LOGO COMPONENT ---
-const StylishLogo: React.FC<{ size?: number, className?: string }> = ({ size = 40, className = "" }) => (
-  <div className={`relative group cursor-pointer ${className}`} style={{ width: size, height: size }}>
+const StylishLogo: React.FC<{ size?: number, className?: string }> = ({ size = 40, className = "" }) => {
+  const getContainerClass = () => {
+     if (size === 32) return "w-8 h-8";
+     if (size === 36) return "w-9 h-9";
+     return "w-12 h-12"; // Increased default size slightly for better image visibility
+  };
+
+  return (
+  <div className={`relative group cursor-pointer ${className} ${getContainerClass()}`}>
     {/* Animated Glow Background */}
     <div className="absolute inset-0 bg-gradient-main rounded-xl blur-lg opacity-40 group-hover:opacity-80 transition-opacity duration-500 animate-pulse-slow"></div>
     
-    {/* Main Container */}
-    <div className="relative w-full h-full bg-[#0B1220] rounded-xl border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group-hover:border-primaryLight/50 transition-colors duration-300">
-       
-       {/* Inner Gradient Shine */}
-       <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-       
-       {/* Letters */}
-       <div className="relative z-10 flex font-display font-bold leading-none select-none" style={{ fontSize: size * 0.5 }}>
-          <span className="text-white transform group-hover:-translate-x-1 group-hover:-rotate-6 transition-all duration-300 ease-out drop-shadow-md">S</span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-br from-primaryLight to-[#F5C97A] transform group-hover:translate-x-1 group-hover:rotate-6 transition-all duration-300 ease-out drop-shadow-md">V</span>
-       </div>
+    {/* Image Container */}
+    <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primaryLight/50 transition-all duration-300 group-hover:scale-105">
+       <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="w-full h-full object-cover" />
     </div>
   </div>
-);
+  );
+};
 
 const CertificatePreview: React.FC<{ className?: string, rotate?: boolean }> = ({ className = "", rotate = false }) => (
   <div className={`relative w-full max-w-[550px] aspect-[1.414/1] bg-gradient-to-br from-[#0B1220] to-[#1E293B] shadow-2xl flex flex-col items-center justify-between overflow-hidden rounded-lg border-4 border-[#F5C97A]/20 select-none ${className} ${rotate ? 'lg:rotate-2 lg:hover:rotate-0 transition-transform duration-500' : ''}`}>
     {/* Background Patterns */}
-    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] bg-[size:24px_24px]"></div>
     <div className="absolute top-0 right-0 w-[150px] md:w-[300px] h-[150px] md:h-[300px] bg-[#6968A6] rounded-full blur-[80px] md:blur-[100px] opacity-20 pointer-events-none"></div>
     <div className="absolute bottom-0 left-0 w-[150px] md:w-[300px] h-[150px] md:h-[300px] bg-[#CF9893] rounded-full blur-[80px] md:blur-[100px] opacity-20 pointer-events-none"></div>
     
@@ -84,7 +85,7 @@ const CertificatePreview: React.FC<{ className?: string, rotate?: boolean }> = (
     {/* Footer with Seal and Signatures */}
     <div className="w-full flex justify-between items-end relative z-10 px-4 md:px-8 pb-3 sm:pb-4 md:pb-6">
        <div className="text-center">
-          <div className="font-handwriting text-[8px] sm:text-xs md:text-sm text-white opacity-90 mb-0.5" style={{ fontFamily: 'cursive' }}>Sarah Jenkins</div>
+          <div className="font-handwriting text-[8px] sm:text-xs md:text-sm text-white opacity-90 mb-0.5 font-['cursive']">Sarah Jenkins</div>
           <div className="w-12 sm:w-16 md:w-24 border-t border-[#6968A6]/50 pt-0.5 md:pt-1">
              <p className="text-[5px] sm:text-[6px] md:text-[8px] font-bold uppercase text-gray-500 tracking-wider">Instructor</p>
           </div>
@@ -126,6 +127,7 @@ const AccordionItem: React.FC<{ title: string, content: string, isOpen: boolean,
 );
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState<'features' | 'certificates' | 'pricing' | 'documentation' | 'blog' | 'support' | 'privacy' | 'terms' | 'brand' | null>(null);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
 
@@ -507,6 +509,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <button 
               onClick={closeModal}
               className="fixed top-6 right-6 z-[110] p-2 rounded-full bg-black/10 hover:bg-black/20 text-textMain dark:bg-black/50 dark:hover:bg-black/70 dark:text-white transition-colors border border-black/10 dark:border-white/10"
+              title="Close"
+              aria-label="Close"
             >
               <X size={24} />
             </button>
@@ -705,38 +709,46 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* DOCUMENTATION MODAL */}
             {activeModal === 'documentation' && (
-              <div className="max-w-4xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
-                  <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500">
-                          <BookOpen size={24} />
+              <div className="max-w-5xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
+                  <div className="text-center mb-10">
+                      <div className="inline-block p-3 rounded-xl bg-blue-500/10 text-blue-500 mb-4">
+                          <BookOpen size={32} />
                       </div>
-                      <h2 className="text-3xl font-bold text-textMain">Documentation</h2>
+                      <h2 className="text-3xl md:text-5xl font-display font-bold text-textMain mb-4">Documentation</h2>
+                      <p className="text-textMuted text-lg max-w-2xl mx-auto">
+                        Explore the complete architecture, features, and algorithms powering SkillVerse's E-learning experience.
+                      </p>
                   </div>
-                  <div className="space-y-4">
-                      <AccordionItem 
-                        title="Getting Started with SkillVerse"
-                        content="Welcome to SkillVerse! To begin, simply create a free account. Once logged in, you can browse courses by category (Programming, DSA, Design) or use the search bar to find specific topics. Your progress is automatically saved as you navigate through notes and quizzes."
-                        isOpen={openAccordion === 'doc-1'}
-                        onClick={() => toggleAccordion('doc-1')}
-                      />
-                      <AccordionItem 
-                        title="How do Certificates work?"
-                        content="Certificates are awarded upon achieving a score of 70% or higher in the final quiz of any course. Once earned, certificates can be downloaded as a PDF from your profile or the 'Certifications' tab. Each certificate contains a unique ID that can be verified by employers."
-                        isOpen={openAccordion === 'doc-2'}
-                        onClick={() => toggleAccordion('doc-2')}
-                      />
-                      <AccordionItem 
-                        title="Using the AI Tutor"
-                        content="Every course includes a built-in AI Tutor. You can access it by clicking the sparkle icon in the bottom right corner of the course view. You can ask for simplified explanations, code examples, or practice questions. The AI is context-aware and knows which course you are currently studying."
-                        isOpen={openAccordion === 'doc-3'}
-                        onClick={() => toggleAccordion('doc-3')}
-                      />
-                       <AccordionItem 
-                        title="Career Mode Features"
-                        content="Career Mode is a specialized section for interview preparation. It allows you to select target companies (like Google, Amazon, etc.) and practice real interview questions. It includes a mock interview simulator that times your responses and tracks your readiness score."
-                        isOpen={openAccordion === 'doc-4'}
-                        onClick={() => toggleAccordion('doc-4')}
-                      />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Layout className="text-primaryLight" size={20}/> Tech Stack</h3>
+                          <p className="text-sm text-textMuted leading-relaxed">Built with React 19, TypeScript, Vite, and Tailwind CSS. Utilizes client-side architecture and localStorage for a seamless offline-capable experience without server dependency.</p>
+                      </div>
+                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Briefcase className="text-primaryLight" size={20}/> Career Mode</h3>
+                          <p className="text-sm text-textMuted leading-relaxed">Simulated interview engine featuring real questions from 20 top tech companies (Google, Meta, Uber, etc.), complete with difficulty tags and a proprietary Readiness Score.</p>
+                      </div>
+                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Bot className="text-primaryLight" size={20}/> AI Integration</h3>
+                          <p className="text-sm text-textMuted leading-relaxed">Powered by Google's GenAI SDK (Gemini). The assistant maintains context-awareness of your current course and provides on-demand explanations and code snippets.</p>
+                      </div>
+                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Trophy className="text-primaryLight" size={20}/> Gamification</h3>
+                          <p className="text-sm text-textMuted leading-relaxed">An immersive XP system that calculates points based on quiz performance and streak multipliers. Users can unlock levels and badges to stay motivated.</p>
+                      </div>
+                  </div>
+
+                  <div className="text-center pt-6 border-t border-white/10">
+                      <button 
+                          onClick={() => {
+                              closeModal();
+                              navigate('/docs');
+                          }}
+                          className="px-8 py-4 rounded-xl bg-gradient-main text-white font-bold text-lg hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all inline-flex items-center gap-2"
+                      >
+                          View Full Documentation <ArrowRight size={20}/>
+                      </button>
                   </div>
               </div>
             )}
@@ -753,7 +765,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                    </div>
                    
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                       <a href="mailto:support@skillverse.com" className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group">
+                       <a href="mailto:khushinayak127@gmail.com" className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group">
                            <div className="p-3 bg-white dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform">
                                <Mail className="text-textMain" size={24} />
                            </div>
@@ -762,7 +774,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                                <div className="text-xs text-textMuted">Get a response in 24h</div>
                            </div>
                        </a>
-                       <button className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group">
+                       <button 
+                           onClick={() => document.getElementById('ai-assistant-toggle')?.click()}
+                           className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group text-left"
+                       >
                             <div className="p-3 bg-white dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform">
                                <Bot className="text-textMain" size={24} />
                            </div>
@@ -815,13 +830,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                           { title: "Data Stored Locally", content: "We use local storage technologies to ensure your progress is saved instantly without server latency. Your quiz scores and preferences primarily reside on your device." },
                           { title: "No Third-Party Tracking", content: "Your learning habits are your business. We do not sell or share your behavioral data with advertisers or third-party brokers." },
                           { title: "User Control", content: "You maintain full ownership of your data. You can export, reset, or permanently clear your learning history at any time from the Settings menu." }
-                       ].map((s, i) => (
-                          <div key={i} className="animate-fade-in-up group" style={{ animationDelay: `${i * 100}ms` }}>
+                       ].map((s, i) => {
+                          const delayClass = i === 0 ? 'delay-0' : i === 1 ? 'delay-[100ms]' : 'delay-[200ms]';
+                          return (
+                          <div key={i} className={`animate-fade-in-up group ${delayClass}`}>
                              <h3 className="font-bold text-textMain mb-2 text-lg">{s.title}</h3>
                              <p className="text-textMuted leading-relaxed">{s.content}</p>
                              <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mt-6 w-0 group-hover:w-full transition-all duration-1000 ease-out"></div>
                           </div>
-                       ))}
+                          );
+                       })}
                    </div>
                 </div>
             )}
@@ -989,6 +1007,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </div>
         </div>
       )}
+      <AIAssistant courseContext="SkillVerse Platform" courseTitle="SkillVerse Help Center" />
     </div>
   );
 };

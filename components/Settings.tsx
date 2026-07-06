@@ -82,9 +82,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
     </button>
   );
 
-  const Toggle = ({ checked, onChange }: { checked: boolean, onChange: (v: boolean) => void }) => (
+  const Toggle = ({ checked, onChange, ariaLabel = 'Toggle setting' }: { checked: boolean, onChange: (v: boolean) => void, ariaLabel?: string }) => (
     <button
       onClick={() => onChange(!checked)}
+      aria-label={ariaLabel}
+      title={ariaLabel}
       className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none ${checked ? 'bg-primaryLight shadow-[0_0_10px_rgba(207,152,147,0.4)]' : 'bg-black/10 dark:bg-white/10'}`}
     >
       <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 shadow-sm ${checked ? 'left-7' : 'left-1'}`} />
@@ -97,8 +99,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
-        <div className="lg:col-span-1">
-          <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-4 sticky top-24">
+        <div className="lg:col-span-1 sticky top-24 self-start">
+          <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-4">
             <TabButton id="profile" icon={User} label="Profile" />
             <TabButton id="appearance" icon={Palette} label="Appearance" />
             <TabButton id="learning" icon={BookOpen} label="Learning" />
@@ -143,20 +145,26 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Display Name</label>
+                    <label htmlFor="profileUsername" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Display Name</label>
                     <input 
+                      id="profileUsername"
                       type="text" 
                       value={formData.username}
                       onChange={(e) => handleProfileChange('username', e.target.value)}
+                      title="Display Name"
+                      placeholder="Enter display name"
                       className="w-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Email Address</label>
+                    <label htmlFor="profileEmail" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Email Address</label>
                     <input 
+                      id="profileEmail"
                       type="email" 
                       value={formData.email}
                       onChange={(e) => handleProfileChange('email', e.target.value)}
+                      title="Email Address"
+                      placeholder="Enter email address"
                       className="w-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
@@ -200,8 +208,9 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
                  </div>
 
                  <div className="space-y-4">
-                    <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Gradient Intensity</label>
+                    <label htmlFor="gradientIntensity" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Gradient Intensity</label>
                     <input 
+                      id="gradientIntensity"
                       type="range" 
                       min="0" max="100" 
                       value={formData.settings.gradientIntensity === 'low' ? 30 : formData.settings.gradientIntensity === 'medium' ? 60 : 90}
@@ -209,6 +218,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
                          const val = Number(e.target.value);
                          handleChange('gradientIntensity', val < 40 ? 'low' : val < 70 ? 'medium' : 'high');
                       }}
+                      title="Gradient Intensity"
+                      placeholder="Gradient Intensity"
                       className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primaryLight"
                     />
                     <div className="flex justify-between text-xs text-textMuted">
@@ -235,13 +246,16 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
                 </h2>
 
                 <div className="space-y-2">
-                   <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Daily Study Goal</label>
+                   <label htmlFor="dailyGoal" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Daily Study Goal</label>
                    <div className="flex items-center gap-4">
                       <input 
+                        id="dailyGoal"
                         type="range" 
                         min="10" max="120" step="10"
                         value={formData.settings.dailyGoal}
                         onChange={(e) => handleChange('dailyGoal', Number(e.target.value))}
+                        title="Daily Study Goal"
+                        placeholder="Daily Study Goal"
                         className="flex-1 h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primaryLight"
                       />
                       <span className="w-24 text-center font-mono text-textMain bg-white/50 dark:bg-white/5 py-2 rounded-lg border border-black/5 dark:border-white/10">

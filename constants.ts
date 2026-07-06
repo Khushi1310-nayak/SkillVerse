@@ -249,47 +249,94 @@ export const COURSES: Course[] = [
 
 // --- CAREER MODE DATA ---
 
+const TOPIC_QUESTION_MAP: Record<string, string[]> = {
+  'Graph Algorithms': ['Implement Dijkstra\'s Algorithm', 'Find the shortest path in a 2D grid', 'Detect a cycle in a directed graph', 'Clone a Graph', 'Course Schedule (Topological Sort)'],
+  'System Design': ['Design a URL Shortener (TinyURL)', 'Design a Rate Limiter', 'Design Twitter/X Feed', 'Design a Key-Value Store', 'Design Uber/Lyft backend'],
+  'Arrays & Strings': ['Two Sum', 'Longest Substring Without Repeating Characters', '3Sum', 'Container With Most Water', 'Valid Anagram'],
+  'OOP Design': ['Design a Parking Lot', 'Design an Elevator System', 'Design a Deck of Cards', 'Design a Library Management System', 'Design a Vending Machine'],
+  'Leadership Principles': ['Tell me about a time you showed customer obsession', 'When did you disagree and commit?', 'Describe a time you delivered results under pressure', 'How do you invent and simplify?', 'Give an example of deep diving into a problem'],
+  'Trees': ['Invert a Binary Tree', 'Maximum Depth of Binary Tree', 'Serialize and Deserialize Binary Tree', 'Lowest Common Ancestor of a BST', 'Binary Tree Level Order Traversal'],
+  'Recursion': ['Generate Parentheses', 'Letter Combinations of a Phone Number', 'Word Search', 'N-Queens Problem', 'Sudoku Solver'],
+  'Product Design': ['Design Instagram Stories', 'Design Facebook News Feed', 'Design WhatsApp Chat', 'Design TikTok Recommendation System', 'Design Airbnb Booking'],
+  'Hardware/OS': ['Explain Virtual Memory', 'How does a context switch work?', 'Design a Cache Replacement Policy (LRU)', 'Explain Mutex vs Semaphore', 'Interrupt Handling Lifecycle'],
+  'Linked Lists': ['Reverse a Linked List', 'Detect Cycle in a Linked List', 'Merge k Sorted Lists', 'LRU Cache Implementation', 'Copy List with Random Pointer'],
+  'Concurrency': ['Print FooBar Alternately', 'The Dining Philosophers Problem', 'Building H2O', 'Web Crawler Multithreaded', 'Thread-Safe Singleton in Java'],
+  'Real-time Systems': ['Design a real-time multiplayer game server', 'Design a stock ticker system', 'Design a live video streaming platform', 'Design a collaborative text editor', 'Handle million WebSockets concurrently'],
+  'Graphs': ['Number of Islands', 'Word Ladder', 'Alien Dictionary', 'Network Delay Time', 'Cheapest Flights Within K Stops'],
+  'Computational Geometry': ['Find if two line segments intersect', 'Convex Hull Algorithm', 'Point in Polygon', 'Closest Pair of Points', 'Area of intersection of two circles'],
+  'C++': ['Explain Virtual Functions and VTable', 'Implement shared_ptr from scratch', 'RAII principle in C++', 'Move semantics and rvalue references', 'Template Metaprogramming'],
+  'Database Design': ['Design database schema for Amazon', 'SQL vs NoSQL trade-offs', 'Explain Database Normalization (1NF to 3NF)', 'Design schema for a social network', 'Handling database migrations at scale'],
+  'Java': ['Explain Garbage Collection roots', 'ConcurrentHashMap internal working', 'Java Memory Model', 'CompletableFuture and ForkJoinPool', 'Spring Boot Dependency Injection'],
+  'Hash Maps': ['Design HashMap', 'Group Anagrams', 'Subarray Sum Equals K', 'Insert Delete GetRandom O(1)', 'Find All Anagrams in a String'],
+  'Dynamic Programming': ['Climbing Stairs', 'Coin Change', 'Longest Increasing Subsequence', 'Edit Distance', 'Regular Expression Matching'],
+  'Experience Design': ['Redesign the checkout flow', 'Improve accessibility of a web app', 'Design a dashboard for analytics', 'Optimize mobile app navigation', 'A/B testing strategies'],
+  'Streaming Architecture': ['Design Netflix video streaming', 'Design Spotify audio streaming', 'Handling buffering and latency', 'CDN architecture', 'Adaptive bitrate streaming'],
+  'Mobile': ['iOS App Lifecycle', 'Android Activity vs Fragment', 'React Native Bridge architecture', 'Mobile offline storage sync', 'Memory management on iOS'],
+  'Embedded Systems': ['Write an I2C driver', 'Handling hardware interrupts in C', 'Real-Time Operating System (RTOS) scheduling', 'Watchdog timer implementation', 'Optimizing battery life in firmware'],
+  'C/C++': ['Memory alignment and padding', 'Volatile keyword', 'Implement malloc/free', 'Pointer arithmetic', 'Inline assembly'],
+  'Distributed Systems': ['Paxos vs Raft consensus', 'Consistent Hashing', 'Vector Clocks', 'CAP Theorem practical application', 'Distributed Tracing'],
+  'Scala': ['Pattern matching in Scala', 'Akka Actor Model', 'Immutability and side effects', 'Tail recursion', 'Implicit parameters'],
+  'Social Graphs': ['Suggest friends algorithm', 'Find degree of separation between users', 'Graph database vs Relational DB', 'Calculate PageRank', 'Handling billion-node graphs'],
+  'Big Data': ['MapReduce word count', 'Design a data pipeline (Kafka/Spark)', 'Lambda vs Kappa architecture', 'Data warehousing (Snowflake/Redshift)', 'Handling stream processing late data'],
+  'Database Internals': ['B-Tree vs B+Tree', 'Write-Ahead Logging (WAL)', 'ACID transactions implementation', 'Multiversion Concurrency Control (MVCC)', 'Query optimizer phases'],
+  'Cloud': ['AWS IAM architecture', 'Kubernetes pod lifecycle', 'Serverless cold start mitigation', 'Designing a multi-region active-active architecture', 'VPC peering and subnets'],
+  'Mainframe/Legacy': ['COBOL integration strategies', 'Migrating DB2 to Cloud', 'Mainframe batch processing', 'CICS transactions', 'EBCDIC to ASCII conversion'],
+  'AI': ['Design a recommendation engine', 'Deploying LLMs at scale', 'Model quantization', 'Vector database architecture', 'Handling GPU memory limits'],
+  'Low-level optimization': ['SIMD instructions', 'Cache line bouncing', 'Branch prediction optimization', 'Loop unrolling', 'Data oriented design'],
+  'Hardware': ['CPU pipeline stages', 'FPGA vs ASIC', 'Cache coherence protocols (MESI)', 'Memory hierarchy', 'PCIe bus architecture'],
+  'GPU Architecture': ['CUDA thread blocks and grid', 'Shared memory vs Global memory', 'Warp divergence', 'Tensor Cores', 'Memory coalescing'],
+  'Parallel Computing': ['Amdahl\'s Law calculation', 'Message Passing Interface (MPI)', 'OpenMP pragmas', 'Deadlock avoidance', 'Lock-free data structures'],
+  'Data Processing': ['ETL pipeline design', 'Handling skewed data in Spark', 'Data lakes vs Data warehouses', 'Real-time vs Batch processing', 'Schema evolution'],
+  'Algorithms': ['KMP String Matching', 'A* Search Algorithm', 'Tarjan\'s SCC', 'Kruskal vs Prim MST', 'Suffix Arrays']
+};
+
 const generateQuestionsForCompany = (companyId: string, focus: string[]): InterviewQuestion[] => {
   const diffs: ('Easy' | 'Medium' | 'Hard')[] = ['Easy', 'Easy', 'Medium', 'Medium', 'Medium', 'Medium', 'Hard', 'Hard', 'Hard', 'Hard'];
   
-  return Array.from({ length: 10 }).map((_, i) => ({
-    id: `${companyId}-q${i + 1}`,
-    title: i % 2 === 0 
-      ? `Solve this ${focus[0]} problem: Invert a Binary Tree` 
-      : `Explain ${focus[1]} concepts in a real-world scenario`,
-    difficulty: diffs[i],
-    tags: [focus[0], focus[1] || 'General'],
-    answer: `
-      <p><strong>Approach:</strong></p>
-      <p>To solve this problem effectively, you should start by clarifying constraints. Then, propose a brute force solution followed by an optimized approach using hash maps or two pointers.</p>
-      <p><strong>Key Takeaways:</strong></p>
-      <ul><li>Time Complexity: O(n)</li><li>Space Complexity: O(1)</li></ul>
-    `,
-    resourceLink: 'https://leetcode.com',
-  }));
+  // Mix questions from both focus tags, fallback to generic if tag missing
+  const questionsList1 = TOPIC_QUESTION_MAP[focus[0]] || ['Explain core concept', 'Solve basic problem', 'Design system component', 'Optimize algorithm', 'Debug edge case'];
+  const questionsList2 = TOPIC_QUESTION_MAP[focus[1]] || questionsList1;
+  
+  const allQuestions = [...questionsList1, ...questionsList2];
+  
+  return Array.from({ length: 10 }).map((_, i) => {
+    // Pick a random question title from the combined pool
+    const randomTitle = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+    return {
+      id: `${companyId}-q${i + 1}`,
+      title: randomTitle,
+      difficulty: diffs[i],
+      tags: [focus[i % 2 === 0 ? 0 : 1] || 'General'],
+      answer: `
+        <p><strong>Approach:</strong></p>
+        <p>Start by clarifying constraints. Discuss trade-offs before writing code. For system design, draw the high-level architecture first.</p>
+      `,
+      resourceLink: 'https://leetcode.com',
+    };
+  });
 };
 
 const COMPANY_LIST = [
-  { name: 'Google', focus: ['Graph Algorithms', 'System Design'] },
-  { name: 'Microsoft', focus: ['Arrays & Strings', 'OOP Design'] },
-  { name: 'Amazon', focus: ['Leadership Principles', 'Trees'] },
-  { name: 'Meta', focus: ['Recursion', 'Product Design'] },
-  { name: 'Apple', focus: ['Hardware/OS', 'Linked Lists'] },
-  { name: 'Netflix', focus: ['Concurrency', 'System Design'] },
-  { name: 'Uber', focus: ['Real-time Systems', 'Graphs'] },
-  { name: 'Adobe', focus: ['Computational Geometry', 'C++'] },
-  { name: 'Salesforce', focus: ['Database Design', 'Java'] },
-  { name: 'Atlassian', focus: ['System Design', 'Hash Maps'] },
-  { name: 'Airbnb', focus: ['Dynamic Programming', 'Experience Design'] },
-  { name: 'Spotify', focus: ['Streaming Architecture', 'Mobile'] },
-  { name: 'Tesla', focus: ['Embedded Systems', 'C/C++'] },
-  { name: 'Twitter (X)', focus: ['Distributed Systems', 'Scala'] }, 
-  { name: 'LinkedIn', focus: ['Social Graphs', 'Big Data'] },
-  { name: 'Oracle', focus: ['Database Internals', 'Cloud'] },
-  { name: 'IBM', focus: ['Mainframe/Legacy', 'AI'] },
-  { name: 'Intel', focus: ['Low-level optimization', 'Hardware'] },
-  { name: 'Nvidia', focus: ['GPU Architecture', 'Parallel Computing'] },
-  { name: 'Palantir', focus: ['Data Processing', 'Algorithms'] },
+  { name: 'Google', focus: ['Graph Algorithms', 'System Design'], domain: 'google.com' },
+  { name: 'Microsoft', focus: ['Arrays & Strings', 'OOP Design'], domain: 'microsoft.com' },
+  { name: 'Amazon', focus: ['Leadership Principles', 'Trees'], domain: 'amazon.com' },
+  { name: 'Meta', focus: ['Recursion', 'Product Design'], domain: 'meta.com' },
+  { name: 'Apple', focus: ['Hardware/OS', 'Linked Lists'], domain: 'apple.com' },
+  { name: 'Netflix', focus: ['Concurrency', 'System Design'], domain: 'netflix.com' },
+  { name: 'Uber', focus: ['Real-time Systems', 'Graphs'], domain: 'uber.com' },
+  { name: 'Adobe', focus: ['Computational Geometry', 'C++'], domain: 'adobe.com' },
+  { name: 'Salesforce', focus: ['Database Design', 'Java'], domain: 'salesforce.com' },
+  { name: 'Atlassian', focus: ['System Design', 'Hash Maps'], domain: 'atlassian.com' },
+  { name: 'Airbnb', focus: ['Dynamic Programming', 'Experience Design'], domain: 'airbnb.com' },
+  { name: 'Spotify', focus: ['Streaming Architecture', 'Mobile'], domain: 'spotify.com' },
+  { name: 'Tesla', focus: ['Embedded Systems', 'C/C++'], domain: 'tesla.com' },
+  { name: 'Twitter (X)', focus: ['Distributed Systems', 'Scala'], domain: 'x.com' }, 
+  { name: 'LinkedIn', focus: ['Social Graphs', 'Big Data'], domain: 'linkedin.com' },
+  { name: 'Oracle', focus: ['Database Internals', 'Cloud'], domain: 'oracle.com' },
+  { name: 'IBM', focus: ['Mainframe/Legacy', 'AI'], domain: 'ibm.com' },
+  { name: 'Intel', focus: ['Low-level optimization', 'Hardware'], domain: 'intel.com' },
+  { name: 'Nvidia', focus: ['GPU Architecture', 'Parallel Computing'], domain: 'nvidia.com' },
+  { name: 'Palantir', focus: ['Data Processing', 'Algorithms'], domain: 'palantir.com' },
 ];
 
 export const COMPANIES: Company[] = COMPANY_LIST.map(c => ({
@@ -303,3 +350,16 @@ export const COMPANIES: Company[] = COMPANY_LIST.map(c => ({
   focus: c.focus,
   questions: generateQuestionsForCompany(c.name.toLowerCase().replace(/\s+/g, '-'), c.focus),
 }));
+
+export const VOICE_INTERVIEW_QUESTIONS = [
+  "Tell me about a time you had to overcome a difficult technical challenge. How did you approach it?",
+  "Describe a situation where you had a disagreement with a team member. How was it resolved?",
+  "Where do you see yourself in your career five years from now?",
+  "What is your greatest professional achievement so far?",
+  "How do you handle tight deadlines and high-pressure situations?",
+  "Tell me about a time you had to learn a new technology or concept very quickly.",
+  "Why are you interested in working for our company specifically?",
+  "Describe your ideal work environment and team culture.",
+  "Tell me about a time you made a mistake at work. What did you learn from it?",
+  "How do you prioritize your tasks when you have multiple urgent deadlines?"
+];

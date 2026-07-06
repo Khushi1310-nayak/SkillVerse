@@ -19,10 +19,10 @@
             },
             colors: {
               background: 'var(--bg-background)',
-              primary: '#6968A6',
-              primaryLight: '#CF9893',
-              secondary: '#085078',
-              accent: '#CF9893',
+              primary: 'rgb(var(--color-primary) / <alpha-value>)',
+              primaryLight: 'rgb(var(--color-primary-light) / <alpha-value>)',
+              secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+              accent: 'rgb(var(--color-primary-light) / <alpha-value>)',
               textMain: 'var(--text-main)',
               textMuted: 'var(--text-muted)',
               success: '#6EE7B7',
@@ -30,8 +30,8 @@
             backgroundImage: {
               'glass': 'var(--glass-bg)',
               'glass-hover': 'var(--glass-hover)',
-              'gradient-main': 'linear-gradient(90deg, #6968A6 0%, #CF9893 100%)',
-              'gradient-sec': 'linear-gradient(90deg, #085078 0%, #6968A6 100%)',
+              'gradient-main': 'linear-gradient(90deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 100%)',
+              'gradient-sec': 'linear-gradient(90deg, rgb(var(--color-secondary)) 0%, rgb(var(--color-primary)) 100%)',
             },
             borderColor: {
               DEFAULT: 'var(--border-color)',
@@ -74,6 +74,11 @@
         --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
         --glass-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
         --border-color: rgba(148, 163, 184, 0.2);
+        
+        /* Theme Colors in RGB format (r g b) for Tailwind opacity support */
+        --color-primary: 105 104 166;
+        --color-primary-light: 207 152 147;
+        --color-secondary: 8 80 120;
       }
 
       .dark {
@@ -90,6 +95,24 @@
         background-color: var(--bg-background);
         color: var(--text-main);
         transition: background-color 0.5s ease, color 0.5s ease;
+      }
+
+      .bg-gradient-input {
+        background-image: linear-gradient(90deg, rgb(var(--color-primary) / 0.1) 0%, rgb(var(--color-primary-light) / 0.1) 100%);
+      }
+
+      .badge-hexagon {
+        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      }
+      .badge-hexagon-inner {
+        border: 1px solid rgba(245, 201, 122, 0.3);
+      }
+      .certificate-pattern {
+        background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+        background-size: 40px 40px;
+      }
+      .font-cursive {
+        font-family: cursive;
       }
 
       /* Custom Scrollbar */

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Printer, Share2, Award } from 'lucide-react';
+import { ArrowLeft, Printer, Share2, Award, CheckCircle, Loader2, Link as LinkIcon } from 'lucide-react';
 import { COURSES } from '../constants';
 import { storageService } from '../services/storageService';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export const Certificate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,8 +27,44 @@ export const Certificate: React.FC = () => {
     );
   }
 
-  const handlePrint = () => {
-    window.print();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0,3).toUpperCase()}-${progress.score}`;
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('certificate-container');
+    if (!element) return;
+    
+    setIsDownloading(true);
+    try {
+      // Temporarily remove shadow for clean print, ensure high scale for crispness
+      element.classList.remove('shadow-2xl');
+      const canvas = await html2canvas(element, { 
+         scale: 3, 
+         useCORS: true,
+         backgroundColor: '#0B1220'
+      });
+      element.classList.add('shadow-2xl');
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('landscape', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${course.title.replace(/\s+/g, '_')}_Certificate.pdf`);
+    } catch (err) {
+      console.error("Failed to generate PDF", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/credential/${credentialId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -35,12 +73,23 @@ export const Certificate: React.FC = () => {
         <Link to="/" className="flex items-center text-textMuted hover:text-textMain transition-colors">
           <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
         </Link>
-        <button 
-          onClick={handlePrint}
-          className="flex items-center gap-2 bg-gradient-main text-white px-6 py-2 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-medium"
-        >
-          <Printer size={18} /> Download / Print PDF
-        </button>
+        <div className="flex items-center gap-4">
+           <button 
+             onClick={handleCopyLink}
+             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/10 dark:border-white/10"
+           >
+             {copied ? <CheckCircle size={18} className="text-success" /> : <LinkIcon size={18} />}
+             {copied ? "Link Copied!" : "Copy Link"}
+           </button>
+           <button 
+             onClick={handleDownloadPDF}
+             disabled={isDownloading}
+             className="flex items-center gap-2 bg-gradient-main text-white px-6 py-2 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-medium disabled:opacity-50"
+           >
+             {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Printer size={18} />} 
+             {isDownloading ? "Generating PDF..." : "Download PDF"}
+           </button>
+        </div>
       </div>
 
       {/* Certificate Container */}
@@ -49,7 +98,7 @@ export const Certificate: React.FC = () => {
         className="relative w-full max-w-[1000px] aspect-[1.414/1] bg-gradient-to-br from-[#0B1220] to-[#1E293B] text-white shadow-2xl p-12 flex flex-col items-center justify-between overflow-hidden"
       >
         {/* Background Texture/Pattern */}
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+        <div className="absolute inset-0 opacity-5 certificate-pattern"></div>
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#6968A6] rounded-full blur-[150px] opacity-10 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#CF9893] rounded-full blur-[150px] opacity-10 pointer-events-none"></div>
 
@@ -109,7 +158,7 @@ export const Certificate: React.FC = () => {
              </div>
           </div>
           
-          <div className="flex flex-col items-center -mb-4">
+          <div className="flex flex-col items-center mb-2">
              <div className="relative">
                 <div className="absolute inset-0 bg-[#F5C97A] rounded-full blur-xl opacity-20"></div>
                 <div className="w-24 h-24 rounded-full border-2 border-[#F5C97A] flex items-center justify-center bg-[#0B1220] relative z-10">
@@ -121,12 +170,12 @@ export const Certificate: React.FC = () => {
                   </div>
                 </div>
              </div>
-             <div className="mt-2 font-mono text-xs text-gray-600">ID: {course.id.toUpperCase()}-{user.username.substring(0,3).toUpperCase()}</div>
+             <div className="mt-4 font-mono text-xs text-[#F5C97A] tracking-wider opacity-80">ID: {credentialId}</div>
           </div>
 
           <div className="text-center">
              <div className="mb-2 h-10 flex items-end justify-center">
-               <span className="font-handwriting text-2xl text-white opacity-80" style={{ fontFamily: 'cursive' }}>SkillVerse</span>
+               <span className="font-handwriting text-2xl text-white opacity-80 font-cursive">SkillVerse</span>
              </div>
              <div className="w-40 border-t border-[#6968A6]/50 pt-2">
                 <p className="text-xs font-bold uppercase text-gray-500 tracking-wider">Platform Director</p>

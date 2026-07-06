@@ -16,6 +16,8 @@ import { Onboarding } from './components/Onboarding';
 import { storageService } from './services/storageService';
 import { User } from './types';
 
+import { DocumentationPage } from './components/DocumentationPage';
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,48 +73,56 @@ function App() {
 
   return (
     <HashRouter>
-      {!user && !showAuth ? (
-        <LandingPage onGetStarted={() => setShowAuth(true)} />
-      ) : showOnboarding && user ? (
-        <Onboarding user={user} onComplete={handleOnboardingComplete} />
-      ) : (
-        <Layout user={user} onLogout={handleLogout}>
-          <Routes>
-            <Route 
-              path="/" 
-              element={user ? <Dashboard user={user} /> : <Auth onLogin={handleLogin} />} 
-            />
-            <Route 
-              path="/courses" 
-              element={user ? <CoursesList /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/career" 
-              element={user ? <CareerMode /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/certifications" 
-              element={user ? <CertificationsList /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/settings" 
-              element={user ? <Settings user={user} onUpdateUser={handleUpdateUser} onLogout={handleLogout} /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/category/:id" 
-              element={user ? <CategoryView /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/course/:id" 
-              element={user ? <CourseView /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/certificate/:id" 
-              element={user ? <Certificate /> : <Navigate to="/" />} 
-            />
-          </Routes>
-        </Layout>
-      )}
+      <Routes>
+        <Route path="/docs" element={<DocumentationPage />} />
+        <Route path="/*" element={
+          !user && !showAuth ? (
+            <LandingPage onGetStarted={() => setShowAuth(true)} />
+          ) : !user && showAuth ? (
+            <Auth onLogin={handleLogin} />
+          ) : showOnboarding && user ? (
+            <Onboarding user={user} onComplete={handleOnboardingComplete} />
+          ) : (
+            <Layout user={user!} onLogout={handleLogout}>
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={<Dashboard user={user} />} 
+                />
+                <Route 
+                  path="/courses" 
+                  element={<CoursesList />} 
+                />
+                <Route 
+                  path="/career" 
+                  element={<CareerMode />} 
+                />
+                <Route 
+                  path="/certifications" 
+                  element={<CertificationsList />} 
+                />
+                <Route 
+                  path="/settings" 
+                  element={<Settings user={user} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} 
+                />
+                <Route 
+                  path="/category/:id" 
+                  element={<CategoryView />} 
+                />
+                <Route 
+                  path="/course/:id" 
+                  element={<CourseView />} 
+                />
+                <Route 
+                  path="/certificate/:id" 
+                  element={<Certificate />} 
+                />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </Layout>
+          )
+        } />
+      </Routes>
     </HashRouter>
   );
 }

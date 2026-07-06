@@ -1,13 +1,72 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, Download, ExternalLink } from 'lucide-react';
+import { Award, Download, CheckCircle, Link as LinkIcon } from 'lucide-react';
 import { COURSES } from '../constants';
+import { Course } from '../types';
 import { storageService } from '../services/storageService';
+
+const BadgeCard: React.FC<{ course: Course, progress: any, user: any }> = ({ course, progress, user }) => {
+  const [copied, setCopied] = useState(false);
+  const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0,3).toUpperCase()}-${progress.score}`;
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/credential/${credentialId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+      <div className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden flex flex-col items-center text-center group hover:border-[#F5C97A]/50 transition-all shadow-xl">
+         {/* Beautiful Pentagon/Hexagon Badge */}
+         <div className="relative w-40 h-40 mb-6 drop-shadow-2xl group-hover:scale-105 transition-transform duration-500">
+            {/* Outer Gold Border */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F5C97A] via-[#D4AF37] to-[#AA7C11] badge-hexagon">
+            </div>
+            {/* Inner Dark Background */}
+            <div className="absolute inset-1 bg-gradient-to-br from-[#0B1220] to-[#1E293B] badge-hexagon">
+            </div>
+            {/* Inner Gold Accents */}
+            <div className="absolute inset-2 bg-gradient-to-br from-[#0B1220] to-[#1E293B] badge-hexagon badge-hexagon-inner">
+            </div>
+            
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+               <Award size={40} className="text-[#F5C97A] mb-1" />
+               <div className="text-[10px] font-bold text-white tracking-widest uppercase mt-2 leading-tight">
+                  {course.title}
+               </div>
+            </div>
+         </div>
+         
+         <h3 className="text-xl font-bold text-textMain mb-1">{course.title} Certified</h3>
+         <div className="text-xs font-mono text-[#F5C97A] mb-2 tracking-wider">ID: {credentialId}</div>
+         <p className="text-sm text-textMuted mb-6">Issued {progress.completedDate}</p>
+         
+         <div className="flex gap-3 w-full">
+            <button 
+              onClick={handleCopyLink}
+              className="flex-1 bg-white/5 dark:bg-white/5 hover:bg-white/10 border border-black/10 dark:border-white/10 text-textMain py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors text-xs sm:text-sm"
+            >
+               {copied ? <CheckCircle size={16} className="text-success" /> : <LinkIcon size={16} />}
+               {copied ? "Copied" : "Copy Link"}
+            </button>
+            <Link 
+              to={`/certificate/${course.id}`}
+              className="flex-1 bg-gradient-main text-white py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium hover:shadow-lg transition-all text-xs sm:text-sm"
+            >
+               <Download size={16} /> Certificate
+            </Link>
+         </div>
+      </div>
+  );
+};
 
 export const CertificationsList: React.FC = () => {
   const progress = storageService.getAllProgress();
   const passedCourses = progress.filter(p => p.passed);
   const user = storageService.getUser();
+
+  if (!user) return null;
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -17,37 +76,12 @@ export const CertificationsList: React.FC = () => {
        </div>
 
        {passedCourses.length > 0 ? (
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {passedCourses.map(p => {
                const course = COURSES.find(c => c.id === p.courseId);
                if (!course) return null;
                
-               return (
-                 <div key={p.courseId} className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-primary/30 transition-all">
-                    {/* Abstract bg pattern */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
-                    
-                    <div className="relative z-10">
-                       <div className="w-16 h-16 rounded-full bg-gradient-main p-0.5 mb-6 shadow-lg shadow-primary/20">
-                          <div className="w-full h-full bg-background rounded-full flex items-center justify-center">
-                             <Award className="text-primaryLight" size={32} />
-                          </div>
-                       </div>
-                       
-                       <h3 className="text-2xl font-bold text-textMain mb-1">{course.title}</h3>
-                       <p className="text-sm text-textMuted mb-6">Completed on {p.completedDate}</p>
-                       
-                       <div className="flex gap-4">
-                          <Link 
-                            to={`/certificate/${course.id}`}
-                            className="flex-1 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 text-textMain py-3 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors"
-                          >
-                             <Download size={18} /> Download
-                          </Link>
-                       </div>
-                    </div>
-                 </div>
-               );
+               return <BadgeCard key={p.courseId} course={course} progress={p} user={user} />;
             })}
          </div>
        ) : (

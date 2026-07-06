@@ -42,9 +42,31 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
     } else {
       document.documentElement.classList.add('dark');
     }
-  }, [user?.settings?.theme]);
 
-  const gradientOpacity = user?.settings?.gradientIntensity === 'low' ? 0.3 : user?.settings?.gradientIntensity === 'high' ? 1.0 : 0.6;
+    // Colors must be space-separated RGB values for Tailwind opacity to work
+    let primary = '105 104 166'; // #6968A6
+    let primaryLight = '207 152 147'; // #CF9893
+
+    if (user?.settings?.gradientIntensity === 'low') {
+      // Subtle
+      primary = '139 138 174'; // #8b8aae
+      primaryLight = '220 189 187'; // #dcbdbb
+    } else if (user?.settings?.gradientIntensity === 'high') {
+      // Vibrant
+      primary = '81 78 204'; // #514ecc
+      primaryLight = '239 107 94'; // #ef6b5e
+    }
+
+    document.documentElement.style.setProperty('--color-primary', primary);
+    document.documentElement.style.setProperty('--color-primary-light', primaryLight);
+  }, [user?.settings?.theme, user?.settings?.gradientIntensity]);
+
+  const getOpacityClass = () => {
+    if (user?.settings?.gradientIntensity === 'low') return 'opacity-30';
+    if (user?.settings?.gradientIntensity === 'high') return 'opacity-100';
+    return 'opacity-60';
+  };
+  const opacityClass = getOpacityClass();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -53,15 +75,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       to={to}
       id={id}
       onClick={() => setMobileMenuOpen(false)}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 overflow-hidden
         ${isActive(to) 
           ? 'bg-gradient-main text-white shadow-lg shadow-primary/20' 
           : 'text-textMuted hover:bg-white/5 hover:text-textMain'
         }`}
     >
-      <Icon size={20} />
-      <span className="font-medium">{label}</span>
-      {isActive(to) && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white" />}
+      <div className="min-w-[20px] flex items-center justify-center"><Icon size={20} /></div>
+      
+      {/* For mobile, always show text */}
+      <span className="font-medium whitespace-nowrap lg:hidden">{label}</span>
+      
+      {/* For desktop, show text only when sidebar is hovered */}
+      <span className="font-medium whitespace-nowrap hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">{label}</span>
+      
+      {isActive(to) && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300" />}
     </Link>
   );
 
@@ -92,22 +120,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
        {/* Background Ambience */}
        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           <div 
-            className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] transition-opacity duration-700"
-            style={{ opacity: gradientOpacity }} 
+            className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
           />
           <div 
-            className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px] transition-opacity duration-700" 
-            style={{ opacity: gradientOpacity }}
+            className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
           />
         </div>
 
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex flex-col w-72 h-screen sticky top-0 border-r border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 p-6 shadow-2xl transition-colors duration-500">
-        <Link to="/" className="flex items-center gap-3 mb-12">
-           <div className="w-10 h-10 rounded-xl bg-gradient-main flex items-center justify-center text-white font-bold shadow-lg">
-              SV
+      <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
+        <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo">
+           <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
+              <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" />
            </div>
-           <span className="text-2xl font-display font-bold bg-gradient-main bg-clip-text text-transparent">
+           <span className="text-2xl font-display font-bold bg-gradient-main bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               SkillVerse
            </span>
         </Link>
@@ -120,24 +147,24 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <NavItem to="/settings" icon={Settings} label="Settings" id="nav-settings" />
         </nav>
 
-        <div className="pt-6 border-t border-black/5 dark:border-white/5">
-          <div className="flex items-center gap-3 px-4 py-3 mb-2" id="nav-user-profile">
+        <div className="pt-6 border-t border-black/5 dark:border-white/5 overflow-hidden">
+          <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
              <img 
                src={AVATARS[user.settings.avatarId || '1']} 
                alt="Avatar" 
-               className="w-10 h-10 rounded-full bg-white/10"
+               className="w-10 h-10 min-w-[40px] rounded-full bg-white/10"
              />
-             <div className="overflow-hidden">
+             <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="font-bold text-textMain truncate">{user.username}</div>
                 <div className="text-xs text-textMuted truncate">{user.email}</div>
              </div>
           </div>
           <button 
             onClick={() => setShowLogoutConfirm(true)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-red-500/10 hover:text-red-400 transition-all"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-red-500/10 hover:text-red-400 transition-all overflow-hidden"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Log Out</span>
+            <div className="min-w-[20px] flex items-center justify-center"><LogOut size={20} /></div>
+            <span className="font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Log Out</span>
           </button>
         </div>
       </aside>
@@ -145,7 +172,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 z-50">
          <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
-         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2">
+         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title="Open Menu" aria-label="Open Menu">
             <Menu />
          </button>
       </div>
@@ -157,7 +184,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-white/10 p-6 flex flex-col animate-slide-right">
              <div className="flex justify-between items-center mb-8">
                 <span className="text-xl font-bold text-textMain">Menu</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted"><X /></button>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title="Close Menu" aria-label="Close Menu"><X /></button>
              </div>
              <nav className="space-y-2 flex-1">
                 <NavItem to="/" icon={LayoutDashboard} label="Dashboard" />
@@ -177,7 +204,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 relative z-10 w-full lg:max-w-[calc(100vw-288px)]">
+      <main className="flex-1 relative z-10 w-full min-w-0 transition-all duration-300">
          <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
             {children}
          </div>

@@ -1,7 +1,4 @@
-<div align="center">
-
-# 🎓 SkillVerse
-### Advanced E-Learning Platform
+# 🎓 SkillVerse - Advanced E-Learning Platform
 
 *A modern, feature-rich E-learning platform designed to deliver a personalized, engaging, and career-focused learning experience.*
 
@@ -12,11 +9,9 @@
 ![Google Cloud Run](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
 ![Status](https://img.shields.io/badge/Project-Completed-success?style=for-the-badge)
 
-</div>
-
 ---
 
-# 📖 Overview
+## 📖 Overview
 
 SkillVerse combines structured learning, real interview preparation, gamification, analytics, certifications, and beautiful UX to simulate a **real SaaS product**, not just a demo app. 
 
@@ -24,7 +19,7 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ---
 
-# ✨ Features
+## ✨ Features
 
 - 🎯 **Smart Onboarding**: Animated question flow to personalize your learning path.
 - 📚 **Structured Courses**: Real learning resources, quizzes, and tracking.
@@ -38,7 +33,7 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ---
 
-# 🏗 Platform Architecture
+## 🏗 Platform Architecture
 
 ```text
                     User Request
@@ -71,33 +66,38 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ---
 
-# 🤖 Core Modules
+## 🤖 Core Modules
 
-## 🔐 Production-Grade Authentication
+### 🔐 Production-Grade Authentication
+
 Replaced basic local storage with a highly secure, scalable **Firebase Authentication** system:
 - Supports Email/Password, Google, and GitHub Sign In.
 - Strict password validation (12+ chars, special chars, no dictionary passwords).
 - Verification Wall (requires email verification before dashboard access).
 - Firestore integration for user document creation and last-login tracking.
 
-## 📚 Learning System
+### 📚 Learning System
+
 Categorized subjects (Programming, DSA, Design) containing structured notes, real resources, and integrated quizzes for progress tracking.
 
-## 💼 Career Mode
+### 💼 Career Mode
+
 Features 20 tech companies with at least 10 real interview questions per company. Includes difficulty tags, topic labels, trusted external resources, and a mock interview mode.
 
-## 🎮 Gamification & XP
+### 🎮 Gamification & XP
+
 Motivation-driven UX featuring an XP system for learning and practice, levels, streaks, achievement badges, and beautiful celebration animations.
 
-## 🎓 Certification System
+### 🎓 Certification System
+
 Generates professional certificates upon course completion. Features a user-friendly preview and allows users to download their certificate as a PDF using `html2canvas` and `jsPDF`.
 
 ---
 
-# 🛠 Tech Stack
+## 🛠 Tech Stack
 
 | Category | Technology |
-|----------|------------|
+| -------- | ---------- |
 | Language | TypeScript |
 | Frontend Framework | React |
 | Styling | Tailwind CSS |
@@ -112,52 +112,66 @@ Generates professional certificates upon course completion. Features a user-frie
 
 ---
 
-# 🖼 Screenshots
+## 🖼 Screenshots
 
 ### Landing Page
-<img width="1920" height="972" alt="Screenshot (1048)" src="https://github.com/user-attachments/assets/aad66e3b-2f8e-48af-bdc0-d4b344f60dc1" />
+
+![Landing Page](https://github.com/user-attachments/assets/aad66e3b-2f8e-48af-bdc0-d4b344f60dc1)
 
 ### Dashboard
-<img width="1920" height="965" alt="Screenshot (1049)" src="https://github.com/user-attachments/assets/85fcfe02-cbce-463f-be36-dcbc84701b66" />
+
+![Dashboard](https://github.com/user-attachments/assets/85fcfe02-cbce-463f-be36-dcbc84701b66)
 
 ### Courses
-<img width="1920" height="997" alt="Screenshot (1050)" src="https://github.com/user-attachments/assets/6c7ec17f-a3a9-4899-aa7d-7df48e5dd12a" />
+
+![Courses](https://github.com/user-attachments/assets/6c7ec17f-a3a9-4899-aa7d-7df48e5dd12a)
 
 ### Career Mode
-<img width="1920" height="976" alt="Screenshot (1051)" src="https://github.com/user-attachments/assets/db89a4f3-314f-4d4b-9317-c1dff3d16a9a" />
+
+![Career Mode](https://github.com/user-attachments/assets/db89a4f3-314f-4d4b-9317-c1dff3d16a9a)
 
 ### Certifications
-<img width="1920" height="972" alt="Screenshot (1052)" src="https://github.com/user-attachments/assets/d08b8533-9149-40a1-9f7b-7bfb1869916a" />
+
+![Certifications](https://github.com/user-attachments/assets/d08b8533-9149-40a1-9f7b-7bfb1869916a)
 
 ### Settings
-<img width="1920" height="944" alt="Screenshot (1053)" src="https://github.com/user-attachments/assets/7c4159f1-717c-4110-ac02-4a3d45e72db8" />
+
+![Settings](https://github.com/user-attachments/assets/7c4159f1-717c-4110-ac02-4a3d45e72db8)
 
 ---
 
-# ⚙️ Installation & Setup
+## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the repository
+
 ```bash
 git clone https://github.com/Khushi1310-nayak/SkillVerse.git
 ```
+
 ### 2️⃣ Navigate to the project
+
 ```bash
 cd skillverse
 ```
+
 ### 3️⃣ Install dependencies
+
 ```bash
 npm install
 ```
+
 ### 4️⃣ Start the development server
+
 ```bash
 npm run dev
 ```
 
 ---
 
-# 🤝 Contributions
+## 🤝 Contributions
 
 Contributions are welcome! If you’d like to improve UI, animations, features, or performance:
+
 1. Fork the repository
 2. Create a new branch
 3. Make your changes
@@ -167,15 +181,15 @@ Please keep code clean and well-documented ✨
 
 ---
 
-# 📜 License
+## 📜 License
 
 This project is licensed under the MIT License. You’re free to use, modify, and distribute it with attribution.
 
 ---
 
-# 👩‍💻 Author
+## 👩‍💻 Author
 
-## **Manisa Nayak**
+**Manisa Nayak**
 
 🎓 Student | Frontend Developer | UI/UX Enthusiast
 
@@ -186,12 +200,9 @@ Passionate about:
 
 ### Connect with Me
 
-**GitHub**
-https://github.com/Khushi1310-nayak
-
-**LinkedIn**
-https://www.linkedin.com/in/manisha-nayak-a74761328/
+- **GitHub**: [Khushi1310-nayak](https://github.com/Khushi1310-nayak)
+- **LinkedIn**: [manisha-nayak-a74761328](https://www.linkedin.com/in/manisha-nayak-a74761328/)
 
 ---
 
-## ⭐ If you found this project interesting, consider giving it a Star!
+### ⭐ If you found this project interesting, consider giving it a Star!

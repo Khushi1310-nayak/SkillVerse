@@ -35,7 +35,7 @@ const StylishLogo: React.FC<{ size?: number, className?: string }> = ({ size = 4
 // --------------------------------------------------------------------------------
 // FRAMER MOTION UTILS
 // --------------------------------------------------------------------------------
-const staggerContainer = {
+const staggerContainer: any = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -43,12 +43,12 @@ const staggerContainer = {
   }
 };
 
-const fadeInUp = {
+const fadeInUp: any = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 15 } }
 };
 
-const blurReveal = {
+const blurReveal: any = {
   hidden: { opacity: 0, filter: "blur(20px)", scale: 0.95 },
   show: { opacity: 1, filter: "blur(0px)", scale: 1, transition: { duration: 0.8, ease: "easeOut" } }
 };

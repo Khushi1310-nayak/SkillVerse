@@ -1,4 +1,8 @@
-# 🎓 SkillVerse - Advanced E-Learning Platform
+<div align="center">
+
+# 🎓 SkillVerse
+
+## Advanced E-Learning Platform
 
 *A modern, feature-rich E-learning platform designed to deliver a personalized, engaging, and career-focused learning experience.*
 
@@ -9,9 +13,11 @@
 ![Google Cloud Run](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
 ![Status](https://img.shields.io/badge/Project-Completed-success?style=for-the-badge)
 
+</div>
+
 ---
 
-## 📖 Overview
+# 📖 Overview
 
 SkillVerse combines structured learning, real interview preparation, gamification, analytics, certifications, and beautiful UX to simulate a **real SaaS product**, not just a demo app.
 
@@ -19,7 +25,7 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ---
 
-## ✨ Features
+# ✨ Features
 
 - 🎯 **Smart Onboarding**: Animated question flow to personalize your learning path.
 - 📚 **Structured Courses**: Real learning resources, quizzes, and tracking.
@@ -33,40 +39,56 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ---
 
-## 🏗 Platform Architecture
+# 🏗 Architecture
 
-```text
-                    User Request
-                         │
-                         ▼
-              SkillVerse Application
-                         │
- ┌─────────────┬──────────────┬──────────────┬─────────────┐
- │             │              │              │             │
- ▼             ▼              ▼              ▼             ▼
+```mermaid
+graph TD
+    Client["Client Browser (React SPA)"]
 
- Authentication    Learning       Career         Gamification  Settings &
- (Firebase)        Engine         Mode           System        Preferences
+    subgraph CloudRun ["Google Cloud Run (Hosting)"]
+        AppRouter["App.tsx (React Router)"]
+        
+        subgraph UI_Modules ["UI & Application Modules"]
+            AuthModule["Auth.tsx & Onboarding.tsx"]
+            DashModule["Dashboard.tsx"]
+            LearnModule["CourseView.tsx & CoursesList.tsx"]
+            CareerModule["CareerMode.tsx"]
+            AIAssistant["AIAssistant.tsx"]
+        end
+    end
 
-                         │
-                         ▼
+    subgraph Firebase ["Firebase Cloud Services"]
+        FirebaseAuth["Firebase Auth (Identity)"]
+        Firestore["Firestore DB (NoSQL)"]
+    end
+    
+    subgraph External ["External & Local Services"]
+        Gemini["Google Gemini API (AI Tutor)"]
+        PDF["jsPDF & html2canvas"]
+        LocalStorage["Browser LocalStorage (Cache)"]
+    end
 
-            Progress & Analytics Engine
-
-                         │
-                         ▼
-
-            Certificate Generation System
-
-                         │
-                         ▼
-
-            Personalized Dashboard & UI
+    Client -- "HTTP / UI Interactions" --> AppRouter
+    AppRouter --> AuthModule
+    AppRouter --> DashModule
+    AppRouter --> LearnModule
+    AppRouter --> CareerModule
+    
+    LearnModule --> AIAssistant
+    DashModule --> PDF
+    
+    AuthModule -- "Identity Verification" --> FirebaseAuth
+    DashModule -- "Read/Write Progress" --> Firestore
+    LearnModule -- "Track Completion" --> Firestore
+    CareerModule -- "Save Mock Scores" --> Firestore
+    
+    AIAssistant -- "Contextual Prompts" --> Gemini
+    UI_Modules -. "State Persistence" .-> LocalStorage
 ```
 
 ---
 
-## 🤖 Core Modules
+# 🤖 Core Modules
 
 ### 🔐 Production-Grade Authentication
 
@@ -95,73 +117,78 @@ Generates professional certificates upon course completion. Features a user-frie
 
 ---
 
-## 🛠 Tech Stack
+# 🛠 Tech Stack
 
 | Category | Technology |
 | -------- | ---------- |
-| Language | TypeScript |
-| Frontend Framework | React |
-| Styling | Tailwind CSS |
-| Animations | Framer Motion |
-| Routing | React Router |
-| Authentication | Firebase Auth |
-| Database | Firestore |
-| Certificate Generation | html2canvas & jsPDF |
-| Hosting | Google Cloud Run |
-| Build Tool | Vite |
-| Version Control | Git & GitHub |
+| **Frontend Framework** | React |
+| **Language** | TypeScript |
+| **Styling** | Tailwind CSS |
+| **Animations** | Framer Motion |
+| **Routing** | React Router |
+| **Authentication** | Firebase Auth |
+| **Database** | Firestore |
+| **Certificate Generation** | html2canvas & jsPDF |
+| **Hosting** | Google Cloud Run |
+| **Build Tool** | Vite |
+| **Version Control** | Git & GitHub |
 
 ---
 
-## 🖼 Screenshots
+# 📸 Screenshots
 
-### Landing Page
+## Landing Page
 
 ![Landing Page](https://github.com/user-attachments/assets/aad66e3b-2f8e-48af-bdc0-d4b344f60dc1)
 
-### Dashboard
+---
+
+## Dashboard
 
 ![Dashboard](https://github.com/user-attachments/assets/85fcfe02-cbce-463f-be36-dcbc84701b66)
 
-### Courses
+---
+
+## Courses
 
 ![Courses](https://github.com/user-attachments/assets/6c7ec17f-a3a9-4899-aa7d-7df48e5dd12a)
 
-### Career Mode
+---
+
+## Career Mode
 
 ![Career Mode](https://github.com/user-attachments/assets/db89a4f3-314f-4d4b-9317-c1dff3d16a9a)
 
-### Certifications
+---
+
+## Certifications
 
 ![Certifications](https://github.com/user-attachments/assets/d08b8533-9149-40a1-9f7b-7bfb1869916a)
 
-### Settings
+---
+
+## Settings
 
 ![Settings](https://github.com/user-attachments/assets/7c4159f1-717c-4110-ac02-4a3d45e72db8)
 
 ---
 
-## ⚙️ Installation & Setup
+# ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/Khushi1310-nayak/SkillVerse.git
-```
-
-### 2️⃣ Navigate to the project
-
-```bash
 cd skillverse
 ```
 
-### 3️⃣ Install dependencies
+## 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 4️⃣ Start the development server
+## 3. Start the development server
 
 ```bash
 npm run dev
@@ -169,7 +196,7 @@ npm run dev
 
 ---
 
-## 🤝 Contributions
+# 🤝 Contributing
 
 Contributions are welcome! If you’d like to improve UI, animations, features, or performance:
 
@@ -182,29 +209,28 @@ Please keep code clean and well-documented ✨
 
 ---
 
-## 📜 License
+# 📜 License
 
 This project is licensed under the MIT License. You’re free to use, modify, and distribute it with attribution.
 
 ---
 
-## 👩‍💻 Author
+# 👩💻 Author
 
-### Manisa Nayak
+## **Manisa Nayak**
 
-🎓 Student | Frontend Developer | UI/UX Enthusiast
+🎓 Student | Full-Stack Developer | AI Product Builder
 
 Passionate about:
-
-- Frontend Architecture
+- Full-Stack Architecture
 - User Experience (UI/UX)
-- Full Stack Development
+- AI Automation & Product Building
 
 ### Connect with Me
 
-- **GitHub**: [Khushi1310-nayak](https://github.com/Khushi1310-nayak)
-- **LinkedIn**: [manisha-nayak-a74761328](https://www.linkedin.com/in/manisha-nayak-a74761328/)
+**GitHub:** [Khushi1310-nayak](https://github.com/Khushi1310-nayak)  
+**LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisha-nayak-a74761328/)
 
 ---
 
-### ⭐ If you found this project interesting, consider giving it a Star
+### ⭐ If you found this project interesting, consider giving it a Star!

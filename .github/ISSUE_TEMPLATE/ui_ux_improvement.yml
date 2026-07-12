@@ -1,0 +1,23 @@
+name: 🎨 UI / UX Improvement
+description: Propose improvements to Tailwind CSS, Animations, or Responsive Design
+title: "[UI/UX]: <Short, descriptive title>"
+labels: ["ui-ux", "tailwind", "enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        SkillVerse follows a strict **Dark-Mode First, Glassmorphism** aesthetic. Ensure your proposals align with the existing styling configuration in `index.html`.
+  - type: textarea
+    id: improvement
+    attributes:
+      label: Visual Improvement Details
+      description: What visual component needs polish? (e.g., hover states, Framer Motion animations, mobile responsiveness)
+      placeholder: The `CourseView` card breaks layout on screens smaller than 375px because of rigid padding.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Screen Records
+      description: Please drag and drop screenshots showing the current issue.

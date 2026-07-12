@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/Khushi1310-nayak/SkillVerse/discussions
+    about: Ask questions, share ideas, and engage with the community here instead of opening an issue.
+  - name: 📖 Contribution Guidelines
+    url: https://github.com/Khushi1310-nayak/SkillVerse/blob/main/CONTRIBUTING.md
+    about: Read our guidelines before contributing to ensure your PR gets merged!

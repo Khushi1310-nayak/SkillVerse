@@ -1,0 +1,14 @@
+name: ⚡ Performance Improvement
+description: Optimize React re-renders, Vite bundles, or Firebase reads
+title: "[PERF]: <Short, descriptive title>"
+labels: ["performance", "enhancement"]
+assignees: []
+body:
+  - type: textarea
+    id: perf_issue
+    attributes:
+      label: Performance Bottleneck
+      description: Describe the bottleneck and how you measured it (e.g., React Profiler, Lighthouse).
+      placeholder: `LandingPage.tsx` re-renders 5 times on initial load due to unmemoized context values.
+    validations:
+      required: true

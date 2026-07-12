@@ -1,0 +1,32 @@
+name: ✨ Feature Request
+description: Propose a new feature, component, or learning module for SkillVerse
+title: "[FEATURE]: <Short, descriptive title>"
+labels: ["enhancement", "needs-discussion"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve SkillVerse! 
+        **Note:** We strongly prefer features that utilize our existing Firebase architecture and LocalStorage persistence. Please do not propose heavy backend migrations.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+      placeholder: I'm always frustrated when I can't filter mock interview questions by difficulty in CareerMode.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like. Be specific about the UI and React architecture.
+      placeholder: Add a Tailwind styled dropdown filter in `CareerMode.tsx` that filters the `questions` array based on `difficulty`.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.

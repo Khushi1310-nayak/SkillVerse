@@ -1,0 +1,14 @@
+name: ♿ Accessibility Improvement
+description: Improve ARIA labels, semantic HTML, or keyboard navigation
+title: "[A11Y]: <Short, descriptive title>"
+labels: ["a11y", "enhancement"]
+assignees: []
+body:
+  - type: textarea
+    id: a11y_issue
+    attributes:
+      label: Accessibility Issue
+      description: What accessibility standard is being violated?
+      placeholder: The icon-only buttons in `Settings.tsx` do not have aria-labels, making them invisible to screen readers.
+    validations:
+      required: true

@@ -1,0 +1,51 @@
+name: 🐞 Bug Report
+description: Report an issue, unexpected behavior, or crash in SkillVerse
+title: "[BUG]: <Short, descriptive title>"
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug in SkillVerse! Please ensure you have searched existing issues before submitting to avoid duplicates.
+  - type: input
+    id: ecsoc
+    attributes:
+      label: ECSoC 2026 Reference
+      description: Are you claiming this bug for Elite Coders Summer of Code? 
+      placeholder: "Yes / No"
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug. Include specific component names (e.g., `CareerMode.tsx`, `Auth.tsx`) if you know them.
+      placeholder: When I click the login button after entering invalid credentials, the app throws an unhandled Firebase error instead of showing the UI alert.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Go to '/login'
+        2. Enter 'test@test' as email and '123' as password
+        3. Click 'Sign In'
+        4. See console error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: Browser, OS, and Node version (if running locally)
+      placeholder: Chrome 114, Windows 11, Node v18
+    validations:
+      required: true

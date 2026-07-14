@@ -505,7 +505,7 @@ ${transcriptText}`;
             placeholder="Search companies (e.g. Google, Amazon)..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+            className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-slate-900 dark:text-textMain placeholder-slate-400 dark:placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
           />
        </div>
 

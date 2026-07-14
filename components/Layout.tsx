@@ -109,12 +109,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px]" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px]" />
         </div>
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10"><main id="main-content" tabIndex={-1}>{children}</main></div>
       </div>
     );
   }
 
   return (
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primaryLight"
+    >
+      Skip to main content
+    </a>
     <div className="min-h-screen font-sans text-textMain bg-background flex transition-colors duration-500">
        <GoldSnow />
        {/* Background Ambience */}
@@ -206,7 +212,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {/* Main Content */}
       <main className="flex-1 relative z-10 w-full min-w-0 transition-all duration-300">
          <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
-            {children}
+            <main id="main-content" tabIndex={-1}>{children}</main>
          </div>
       </main>
 

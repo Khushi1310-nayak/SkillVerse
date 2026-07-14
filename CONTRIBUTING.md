@@ -210,7 +210,7 @@ Use descriptive branch names prefixing the type of work:
 
 ## Issue Workflow
 
-- **Claiming Issues**: Do not start working on an issue without claiming it. Comment on the issue asking to be assigned.
+- **Claiming Issues**: Comment on the issue requesting assignment. Wait for a maintainer to assign the issue before beginning work. Pull requests for unassigned issues may be closed without review.
 - **Discussing Features**: For new features, open an issue first to discuss the idea with maintainers before writing code.
 - **Bug Reports**: Provide clear steps to reproduce, expected behavior, actual behavior, and browser/OS details.
 
@@ -275,7 +275,7 @@ Contributors who have their PRs merged will be highlighted in our repository's c
 
 For contributors participating in the **Elite Coders Summer of Code (ECSoC) 2026**:
 
-1. **Claim First**: You must claim an issue and be assigned to it before you begin working.
+1. **Claim First**: You must claim an issue, receive maintainer assignment, and only then begin work. PRs submitted without prior assignment may be closed.
 2. **Reference the Issue**: Your Pull Request must reference the issue number (e.g., `Fixes #12`).
 3. **Required Label**: Your PR must have the `ECSoC26` label. If you do not have permission to add labels, request a maintainer to add it for you before the PR is merged.
 4. **Keep PRs Focused**: Only submit changes related to the specific issue you claimed.

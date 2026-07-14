@@ -96,6 +96,25 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
     }
   };
 
+  // Keyboard navigation support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case 'ArrowRight':
+          handleNext();
+          break;
+        case 'ArrowLeft':
+          handlePrev();
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, onClose]);
+
   const currentSlide = SLIDES[currentIndex];
   const Icon = currentSlide.icon;
 

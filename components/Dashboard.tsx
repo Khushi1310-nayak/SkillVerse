@@ -117,7 +117,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
              placeholder="Search courses..." 
              value={searchQuery}
              onChange={(e) => setSearchQuery(e.target.value)}
-             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
            />
            {filteredCourses.length > 0 && (
              <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden">

@@ -510,16 +510,26 @@ ${transcriptText}`;
        </div>
 
        {/* Company Grid */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredCompanies.map(company => (
-            <CompanyCard 
-              key={company.id} 
-              company={company} 
-              progress={progress}
-              onClick={() => { setSelectedCompany(company); setActiveTab('study'); setMockState('idle'); }} 
-            />
-          ))}
-       </div>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+  {filteredCompanies.length > 0 ? (
+    filteredCompanies.map(company => (
+      <CompanyCard
+        key={company.id}
+        company={company}
+        progress={progress}
+        onClick={() => {
+          setSelectedCompany(company);
+          setActiveTab('study');
+          setMockState('idle');
+        }}
+      />
+    ))
+  ) : (
+    <div className="col-span-full text-center py-20 text-textMuted">
+      No companies found matching your criteria.
+    </div>
+  )}
+</div>
 
        {/* COMPANY MODAL - Uses Portal to escape sidebar stacking context */}
        {selectedCompany && createPortal(

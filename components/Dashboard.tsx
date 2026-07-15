@@ -119,21 +119,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
              onChange={(e) => setSearchQuery(e.target.value)}
              className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
            />
-           {filteredCourses.length > 0 && (
-             <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden">
-               {filteredCourses.map(course => (
-                 <Link 
-                   key={course.id} 
-                   to={`/course/${course.id}`}
-                   className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
-                 >
-                   <span className="text-textMain text-sm font-medium">{course.title}</span>
-                   <ChevronRight size={16} className="text-textMuted" />
-                 </Link>
-               ))}
-               <Link to="/courses" className="block p-3 text-center text-xs font-bold text-primaryLight uppercase tracking-wider bg-white/5 hover:bg-white/10">View All Results</Link>
-             </div>
-           )}
+           {searchQuery.trim() !== "" && (
+  <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden">
+    {filteredCourses.length > 0 ? (
+      <>
+        {filteredCourses.map(course => (
+          <Link
+            key={course.id}
+            to={`/course/${course.id}`}
+            className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+          >
+            <span className="text-textMain text-sm font-medium">{course.title}</span>
+            <ChevronRight size={16} className="text-textMuted" />
+          </Link>
+        ))}
+        <Link
+          to="/courses"
+          className="block p-3 text-center text-xs font-bold text-primaryLight uppercase tracking-wider bg-white/5 hover:bg-white/10"
+        >
+          View All Results
+        </Link>
+      </>
+    ) : (
+      <div className="p-4 text-center text-textMuted">
+        No courses found matching your criteria.
+      </div>
+    )}
+  </div>
+)}
         </div>
       </div>
 

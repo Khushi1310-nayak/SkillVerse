@@ -21,6 +21,21 @@ export interface UserSettings {
   learningStyle?: string;
 }
 
+export const DEFAULT_SETTINGS: UserSettings = {
+  theme: 'dark',
+  gradientIntensity: 'medium',
+  dailyGoal: 60,
+  reminders: true,
+  autoSave: true,
+  instantFeedback: true,
+  showAnswers: false,
+  retryQuiz: true,
+  certificateName: '',
+  avatarId: '1',
+  onboardingCompleted: false,
+  hasSeenTour: false
+};
+
 export interface User {
   username: string;
   email: string;

@@ -20,7 +20,7 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
 
 const AppRoutes = () => {
-  const { user, appUser, logout } = useAuth();
+  const { user, appUser, logout, updateUserSettings } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -32,14 +32,12 @@ const AppRoutes = () => {
      }
   }, [appUser]);
 
-  // Handle local mock update for settings changes until full firestore migration
-  const handleUpdateUser = (updatedUser: any) => {
-     // In a full migration, this would call a firestore update function
-     // For now, it satisfies the prop requirement for Settings component
+  const handleUpdateUser = async (updatedUser: any) => {
+     await updateUserSettings(updatedUser.settings);
   };
 
-  const handleOnboardingComplete = (updatedUser: any) => {
-      // In a full migration, this updates the user document in firestore
+  const handleOnboardingComplete = async (updatedUser: any) => {
+      await updateUserSettings(updatedUser.settings);
       setShowOnboarding(false);
   };
 

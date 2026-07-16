@@ -1,6 +1,7 @@
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { User } from "firebase/auth";
+import { DEFAULT_SETTINGS } from "../types";
 
 export const createUserDocument = async (user: User, username?: string) => {
   if (!user) return;
@@ -33,8 +34,7 @@ export const createUserDocument = async (user: User, username?: string) => {
         courses: [],
         badges: [],
         preferences: {
-            theme: "dark",
-            emailNotifications: true
+            settings: DEFAULT_SETTINGS
         }
       });
     } catch (error) {

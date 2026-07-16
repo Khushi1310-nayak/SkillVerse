@@ -10,12 +10,12 @@ import {
   signInWithPopup,
   updateProfile
 } from 'firebase/auth';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { googleProvider, githubProvider } from '../firebase/providers';
 import { createUserDocument } from '../services/authService';
 import { mapFirebaseError } from '../utils/firebaseErrors';
-import { User as AppUser, UserSettings } from '../types';
+import { User as AppUser, UserSettings, DEFAULT_SETTINGS } from '../types';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -29,24 +29,10 @@ interface AuthContextType {
   loginWithGithub: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
+  updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-const defaultSettings: UserSettings = {
-  theme: 'dark',
-  gradientIntensity: 'medium',
-  dailyGoal: 60,
-  reminders: true,
-  autoSave: true,
-  instantFeedback: true,
-  showAnswers: false,
-  retryQuiz: true,
-  certificateName: '',
-  avatarId: '1',
-  onboardingCompleted: false,
-  hasSeenTour: false
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -68,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-                settings: data.preferences?.settings || defaultSettings
+                settings: data.preferences?.settings || DEFAULT_SETTINGS
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -78,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: currentUser.displayName || "User",
                 email: currentUser.email || "",
                 enrolledDate: new Date().toISOString(),
-                settings: defaultSettings
+                settings: DEFAULT_SETTINGS
              });
              setLoading(false);
            }
@@ -162,6 +148,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
+    if (auth.currentUser) {
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      try {
+        await setDoc(
+          userRef,
+          {
+            preferences: {
+              settings: newSettings,
+            },
+          },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error("Error updating user settings:", error);
+      }
+    }
+  };
+
   const value = {
     user,
     appUser,
@@ -173,7 +178,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loginWithGoogle,
     loginWithGithub,
     resendVerificationEmail,
-    updateUserProfile
+    updateUserProfile,
+    updateUserSettings
   };
 
   return (

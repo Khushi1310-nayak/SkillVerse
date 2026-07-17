@@ -173,9 +173,6 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
       console.error("Error updating user settings:", error);
       throw error;
     }
-  }
-};
-
 const value = {
   user,
   appUser,

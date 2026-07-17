@@ -30,6 +30,8 @@ interface AuthContextType {
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
+updateUserAccount: (updatedUser: AppUser) => Promise<void>;  
+
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -167,6 +169,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+const updateUserAccount = async (updatedUser: AppUser) => {
+  if (auth.currentUser) {
+    const userRef = doc(db, "users", auth.currentUser.uid);
+
+    try {
+      // Keep Firebase Auth display name in sync
+      await updateProfile(auth.currentUser, {
+        displayName: updatedUser.username,
+      });
+
+      // Update Firestore document
+      await setDoc(
+        userRef,
+        {
+          username: updatedUser.username,
+          preferences: {
+            settings: updatedUser.settings,
+          },
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Error updating user account:", error);
+    }
+  }
+};  
+
   const value = {
     user,
     appUser,
@@ -179,7 +208,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loginWithGithub,
     resendVerificationEmail,
     updateUserProfile,
-    updateUserSettings
+    updateUserSettings,
+    updateUserAccount
   };
 
   return (

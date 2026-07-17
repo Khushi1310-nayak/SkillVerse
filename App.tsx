@@ -20,7 +20,7 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
 
 const AppRoutes = () => {
-  const { user, appUser, logout, updateUserSettings } = useAuth();
+  const { user, appUser, logout, updateUserSettings, updateUserAccount } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -33,7 +33,7 @@ const AppRoutes = () => {
   }, [appUser]);
 
   const handleUpdateUser = async (updatedUser: any) => {
-     await updateUserSettings(updatedUser.settings);
+     await updateUserAccount(updatedUser);
   };
 
   const handleOnboardingComplete = async (updatedUser: any) => {

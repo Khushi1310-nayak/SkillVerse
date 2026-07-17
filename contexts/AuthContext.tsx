@@ -151,6 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
     if (auth.currentUser) {
       const userRef = doc(db, "users", auth.currentUser.uid);
+ fix/firestore-settings-persistence
       // Merge with existing settings so partial updates don't overwrite the
       // entire preferences.settings object in Firestore (setDoc with merge:true
       // only shallow-merges at the top-level document, not nested objects).
@@ -158,19 +159,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...(appUser?.settings ?? DEFAULT_SETTINGS),
         ...newSettings,
       };
+=======
+\ main
       try {
         await setDoc(
           userRef,
           {
             preferences: {
+ fix/firestore-settings-persistence
               settings: mergedSettings,
+=======
+              settings: newSettings,
+ main
             },
           },
           { merge: true }
         );
       } catch (error) {
         console.error("Error updating user settings:", error);
+fix/firestore-settings-persistence
         throw error;
+=======
+ main
       }
     }
   };

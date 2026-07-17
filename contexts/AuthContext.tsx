@@ -148,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
- const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
+const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
   if (auth.currentUser) {
     const userRef = doc(db, "users", auth.currentUser.uid);
 
@@ -175,20 +175,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 };
-  const value = {
-    user,
-    appUser,
-    loading,
-    login,
-    signup,
-    logout,
-    resetPassword,
-    loginWithGoogle,
-    loginWithGithub,
-    resendVerificationEmail,
-    updateUserProfile,
-    updateUserSettings
-  };
+
+const value = {
+  user,
+  appUser,
+  loading,
+  login,
+  signup,
+  logout,
+  resetPassword,
+  loginWithGoogle,
+  loginWithGithub,
+  resendVerificationEmail,
+  updateUserProfile,
+  updateUserSettings
+};
 
   return (
     <AuthContext.Provider value={value}>

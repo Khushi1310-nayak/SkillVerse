@@ -159,7 +159,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...(appUser?.settings ?? DEFAULT_SETTINGS),
         ...newSettings,
       };
-=======
 \ main
       try {
         await setDoc(
@@ -168,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             preferences: {
  fix/firestore-settings-persistence
               settings: mergedSettings,
-=======
+
               settings: newSettings,
  main
             },
@@ -179,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error("Error updating user settings:", error);
 fix/firestore-settings-persistence
         throw error;
-=======
+
  main
       }
     }

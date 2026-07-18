@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { 
   X, ChevronRight, ChevronLeft, 
   LayoutDashboard, BookOpen, Briefcase, 
@@ -82,19 +82,19 @@ const SLIDES = [
 export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handleNext = () => {
-    if (currentIndex < SLIDES.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else {
+  const handleNext = useCallback(() => {
+  setCurrentIndex((prev) => {
+    if (prev >= SLIDES.length - 1) {
       onClose();
+      return prev;
     }
-  };
+    return Math.min(prev + 1, SLIDES.length - 1);
+  });
+}, [onClose]);
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-    }
-  };
+const handlePrev = useCallback(() => {
+  setCurrentIndex((prev) => Math.max(prev - 1, 0));
+}, []);
   useEffect(() => {
   const handleKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
@@ -103,10 +103,12 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
         break;
 
       case "ArrowRight":
+        event.preventDefault();
         handleNext();
         break;
 
       case "ArrowLeft":
+        event.preventDefault();
         handlePrev();
         break;
 
@@ -120,7 +122,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
   return () => {
     window.removeEventListener("keydown", handleKeyDown);
   };
-}, [currentIndex, onClose]);
+}, [handleNext, handlePrev, onClose]);
 
 
 

@@ -183,7 +183,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
                    <Palette className="text-primaryLight" /> Appearance
                  </h2>
 
-                 <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
                     <div className="flex items-center gap-3">
                        {formData.settings.theme === 'dark' ? <Moon size={24} className="text-purple-400" /> : <Sun size={24} className="text-yellow-400" />}
                        <div>
@@ -191,7 +191,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
                           <div className="text-sm text-textMuted">Toggle between dark and light mode</div>
                        </div>
                     </div>
-                    <div className="flex bg-black/5 dark:bg-black/30 rounded-lg p-1">
+                    <div className="flex self-start sm:self-auto bg-black/5 dark:bg-black/30 rounded-lg p-1 shrink-0">
                        <button 
                          onClick={() => handleChange('theme', 'light')}
                          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${formData.settings.theme === 'light' ? 'bg-white text-black shadow-md' : 'text-textMuted hover:text-textMain'}`}

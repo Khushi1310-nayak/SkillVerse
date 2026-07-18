@@ -95,6 +95,34 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
       setCurrentIndex(prev => prev - 1);
     }
   };
+  useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Escape":
+        onClose();
+        break;
+
+      case "ArrowRight":
+        handleNext();
+        break;
+
+      case "ArrowLeft":
+        handlePrev();
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [currentIndex, onClose]);
+
+
 
   const currentSlide = SLIDES[currentIndex];
   const Icon = currentSlide.icon;

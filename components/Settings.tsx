@@ -99,7 +99,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
-        <div className="lg:col-span-1 sticky top-24 self-start">
+        <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
           <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-4">
             <TabButton id="profile" icon={User} label="Profile" />
             <TabButton id="appearance" icon={Palette} label="Appearance" />

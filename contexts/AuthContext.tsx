@@ -30,6 +30,8 @@ interface AuthContextType {
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
+updateUserAccount: (updatedUser: AppUser) => Promise<void>;  
+
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -173,20 +175,50 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
       console.error("Error updating user settings:", error);
       throw error;
     }
-const value = {
-  user,
-  appUser,
-  loading,
-  login,
-  signup,
-  logout,
-  resetPassword,
-  loginWithGoogle,
-  loginWithGithub,
-  resendVerificationEmail,
-  updateUserProfile,
-  updateUserSettings
-};
+  };
+
+const updateUserAccount = async (updatedUser: AppUser) => {
+  if (auth.currentUser) {
+    const userRef = doc(db, "users", auth.currentUser.uid);
+
+    try {
+      // Keep Firebase Auth display name in sync
+      await updateProfile(auth.currentUser, {
+        displayName: updatedUser.username,
+      });
+
+      // Update Firestore document
+      await setDoc(
+        userRef,
+        {
+          username: updatedUser.username,
+          preferences: {
+            settings: updatedUser.settings,
+          },
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Error updating user account:", error);
+    }
+  }
+};  
+
+  const value = {
+    user,
+    appUser,
+    loading,
+    login,
+    signup,
+    logout,
+    resetPassword,
+    loginWithGoogle,
+    loginWithGithub,
+    resendVerificationEmail,
+    updateUserProfile,
+    updateUserSettings,
+    updateUserAccount
+  };
 
   return (
     <AuthContext.Provider value={value}>

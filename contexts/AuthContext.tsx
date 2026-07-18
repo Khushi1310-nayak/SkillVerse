@@ -151,80 +151,78 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
 const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
-  if (auth.currentUser) {
-    const userRef = doc(db, "users", auth.currentUser.uid);
+  if (!auth.currentUser) return;
 
-    // Merge with existing settings so partial updates don't overwrite
-    // the entire preferences.settings object.
-    const mergedSettings: UserSettings = {
-      ...(appUser?.settings ?? DEFAULT_SETTINGS),
-      ...newSettings,
-    };
+  const userRef = doc(db, "users", auth.currentUser.uid);
 
-    try {
-      await setDoc(
-        userRef,
-        {
-          preferences: {
-            settings: mergedSettings,
-          },
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      console.error("Error updating user settings:", error);
-      throw error;
-    }
+  const mergedSettings: UserSettings = {
+    ...(appUser?.settings ?? DEFAULT_SETTINGS),
+    ...newSettings,
   };
+
+  try {
+    await setDoc(
+      userRef,
+      {
+        preferences: {
+          settings: mergedSettings,
+        },
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Error updating user settings:", error);
+    throw error;
+  }
+};
 
 const updateUserAccount = async (updatedUser: AppUser) => {
-  if (auth.currentUser) {
-    const userRef = doc(db, "users", auth.currentUser.uid);
+  if (!auth.currentUser) return;
 
-    try {
-      // Keep Firebase Auth display name in sync
-      await updateProfile(auth.currentUser, {
-        displayName: updatedUser.username,
-      });
+  const userRef = doc(db, "users", auth.currentUser.uid);
 
-      // Update Firestore document
-      await setDoc(
-        userRef,
-        {
-          username: updatedUser.username,
-          preferences: {
-            settings: updatedUser.settings,
-          },
+  try {
+    await updateProfile(auth.currentUser, {
+      displayName: updatedUser.username,
+    });
+
+    await setDoc(
+      userRef,
+      {
+        username: updatedUser.username,
+        preferences: {
+          settings: updatedUser.settings,
         },
-        { merge: true }
-      );
-    } catch (error) {
-      console.error("Error updating user account:", error);
-    }
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Error updating user account:", error);
+    throw error;
   }
-};  
+};
 
-  const value = {
-    user,
-    appUser,
-    loading,
-    login,
-    signup,
-    logout,
-    resetPassword,
-    loginWithGoogle,
-    loginWithGithub,
-    resendVerificationEmail,
-    updateUserProfile,
-    updateUserSettings,
-    updateUserAccount
-  };
+const value: AuthContextType = {
+  user,
+  appUser,
+  loading,
+  login,
+  signup,
+  logout,
+  resetPassword,
+  loginWithGoogle,
+  loginWithGithub,
+  resendVerificationEmail,
+  updateUserProfile,
+  updateUserSettings,
+  updateUserAccount,
+};
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+return (
+  <AuthContext.Provider value={value}>
+    {!loading && children}
+  </AuthContext.Provider>
+);
 };
 
 export const useAuthContext = () => {
@@ -232,3 +230,4 @@ export const useAuthContext = () => {
   if (!context) throw new Error("useAuthContext must be used within an AuthProvider");
   return context;
 };
+

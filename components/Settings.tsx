@@ -9,7 +9,8 @@ import { User as UserType, UserSettings } from '../types';
 
 interface SettingsProps {
   user: UserType;
-  onUpdateUser: (user: UserType) => void;
+  onPreviewUpdate: (user: UserType) => void;
+  onUpdateUser: (user: UserType) => Promise<void>;
   onLogout: () => void;
 }
 
@@ -21,7 +22,7 @@ const AVATARS = [
   { id: '5', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha' },
 ];
 
-export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout }) => {
+export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpdateUser, onLogout }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState<UserType>(user);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, onLogout
 
     // Apply appearance settings immediately for live preview
     if (field === 'theme' || field === 'gradientIntensity') {
-      onUpdateUser(updatedUser);
+      onPreviewUpdate(updatedUser);
     }
   };
 

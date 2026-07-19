@@ -30,7 +30,8 @@ interface AuthContextType {
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
-updateUserAccount: (updatedUser: AppUser) => Promise<void>;  
+updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
+updateLocalUser: (updatedUser: AppUser) => void; 
 
 }
 
@@ -202,6 +203,10 @@ const updateUserAccount = async (updatedUser: AppUser) => {
   }
 };
 
+const updateLocalUser = (updatedUser: AppUser) => {
+  setAppUser(updatedUser);
+};
+
 const value: AuthContextType = {
   user,
   appUser,
@@ -216,6 +221,7 @@ const value: AuthContextType = {
   updateUserProfile,
   updateUserSettings,
   updateUserAccount,
+  updateLocalUser,
 };
 
 return (

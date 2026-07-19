@@ -20,7 +20,7 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
 
 const AppRoutes = () => {
-  const { user, appUser, logout, updateUserSettings, updateUserAccount } = useAuth();
+  const { user, appUser, logout, updateUserSettings, updateUserAccount, updateLocalUser, } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -35,6 +35,10 @@ const AppRoutes = () => {
   const handleUpdateUser = async (updatedUser: any) => {
      await updateUserAccount(updatedUser);
   };
+
+  const handlePreviewUpdate = (updatedUser: any) => {
+   updateLocalUser(updatedUser);
+};
 
   const handleOnboardingComplete = async (updatedUser: any) => {
       await updateUserSettings(updatedUser.settings);
@@ -75,7 +79,7 @@ const AppRoutes = () => {
                       <Route path="/courses" element={<CoursesList />} />
                       <Route path="/career" element={<CareerMode />} />
                       <Route path="/certifications" element={<CertificationsList />} />
-                      <Route path="/settings" element={<Settings user={appUser} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
+                      <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
                       <Route path="/category/:id" element={<CategoryView />} />
                       <Route path="/course/:id" element={<CourseView />} />
                       <Route path="/certificate/:id" element={<Certificate />} />

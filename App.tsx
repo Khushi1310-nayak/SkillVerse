@@ -14,7 +14,7 @@ import { CareerMode } from './components/CareerMode';
 import { Onboarding } from './components/Onboarding';
 import { CredentialVerification } from './components/CredentialVerification';
 import { DocumentationPage } from './components/DocumentationPage';
-import { AuthProvider } from './contexts/AuthContext';
+import { CustomCursor } from './components/CustomCursor';import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
@@ -96,6 +96,7 @@ function App() {
        <HashRouter>
           <AppRoutes />
        </HashRouter>
+       <CustomCursor />
     </AuthProvider>
   );
 }

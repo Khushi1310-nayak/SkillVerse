@@ -123,8 +123,14 @@
         font-family: cursive;
       }
 
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
+/* Custom Cursor: native cursor is hidden only when JS has confirmed
+         a non-touch device and mounted the custom cursor component */
+      .custom-cursor-active,
+      .custom-cursor-active * {
+        cursor: none !important;
+      }
+
+      /* Custom Scrollbar */      ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }

@@ -99,7 +99,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
-           <div className="flex items-center gap-4 mb-1">
+           <div className="flex flex-wrap items-center gap-3 mb-1">
                <h2 className="text-3xl font-display font-bold text-textMain">Dashboard</h2>
                <button 
                  onClick={() => setShowTour(true)}
@@ -153,18 +153,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Stats & Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Stats Card */}
-        <div id="dash-stats" className="lg:col-span-2 bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
+        <div id="dash-stats" className="lg:col-span-2 bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
           <div className="relative z-10">
             <h2 className="text-2xl font-bold text-textMain mb-2">Keep it up, {user.username}!</h2>
             <p className="text-textMuted mb-6 max-w-lg">
               You've completed <span className="text-textMain font-bold">{completedCount}</span> out of <span className="text-textMain font-bold">{totalCourses}</span> available courses.
             </p>
             
-            <div className="flex gap-4">
-               <Link to="/courses" className="px-6 py-2.5 bg-white/10 dark:bg-white/10 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/20 text-textMain rounded-lg font-medium transition-colors">
+            <div className="flex flex-wrap gap-4">
+               <Link to="/courses" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-white/10 dark:bg-white/10 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/20 text-textMain rounded-lg font-medium transition-colors">
                   Continue Learning
                </Link>
-               <Link to="/certifications" className="px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all">
+               <Link to="/certifications" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all">
                   View Certificates
                </Link>
             </div>
@@ -173,9 +173,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         {/* Progress Chart */}
-        <div id="dash-progress-chart" className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 flex flex-col">
+        <div id="dash-progress-chart" className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 flex flex-col">
           <h3 className="text-lg font-semibold text-textMain mb-6">Progress by Category</h3>
-          <div className="flex-1 flex items-end gap-4 min-h-[150px]">
+          <div className="flex-1 flex items-end gap-2 sm:gap-4 min-h-[130px] sm:min-h-[150px]">
             {chartData.map((data, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
                  <div className="relative w-full bg-black/5 dark:bg-white/5 rounded-t-lg h-32 flex items-end overflow-hidden">
@@ -186,7 +186,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                       `}
                     />
                  </div>
-                 <div className="text-xs text-textMuted text-center font-medium truncate w-full" title={data.label}>
+                 <div className="text-[10px] sm:text-xs text-textMuted text-center font-medium truncate w-full" title={data.label}>
                    {data.label.split(' ')[0]}
                  </div>
               </div>

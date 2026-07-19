@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
-
+import { ScrollToTop } from './ScrollToTop';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
@@ -237,6 +237,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
            </div>
         </div>
       )}
+      <ScrollToTop />
     </div>
   );
 };

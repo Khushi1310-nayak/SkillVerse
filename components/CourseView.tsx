@@ -6,14 +6,18 @@ import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
+import NotFound from './NotFound';
 
 export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const course = COURSES.find(c => c.id === id);
+  if (!course) {
+    return <NotFound />;
+  }
   const { appUser: user } = useAuth();
   const settings = user?.settings;
-  
+
   const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
@@ -24,29 +28,29 @@ export const CourseView: React.FC = () => {
   useEffect(() => {
     // Load existing progress
     if (id) {
-        const existing = storageService.getProgress(id);
-        if (existing && existing.passed) {
-            setPassed(true);
-            setScore(existing.score);
-            setQuizSubmitted(true);
-        } else if (settings?.autoSave) {
-            const saved = localStorage.getItem(`quizState_${id}`);
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.selectedAnswers) setSelectedAnswers(parsed.selectedAnswers);
-                    if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
-                    if (parsed.selectedAnswers && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
-                } catch(e) {}
-            }
+      const existing = storageService.getProgress(id);
+      if (existing && existing.passed) {
+        setPassed(true);
+        setScore(existing.score);
+        setQuizSubmitted(true);
+      } else if (settings?.autoSave) {
+        const saved = localStorage.getItem(`quizState_${id}`);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed.selectedAnswers) setSelectedAnswers(parsed.selectedAnswers);
+            if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
+            if (parsed.selectedAnswers && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
+          } catch (e) { }
         }
+      }
     }
   }, [id, settings?.autoSave]);
 
   useEffect(() => {
-     if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
-         localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
-     }
+    if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
+      localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
+    }
   }, [selectedAnswers, currentQuestion, id, settings?.autoSave, quizSubmitted]);
 
   if (!course) return <div>Course not found</div>;
@@ -91,9 +95,9 @@ export const CourseView: React.FC = () => {
   };
 
   const getProgressWidthClass = (current: number, total: number) => {
-     const percent = Math.round((current / total) * 100);
-     const rounded = Math.max(0, Math.min(100, Math.round(percent / 5) * 5));
-     const wMap: Record<number, string> = {
+    const percent = Math.round((current / total) * 100);
+    const rounded = Math.max(0, Math.min(100, Math.round(percent / 5) * 5));
+    const wMap: Record<number, string> = {
       0: 'w-0', 5: 'w-[5%]', 10: 'w-[10%]', 15: 'w-[15%]', 20: 'w-[20%]', 25: 'w-[25%]', 30: 'w-[30%]', 35: 'w-[35%]', 40: 'w-[40%]', 45: 'w-[45%]', 50: 'w-[50%]', 55: 'w-[55%]', 60: 'w-[60%]', 65: 'w-[65%]', 70: 'w-[70%]', 75: 'w-[75%]', 80: 'w-[80%]', 85: 'w-[85%]', 90: 'w-[90%]', 95: 'w-[95%]', 100: 'w-full'
     };
     return wMap[rounded];
@@ -111,42 +115,42 @@ export const CourseView: React.FC = () => {
         <Link to={`/category/${course.categoryId}`} className="inline-flex items-center text-textMuted hover:text-textMain transition-colors">
           <ArrowLeft size={20} className="mr-2" /> Back
         </Link>
-        
+
         <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 sticky top-28">
-           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
-              <BookOpen className="text-white" />
-           </div>
-           <h2 className="text-xl font-bold text-textMain mb-2">{course.title}</h2>
-           <div className="flex flex-col gap-2 mt-6">
-             <button 
-                onClick={() => setActiveTab('learn')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
-             >
-               <span>Notes & Resources</span>
-               {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
-             </button>
-             <button 
-                onClick={() => setActiveTab('quiz')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
-             >
-               <span>Final Quiz</span>
-               {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
-             </button>
-           </div>
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
+            <BookOpen className="text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-textMain mb-2">{course.title}</h2>
+          <div className="flex flex-col gap-2 mt-6">
+            <button
+              onClick={() => setActiveTab('learn')}
+              className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+            >
+              <span>Notes & Resources</span>
+              {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
+            </button>
+            <button
+              onClick={() => setActiveTab('quiz')}
+              className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+            >
+              <span>Final Quiz</span>
+              {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content Area */}
       <div className="lg:col-span-3">
         <div className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 md:p-12 min-h-[600px]">
-          
+
           {activeTab === 'learn' ? (
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
-                 {/* Dangerously setting HTML for this demo, in prod use a sanitizer */}
-                 <div dangerouslySetInnerHTML={{ __html: course.content }} />
+                {/* Dangerously setting HTML for this demo, in prod use a sanitizer */}
+                <div dangerouslySetInnerHTML={{ __html: course.content }} />
               </div>
-              
+
               <div className="border-t border-black/5 dark:border-white/10 pt-8 mt-12">
                 <h3 className="text-lg font-bold text-textMain mb-4">External Resources</h3>
                 <div className="flex flex-wrap gap-4">
@@ -159,7 +163,7 @@ export const CourseView: React.FC = () => {
               </div>
 
               <div className="flex justify-end pt-8">
-                <button 
+                <button
                   onClick={() => setActiveTab('quiz')}
                   className="bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
                 >
@@ -174,7 +178,7 @@ export const CourseView: React.FC = () => {
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-textMain">Question {currentQuestion + 1} <span className="text-textMuted text-lg">/ {course.quiz.length}</span></h2>
                     <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
-                       <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
+                      <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
                     </div>
                   </div>
 
@@ -190,21 +194,21 @@ export const CourseView: React.FC = () => {
                       const isCorrect = idx === course.quiz[currentQuestion].correctAnswer;
                       const showInstant = settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined;
 
-                      let btnClass = isSelected 
-                        ? 'bg-primary/20 border-primaryLight text-textMain' 
+                      let btnClass = isSelected
+                        ? 'bg-primary/20 border-primaryLight text-textMain'
                         : 'bg-white/50 dark:bg-white/5 border-black/5 dark:border-white/10 text-textMuted hover:bg-white/80 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20';
                       let iconBorder = isSelected ? 'border-primaryLight' : 'border-black/20 dark:border-white/20';
 
                       if (showInstant) {
-                         if (isCorrect) {
-                            btnClass = 'bg-success/20 border-success text-success';
-                            iconBorder = 'border-success';
-                         } else if (isSelected) {
-                            btnClass = 'bg-red-500/20 border-red-500 text-red-500';
-                            iconBorder = 'border-red-500';
-                         } else {
-                            btnClass = 'bg-white/5 dark:bg-white/5 border-transparent opacity-50';
-                         }
+                        if (isCorrect) {
+                          btnClass = 'bg-success/20 border-success text-success';
+                          iconBorder = 'border-success';
+                        } else if (isSelected) {
+                          btnClass = 'bg-red-500/20 border-red-500 text-red-500';
+                          iconBorder = 'border-red-500';
+                        } else {
+                          btnClass = 'bg-white/5 dark:bg-white/5 border-transparent opacity-50';
+                        }
                       }
 
                       return (
@@ -224,7 +228,7 @@ export const CourseView: React.FC = () => {
                   </div>
 
                   <div className="flex justify-between">
-                    <button 
+                    <button
                       onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
                       disabled={currentQuestion === 0}
                       className="px-6 py-2 rounded-lg text-textMuted hover:text-textMain disabled:opacity-50"
@@ -232,14 +236,14 @@ export const CourseView: React.FC = () => {
                       Previous
                     </button>
                     {currentQuestion < course.quiz.length - 1 ? (
-                      <button 
+                      <button
                         onClick={() => setCurrentQuestion(currentQuestion + 1)}
                         className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors"
                       >
                         Next
                       </button>
                     ) : (
-                      <button 
+                      <button
                         onClick={submitQuiz}
                         disabled={selectedAnswers.length < course.quiz.length}
                         className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -254,59 +258,59 @@ export const CourseView: React.FC = () => {
                   <div className="mb-6 inline-flex p-4 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10">
                     {passed ? <Award size={64} className="text-yellow-400" /> : <XCircle size={64} className="text-red-400" />}
                   </div>
-                  
+
                   <h2 className="text-3xl font-bold text-textMain mb-2">{passed ? 'Congratulations!' : 'Keep Trying!'}</h2>
                   <p className="text-textMuted mb-8">
-                    You scored <span className={`font-bold ${passed ? 'text-success' : 'text-red-400'}`}>{score}%</span>. 
+                    You scored <span className={`font-bold ${passed ? 'text-success' : 'text-red-400'}`}>{score}%</span>.
                     {passed ? ' You have earned a certificate.' : ' You need 70% to pass.'}
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     {passed ? (
-                       <Link 
-                         to={`/certificate/${course.id}`}
-                         className="flex items-center justify-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
-                       >
-                         <Download size={20} /> View Certificate
-                       </Link>
+                      <Link
+                        to={`/certificate/${course.id}`}
+                        className="flex items-center justify-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
+                      >
+                        <Download size={20} /> View Certificate
+                      </Link>
                     ) : (
-                       settings?.retryQuiz !== false ? (
-                           <button 
-                             onClick={resetQuiz}
-                             className="flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 text-textMain px-8 py-3 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                           >
-                             <RefreshCcw size={20} /> Retry Quiz
-                           </button>
-                       ) : (
-                           <p className="text-textMuted italic mt-4 w-full">Retrying quizzes is disabled in your settings.</p>
-                       )
+                      settings?.retryQuiz !== false ? (
+                        <button
+                          onClick={resetQuiz}
+                          className="flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 text-textMain px-8 py-3 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                        >
+                          <RefreshCcw size={20} /> Retry Quiz
+                        </button>
+                      ) : (
+                        <p className="text-textMuted italic mt-4 w-full">Retrying quizzes is disabled in your settings.</p>
+                      )
                     )}
                   </div>
-                  
+
                   {settings?.showAnswers && (
                     <div className="mt-16 space-y-6 text-left border-t border-black/5 dark:border-white/10 pt-10">
-                       <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Answers</h3>
-                       {course.quiz.map((q, qIdx) => (
-                          <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10">
-                             <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
-                             <div className="space-y-3">
-                               {q.options.map((opt, oIdx) => {
-                                  const isCorrect = oIdx === q.correctAnswer;
-                                  const isSelected = selectedAnswers[qIdx] === oIdx;
-                                  let colorClass = "text-textMuted";
-                                  if (isCorrect) colorClass = "text-success font-bold bg-success/10 p-2 rounded-lg";
-                                  else if (isSelected) colorClass = "text-red-500 line-through bg-red-500/10 p-2 rounded-lg";
+                      <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Answers</h3>
+                      {course.quiz.map((q, qIdx) => (
+                        <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10">
+                          <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
+                          <div className="space-y-3">
+                            {q.options.map((opt, oIdx) => {
+                              const isCorrect = oIdx === q.correctAnswer;
+                              const isSelected = selectedAnswers[qIdx] === oIdx;
+                              let colorClass = "text-textMuted";
+                              if (isCorrect) colorClass = "text-success font-bold bg-success/10 p-2 rounded-lg";
+                              else if (isSelected) colorClass = "text-red-500 line-through bg-red-500/10 p-2 rounded-lg";
 
-                                  return (
-                                    <div key={oIdx} className={`flex items-center gap-3 ${colorClass} ${(!isCorrect && !isSelected) ? 'p-2' : ''}`}>
-                                       {isCorrect ? <CheckCircle size={18} /> : isSelected ? <XCircle size={18} /> : <div className="w-[18px]" />}
-                                       <span>{opt}</span>
-                                    </div>
-                                  )
-                               })}
-                             </div>
+                              return (
+                                <div key={oIdx} className={`flex items-center gap-3 ${colorClass} ${(!isCorrect && !isSelected) ? 'p-2' : ''}`}>
+                                  {isCorrect ? <CheckCircle size={18} /> : isSelected ? <XCircle size={18} /> : <div className="w-[18px]" />}
+                                  <span>{opt}</span>
+                                </div>
+                              )
+                            })}
                           </div>
-                       ))}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

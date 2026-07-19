@@ -18,6 +18,7 @@ import { CustomCursor } from './components/CustomCursor';import { AuthProvider }
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
+import  NotFound  from './components/NotFound';
 
 const AppRoutes = () => {
   const { user, appUser, logout, updateUserSettings, updateUserAccount, updateLocalUser, } = useAuth();
@@ -83,7 +84,7 @@ const AppRoutes = () => {
                       <Route path="/category/:id" element={<CategoryView />} />
                       <Route path="/course/:id" element={<CourseView />} />
                       <Route path="/certificate/:id" element={<Certificate />} />
-                      <Route path="*" element={<Navigate to="/" />} />
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Layout>
               )}

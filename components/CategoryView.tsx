@@ -3,14 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, PlayCircle, Lock, ArrowLeft } from 'lucide-react';
 import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
+import NotFound from './NotFound';
 
 export const CategoryView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const category = CATEGORIES.find(c => c.id === id);
   const courses = COURSES.filter(c => c.categoryId === id);
   const progress = storageService.getAllProgress();
+  if (!category) {
+    return <NotFound />;
+  }
 
-  if (!category) return <div>Category not found</div>;
 
   return (
     <div className="animate-fade-in">
@@ -27,10 +30,10 @@ export const CategoryView: React.FC = () => {
         {courses.map(course => {
           const courseProgress = progress.find(p => p.courseId === course.id);
           const isPassed = courseProgress?.passed;
-          
+
           return (
-            <Link 
-              key={course.id} 
+            <Link
+              key={course.id}
               to={`/course/${course.id}`}
               className={`relative bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-white/40 hover:shadow-xl group overflow-hidden`}
             >
@@ -39,15 +42,14 @@ export const CategoryView: React.FC = () => {
                   <CheckCircle size={24} />
                 </div>
               )}
-              
+
               <div className="mb-4">
-                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                    course.level === 'Beginner' ? 'bg-emerald-500/20 text-emerald-500 dark:text-emerald-300' :
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${course.level === 'Beginner' ? 'bg-emerald-500/20 text-emerald-500 dark:text-emerald-300' :
                     course.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-500 dark:text-blue-300' :
-                    'bg-purple-500/20 text-purple-500 dark:text-purple-300'
-                 }`}>
-                   {course.level}
-                 </span>
+                      'bg-purple-500/20 text-purple-500 dark:text-purple-300'
+                  }`}>
+                  {course.level}
+                </span>
               </div>
 
               <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
@@ -63,10 +65,10 @@ export const CategoryView: React.FC = () => {
                   {isPassed ? 'Review' : 'Start'} <PlayCircle size={16} className="ml-2" />
                 </span>
               </div>
-              
+
               {/* Progress Bar at bottom */}
               <div className="absolute bottom-0 left-0 w-full h-1 bg-black/5 dark:bg-white/5">
-                 {isPassed && <div className="h-full bg-success w-full" />}
+                {isPassed && <div className="h-full bg-success w-full" />}
               </div>
             </Link>
           );

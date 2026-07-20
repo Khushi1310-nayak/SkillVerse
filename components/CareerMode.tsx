@@ -74,10 +74,10 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
   return (
     <div 
       onClick={onClick}
-      className="group bg-glass border border-black/5 dark:border-white/20 rounded-2xl p-6 cursor-pointer hover:bg-glass-hover hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden"
+      className="group bg-glass border border-black/5 dark:border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:bg-glass-hover hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden"
     >
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <div className="w-16 h-16 rounded-xl bg-white border border-black/5 p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
+      <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/5 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
            <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
@@ -89,8 +89,8 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
         </div>
       </div>
       
-      <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">{company.name}</h3>
-      <p className="text-sm text-textMuted mb-6 line-clamp-2">{company.description}</p>
+      <h3 className="text-lg sm:text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">{company.name}</h3>
+      <p className="text-sm text-textMuted mb-4 line-clamp-2">{company.description}</p>
       
       <div className="space-y-2">
          <div className="flex justify-between text-xs font-medium text-textMuted">

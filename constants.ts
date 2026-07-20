@@ -330,7 +330,7 @@ const COMPANY_LIST = [
   { name: 'Airbnb', focus: ['Dynamic Programming', 'Experience Design'], domain: 'airbnb.com' },
   { name: 'Spotify', focus: ['Streaming Architecture', 'Mobile'], domain: 'spotify.com' },
   { name: 'Tesla', focus: ['Embedded Systems', 'C/C++'], domain: 'tesla.com' },
-  { name: 'Twitter (X)', focus: ['Distributed Systems', 'Scala'], domain: 'x.com' }, 
+  { name: ' X (Twitter)', focus: ['Distributed Systems', 'Scala'], domain: 'x.com' }, 
   { name: 'LinkedIn', focus: ['Social Graphs', 'Big Data'], domain: 'linkedin.com' },
   { name: 'Oracle', focus: ['Database Internals', 'Cloud'], domain: 'oracle.com' },
   { name: 'IBM', focus: ['Mainframe/Legacy', 'AI'], domain: 'ibm.com' },

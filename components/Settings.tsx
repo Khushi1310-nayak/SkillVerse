@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   User, Palette, BookOpen, Brain, Award, Shield, 
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2, 
@@ -23,10 +23,15 @@ const AVATARS = [
 ];
 
 export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpdateUser, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(() => {
+  return localStorage.getItem('settings_active_tab') || 'profile';
+});
   const [formData, setFormData] = useState<UserType>(user);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | null }>({ type: null });
+  useEffect(() => {
+  localStorage.setItem('settings_active_tab', activeTab);
+}, [activeTab]);
 
   const handleChange = (field: keyof UserSettings, value: any) => {
     const updatedUser = {
@@ -71,7 +76,10 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
   const TabButton = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => (
     <button
-      onClick={() => setActiveTab(id)}
+      onClick={() => {
+        setActiveTab(id);
+        localStorage.setItem('settings_active_tab', id);
+      }}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left mb-1
         ${activeTab === id 
           ? 'bg-primary/10 text-primaryLight border border-primary/20 shadow-sm' 

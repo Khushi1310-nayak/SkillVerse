@@ -223,26 +223,21 @@ export const DocumentationPage: React.FC = () => {
 
             {activeSection === 'local-storage' && (
               <div className="animate-fade-in-up">
-                <h1 className="text-4xl md:text-5xl font-display font-bold text-textMain mb-6">Local Storage & Persistence</h1>
+                <h1 className="text-4xl md:text-5xl font-display font-bold text-textMain mb-6">Data Persistence</h1>
                 <p className="text-lg text-textMuted leading-relaxed mb-6">
-                  Because SkillVerse operates without a backend database, it relies on <code className="bg-white/10 px-1.5 py-0.5 rounded">localStorage</code> to manage user states, progress, and settings persistently across sessions.
+                  SkillVerse persists user settings in <code className="bg-white/10 px-1.5 py-0.5 rounded">Firebase Firestore</code> for seamless cross-device synchronization, while using <code className="bg-white/10 px-1.5 py-0.5 rounded">localStorage</code> for local course progress and career mode tracking.
                 </p>
                 <div className="bg-glass border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-xl font-bold text-textMain mb-4">storageService Object</h3>
+                  <h3 className="text-xl font-bold text-textMain mb-4">storageService & Firestore Integration</h3>
                   <p className="text-sm text-textMuted mb-4">
-                    The <code className="text-primaryLight">storageService</code> is responsible for serializing and deserializing the <code className="text-primaryLight">User</code> object. It holds:
+                    The <code className="text-primaryLight">storageService</code> coordinates with Firebase Auth and Firestore to persist and synchronize:
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-sm text-textMuted ml-2">
-                    <li>Basic User Data (Name, Email, Role)</li>
-                    <li>Course Progress Maps (courseId -&gt; Progress)</li>
-                    <li>Gamification Data (XP, Level, Streak)</li>
-                    <li>Earned Certificates</li>
-                    <li>User Settings (Theme, Notification preferences)</li>
+                    <li>User Settings (Theme, Gradient Intensity, Daily Goals, Quiz & Notification Preferences)</li>
+                    <li>Onboarding completion state and user goals (stored in Firestore)</li>
+                    <li>Course Progress & Quiz Scores (localStorage fallback)</li>
+                    <li>Earned Certificates & Career Mode Practice Data</li>
                   </ul>
-                  <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex gap-3">
-                    <Shield className="shrink-0" />
-                    <p>Since data is stored purely in the browser, clearing site data or accessing the application in Incognito mode will reset progress to default.</p>
-                  </div>
                 </div>
               </div>
             )}

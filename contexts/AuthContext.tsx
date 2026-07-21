@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-                settings: data.preferences?.settings || DEFAULT_SETTINGS
+                settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) }
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -154,12 +154,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
   if (!auth.currentUser) return;
 
+  const previousAppUser = appUser;
   const userRef = doc(db, "users", auth.currentUser.uid);
 
   const mergedSettings: UserSettings = {
     ...(appUser?.settings ?? DEFAULT_SETTINGS),
     ...newSettings,
   };
+
+  // Optimistic UI update
+  setAppUser(prev => prev ? { ...prev, settings: mergedSettings } : null);
 
   try {
     await setDoc(
@@ -172,6 +176,8 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
       { merge: true }
     );
   } catch (error) {
+    // Roll back optimistic state on failure
+    setAppUser(previousAppUser);
     console.error("Error updating user settings:", error);
     throw error;
   }
@@ -180,7 +186,11 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
 const updateUserAccount = async (updatedUser: AppUser) => {
   if (!auth.currentUser) return;
 
+  const previousAppUser = appUser;
   const userRef = doc(db, "users", auth.currentUser.uid);
+
+  // Optimistic UI update
+  setAppUser(updatedUser);
 
   try {
     await updateProfile(auth.currentUser, {
@@ -198,6 +208,8 @@ const updateUserAccount = async (updatedUser: AppUser) => {
       { merge: true }
     );
   } catch (error) {
+    // Roll back optimistic state on failure
+    setAppUser(previousAppUser);
     console.error("Error updating user account:", error);
     throw error;
   }

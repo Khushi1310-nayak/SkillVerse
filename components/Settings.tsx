@@ -55,10 +55,16 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     setTimeout(() => setToastMessage(null), 2000);
   };
 
-  const saveSettings = () => {
-    storageService.updateUser(formData);
-    onUpdateUser(formData);
-    showToast('Settings Saved Successfully');
+  const saveSettings = async () => {
+    try {
+      onPreviewUpdate(formData);
+      await storageService.updateUser(formData);
+      await onUpdateUser(formData);
+      showToast('Settings Saved Successfully');
+    } catch (error) {
+      console.error('Error saving user settings:', error);
+      showToast('Failed to Save Settings');
+    }
   };
 
   const handleResetProgress = () => {

@@ -64,11 +64,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     }
   };
 
-  const handleTourComplete = () => {
+  const handleTourComplete = async () => {
       setShowTour(false);
       // Persist that user has seen tour
       const updatedUser = { ...user, settings: { ...user.settings, hasSeenTour: true } };
-      storageService.updateUser(updatedUser);
+      try {
+        await storageService.updateUser(updatedUser);
+      } catch (error) {
+        console.error('Error persisting tour completion:', error);
+      }
   };
 
   const getPercentClass = (p: number, type: 'h' | 'w') => {

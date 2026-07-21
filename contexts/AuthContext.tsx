@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-                settings: data.preferences?.settings || DEFAULT_SETTINGS
+                settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) }
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -161,6 +161,9 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
     ...newSettings,
   };
 
+  // Optimistic UI update
+  setAppUser(prev => prev ? { ...prev, settings: mergedSettings } : null);
+
   try {
     await setDoc(
       userRef,
@@ -181,6 +184,9 @@ const updateUserAccount = async (updatedUser: AppUser) => {
   if (!auth.currentUser) return;
 
   const userRef = doc(db, "users", auth.currentUser.uid);
+
+  // Optimistic UI update
+  setAppUser(updatedUser);
 
   try {
     await updateProfile(auth.currentUser, {

@@ -1,3 +1,5 @@
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/firebase';
 import { Progress, CareerProgress } from '../types';
 
 const PROGRESS_KEY = 'skillverse_progress';
@@ -10,10 +12,27 @@ const DEFAULT_CAREER_PROGRESS: CareerProgress = {
 };
 
 export const storageService = {
-  updateUser: (user: any) => {
-    // TODO: Migrate settings updates to Firestore.
-    // For now, save locally so UI doesn't crash
-    localStorage.setItem('skillverse_temp_user_settings', JSON.stringify(user));
+  updateUser: async (user: any) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const userRef = doc(db, 'users', currentUser.uid);
+    const settingsToSave = user?.settings ?? user;
+
+    try {
+      await setDoc(
+        userRef,
+        {
+          preferences: {
+            settings: settingsToSave,
+          },
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error('Error updating user settings in Firestore:', error);
+      throw error;
+    }
   },
 
   // --- PROGRESS ---

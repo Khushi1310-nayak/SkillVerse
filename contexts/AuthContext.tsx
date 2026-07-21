@@ -154,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
   if (!auth.currentUser) return;
 
+  const previousAppUser = appUser;
   const userRef = doc(db, "users", auth.currentUser.uid);
 
   const mergedSettings: UserSettings = {
@@ -175,6 +176,8 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
       { merge: true }
     );
   } catch (error) {
+    // Roll back optimistic state on failure
+    setAppUser(previousAppUser);
     console.error("Error updating user settings:", error);
     throw error;
   }
@@ -183,6 +186,7 @@ const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
 const updateUserAccount = async (updatedUser: AppUser) => {
   if (!auth.currentUser) return;
 
+  const previousAppUser = appUser;
   const userRef = doc(db, "users", auth.currentUser.uid);
 
   // Optimistic UI update
@@ -204,6 +208,8 @@ const updateUserAccount = async (updatedUser: AppUser) => {
       { merge: true }
     );
   } catch (error) {
+    // Roll back optimistic state on failure
+    setAppUser(previousAppUser);
     console.error("Error updating user account:", error);
     throw error;
   }

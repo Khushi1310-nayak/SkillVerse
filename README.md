@@ -228,6 +228,16 @@ Please keep code clean and well-documented ✨
 
 ---
 
+# 🌟 Contributors
+
+Thank you to everyone who has contributed to SkillVerse! 
+
+<a href="https://github.com/Khushi1310-nayak/SkillVerse/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Khushi1310-nayak/SkillVerse" />
+</a>
+
+---
+
 # 📜 License
 
 This project is licensed under the MIT License. You’re free to use, modify, and distribute it with attribution.
@@ -248,7 +258,7 @@ Passionate about:
 ### Connect with Me
 
 **GitHub:** [Khushi1310-nayak](https://github.com/Khushi1310-nayak)  
-**LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisha-nayak-a74761328/)
+**LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisa-nayak-185bb5378/)
 
 ---
 

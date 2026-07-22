@@ -57,16 +57,6 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       - **Latest Updates (Epic 1 & 2)**: 
         - Epic 1 introduced a fluid Animated Custom Cursor with ripple effects across the entire site.
         - Epic 2 introduced the Real-Time Voice Interview mode (using Web Speech API), full-screen distraction-free locking, a 10-question dynamic limit, an "End Interview Early" bypass flow, and strict double-spaced, bulleted Markdown AI assessment reports.
-      - **Site Structure**:
-        - Dashboard: Main hub showing career progress, recommended courses, and active courses.
-        - Career Mode: Live mock interviews (both Voice and Text) for specific target companies.
-        - Certificates: Proof of completion for finished courses.
-        - Settings: User profile and onboarding data configuration.
-      - **Available Content**:
-        - Categories: ${CATEGORIES.map(c => c.title).join(', ')}.
-        - Companies for Interviews: ${COMPANIES.map(c => c.name).join(', ')}.
-        - Courses:
-${COURSES.map((c: any) => `          * ${c.title} (${c.level}): ${c.description}`).join('\n')}
       
       Goal: Make the user feel like they are chatting with a knowledgeable human tutor, not a robot reading a manual.`;
 

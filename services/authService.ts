@@ -21,7 +21,6 @@ export const createUserDocument = async (user: User, username?: string) => {
       await setDoc(userRef, {
         uid: user.uid,
         username: finalUsername,
-        email,
         photoURL: user.photoURL || "",
         provider: user.providerData[0]?.providerId || "password",
         createdAt: serverTimestamp(),

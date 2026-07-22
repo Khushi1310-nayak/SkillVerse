@@ -15,7 +15,7 @@ export const CourseView: React.FC = () => {
   if (!course) {
     return <NotFound />;
   }
-  const { appUser: user } = useAuth();
+  const { appUser: user, completeCourse } = useAuth();
   const settings = user?.settings;
 
   const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
@@ -127,6 +127,11 @@ export const CourseView: React.FC = () => {
       passed: isPassed,
       completedDate: new Date().toLocaleDateString()
     });
+
+    if (isPassed && !user?.courses?.includes(course.id)) {
+       // Only award XP if the user hasn't completed this course before
+       completeCourse(course.id, 100).catch(console.error);
+    }
   };
 
   const resetQuiz = () => {

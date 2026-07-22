@@ -10,7 +10,7 @@ import {
   signInWithPopup,
   updateProfile
 } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc, arrayUnion, increment } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { googleProvider, githubProvider } from '../firebase/providers';
 import { createUserDocument } from '../services/authService';
@@ -32,6 +32,7 @@ interface AuthContextType {
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
 updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
 updateLocalUser: (updatedUser: AppUser) => void; 
+completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
 
 }
 
@@ -57,7 +58,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-                settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) }
+                settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) },
+                xp: data.xp || 0,
+                level: data.level || 1,
+                courses: data.courses || []
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -67,7 +71,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: currentUser.displayName || "User",
                 email: currentUser.email || "",
                 enrolledDate: new Date().toISOString(),
-                settings: DEFAULT_SETTINGS
+                settings: DEFAULT_SETTINGS,
+                xp: 0,
+                level: 1,
+                courses: []
              });
              setLoading(false);
            }
@@ -219,6 +226,22 @@ const updateLocalUser = (updatedUser: AppUser) => {
   setAppUser(updatedUser);
 };
 
+const completeCourse = async (courseId: string, xpEarned: number) => {
+  if (!auth.currentUser) return;
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  try {
+    await setDoc(userRef, {
+      xp: increment(xpEarned),
+      courses: arrayUnion(courseId)
+    }, { merge: true });
+    
+    // Level up logic could be added here later, but for now we'll just handle XP
+  } catch (error) {
+    console.error("Error completing course:", error);
+    throw error;
+  }
+};
+
 const value: AuthContextType = {
   user,
   appUser,
@@ -234,6 +257,7 @@ const value: AuthContextType = {
   updateUserSettings,
   updateUserAccount,
   updateLocalUser,
+  completeCourse,
 };
 
 return (

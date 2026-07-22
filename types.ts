@@ -41,6 +41,9 @@ export interface User {
   email: string;
   enrolledDate: string;
   settings: UserSettings;
+  xp: number;
+  level: number;
+  courses: string[];
 }
 
 export interface Category {

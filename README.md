@@ -129,7 +129,7 @@ Generates professional certificates upon course completion. Features a user-frie
 | **Authentication** | Firebase Auth |
 | **Database** | Firestore |
 | **Certificate Generation** | html2canvas & jsPDF |
-| **Hosting** | Google Cloud Run |
+| **Hosting** | Vercel |
 | **Build Tool** | Vite |
 | **Version Control** | Git & GitHub |
 

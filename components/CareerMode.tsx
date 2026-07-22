@@ -11,7 +11,8 @@ import ReactMarkdown from 'react-markdown';
 import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress } from '../types';
-import { auth } from '../firebase/firebase';
+import { auth, db } from '../firebase/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 import { Typewriter } from './Typewriter';
 
 const getTimeOfDay = () => {
@@ -204,6 +205,8 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
 export const CareerMode: React.FC = () => {
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [companiesList, setCompaniesList] = useState<Company[]>(COMPANIES);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const [activeTab, setActiveTab] = useState<'study' | 'mock'>('study');
   
   // Mock Interview State
@@ -239,6 +242,36 @@ export const CareerMode: React.FC = () => {
     return () => clearInterval(interval);
   }, [mockState]);
 
+  // Fetch Live Firestore Companies
+  useEffect(() => {
+    const fetchLiveCompanies = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'companies'));
+        if (!snapshot.empty) {
+          const liveData = snapshot.docs.map(doc => {
+            const data = doc.data();
+            // find the original company icon/desc if it exists in local constants, else default
+            const localMatch = COMPANIES.find(c => c.name.toLowerCase() === data.name.toLowerCase());
+            return {
+              id: doc.id,
+              name: data.name || localMatch?.name || doc.id,
+              logo: localMatch?.logo || 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', // generic default
+              description: localMatch?.description || 'Top tech company',
+              focus: localMatch?.focus || ['Algorithms', 'System Design'],
+              questions: data.questions || []
+            } as Company;
+          });
+          setCompaniesList(liveData);
+        }
+      } catch (error) {
+        console.error("Error fetching live companies:", error);
+      } finally {
+        setIsLoadingCompanies(false);
+      }
+    };
+    fetchLiveCompanies();
+  }, []);
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (selectedCompany) {
@@ -269,9 +302,9 @@ export const CareerMode: React.FC = () => {
 
   const startMockInterview = () => {
     if (!selectedCompany) return;
-    // Shuffle and pick 5 random questions
+    // Shuffle and pick up to 10 random questions
     const shuffled = [...selectedCompany.questions].sort(() => 0.5 - Math.random());
-    setMockQuestions(shuffled.slice(0, 5));
+    setMockQuestions(shuffled.slice(0, 10));
     setMockState('active');
     setTimer(0);
     setCurrentMockIndex(0);
@@ -289,7 +322,7 @@ export const CareerMode: React.FC = () => {
     });
 
     const systemInstruction = `You are Robin, an elite Technical Interviewer for ${selectedCompany?.name}.
-You have just concluded a 5-question coding/system design interview with a candidate named ${userName}.
+You have just concluded a coding/system design interview with a candidate named ${userName}.
 Here is the transcript of the questions and the code/approach they typed:
 ${transcriptText}
 
@@ -556,12 +589,12 @@ ${transcriptText}`;
   };
 
   // Readiness Score Calculation
-  const totalQuestions = COMPANIES.reduce((acc, c) => acc + c.questions.length, 0);
+  const totalQuestions = companiesList.reduce((acc, c) => acc + c.questions.length, 0);
   const totalPracticed = progress.practicedQuestions.length;
   const readinessScore = Math.round((totalPracticed / (totalQuestions || 1)) * 100);
 
   // Filter Companies
-  const filteredCompanies = COMPANIES.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredCompanies = companiesList.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="animate-fade-in space-y-8 pb-20 relative">
@@ -604,8 +637,15 @@ ${transcriptText}`;
        </div>
 
        {/* Company Grid */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-  {filteredCompanies.length > 0 ? (
+       {isLoadingCompanies ? (
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+           {[...Array(8)].map((_, i) => (
+             <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-3xl h-[280px]"></div>
+           ))}
+         </div>
+       ) : (
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+           {filteredCompanies.length > 0 ? (
     filteredCompanies.map(company => (
       <CompanyCard
         key={company.id}
@@ -624,6 +664,7 @@ ${transcriptText}`;
     </div>
   )}
 </div>
+       )}
 
        {/* COMPANY MODAL - Uses Portal to escape sidebar stacking context */}
        {selectedCompany && createPortal(

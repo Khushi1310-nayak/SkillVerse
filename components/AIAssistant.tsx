@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Sparkles, Bot, User, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { COURSES, COMPANIES, CATEGORIES } from '../constants';
 
 interface AIAssistantProps {
   courseContext: string;

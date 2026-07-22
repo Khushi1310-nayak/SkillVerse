@@ -258,7 +258,7 @@ Passionate about:
 ### Connect with Me
 
 **GitHub:** [Khushi1310-nayak](https://github.com/Khushi1310-nayak)  
-**LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisha-nayak-a74761328/)
+**LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisa-nayak-185bb5378/)
 
 ---
 

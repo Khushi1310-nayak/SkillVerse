@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, PlayCircle, CheckCircle, ChevronDown } from 'lucide-react';
 import { COURSES, CATEGORIES } from '../constants';
@@ -7,6 +7,14 @@ import { storageService } from '../services/storageService';
 export const CoursesList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
   const progress = storageService.getAllProgress();
 
   const filtered = COURSES.filter(course => {
@@ -53,43 +61,84 @@ export const CoursesList: React.FC = () => {
        </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map(course => {
-             const isPassed = progress.find(p => p.courseId === course.id)?.passed;
-             return (
-               <Link 
-                 key={course.id} 
-                 to={`/course/${course.id}`}
-                 className="group bg-glass border border-white/20 dark:border-white/10 hover:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
-               >
-                 <div className="flex justify-between items-start mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                        course.level === 'Beginner' ? 'bg-emerald-500/10 text-emerald-500' :
-                        course.level === 'Intermediate' ? 'bg-blue-500/10 text-blue-500' :
-                        'bg-purple-500/10 text-purple-500'
-                    }`}>
-                      {course.level}
-                    </span>
-                    {isPassed && <CheckCircle className="text-success" size={20} />}
-                 </div>
-                 
-                 <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">{course.title}</h3>
-                 <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">{course.description}</p>
-                 
-                 <div className="pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
-                    <span className="text-xs text-textMuted font-mono">{course.duration}</span>
-                    <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
-                       {isPassed ? 'Review' : 'Start Learning'} <PlayCircle size={16} className="ml-2" />
-                    </span>
-                 </div>
-               </Link>
-             )
-          })}
-          {filtered.length === 0 && (
-            <div className="col-span-full text-center py-20 text-textMuted">
-               No courses found matching your criteria.
+  {isLoading ? (
+    Array.from({ length: 6 }).map((_, index) => (
+      <div
+        key={index}
+        className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 animate-pulse flex flex-col"
+      >
+        <div className="flex justify-between items-start mb-4">
+          <div className="h-6 w-20 rounded-full bg-white/10" />
+          <div className="h-5 w-5 rounded-full bg-white/10" />
+        </div>
+
+        <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
+        <div className="h-4 w-full rounded bg-white/10 mb-2" />
+        <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
+
+        <div className="pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+          <div className="h-4 w-16 rounded bg-white/10" />
+          <div className="h-4 w-24 rounded bg-white/10" />
+        </div>
+      </div>
+    ))
+  ) : (
+    <>
+      {filtered.map(course => {
+        const isPassed = progress.find(p => p.courseId === course.id)?.passed;
+
+        return (
+          <Link
+            key={course.id}
+            to={`/course/${course.id}`}
+            className="group bg-glass border border-white/20 dark:border-white/10 hover:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                  course.level === "Beginner"
+                    ? "bg-emerald-500/10 text-emerald-500"
+                    : course.level === "Intermediate"
+                    ? "bg-blue-500/10 text-blue-500"
+                    : "bg-purple-500/10 text-purple-500"
+                }`}
+              >
+                {course.level}
+              </span>
+
+              {isPassed && <CheckCircle className="text-success" size={20} />}
             </div>
-          )}
-       </div>
-    </div>
-  );
+
+            <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
+              {course.title}
+            </h3>
+
+            <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">
+              {course.description}
+            </p>
+
+            <div className="pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+              <span className="text-xs text-textMuted font-mono">
+                {course.duration}
+              </span>
+
+              <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
+                {isPassed ? "Review" : "Start Learning"}
+                <PlayCircle size={16} className="ml-2" />
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+
+      {filtered.length === 0 && (
+        <div className="col-span-full text-center py-20 text-textMuted">
+          No courses found matching your criteria.
+        </div>
+      )}
+    </>
+  )}
+</div>
+</div>
+);
 };

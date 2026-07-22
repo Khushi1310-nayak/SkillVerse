@@ -11,8 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress } from '../types';
-import { auth, db } from '../firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { auth } from '../firebase/firebase';
 import { Typewriter } from './Typewriter';
 
 const getTimeOfDay = () => {
@@ -322,7 +321,7 @@ export const CareerMode: React.FC = () => {
     });
 
     const systemInstruction = `You are Robin, an elite Technical Interviewer for ${selectedCompany?.name}.
-You have just concluded a coding/system design interview with a candidate named ${userName}.
+You have just concluded a 5-question coding/system design interview with a candidate named ${userName}.
 Here is the transcript of the questions and the code/approach they typed:
 ${transcriptText}
 

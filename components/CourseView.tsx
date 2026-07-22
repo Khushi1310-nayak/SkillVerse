@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock } from 'lucide-react';
 import { COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
@@ -15,8 +15,11 @@ export const CourseView: React.FC = () => {
   if (!course) {
     return <NotFound />;
   }
-  const { appUser: user } = useAuth();
+  const { appUser: user, completeCourse } = useAuth();
   const settings = user?.settings;
+
+  const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+  const cooldownKey = `cooldown_${id}`;
 
   const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -24,6 +27,8 @@ export const CourseView: React.FC = () => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [passed, setPassed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     // Load existing progress
@@ -53,6 +58,39 @@ export const CourseView: React.FC = () => {
     }
   }, [selectedAnswers, currentQuestion, id, settings?.autoSave, quizSubmitted]);
 
+  // Cooldown timer — read from localStorage and start a live countdown
+  const startCooldownInterval = (remaining: number) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setTimeLeft(remaining);
+    intervalRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null;
+          localStorage.removeItem(cooldownKey);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem(cooldownKey);
+    if (saved) {
+      const elapsed = Date.now() - parseInt(saved, 10);
+      const remaining = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
+      if (remaining > 0) {
+        startCooldownInterval(remaining);
+      } else {
+        localStorage.removeItem(cooldownKey);
+      }
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [id]);
+
   if (!course) return <div>Course not found</div>;
 
   const handleOptionSelect = (optionIndex: number) => {
@@ -76,6 +114,12 @@ export const CourseView: React.FC = () => {
     setPassed(isPassed);
     setQuizSubmitted(true);
 
+    // Start cooldown on failure
+    if (!isPassed) {
+      localStorage.setItem(cooldownKey, Date.now().toString());
+      startCooldownInterval(COOLDOWN_MS / 1000);
+    }
+
     storageService.saveProgress({
       courseId: course.id,
       completed: true,
@@ -83,6 +127,11 @@ export const CourseView: React.FC = () => {
       passed: isPassed,
       completedDate: new Date().toLocaleDateString()
     });
+
+    if (isPassed && !user?.courses?.includes(course.id)) {
+       // Only award XP if the user hasn't completed this course before
+       completeCourse(course.id, 100).catch(console.error);
+    }
   };
 
   const resetQuiz = () => {
@@ -92,6 +141,13 @@ export const CourseView: React.FC = () => {
     setScore(0);
     setPassed(false);
     if (id) localStorage.removeItem(`quizState_${id}`);
+    // Note: we do NOT clear the cooldown here — it must expire naturally
+  };
+
+  const formatCooldown = (seconds: number): string => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
   const getProgressWidthClass = (current: number, total: number) => {
@@ -275,12 +331,34 @@ export const CourseView: React.FC = () => {
                       </Link>
                     ) : (
                       settings?.retryQuiz !== false ? (
-                        <button
-                          onClick={resetQuiz}
-                          className="flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 text-textMain px-8 py-3 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                        >
-                          <RefreshCcw size={20} /> Retry Quiz
-                        </button>
+                        <div className="flex flex-col items-center gap-3">
+                          {timeLeft > 0 && (
+                            <p className="text-orange-400 text-sm font-medium flex items-center gap-2">
+                              <Clock size={14} />
+                              Take a moment to review the course material before trying again!
+                            </p>
+                          )}
+                          <button
+                            onClick={resetQuiz}
+                            disabled={timeLeft > 0}
+                            className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold transition-all
+                              ${timeLeft > 0
+                                ? 'bg-black/10 dark:bg-white/5 text-textMuted opacity-50 cursor-not-allowed border border-orange-500/30'
+                                : 'bg-black/5 dark:bg-white/10 text-textMain hover:bg-black/10 dark:hover:bg-white/20'
+                              }`}
+                          >
+                            {timeLeft > 0 ? (
+                              <>
+                                <Clock size={20} className="text-orange-400" />
+                                ⏳ You can retry in {formatCooldown(timeLeft)}
+                              </>
+                            ) : (
+                              <>
+                                <RefreshCcw size={20} /> Retry Quiz
+                              </>
+                            )}
+                          </button>
+                        </div>
                       ) : (
                         <p className="text-textMuted italic mt-4 w-full">Retrying quizzes is disabled in your settings.</p>
                       )

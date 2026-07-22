@@ -6,6 +6,7 @@ import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
+import { Leaderboard } from './Leaderboard';
 
 interface DashboardProps {
   user: User;
@@ -230,6 +231,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             );
           })}
         </div>
+      </div>
+
+      {/* Global Leaderboard */}
+      <div id="dash-leaderboard" className="mt-8">
+        <Leaderboard />
       </div>
     </div>
   );

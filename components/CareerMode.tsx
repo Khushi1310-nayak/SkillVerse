@@ -11,6 +11,15 @@ import ReactMarkdown from 'react-markdown';
 import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress } from '../types';
+import { auth } from '../firebase/firebase';
+import { Typewriter } from './Typewriter';
+
+const getTimeOfDay = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'morning';
+  if (hour < 18) return 'afternoon';
+  return 'evening';
+};
 
 const getPercentClass = (p: number) => {
   const rounded = Math.max(0, Math.min(100, Math.round(p / 5) * 5));
@@ -208,14 +217,15 @@ export const CareerMode: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   // Voice State
-  const [voiceQuestions, setVoiceQuestions] = useState<string[]>([]);
-  const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0);
-  const [voiceTranscript, setVoiceTranscript] = useState<{q: string, a: string}[]>([]);
-  const [voiceStatus, setVoiceStatus] = useState<'speaking' | 'listening' | 'generating'>('speaking');
+  const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([]);
+  const [turnCount, setTurnCount] = useState(0);
+  const [voiceStatus, setVoiceStatus] = useState<'speaking' | 'listening' | 'generating'>('generating');
   const [currentSpeech, setCurrentSpeech] = useState("");
   const [voiceReport, setVoiceReport] = useState("");
   const recognitionRef = React.useRef<any>(null);
   const synthRef = React.useRef<SpeechSynthesis | null>(window.speechSynthesis);
+  const silenceTimerRef = React.useRef<any>(null);
+  const currentSpeechRef = React.useRef("");
 
   // Search Filter
   const [search, setSearch] = useState('');
@@ -235,8 +245,16 @@ export const CareerMode: React.FC = () => {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
+      if (synthRef.current) synthRef.current.cancel();
+      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch(e){} }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => { 
+      document.body.style.overflow = 'unset'; 
+      if (synthRef.current) synthRef.current.cancel();
+      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch(e){} }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    };
   }, [selectedCompany]);
 
   const handleTogglePractice = (qId: string) => {
@@ -258,23 +276,30 @@ export const CareerMode: React.FC = () => {
     setTimer(0);
     setCurrentMockIndex(0);
     setMockAnswers([]);
+    setIsFullScreen(true);
   };
 
   const finishMockInterview = async () => {
     setIsGeneratingText(true);
     
-    let transcriptText = `Company: ${selectedCompany?.name}\n\n`;
+    const userName = auth.currentUser?.displayName || 'candidate';
+    let transcriptText = `Candidate Name: ${userName}\nInterviewer Name: Robin\nCompany: ${selectedCompany?.name}\n\n`;
     mockQuestions.forEach((q, i) => {
       transcriptText += `Q${i+1} (${q.difficulty}): ${q.title}\nUser's Code/Approach:\n${mockAnswers[i] || 'No answer provided.'}\n\n`;
     });
 
-    const systemInstruction = `You are an elite Technical Interviewer for ${selectedCompany?.name}.
-You have just concluded a 5-question coding/system design interview with a candidate.
+    const systemInstruction = `You are Robin, an elite Technical Interviewer for ${selectedCompany?.name}.
+You have just concluded a 5-question coding/system design interview with a candidate named ${userName}.
 Here is the transcript of the questions and the code/approach they typed:
 ${transcriptText}
 
 Provide a brutally honest, highly technical Markdown report evaluating their performance.
 Focus on time/space complexity, edge cases missed, and system design flaws.
+IMPORTANT STYLING RULES:
+- Use very simple, precise, and easy-to-understand English.
+- NEVER write dense paragraphs. Every single sentence or point MUST be separated by a double newline (blank line).
+- Use bullet points abundantly to make it highly readable.
+- If the user provided no answer, simply state "No answer provided" and move on instead of writing a huge dense paragraph about what they missed. Keep it clean.
 At the very end of your report, provide a final score on a scale of 0 to 100 in the exact format: [SCORE: 85]`;
 
     try {
@@ -315,19 +340,67 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
   // --- VOICE INTERVIEW LOGIC ---
   const startVoiceInterview = () => {
     if (!selectedCompany) return;
-    const shuffled = [...VOICE_INTERVIEW_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, 10);
-    setVoiceQuestions(shuffled);
     setMockState('active_voice');
     setVoiceStatus('speaking');
-    setCurrentVoiceIndex(0);
-    setVoiceTranscript([]);
+    setTurnCount(1);
     setVoiceReport("");
     setTimer(0);
+    setCurrentSpeech("");
+    currentSpeechRef.current = "";
+    setIsFullScreen(true);
+
+    const userName = auth.currentUser?.displayName || 'candidate';
+    const timeOfDay = getTimeOfDay();
     
-    // Auto-start first question after slight delay for UI transition
+    // Hardcode the first greeting to guarantee it plays
+    const greetingMsg = `Good ${timeOfDay}, ${userName}! I am Robin, your interviewer. Let's start our interview. Could you please introduce yourself and tell me about your most recent project?`;
+    
+    setChatHistory([{ role: 'assistant', content: greetingMsg }]);
+    
     setTimeout(() => {
-       speakQuestion(shuffled[0]);
+      speakQuestion(greetingMsg);
     }, 500);
+  };
+
+  const generateAIResponse = async (history: any[]) => {
+    setVoiceStatus('generating');
+    const systemPrompt = `You are Robin, a Senior Engineer at ${selectedCompany?.name} conducting a verbal technical interview.
+    If the user gives a wrong answer, gently push back and ask them to reconsider.
+    Use simple, precise, and highly conversational English.
+    Use conversational filler words like 'um', 'hmm', and 'I see' so you sound human when your text is spoken via TTS.
+    Keep your responses short, under 50 words, just like a real verbal conversation.
+    Ask one question or follow-up at a time. Do not use Markdown styling.`;
+
+    const cleanHistory = history.filter(h => h.role !== 'system');
+    const apiMessages = [ { role: 'system', content: systemPrompt }, ...cleanHistory ];
+
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${(import.meta as any).env.VITE_OPENROUTER_API_KEY || process.env.API_KEY || ''}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: apiMessages,
+          max_tokens: 150
+        })
+      });
+
+      if (!res.ok) throw new Error("API failed");
+      const data = await res.json();
+      const aiText = data.choices?.[0]?.message?.content || "I didn't quite catch that.";
+      
+      const updatedHistory = [...history, { role: 'assistant', content: aiText }];
+      setChatHistory(updatedHistory);
+      setTurnCount(prev => prev + 1);
+      
+      speakQuestion(aiText);
+    } catch (err) {
+      console.error(err);
+      speakQuestion("Sorry, I'm having connection issues. Can you repeat that?");
+    }
   };
 
   const speakQuestion = (text: string) => {
@@ -340,7 +413,6 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       };
       synthRef.current.speak(utterance);
     } else {
-      // Fallback if no TTS
       startListening();
     }
   };
@@ -348,8 +420,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
   const startListening = () => {
     setVoiceStatus('listening');
     setCurrentSpeech("");
+    currentSpeechRef.current = "";
     
-    // Use type assertion for cross-browser web speech API
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setCurrentSpeech("Speech recognition is not supported in this browser. Please use Chrome.");
@@ -357,69 +429,92 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     }
 
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try { recognitionRef.current.stop(); } catch(e){}
     }
 
     const recognition = new SpeechRecognitionAPI();
     recognition.continuous = true;
     recognition.interimResults = true;
     
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = setTimeout(() => {
+       stopListeningAndSubmit();
+    }, 8000); // 8 second fallback if they never speak
+    
     recognition.onresult = (event: any) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
       }
       if (finalTranscript) {
-        setCurrentSpeech(prev => prev + " " + finalTranscript);
+        setCurrentSpeech(prev => {
+          const updated = prev + " " + finalTranscript;
+          currentSpeechRef.current = updated.trim();
+          return updated.trim();
+        });
       }
+      // Reset silence timer on any audio activity
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = setTimeout(() => {
+         stopListeningAndSubmit();
+      }, 3000);
     };
 
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error", event.error);
-    };
-
+    recognition.onerror = (event: any) => console.error("Speech recognition error", event.error);
     recognitionRef.current = recognition;
     recognition.start();
   };
 
-  const stopListeningAndNext = async () => {
+  const stopListeningAndSubmit = async (forceEnd = false) => {
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try { recognitionRef.current.stop(); } catch(e){}
     }
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     
-    // Save transcript for this question
-    const currentQ = voiceQuestions[currentVoiceIndex];
-    setVoiceTranscript(prev => [...prev, { q: currentQ, a: currentSpeech || "(No answer provided)" }]);
-    setCurrentSpeech("");
-
-    if (currentVoiceIndex < voiceQuestions.length - 1) {
-      setCurrentVoiceIndex(prev => prev + 1);
-      speakQuestion(voiceQuestions[currentVoiceIndex + 1]);
-    } else {
-      // Finish interview
-      setVoiceStatus('generating');
-      await generateVoiceReport();
+    const finalSpeech = currentSpeechRef.current;
+    
+    if (!finalSpeech.trim() && !forceEnd) {
+       startListening();
+       return;
     }
+
+    setVoiceStatus('generating');
+    
+    setChatHistory(prevHistory => {
+       const newHistory = finalSpeech.trim() ? [...prevHistory, { role: 'user', content: finalSpeech }] : prevHistory;
+       
+       setTimeout(() => {
+           if (turnCount >= 10 || forceEnd) {
+              generateVoiceReport(newHistory);
+           } else {
+              generateAIResponse(newHistory);
+           }
+       }, 0);
+       
+       return newHistory;
+    });
+    
+    setCurrentSpeech("");
+    currentSpeechRef.current = "";
   };
 
-  const generateVoiceReport = async () => {
-    // Current transcript might not have the last answer yet due to state closure, 
-    // so we build it manually for the API call
-    const finalTranscript = [...voiceTranscript, { q: voiceQuestions[currentVoiceIndex], a: currentSpeech || "(No answer provided)" }];
+  const generateVoiceReport = async (history: any[]) => {
+    const userName = auth.currentUser?.displayName || 'candidate';
+    const transcriptText = history.map(h => `${h.role === 'user' ? userName : 'Robin'}: ${h.content}`).join('\n\n');
     
-    const transcriptText = finalTranscript.map((t, i) => `Q${i+1}: ${t.q}\nUser Answer: ${t.a}`).join('\n\n');
-    
-    const systemInstruction = `You are an expert HR Interviewer and English Language Assessor.
-Analyze the following transcript of a mock interview. The user answered these questions using speech-to-text.
-Please provide a highly professional, brutally honest, but constructive markdown report.
+    const systemInstruction = `You are Robin, an expert HR Interviewer and Senior Engineer.
+Analyze the following transcript of a real-time mock interview with candidate ${userName}.
+Please provide a brutally honest, highly technical Markdown report.
+IMPORTANT STYLING RULES:
+- Use very simple, precise, and easy-to-understand English.
+- NEVER write dense paragraphs. Every single sentence or point MUST be separated by a double newline (blank line).
+- Use bullet points abundantly to make it highly readable.
 Your report MUST include:
-1. **Overall Performance**: A brief summary of how they did.
-2. **Vocabulary & Fluency**: Assess their English vocabulary, sentence structure, and communication clarity.
-3. **Content Accuracy**: Did their answers make sense for standard HR/Behavioral questions?
-4. **Key Strengths**: Bullet points of what they did well.
-5. **Areas for Improvement**: Bullet points of what they need to work on.
+1. **Overall Performance**: Summary of how they did.
+2. **Technical Accuracy**: Did their answers make sense for the coding/system design questions?
+3. **Communication**: Assess their verbal clarity and structure.
+4. **Key Strengths**: What they did well.
+5. **Areas for Improvement**: What they need to work on.
 
 Transcript:
 ${transcriptText}`;
@@ -447,7 +542,6 @@ ${transcriptText}`;
       setVoiceReport("There was an error generating your report. Please check your API key or internet connection.");
     } finally {
       setMockState('finished_voice');
-      // Save score
       if (selectedCompany) {
          storageService.saveMockInterviewScore(selectedCompany.id, Math.floor(Math.random() * (100 - 70 + 1) + 70));
          setProgress(storageService.getCareerProgress());
@@ -540,8 +634,21 @@ ${transcriptText}`;
             {/* Modal Content: Adaptive Light/Dark */}
             <div className={`relative z-10 bg-background border border-black/10 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col animate-fade-in-up transition-all duration-300 ${isFullScreen ? 'w-full h-full rounded-none' : 'w-full max-w-6xl h-[85vh] md:h-[90vh] rounded-2xl md:rounded-3xl'}`}>
                
-               {/* Modal Header */}
-               <div className="shrink-0 p-5 md:p-8 border-b border-black/10 dark:border-white/10 bg-white dark:bg-gradient-to-r dark:from-[#1E293B] dark:to-[#0B1220] flex items-center justify-between">
+               {/* Floating Close Buttons in FullScreen */}
+               {isFullScreen && (
+                 <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                     <button onClick={() => setIsFullScreen(false)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Exit Fullscreen" aria-label="Exit Fullscreen">
+                        <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
+                     </button>
+                     <button onClick={() => { setSelectedCompany(null); setIsFullScreen(false); setMockState('idle'); }} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                        <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
+                     </button>
+                 </div>
+               )}
+
+               {/* Modal Header (Hidden in FullScreen) */}
+               {!isFullScreen && (
+                 <div className="shrink-0 p-5 md:p-8 border-b border-black/10 dark:border-white/10 bg-white dark:bg-gradient-to-r dark:from-[#1E293B] dark:to-[#0B1220] flex items-center justify-between">
                   <div className="flex items-center gap-4 md:gap-6">
                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white border border-black/5 p-3 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
                         <img src={selectedCompany.logo} alt={selectedCompany.name} className="w-full h-full object-contain" />
@@ -559,11 +666,12 @@ ${transcriptText}`;
                      <button onClick={() => setIsFullScreen(!isFullScreen)} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"} aria-label="Toggle fullscreen">
                         {isFullScreen ? <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" /> : <Maximize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />}
                      </button>
-                     <button onClick={() => { setSelectedCompany(null); setIsFullScreen(false); }} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                     <button onClick={() => { setSelectedCompany(null); setIsFullScreen(false); setMockState('idle'); }} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title="Close modal" aria-label="Close modal">
                         <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                      </button>
                   </div>
                </div>
+               )}
 
                {/* Mock Interview - Active Mode Overlay */}
                {mockState === 'active' ? (
@@ -588,8 +696,8 @@ ${transcriptText}`;
                          <>
                            <div className="text-center mb-6 md:mb-8">
                               <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Question {currentMockIndex + 1} of 5</span>
-                              <h3 className="text-xl md:text-4xl font-bold text-textMain mt-4 leading-tight">
-                                 {mockQuestions[currentMockIndex]?.title}
+                              <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
+                                 <Typewriter text={mockQuestions[currentMockIndex]?.title || ''} speed={50} />
                               </h3>
                            </div>
                            
@@ -628,63 +736,73 @@ ${transcriptText}`;
                        )}
                     </div>
                  </div>
-               ) : mockState === 'active_voice' ? (
-                 <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden overflow-y-auto">
-                    {/* Progress Bar */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-black/5 dark:bg-white/10">
-                       <div className={`h-full bg-gradient-main transition-all duration-1000 ${getPercentClass((currentVoiceIndex / 10) * 100)}`} />
-                    </div>
+                ) : mockState === 'active_voice' ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden overflow-y-auto">
+                     {/* Progress Bar */}
+                     <div className="absolute top-0 left-0 w-full h-1 bg-black/5 dark:bg-white/10">
+                        <div className={`h-full bg-gradient-main transition-all duration-1000 ${getPercentClass((turnCount / 10) * 100)}`} />
+                     </div>
 
-                    <div className="absolute top-6 right-6 md:right-8 flex items-center gap-2 font-mono text-lg md:text-xl text-primaryLight animate-pulse">
-                       <Timer /> {formatTime(timer)}
-                    </div>
+                     <div className="absolute top-6 right-6 md:right-8 flex items-center gap-2 font-mono text-lg md:text-xl text-primaryLight animate-pulse">
+                        <Timer /> {formatTime(timer)}
+                     </div>
 
-                    <div className="max-w-3xl w-full mt-10 md:mt-0 flex flex-col items-center">
-                       <div className="text-center mb-10">
-                          <span className="text-textMuted uppercase tracking-widest text-xs font-bold">HR/Behavioral Question {currentVoiceIndex + 1} of 10</span>
-                          <h3 className="text-2xl md:text-4xl font-bold text-textMain mt-4 leading-tight">
-                             {voiceQuestions[currentVoiceIndex]}
-                          </h3>
-                       </div>
+                     <div className="max-w-3xl w-full mt-10 md:mt-0 flex flex-col items-center">
+                        <div className="text-center mb-10">
+                           <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Live Voice Interview - Turn {turnCount} of 10</span>
+                           <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
+                             {chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
+                               ? <Typewriter text={chatHistory[chatHistory.length - 1].content} speed={50} />
+                               : chatHistory.length > 1 ? <Typewriter text={chatHistory[chatHistory.length - 2].content} speed={50} /> : "Connecting..."}
+                           </h3>
+                        </div>
 
-                       {voiceStatus === 'generating' ? (
-                         <div className="flex flex-col items-center gap-4 animate-fade-in">
-                            <Loader2 size={48} className="text-primaryLight animate-spin" />
-                            <p className="text-textMuted text-lg">AI is analyzing your vocabulary and fluency...</p>
-                         </div>
-                       ) : (
-                         <div className="flex flex-col items-center w-full max-w-xl">
-                            {/* Visualizer / Mic indicator */}
-                            <div className="relative mb-8">
-                               {voiceStatus === 'listening' && (
-                                 <>
-                                   <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150"></div>
-                                   <div className="absolute inset-0 bg-primary/40 rounded-full animate-pulse scale-110"></div>
-                                 </>
-                               )}
-                               <div className={`w-24 h-24 rounded-full flex items-center justify-center relative z-10 transition-colors duration-500 ${voiceStatus === 'listening' ? 'bg-gradient-main text-white shadow-lg shadow-primary/40' : 'bg-black/5 dark:bg-white/10 text-textMuted'}`}>
-                                  {voiceStatus === 'listening' ? <Mic size={40} /> : <Volume2 size={40} className="animate-pulse" />}
-                               </div>
-                            </div>
-                            
-                            <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
-                               <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> Your Answer:</div>
-                               <p className="text-textMain text-lg italic">
-                                  {currentSpeech || (voiceStatus === 'listening' ? "Listening..." : "Wait for question to finish...")}
-                               </p>
-                            </div>
+                        {voiceStatus === 'generating' ? (
+                          <div className="flex flex-col items-center gap-4 animate-fade-in">
+                             <Loader2 size={48} className="text-primaryLight animate-spin" />
+                             <p className="text-textMuted text-lg">AI is thinking...</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center w-full max-w-xl">
+                             {/* Visualizer / Mic indicator */}
+                             <div className="relative mb-8">
+                                {voiceStatus === 'listening' && (
+                                  <>
+                                    <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150"></div>
+                                    <div className="absolute inset-0 bg-primary/40 rounded-full animate-pulse scale-110"></div>
+                                  </>
+                                )}
+                                <div className={`w-24 h-24 rounded-full flex items-center justify-center relative z-10 transition-colors duration-500 ${voiceStatus === 'listening' ? 'bg-gradient-main text-white shadow-lg shadow-primary/40' : 'bg-black/5 dark:bg-white/10 text-textMuted'}`}>
+                                   {voiceStatus === 'listening' ? <Mic size={40} /> : <Volume2 size={40} className="animate-pulse" />}
+                                </div>
+                             </div>
+                             
+                             <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
+                                <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> Your Answer:</div>
+                                <p className="text-textMain text-lg italic">
+                                   {currentSpeech || (voiceStatus === 'listening' ? "Listening (speaking will auto-detect)..." : "Wait for AI to finish...")}
+                                </p>
+                             </div>
 
-                            <button 
-                              onClick={stopListeningAndNext}
-                              disabled={voiceStatus === 'speaking'}
-                              className={`px-10 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${voiceStatus === 'speaking' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
-                            >
-                               {currentVoiceIndex < 9 ? 'Next Question' : 'Finish & Generate Report'} <ArrowRight size={20} />
-                            </button>
-                         </div>
-                       )}
-                    </div>
-                 </div>
+                             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                               <button 
+                                 onClick={() => { stopListeningAndSubmit(true); }}
+                                 className="px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 hover:bg-red-500/10 hover:text-red-500 text-textMuted"
+                               >
+                                  End Interview Early
+                               </button>
+                               <button 
+                                 onClick={() => { stopListeningAndSubmit(); }}
+                                 disabled={voiceStatus !== 'listening'}
+                                 className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voiceStatus !== 'listening' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
+                               >
+                                  Send Now (Override Silence) <ArrowRight size={20} />
+                               </button>
+                             </div>
+                          </div>
+                        )}
+                     </div>
+                  </div>
                ) : mockState === 'finished_voice' ? (
                  <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-hidden overflow-y-auto w-full custom-scrollbar">
                     <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in-up pt-10">

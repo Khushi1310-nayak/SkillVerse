@@ -11,7 +11,7 @@ const isTouchDevice = () =>
 export const CustomCursor: React.FC = () => {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const rafId = useRef<number>();
+  const rafId = useRef<number>(0);
   const mouse = useRef({ x: 0, y: 0 });
   const ringPos = useRef({ x: 0, y: 0 });
 
@@ -79,11 +79,11 @@ export const CustomCursor: React.FC = () => {
       {/* Small dot: follows the mouse instantly, no lag */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 z-[100] w-2 h-2 rounded-full bg-primaryLight pointer-events-none"
+        className="fixed top-0 left-0 z-[99999] w-2 h-2 rounded-full bg-primaryLight pointer-events-none"
       />
 
       {/* Outer ring: trails slightly behind, scales up on hover, shrinks on click */}
-      <div ref={ringRef} className="fixed top-0 left-0 z-[100] pointer-events-none">
+      <div ref={ringRef} className="fixed top-0 left-0 z-[99999] pointer-events-none">
         <div
           className={`rounded-full border-2 border-primary transition-all duration-200 ease-out
             ${isHovering ? 'w-12 h-12 border-primaryLight bg-primary/10' : 'w-8 h-8'}

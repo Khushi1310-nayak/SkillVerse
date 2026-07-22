@@ -65,7 +65,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.API_KEY}`,
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({

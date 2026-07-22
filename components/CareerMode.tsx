@@ -11,7 +11,8 @@ import ReactMarkdown from 'react-markdown';
 import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress } from '../types';
-import { auth } from '../firebase/firebase';
+import { auth, db } from '../firebase/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 import { Typewriter } from './Typewriter';
 
 const getTimeOfDay = () => {
@@ -231,7 +232,6 @@ export const CareerMode: React.FC = () => {
 
   // Search Filter
   const [search, setSearch] = useState('');
-
   // Timer logic
   useEffect(() => {
     let interval: any;
@@ -265,8 +265,11 @@ export const CareerMode: React.FC = () => {
       } catch (error) {
         console.error("Error fetching live companies:", error);
       } finally {
-        setIsLoadingCompanies(false);
-      }
+        // Keep the skeleton visible briefly for a smoother loading experience
+          setTimeout(() => {
+            setIsLoadingCompanies(false);
+          }, 1500);
+        }
     };
     fetchLiveCompanies();
   }, []);
@@ -644,7 +647,37 @@ ${transcriptText}`;
          </div>
        ) : (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-           {filteredCompanies.length > 0 ? (
+  {isLoadingCompanies ? (
+    Array.from({ length: 8 }).map((_, index) => (
+      <div
+        key={index}
+        className="bg-glass border border-black/5 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse"
+      >
+        {/* Logo & Badge */}
+        <div className="flex items-start justify-between mb-5 sm:mb-6">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
+          <div className="h-6 w-20 rounded-full bg-white/10" />
+        </div>
+
+        {/* Title */}
+        <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
+
+        {/* Description */}
+        <div className="h-4 w-full rounded bg-white/10 mb-2" />
+        <div className="h-4 w-5/6 rounded bg-white/10 mb-6" />
+
+        {/* Progress */}
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <div className="h-3 w-16 rounded bg-white/10" />
+            <div className="h-3 w-12 rounded bg-white/10" />
+          </div>
+
+          <div className="h-2 rounded-full bg-white/10" />
+        </div>
+      </div>
+    ))
+  ) : filteredCompanies.length > 0 ? (
     filteredCompanies.map(company => (
       <CompanyCard
         key={company.id}

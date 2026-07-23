@@ -61,7 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) },
                 xp: data.xp || 0,
                 level: data.level || 1,
-                courses: data.courses || []
+                courses: data.courses || [],
+                photoURL: data.photoURL || currentUser.photoURL || ""
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -74,7 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 settings: DEFAULT_SETTINGS,
                 xp: 0,
                 level: 1,
-                courses: []
+                courses: [],
+                photoURL: currentUser.photoURL || ""
              });
              setLoading(false);
            }
@@ -202,12 +204,14 @@ const updateUserAccount = async (updatedUser: AppUser) => {
   try {
     await updateProfile(auth.currentUser, {
       displayName: updatedUser.username,
+      photoURL: updatedUser.photoURL || "",
     });
 
     await setDoc(
       userRef,
       {
         username: updatedUser.username,
+        photoURL: updatedUser.photoURL || "",
         preferences: {
           settings: updatedUser.settings,
         },

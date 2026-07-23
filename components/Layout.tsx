@@ -150,9 +150,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         <div className="pt-6 border-t border-black/5 dark:border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
              <img 
-               src={AVATARS[user.settings.avatarId || '1']} 
+               src={user.photoURL || AVATARS[user.settings.avatarId || '1']} 
                alt="Avatar" 
-               className="w-10 h-10 min-w-[40px] rounded-full bg-white/10"
+               className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
              />
              <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="font-bold text-textMain truncate">{user.username}</div>

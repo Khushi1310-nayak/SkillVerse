@@ -23,6 +23,8 @@ export const storageService = {
       await setDoc(
         userRef,
         {
+          username: user.username,
+          photoURL: user.photoURL || "",
           preferences: {
             settings: settingsToSave,
           },

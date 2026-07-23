@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { 
   User, Palette, BookOpen, Brain, Award, Shield, 
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2, 
-  LogOut, AlertTriangle, Smartphone, Zap
+  LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2
 } from 'lucide-react';
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { User as UserType, UserSettings } from '../types';
 
@@ -29,6 +33,16 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [formData, setFormData] = useState<UserType>(user);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | null }>({ type: null });
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormData(user);
+  }, [user]);
+
   useEffect(() => {
   localStorage.setItem('settings_active_tab', activeTab);
 }, [activeTab]);
@@ -48,6 +62,109 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
   const handleProfileChange = (field: keyof UserType, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAvatarSelect = async (avatarId: string) => {
+    const updatedUser = {
+      ...formData,
+      photoURL: '',
+      settings: { ...formData.settings, avatarId }
+    };
+    setFormData(updatedUser);
+    onPreviewUpdate(updatedUser);
+
+    const currentUser = auth.currentUser;
+    if (currentUser && formData.photoURL) {
+      try {
+        await updateProfile(currentUser, { photoURL: '' });
+        await setDoc(doc(db, 'users', currentUser.uid), { photoURL: '' }, { merge: true });
+      } catch (err) {
+        console.error('Error clearing photoURL on avatar select:', err);
+      }
+    }
+  };
+
+  const handleRemoveCustomAvatar = async () => {
+    const updatedUser = { ...formData, photoURL: '' };
+    setFormData(updatedUser);
+    onPreviewUpdate(updatedUser);
+
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        await updateProfile(currentUser, { photoURL: '' });
+        await setDoc(doc(db, 'users', currentUser.uid), { photoURL: '' }, { merge: true });
+        await onUpdateUser(updatedUser);
+        showToast('Custom Avatar Removed');
+      } catch (err) {
+        console.error('Error removing custom avatar:', err);
+        showToast('Failed to remove custom avatar');
+      }
+    }
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError(null);
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (PNG, JPEG, etc.).');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError('File size exceeds the 2MB limit.');
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setUploadError('User must be authenticated to upload custom avatar.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    const fileRef = storageRef(storage, `avatars/${currentUser.uid}`);
+    const uploadTask = uploadBytesResumable(fileRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(Math.round(progress));
+      },
+      (error) => {
+        console.error('Upload error:', error);
+        setUploadError('Failed to upload image. Please try again.');
+        setUploading(false);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          await updateProfile(currentUser, { photoURL: downloadURL });
+          await setDoc(doc(db, 'users', currentUser.uid), { photoURL: downloadURL }, { merge: true });
+          
+          const updatedUser = { ...formData, photoURL: downloadURL };
+          setFormData(updatedUser);
+          onPreviewUpdate(updatedUser);
+          await onUpdateUser(updatedUser);
+
+          showToast('Custom Avatar Uploaded Successfully!');
+        } catch (err) {
+          console.error('Error finalizing avatar upload:', err);
+          setUploadError('Error updating profile after upload.');
+        } finally {
+          setUploading(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }
+      }
+    );
   };
 
   const showToast = (msg: string) => {
@@ -145,16 +262,90 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 
                 <div className="space-y-4">
                   <label className="block text-sm font-semibold text-textMuted uppercase tracking-wider">Avatar</label>
-                  <div className="flex flex-wrap gap-4">
-                    {AVATARS.map(avatar => (
-                      <button
-                        key={avatar.id}
-                        onClick={() => handleChange('avatarId', avatar.id)}
-                        className={`p-1 rounded-full border-2 transition-all ${formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110' : 'border-transparent hover:border-white/20'}`}
-                      >
-                        <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" />
-                      </button>
-                    ))}
+                  
+                  {/* Current Active Avatar Display & Upload Controls */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10">
+                    <div className="relative group">
+                      <img 
+                        src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url} 
+                        alt="Current Avatar" 
+                        className="w-20 h-20 rounded-full object-cover bg-white/10 border-2 border-primaryLight shadow-md" 
+                      />
+                      {formData.photoURL && (
+                        <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
+                          Custom
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 flex-1">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleAvatarUpload} 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploading}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primaryLight border border-primary/20 rounded-xl font-medium transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                        >
+                          {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                          <span>{uploading ? `Uploading (${uploadProgress}%)` : 'Upload Custom Avatar'}</span>
+                        </button>
+
+                        {formData.photoURL && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveCustomAvatar}
+                            disabled={uploading}
+                            className="flex items-center gap-1.5 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium transition-all"
+                          >
+                            <Trash2 size={16} />
+                            <span>Remove Custom</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {uploading && (
+                        <div className="w-full max-w-xs bg-black/10 dark:bg-white/10 h-2 rounded-full overflow-hidden mt-2">
+                          <div 
+                            className="bg-primaryLight h-full transition-all duration-300" 
+                            style={{ width: `${uploadProgress}%` }} 
+                          />
+                        </div>
+                      )}
+
+                      {uploadError && (
+                        <p className="text-sm text-red-400 font-medium flex items-center gap-1 mt-1">
+                          <AlertTriangle size={14} /> {uploadError}
+                        </p>
+                      )}
+
+                      <p className="text-xs text-textMuted">
+                        Upload a PNG or JPEG image (max 2MB), or select a preset avatar below.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DiceBear Avatars Grid */}
+                  <div className="space-y-2 pt-2">
+                    <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">Or Select Preset Avatar</span>
+                    <div className="flex flex-wrap gap-4">
+                      {AVATARS.map(avatar => (
+                        <button
+                          key={avatar.id}
+                          type="button"
+                          onClick={() => handleAvatarSelect(avatar.id)}
+                          className={`p-1 rounded-full border-2 transition-all ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-white/20'}`}
+                        >
+                          <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

@@ -117,7 +117,7 @@ export const Leaderboard: React.FC = () => {
                 
                 <div className="relative">
                   <img
-                    src={AVATARS[user.avatarId || '1']}
+                    src={user.photoURL || AVATARS[user.avatarId || '1']}
                     alt={user.username}
                     className="w-12 h-12 rounded-full object-cover border border-white/10 bg-black/20"
                   />

@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   // Split the API key string so GitHub's regex scanner doesn't falsely flag it as a leaked secret
@@ -15,7 +16,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 // Enforce browser local persistence (default, but explicitly stated for security/clarity)
 setPersistence(auth, browserLocalPersistence)
   .catch((error) => console.error("Firebase persistence error:", error));
+

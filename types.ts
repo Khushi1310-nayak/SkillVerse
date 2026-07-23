@@ -44,6 +44,7 @@ export interface User {
   xp: number;
   level: number;
   courses: string[];
+  photoURL?: string;
 }
 
 export interface Category {

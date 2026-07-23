@@ -112,7 +112,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value.trim())}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+                className="w-full bg-white/5 border border-black/20 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
                 placeholder="Choose a username"
               />
             </div>
@@ -128,7 +128,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
               required 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+              className="w-full bg-white/5 border border-black/20 dark:border-white/10 rounded-xl py-3 pl-12 pr-4 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
               placeholder="name@example.com"
             />
           </div>
@@ -147,7 +147,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
               required 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-12 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+              className="w-full bg-white/5 border border-black/20 dark:border-white/10 rounded-xl py-3 pl-12 pr-12 text-textMain placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
               placeholder="••••••••"
             />
             <button
@@ -167,7 +167,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden mt-3"
               >
-                <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+                <div className="p-4 rounded-xl bg-black/40 border border-black/20 dark:border-white/5">
                   <div className="flex justify-between items-center mb-3">
                     <div className="text-xs text-textMuted font-bold">Password Strength</div>
                     <div className={`text-xs font-bold ${pwdStrength.label === 'Weak' ? 'text-red-500' : pwdStrength.label === 'Fair' ? 'text-orange-500' : pwdStrength.label === 'Good' ? 'text-yellow-400' : 'text-green-500'}`}>
@@ -203,7 +203,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
           className="mt-4 w-full bg-gradient-main text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
-            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="w-5 h-5 border-2 border-black/20 dark:border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>
               Create Account <ArrowRight size={20} />
@@ -222,14 +222,14 @@ export const SignupForm: React.FC<SignupFormProps> = ({ setView, onSignupSuccess
         <button 
           onClick={() => handleSocialLogin('google')}
           disabled={loading}
-          className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors focus:outline-none"
+          className="flex-1 bg-white/5 hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors focus:outline-none"
         >
           <Chrome size={18} /> Google
         </button>
         <button 
           onClick={() => handleSocialLogin('github')}
           disabled={loading}
-          className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors focus:outline-none"
+          className="flex-1 bg-white/5 hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors focus:outline-none"
         >
           <Github size={18} /> GitHub
         </button>

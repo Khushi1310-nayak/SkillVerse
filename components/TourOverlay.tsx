@@ -135,7 +135,7 @@ const handlePrev = useCallback(() => {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-fade-in" onClick={onClose} />
 
       {/* Main Modal - Responsive Layout */}
-      <div className="relative z-10 w-full max-w-4xl bg-[#0B1220] border border-white/10 rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up max-h-[90vh] md:h-[500px]">
+      <div className="relative z-10 w-full max-w-4xl bg-[#0B1220] border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in-up max-h-[90vh] md:h-[500px]">
          
          {/* Close Button */}
          <button 
@@ -190,7 +190,7 @@ const handlePrev = useCallback(() => {
              </div>
 
              {/* Navigation Buttons */}
-             <div className="flex items-center justify-between mt-auto pt-4 md:pt-6 border-t border-white/5 shrink-0">
+             <div className="flex items-center justify-between mt-auto pt-4 md:pt-6 border-t border-black/20 dark:border-white/5 shrink-0">
                 <button 
                   onClick={handlePrev}
                   disabled={currentIndex === 0}

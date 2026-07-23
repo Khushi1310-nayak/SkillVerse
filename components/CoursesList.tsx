@@ -65,7 +65,7 @@ export const CoursesList: React.FC = () => {
     Array.from({ length: 6 }).map((_, index) => (
       <div
         key={index}
-        className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 animate-pulse flex flex-col"
+        className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 animate-pulse flex flex-col"
       >
         <div className="flex justify-between items-start mb-4">
           <div className="h-6 w-20 rounded-full bg-white/10" />
@@ -76,7 +76,7 @@ export const CoursesList: React.FC = () => {
         <div className="h-4 w-full rounded bg-white/10 mb-2" />
         <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
 
-        <div className="pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+        <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
           <div className="h-4 w-16 rounded bg-white/10" />
           <div className="h-4 w-24 rounded bg-white/10" />
         </div>
@@ -91,7 +91,7 @@ export const CoursesList: React.FC = () => {
           <Link
             key={course.id}
             to={`/course/${course.id}`}
-            className="group bg-glass border border-white/20 dark:border-white/10 hover:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
+            className="group bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
           >
             <div className="flex justify-between items-start mb-4">
               <span
@@ -117,7 +117,7 @@ export const CoursesList: React.FC = () => {
               {course.description}
             </p>
 
-            <div className="pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+            <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
               <span className="text-xs text-textMuted font-mono">
                 {course.duration}
               </span>

@@ -32,7 +32,7 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ email }) => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }} 
         animate={{ opacity: 1, scale: 1 }} 
-        className="w-full max-w-md bg-glass border border-white/20 p-8 rounded-3xl shadow-2xl text-center"
+        className="w-full max-w-md bg-glass border border-black/20 dark:border-white/20 p-8 rounded-3xl shadow-2xl text-center"
       >
         <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <Mail className="text-primaryLight w-10 h-10" />
@@ -50,7 +50,7 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ email }) => {
           className="w-full bg-gradient-main text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/40 transition-all flex justify-center items-center gap-2 mb-4 disabled:opacity-50"
         >
           {loading ? (
-            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="w-5 h-5 border-2 border-black/20 dark:border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             "Resend Verification Email"
           )}

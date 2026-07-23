@@ -111,7 +111,7 @@ const CertificatePreview: React.FC<{ className?: string, rotate?: boolean }> = (
 );
 
 const AccordionItem: React.FC<{ title: string, content: string, isOpen: boolean, onClick: () => void }> = ({ title, content, isOpen, onClick }) => (
-    <div className="border border-black/5 dark:border-white/10 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 transition-all duration-300">
+    <div className="border border-black/20 dark:border-white/10 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 transition-all duration-300">
         <button 
             onClick={onClick}
             className="w-full flex items-center justify-between p-4 text-left hover:bg-black/10 dark:hover:bg-white/10 transition-colors group"
@@ -120,7 +120,7 @@ const AccordionItem: React.FC<{ title: string, content: string, isOpen: boolean,
             <ChevronDown className={`text-textMuted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} size={20} />
         </button>
         <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <div className="p-4 pt-0 text-textMuted text-sm leading-relaxed border-t border-black/5 dark:border-white/5 mt-2">
+            <div className="p-4 pt-0 text-textMuted text-sm leading-relaxed border-t border-black/20 dark:border-white/5 mt-2">
                 {content}
             </div>
         </div>
@@ -159,7 +159,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <GoldSnow />
       
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10">
+      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-black/20 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <StylishLogo size={36} />
@@ -203,7 +203,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </button>
             <button 
               onClick={handleGetStarted}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/5 border border-black/10 dark:border-white/10 text-textMain font-bold text-lg hover:bg-white/10 transition-all"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/5 border border-black/20 dark:border-white/10 text-textMain font-bold text-lg hover:bg-white/10 transition-all"
             >
               Explore Courses
             </button>
@@ -212,8 +212,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           {/* Floating Cards Hero Graphic */}
           <div className="mt-20 relative max-w-5xl mx-auto h-[450px] hidden md:block animate-fade-in [animation-delay:800ms]">
              {/* Center Card */}
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-glass border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-20 animate-float backdrop-blur-xl">
-                <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
+             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-20 animate-float backdrop-blur-xl">
+                <div className="p-4 border-b border-black/20 dark:border-white/5 flex items-center justify-between">
                    <div className="flex items-center gap-3">
                       <div className="flex gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -236,7 +236,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                       </div>
                       
                       <div className="space-y-4">
-                         <div className="flex items-center gap-4 p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                         <div className="flex items-center gap-4 p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/5">
                             <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
                                <PlayCircle size={20} />
                             </div>
@@ -247,7 +247,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                             <div className="text-xs font-bold text-primaryLight">Resume</div>
                          </div>
 
-                         <div className="flex items-center gap-4 p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/5 opacity-60">
+                         <div className="flex items-center gap-4 p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/5 opacity-60">
                             <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
                                <BookOpen size={20} />
                             </div>
@@ -261,7 +261,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                    </div>
 
                    {/* Right Column: Progress */}
-                   <div className="col-span-2 flex flex-col items-center justify-center p-4 bg-white/30 dark:bg-black/20 rounded-2xl border border-black/5 dark:border-white/5">
+                   <div className="col-span-2 flex flex-col items-center justify-center p-4 bg-white/30 dark:bg-black/20 rounded-2xl border border-black/20 dark:border-white/5">
                       <div className="relative w-32 h-32 flex items-center justify-center mb-4">
                          <svg className="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border-color)" strokeWidth="3" />
@@ -280,7 +280,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
              </div>
              
              {/* Left Card: Quiz Passed */}
-             <div className="absolute top-16 left-[-10px] w-[280px] bg-glass border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl p-5 z-20 animate-float [animation-delay:1s] backdrop-blur-md">
+             <div className="absolute top-16 left-[-10px] w-[280px] bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl shadow-2xl p-5 z-20 animate-float [animation-delay:1s] backdrop-blur-md">
                 <div className="flex items-center gap-3 mb-3">
                    <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center text-success border border-success/20">
                       <CheckCircle size={20}/>
@@ -300,7 +300,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
              </div>
 
              {/* Bottom Left Card: Certified */}
-             <div className="absolute top-[280px] left-[-30px] w-[260px] bg-glass border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl p-5 z-20 animate-float [animation-delay:1.5s] backdrop-blur-md">
+             <div className="absolute top-[280px] left-[-30px] w-[260px] bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl shadow-2xl p-5 z-20 animate-float [animation-delay:1.5s] backdrop-blur-md">
                 <div className="flex items-start gap-4">
                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
                       <Award size={24}/>
@@ -326,7 +326,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                  { icon: Award, title: 'Certificates', desc: 'Earn verified credentials for your resume.', color: 'bg-purple-500/10 text-purple-500' },
                  { icon: Shield, title: 'Career Skills', desc: 'Curriculum designed by industry pros.', color: 'bg-emerald-500/10 text-emerald-500' },
                ].map((item, i) => (
-                 <div key={i} className="group p-8 rounded-3xl bg-glass border border-white/20 dark:border-white/10 hover:bg-glass-hover hover:-translate-y-1 transition-all duration-300">
+                 <div key={i} className="group p-8 rounded-3xl bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:bg-glass-hover hover:-translate-y-1 transition-all duration-300">
                     <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                        <item.icon size={28} />
                     </div>
@@ -358,7 +358,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     <div className="w-16 h-16 rounded-full bg-background border-4 border-primary/30 text-xl font-bold flex items-center justify-center mb-6 shadow-xl text-primaryLight z-20">
                        {item.step}
                     </div>
-                    <div className="bg-glass border border-white/20 dark:border-white/10 p-8 rounded-3xl w-full hover:border-primaryLight/30 transition-colors">
+                    <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 p-8 rounded-3xl w-full hover:border-primaryLight/30 transition-colors">
                        <h3 className="text-xl font-bold mb-2 text-textMain">{item.title}</h3>
                        <p className="text-textMuted">{item.desc}</p>
                     </div>
@@ -369,7 +369,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Certificate Showcase */}
-      <section className="py-20 px-6 bg-white/5 border-y border-white/10">
+      <section className="py-20 px-6 bg-white/5 border-y border-black/20 dark:border-white/10">
          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2">
                <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primaryLight font-bold text-sm mb-6">
@@ -410,7 +410,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                </button>
                <button 
                  onClick={handleGetStarted}
-                 className="px-10 py-4 rounded-xl bg-white/5 border border-black/10 dark:border-white/10 text-textMain font-bold text-xl hover:bg-white/10 transition-all"
+                 className="px-10 py-4 rounded-xl bg-white/5 border border-black/20 dark:border-white/10 text-textMain font-bold text-xl hover:bg-white/10 transition-all"
                >
                  Log In
                </button>
@@ -419,7 +419,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/5 dark:bg-[#050911] pt-16 pb-8 px-6">
+      <footer className="border-t border-black/20 dark:border-white/10 bg-black/5 dark:bg-[#050911] pt-16 pb-8 px-6">
          <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                <div className="col-span-2 md:col-span-1 animate-fade-in-up">
@@ -456,7 +456,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   </ul>
                </div>
             </div>
-            <div className="border-t border-white/10 pt-8 text-center text-sm text-textMuted animate-fade-in [animation-delay:400ms]">
+            <div className="border-t border-black/20 dark:border-white/10 pt-8 text-center text-sm text-textMuted animate-fade-in [animation-delay:400ms]">
                © 2026 SkillVerse Inc. All rights reserved.
             </div>
          </div>
@@ -473,7 +473,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             {/* CLOSE BUTTON */}
             <button 
               onClick={closeModal}
-              className="fixed top-6 right-6 z-[110] p-2 rounded-full bg-black/10 hover:bg-black/20 text-textMain dark:bg-black/50 dark:hover:bg-black/70 dark:text-white transition-colors border border-black/10 dark:border-white/10"
+              className="fixed top-6 right-6 z-[110] p-2 rounded-full bg-black/10 hover:bg-black/20 text-textMain dark:bg-black/50 dark:hover:bg-black/70 dark:text-white transition-colors border border-black/20 dark:border-white/10"
               title="Close"
               aria-label="Close"
             >
@@ -482,7 +482,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* FEATURES MODAL */}
             {activeModal === 'features' && (
-              <div className="bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+              <div className="bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
                 <div className="p-6 md:p-12">
                    <div className="text-center mb-8 md:mb-12 pt-8">
                       <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primaryLight text-sm font-semibold mb-4">
@@ -549,7 +549,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* CERTIFICATES MODAL */}
             {activeModal === 'certificates' && (
-              <div className="bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up flex flex-col lg:flex-row">
+              <div className="bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up flex flex-col lg:flex-row">
                  {/* Left Content */}
                  <div className="lg:w-1/2 p-6 md:p-12 flex flex-col justify-center pt-12 md:pt-12">
                     <div className="inline-block self-start px-4 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm font-bold mb-6">
@@ -620,7 +620,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* PRICING MODAL */}
             {activeModal === 'pricing' && (
-              <div className="max-w-4xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+              <div className="max-w-4xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
                  <div className="text-center p-8 md:p-12 pb-6 pt-12">
                     <h2 className="text-2xl md:text-5xl font-display font-bold text-textMain mb-4">
                        Simple, Transparent Pricing
@@ -674,7 +674,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* DOCUMENTATION MODAL */}
             {activeModal === 'documentation' && (
-              <div className="max-w-5xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
+              <div className="max-w-5xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
                   <div className="text-center mb-10">
                       <div className="inline-block p-3 rounded-xl bg-blue-500/10 text-blue-500 mb-4">
                           <BookOpen size={32} />
@@ -686,25 +686,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
                           <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Layout className="text-primaryLight" size={20}/> Tech Stack</h3>
                           <p className="text-sm text-textMuted leading-relaxed">Built with React 19, TypeScript, Vite, and Tailwind CSS. Utilizes client-side architecture and localStorage for a seamless offline-capable experience without server dependency.</p>
                       </div>
-                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
                           <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Briefcase className="text-primaryLight" size={20}/> Career Mode</h3>
                           <p className="text-sm text-textMuted leading-relaxed">Simulated interview engine featuring real questions from 20 top tech companies (Google, Meta, Uber, etc.), complete with difficulty tags and a proprietary Readiness Score.</p>
                       </div>
-                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
                           <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Bot className="text-primaryLight" size={20}/> AI Integration</h3>
                           <p className="text-sm text-textMuted leading-relaxed">Powered by Google's GenAI SDK (Gemini). The assistant maintains context-awareness of your current course and provides on-demand explanations and code snippets.</p>
                       </div>
-                      <div className="bg-glass border border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
+                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
                           <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Trophy className="text-primaryLight" size={20}/> Gamification</h3>
                           <p className="text-sm text-textMuted leading-relaxed">An immersive XP system that calculates points based on quiz performance and streak multipliers. Users can unlock levels and badges to stay motivated.</p>
                       </div>
                   </div>
 
-                  <div className="text-center pt-6 border-t border-white/10">
+                  <div className="text-center pt-6 border-t border-black/20 dark:border-white/10">
                       <button 
                           onClick={() => {
                               closeModal();
@@ -720,7 +720,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* SUPPORT MODAL */}
             {activeModal === 'support' && (
-               <div className="max-w-3xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
+               <div className="max-w-3xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
                    <div className="text-center mb-10">
                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
                            <HelpCircle size={32} className="text-primaryLight" />
@@ -730,7 +730,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                    </div>
                    
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                       <a href="mailto:khushinayak127@gmail.com" className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group">
+                       <a href="mailto:khushinayak127@gmail.com" className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/20 dark:border-white/5 group">
                            <div className="p-3 bg-white dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform">
                                <Mail className="text-textMain" size={24} />
                            </div>
@@ -741,7 +741,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                        </a>
                        <button 
                            onClick={() => document.getElementById('ai-assistant-toggle')?.click()}
-                           className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5 group text-left"
+                           className="flex items-center gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/20 dark:border-white/5 group text-left"
                        >
                             <div className="p-3 bg-white dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform">
                                <Bot className="text-textMain" size={24} />
@@ -779,7 +779,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* PRIVACY MODAL */}
             {activeModal === 'privacy' && (
-                <div className="max-w-4xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
+                <div className="max-w-4xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
                    <div className="text-center mb-10">
                        <h2 className="text-3xl font-bold text-textMain mb-4">Privacy Policy</h2>
                        <p className="text-textMuted">Transparent, secure, and user-centric.</p>
@@ -811,7 +811,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* TERMS MODAL */}
             {activeModal === 'terms' && (
-                <div className="max-w-4xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12 flex flex-col h-[70vh]">
+                <div className="max-w-4xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12 flex flex-col h-[70vh]">
                    <h2 className="text-3xl font-bold text-textMain mb-6 shrink-0">Terms of Service</h2>
                    
                    <div className="relative flex-1 overflow-y-auto custom-scrollbar pr-4 space-y-8 pb-10">
@@ -853,7 +853,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* BLOG MODAL */}
             {activeModal === 'blog' && (
-                <div className="max-w-5xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
+                <div className="max-w-5xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
                     <div className="flex justify-between items-end mb-8">
                        <div>
                           <h2 className="text-3xl font-bold text-textMain mb-2">SkillVerse Blog</h2>
@@ -901,7 +901,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                                 href={post.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group cursor-pointer rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
+                                className="group cursor-pointer rounded-2xl overflow-hidden border border-black/20 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
                             >
                                 <div className="h-48 bg-black/10 dark:bg-white/10 flex items-center justify-center text-textMuted/50 relative overflow-hidden">
                                    <FileText size={48} className="group-hover:scale-110 transition-transform duration-500" />
@@ -929,7 +929,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* BRAND MODAL (Our Story) */}
             {activeModal === 'brand' && (
-               <div className="max-w-4xl mx-auto bg-background border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+               <div className="max-w-4xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
                   <div className="relative p-12 md:p-16 text-center overflow-hidden">
                       {/* Animated Gradient BG */}
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20 animate-pulse-slow"></div>
@@ -948,21 +948,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                           </p>
 
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-2xl mb-12">
-                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/5 dark:border-white/10">
+                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/20 dark:border-white/10">
                                   <div className="text-3xl font-bold text-textMain mb-1">10k+</div>
                                   <div className="text-xs text-textMuted uppercase tracking-wider">Students</div>
                               </div>
-                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/5 dark:border-white/10">
+                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/20 dark:border-white/10">
                                   <div className="text-3xl font-bold text-textMain mb-1">50+</div>
                                   <div className="text-xs text-textMuted uppercase tracking-wider">Courses</div>
                               </div>
-                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/5 dark:border-white/10">
+                              <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-black/20 dark:border-white/10">
                                   <div className="text-3xl font-bold text-textMain mb-1">98%</div>
                                   <div className="text-xs text-textMuted uppercase tracking-wider">Hired</div>
                               </div>
                           </div>
 
-                          <div className="inline-block px-4 py-1.5 rounded-full border border-black/10 dark:border-white/10 text-xs font-mono text-textMuted">
+                          <div className="inline-block px-4 py-1.5 rounded-full border border-black/20 dark:border-white/10 text-xs font-mono text-textMuted">
                               v1.0.4 • Stable Release
                           </div>
                       </div>

@@ -30,7 +30,7 @@ export const CertificationsList: React.FC = () => {
             })}
          </div>
        ) : (
-         <div className="flex flex-col items-center justify-center py-20 bg-glass border border-white/20 dark:border-white/10 rounded-3xl text-center">
+         <div className="flex flex-col items-center justify-center py-20 bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl text-center">
             <div className="w-20 h-20 bg-white/50 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                <Award size={40} className="text-textMuted opacity-50" />
             </div>

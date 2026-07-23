@@ -94,7 +94,7 @@ export const Certificate: React.FC = () => {
         <div className="flex items-center gap-4">
            <button 
              onClick={handleCopyLink}
-             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/10 dark:border-white/10"
+             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10"
            >
              {copied ? <CheckCircle size={18} className="text-success" /> : <LinkIcon size={18} />}
              {copied ? "Link Copied!" : "Copy Link"}

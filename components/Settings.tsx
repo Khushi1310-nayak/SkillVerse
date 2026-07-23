@@ -232,7 +232,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
         <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
-          <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-4">
+          <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
             <TabButton id="profile" icon={User} label="Profile" />
             <TabButton id="appearance" icon={Palette} label="Appearance" />
             <TabButton id="learning" icon={BookOpen} label="Learning" />
@@ -244,7 +244,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
         {/* Settings Content */}
         <div className="lg:col-span-3">
-          <div className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 min-h-[500px] relative">
+          <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-8 min-h-[500px] relative">
             
             {/* Save Toast */}
             {toastMessage && (
@@ -264,7 +264,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <label className="block text-sm font-semibold text-textMuted uppercase tracking-wider">Avatar</label>
                   
                   {/* Current Active Avatar Display & Upload Controls */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-black/20 dark:border-white/10">
                     <div className="relative group">
                       <img 
                         src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url} 
@@ -340,7 +340,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                           key={avatar.id}
                           type="button"
                           onClick={() => handleAvatarSelect(avatar.id)}
-                          className={`p-1 rounded-full border-2 transition-all ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-white/20'}`}
+                          className={`p-1 rounded-full border-2 transition-all ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-black/20 dark:border-white/20'}`}
                         >
                           <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" />
                         </button>
@@ -359,7 +359,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       onChange={(e) => handleProfileChange('username', e.target.value)}
                       title="Display Name"
                       placeholder="Enter display name"
-                      className="w-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
+                      className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
@@ -371,12 +371,12 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       onChange={(e) => handleProfileChange('email', e.target.value)}
                       title="Email Address"
                       placeholder="Enter email address"
-                      className="w-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
+                      className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-black/20 dark:border-white/10">
                    <p className="text-sm text-textMuted">Member since: <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString()}</span></p>
                 </div>
               </div>
@@ -389,7 +389,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                    <Palette className="text-primaryLight" /> Appearance
                  </h2>
 
-                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                     <div className="flex items-center gap-3">
                        {formData.settings.theme === 'dark' ? <Moon size={24} className="text-purple-400" /> : <Sun size={24} className="text-yellow-400" />}
                        <div>
@@ -464,14 +464,14 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                         placeholder="Daily Study Goal"
                         className="flex-1 h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primaryLight"
                       />
-                      <span className="w-24 text-center font-mono text-textMain bg-white/50 dark:bg-white/5 py-2 rounded-lg border border-black/5 dark:border-white/10">
+                      <span className="w-24 text-center font-mono text-textMain bg-white/50 dark:bg-white/5 py-2 rounded-lg border border-black/20 dark:border-white/10">
                         {formData.settings.dailyGoal} min
                       </span>
                    </div>
                 </div>
 
                 <div className="space-y-4">
-                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                       <div className="flex items-center gap-3">
                          <Smartphone className="text-blue-500 dark:text-blue-400" />
                          <div>
@@ -482,7 +482,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       <Toggle checked={formData.settings.reminders} onChange={(v) => handleChange('reminders', v)} />
                    </div>
 
-                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                       <div className="flex items-center gap-3">
                          <Save className="text-emerald-500 dark:text-emerald-400" />
                          <div>
@@ -504,7 +504,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </h2>
 
                 <div className="space-y-4">
-                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                       <div className="flex items-center gap-3">
                          <Zap className="text-yellow-500 dark:text-yellow-400" />
                          <div>
@@ -515,7 +515,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       <Toggle checked={formData.settings.instantFeedback} onChange={(v) => handleChange('instantFeedback', v)} />
                    </div>
 
-                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                       <div className="flex items-center gap-3">
                          <CheckCircle className="text-success" />
                          <div>
@@ -526,7 +526,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       <Toggle checked={formData.settings.showAnswers} onChange={(v) => handleChange('showAnswers', v)} />
                    </div>
 
-                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                   <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                       <div className="flex items-center gap-3">
                          <RefreshCcw className="text-purple-500 dark:text-purple-400" />
                          <div>
@@ -554,7 +554,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       value={formData.settings.certificateName}
                       onChange={(e) => handleChange('certificateName', e.target.value)}
                       placeholder="Legal Name"
-                      className="w-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
+                      className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                     <p className="text-xs text-textMuted">This name will appear on all your earned certificates.</p>
                  </div>
@@ -563,7 +563,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Default Format</label>
                     <div className="grid grid-cols-2 gap-4">
                        <button className="p-4 rounded-xl border border-primaryLight bg-primary/10 text-primaryLight font-bold">PDF (Standard)</button>
-                       <button className="p-4 rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 text-textMuted hover:bg-black/10 dark:hover:bg-white/10 cursor-not-allowed">Image (Pro)</button>
+                       <button className="p-4 rounded-xl border border-black/20 dark:border-white/10 bg-black/5 dark:bg-white/5 text-textMuted hover:bg-black/10 dark:hover:bg-white/10 cursor-not-allowed">Image (Pro)</button>
                     </div>
                  </div>
                </div>
@@ -579,7 +579,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <div className="space-y-4">
                    <button 
                      onClick={() => setModal({ type: 'reset' })}
-                     className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 rounded-xl transition-all group"
+                     className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl transition-all group"
                    >
                       <div className="flex items-center gap-3">
                          <RefreshCcw className="text-orange-500 dark:text-orange-400" />
@@ -593,7 +593,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
                    <button 
                      onClick={() => setModal({ type: 'clear' })}
-                     className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-red-500/10 border border-black/5 dark:border-white/10 hover:border-red-500/50 rounded-xl transition-all group"
+                     className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-red-500/10 border border-black/20 dark:border-white/10 hover:border-red-500/50 rounded-xl transition-all group"
                    >
                       <div className="flex items-center gap-3">
                          <Trash2 className="text-red-500 dark:text-red-400" />
@@ -609,7 +609,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             )}
 
             {/* Save Button (Global) */}
-            <div className="mt-12 pt-6 border-t border-black/5 dark:border-white/10 flex justify-end">
+            <div className="mt-12 pt-6 border-t border-black/20 dark:border-white/10 flex justify-end">
                <button 
                  onClick={saveSettings}
                  className="flex items-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all active:scale-95"
@@ -625,7 +625,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
       {modal.type && (
          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setModal({ type: null })} />
-            <div className="relative bg-background border border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
+            <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
                   <AlertTriangle size={24} />
                </div>
@@ -641,7 +641,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                <div className="flex gap-4">
                   <button 
                     onClick={() => setModal({ type: null })}
-                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/5 dark:border-white/10 font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
                   >
                     Cancel
                   </button>

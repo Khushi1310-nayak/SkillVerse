@@ -25,7 +25,7 @@ export const DocumentationPage: React.FC = () => {
       <GoldSnow />
       
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 h-20 flex items-center px-6 md:px-10 justify-between">
+      <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-black/20 dark:border-white/10 h-20 flex items-center px-6 md:px-10 justify-between">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/')}
@@ -53,7 +53,7 @@ export const DocumentationPage: React.FC = () => {
       <div className="flex flex-1 pt-20 h-screen w-full max-w-7xl mx-auto">
         
         {/* Sidebar */}
-        <aside className="w-72 hidden md:flex flex-col border-r border-white/10 bg-background/50 backdrop-blur-sm overflow-y-auto custom-scrollbar h-full py-8 px-6">
+        <aside className="w-72 hidden md:flex flex-col border-r border-black/20 dark:border-white/10 bg-background/50 backdrop-blur-sm overflow-y-auto custom-scrollbar h-full py-8 px-6">
           <h3 className="text-xs font-bold uppercase tracking-wider text-textMuted mb-4">Contents</h3>
           <nav className="space-y-1">
             {sections.map(section => (
@@ -82,11 +82,11 @@ export const DocumentationPage: React.FC = () => {
                 <p className="text-lg text-textMuted leading-relaxed mb-8">
                   Welcome to the official documentation for SkillVerse! This platform is designed as an advanced E-Learning SaaS product that focuses heavily on user engagement, interactive learning, and career readiness.
                 </p>
-                <div className="bg-glass border border-white/10 rounded-2xl p-6 mb-8 hover:border-primaryLight/30 transition-colors">
+                <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 mb-8 hover:border-primaryLight/30 transition-colors">
                   <h3 className="text-xl font-bold text-textMain mb-4 flex items-center gap-2">
                     <Terminal className="text-primaryLight" /> Installation
                   </h3>
-                  <div className="bg-[#0B1220] rounded-xl p-4 font-mono text-sm text-gray-300 mb-4 overflow-x-auto shadow-inner border border-white/5">
+                  <div className="bg-[#0B1220] rounded-xl p-4 font-mono text-sm text-gray-300 mb-4 overflow-x-auto shadow-inner border border-black/20 dark:border-white/5">
                     <div className="mb-2 text-gray-500"># Clone the repository</div>
                     <div>git clone https://github.com/Khushi1310-nayak/skillverse.git</div>
                     <div>cd skillverse</div>
@@ -118,7 +118,7 @@ export const DocumentationPage: React.FC = () => {
                     { label: 'Routing', val: 'React Router v7', icon: Server },
                     { label: 'AI Provider', val: 'Google GenAI SDK', icon: Bot },
                   ].map((item, i) => (
-                    <div key={i} className="bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4">
+                    <div key={i} className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl p-4 flex items-center gap-4">
                       <div className="p-3 bg-white/5 rounded-lg text-primaryLight"><item.icon size={20} /></div>
                       <div>
                         <div className="text-xs text-textMuted">{item.label}</div>
@@ -143,7 +143,7 @@ export const DocumentationPage: React.FC = () => {
                 <p className="text-lg text-textMuted leading-relaxed mb-6">
                   Courses are divided into categories: <strong>Programming, DSA, and Design</strong>. Each course contains exactly 8 modules dynamically generated with rich content and Official Documentation Links.
                 </p>
-                <div className="bg-glass border border-white/10 rounded-2xl p-6 mb-8">
+                <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 mb-8">
                   <h3 className="text-xl font-bold text-textMain mb-3">Certification Logic</h3>
                   <p className="text-textMuted mb-4">
                     Upon completing a course, users are challenged with a 12-question quiz. A score of <strong>70% or higher</strong> is required to unlock a certificate.
@@ -165,11 +165,11 @@ export const DocumentationPage: React.FC = () => {
                   The Career Mode Simulator provides curated interview prep for 20 top tech companies (Google, Meta, Netflix, Uber, etc.). 
                 </p>
                 <div className="space-y-4">
-                  <div className="bg-black/20 p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                  <div className="bg-black/20 p-5 rounded-2xl border border-black/20 dark:border-white/5 hover:border-black/20 dark:border-white/10 transition-colors">
                     <h4 className="font-bold text-textMain mb-2">Company Mock Data</h4>
                     <p className="text-sm text-textMuted">Each company has specific focus areas (e.g. Google focuses on Graph Algorithms and System Design, Netflix focuses on Concurrency). Questions are generated based on these focuses and are categorized as Easy, Medium, or Hard.</p>
                   </div>
-                  <div className="bg-black/20 p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                  <div className="bg-black/20 p-5 rounded-2xl border border-black/20 dark:border-white/5 hover:border-black/20 dark:border-white/10 transition-colors">
                     <h4 className="font-bold text-textMain mb-2">Readiness Score</h4>
                     <p className="text-sm text-textMuted">A proprietary Readiness Score calculates the user's performance against the difficulty of the questions answered, helping them gauge when they are ready for the real interview.</p>
                   </div>
@@ -184,17 +184,17 @@ export const DocumentationPage: React.FC = () => {
                   User engagement is driven by an immersive gamification engine tracking XP, Levels, and Streaks.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                  <div className="bg-glass border border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
+                  <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
                     <div className="text-3xl mb-2">🔥</div>
                     <h4 className="font-bold text-textMain">Streaks</h4>
                     <p className="text-xs text-textMuted mt-2">Daily logins increase streak count, applying multipliers to XP gains.</p>
                   </div>
-                  <div className="bg-glass border border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
+                  <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
                     <div className="text-3xl mb-2">⭐</div>
                     <h4 className="font-bold text-textMain">Levels</h4>
                     <p className="text-xs text-textMuted mt-2">Dynamic level caps based on total accumulated XP.</p>
                   </div>
-                  <div className="bg-glass border border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
+                  <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-5 text-center transform transition-transform hover:-translate-y-1">
                     <div className="text-3xl mb-2">🏅</div>
                     <h4 className="font-bold text-textMain">Badges</h4>
                     <p className="text-xs text-textMuted mt-2">Earn badges for specific achievements like first 100% quiz.</p>
@@ -209,7 +209,7 @@ export const DocumentationPage: React.FC = () => {
                 <p className="text-lg text-textMuted leading-relaxed mb-6">
                   The <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm">AIAssistant.tsx</code> component interfaces directly with the <strong>Google GenAI SDK</strong> (<code className="text-sm">@google/genai</code>) to act as a personal tutor.
                 </p>
-                <div className="bg-black/20 rounded-2xl p-6 border border-white/5">
+                <div className="bg-black/20 rounded-2xl p-6 border border-black/20 dark:border-white/5">
                   <h3 className="font-bold text-textMain mb-3">Context Aware Prompts</h3>
                   <p className="text-sm text-textMuted mb-4">
                     The assistant injects the user's current context (e.g., currently viewed course or category) into the system instructions, ensuring the Gemini model provides highly relevant answers and code snippets tailored to what the user is actively studying.
@@ -227,7 +227,7 @@ export const DocumentationPage: React.FC = () => {
                 <p className="text-lg text-textMuted leading-relaxed mb-6">
                   SkillVerse persists user settings in <code className="bg-white/10 px-1.5 py-0.5 rounded">Firebase Firestore</code> for seamless cross-device synchronization, while using <code className="bg-white/10 px-1.5 py-0.5 rounded">localStorage</code> for local course progress and career mode tracking.
                 </p>
-                <div className="bg-glass border border-white/10 rounded-2xl p-6">
+                <div className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6">
                   <h3 className="text-xl font-bold text-textMain mb-4">storageService & Firestore Integration</h3>
                   <p className="text-sm text-textMuted mb-4">
                     The <code className="text-primaryLight">storageService</code> coordinates with Firebase Auth and Firestore to persist and synchronize:

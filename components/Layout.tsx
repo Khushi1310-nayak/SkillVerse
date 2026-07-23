@@ -128,7 +128,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         </div>
 
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
+      <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-black/20 dark:border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
         <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo">
            <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
@@ -147,7 +147,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <NavItem to="/settings" icon={Settings} label="Settings" id="nav-settings" />
         </nav>
 
-        <div className="pt-6 border-t border-black/5 dark:border-white/5 overflow-hidden">
+        <div className="pt-6 border-t border-black/20 dark:border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
              <img 
                src={user.photoURL || AVATARS[user.settings.avatarId || '1']} 
@@ -170,7 +170,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       </aside>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 z-50">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
          <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
          <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title="Open Menu" aria-label="Open Menu">
             <Menu />
@@ -181,7 +181,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-white/10 p-6 flex flex-col animate-slide-right">
+          <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-black/20 dark:border-white/10 p-6 flex flex-col animate-slide-right">
              <div className="flex justify-between items-center mb-8">
                 <span className="text-xl font-bold text-textMain">Menu</span>
                 <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title="Close Menu" aria-label="Close Menu"><X /></button>
@@ -214,7 +214,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
-           <div className="relative bg-background border border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
+           <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
               <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
                  <AlertTriangle size={24} />
               </div>
@@ -223,7 +223,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
               <div className="flex gap-4">
                  <button 
                    onClick={() => setShowLogoutConfirm(false)}
-                   className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/5 dark:border-white/10 font-medium transition-colors"
+                   className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
                  >
                    Cancel
                  </button>

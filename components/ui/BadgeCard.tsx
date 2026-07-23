@@ -30,7 +30,7 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ course, progress, user }) 
   };
 
   return (
-    <div className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden flex flex-col items-center text-center group hover:border-[#F5C97A]/50 transition-all shadow-xl">
+    <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden flex flex-col items-center text-center group hover:border-[#F5C97A]/50 transition-all shadow-xl">
       {/* Beautiful Pentagon/Hexagon Badge */}
       <div className="relative w-40 h-40 mb-6 drop-shadow-2xl group-hover:scale-105 transition-transform duration-500">
         {/* Outer Gold Border */}
@@ -58,7 +58,7 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ course, progress, user }) 
       <div className="flex gap-3 w-full">
         <button 
           onClick={handleCopyLink}
-          className="flex-1 bg-white/5 dark:bg-white/5 hover:bg-white/10 border border-black/10 dark:border-white/10 text-textMain py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors text-xs sm:text-sm"
+          className="flex-1 bg-white/5 dark:bg-white/5 hover:bg-white/10 border border-black/20 dark:border-white/10 text-textMain py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors text-xs sm:text-sm"
         >
           {copied ? <CheckCircle size={16} className="text-success" /> : <LinkIcon size={16} />}
           {copied ? "Copied" : "Copy Link"}

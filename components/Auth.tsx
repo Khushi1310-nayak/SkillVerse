@@ -53,7 +53,7 @@ export const Auth: React.FC = () => {
 
         <motion.div 
            layout
-           className="bg-glass border border-white/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden group backdrop-blur-md"
+           className="bg-glass border border-black/20 dark:border-white/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden group backdrop-blur-md"
         >
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
             

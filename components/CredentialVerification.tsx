@@ -81,7 +81,7 @@ export const CredentialVerification: React.FC = () => {
       
       <div className="relative z-10 container mx-auto px-6 py-12 flex flex-col items-center">
         
-        <div className="w-full max-w-5xl mb-8 flex justify-between items-center bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl">
+        <div className="w-full max-w-5xl mb-8 flex justify-between items-center bg-white/5 backdrop-blur-md border border-black/20 dark:border-white/10 p-4 rounded-2xl shadow-2xl">
           <Link to="/" className="flex items-center text-textMuted hover:text-white transition-colors font-medium">
             <ArrowLeft size={20} className="mr-2" /> SkillVerse Academy
           </Link>
@@ -109,7 +109,7 @@ export const CredentialVerification: React.FC = () => {
               <h2 className="text-2xl font-bold text-white mb-2">{data.username}</h2>
               <p className="text-[#B9B6E3] mb-6 font-medium tracking-wide">{data.courseTitle} Certified</p>
 
-              <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm text-left">
+              <div className="w-full bg-white/5 border border-black/20 dark:border-white/10 rounded-2xl p-6 backdrop-blur-sm text-left">
                  <div className="mb-4">
                     <p className="text-xs text-textMuted uppercase tracking-wider mb-1">Credential ID</p>
                     <p className="font-mono text-[#F5C97A]">{data.credentialId}</p>

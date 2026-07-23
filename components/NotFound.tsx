@@ -13,7 +13,7 @@ const NotFound = () => {
 
       <div className="relative z-10 w-full max-w-2xl">
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_40px_rgba(99,102,241,0.15)] p-10 md:p-12 text-center">
+        <div className="rounded-3xl border border-black/20 dark:border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_40px_rgba(99,102,241,0.15)] p-10 md:p-12 text-center">
 
           {/* Icon */}
           <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/20">

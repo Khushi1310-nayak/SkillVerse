@@ -111,7 +111,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       {/* Chat Window */}
       {isOpen && (
         <div className={`
-            bg-[#1A1F2E] dark:bg-[#1A1F2E] bg-white border border-white/20 dark:border-white/10 shadow-2xl rounded-2xl overflow-hidden flex flex-col
+            bg-[#1A1F2E] dark:bg-[#1A1F2E] bg-white border border-black/20 dark:border-white/20 dark:border-white/10 shadow-2xl rounded-2xl overflow-hidden flex flex-col
             transition-all duration-300 origin-bottom-right
             ${isExpanded ? 'w-[80vw] md:w-[600px] h-[80vh]' : 'w-[90vw] md:w-[400px] h-[500px]'}
             mb-4 animate-fade-in-up
@@ -146,7 +146,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                     max-w-[85%] rounded-2xl p-3 text-sm leading-relaxed
                     ${msg.role === 'user' 
                       ? 'bg-primary text-white rounded-tr-none' 
-                      : 'bg-white dark:bg-[#2A303C] text-textMain border border-black/5 dark:border-white/5 rounded-tl-none'}
+                      : 'bg-white dark:bg-[#2A303C] text-textMain border border-black/20 dark:border-white/5 rounded-tl-none'}
                 `}>
                   {/* Better Plain Text Rendering */}
                   {msg.text.split('\n').map((line, i) => {
@@ -170,7 +170,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center">
                      <Sparkles size={14} />
                   </div>
-                  <div className="bg-white dark:bg-[#2A303C] rounded-2xl rounded-tl-none p-3 border border-black/5 dark:border-white/5 flex items-center gap-2">
+                  <div className="bg-white dark:bg-[#2A303C] rounded-2xl rounded-tl-none p-3 border border-black/20 dark:border-white/5 flex items-center gap-2">
                      <Loader2 size={16} className="animate-spin text-primaryLight" />
                      <span className="text-xs text-textMuted">Thinking...</span>
                   </div>
@@ -180,7 +180,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white dark:bg-[#1A1F2E] border-t border-black/5 dark:border-white/10 shrink-0">
+          <div className="p-4 bg-white dark:bg-[#1A1F2E] border-t border-black/20 dark:border-white/10 shrink-0">
              <div className="flex gap-2 relative">
                 <input
                   type="text"

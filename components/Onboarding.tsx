@@ -288,7 +288,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ user, onComplete }) => {
                                     hover:scale-[1.02] active:scale-[0.98] backdrop-blur-md
                                     ${isSelected 
                                         ? 'border-primaryLight bg-primary/20 shadow-lg shadow-primary/20' 
-                                        : 'border-black/5 dark:border-white/10 bg-white/40 dark:bg-black/40 hover:border-primary/50 hover:bg-white/60 dark:hover:bg-black/60'
+                                        : 'border-black/20 dark:border-white/10 bg-white/40 dark:bg-black/40 hover:border-primary/50 hover:bg-white/60 dark:hover:bg-black/60'
                                     }
                                 `}
                             >

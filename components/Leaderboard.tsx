@@ -74,20 +74,20 @@ export const Leaderboard: React.FC = () => {
       case 2:
         return 'bg-gradient-to-r from-amber-600/20 to-transparent border-amber-600/50';
       default:
-        return 'bg-white/5 border-white/10 hover:bg-white/10';
+        return 'bg-white/5 border-black/20 dark:border-white/10 hover:bg-white/10';
     }
   };
 
   if (loading) {
     return (
-      <div className="bg-glass border border-white/20 rounded-3xl p-8 flex justify-center items-center h-64">
+      <div className="bg-glass border border-black/20 dark:border-white/20 rounded-3xl p-8 flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryLight"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-glass border border-white/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+    <div className="bg-glass border border-black/20 dark:border-white/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-gradient-main flex items-center justify-center shadow-lg">
           <TrendingUp className="text-white" size={20} />
@@ -119,7 +119,7 @@ export const Leaderboard: React.FC = () => {
                   <img
                     src={user.photoURL || AVATARS[user.avatarId || '1']}
                     alt={user.username}
-                    className="w-12 h-12 rounded-full object-cover border border-white/10 bg-black/20"
+                    className="w-12 h-12 rounded-full object-cover border border-black/20 dark:border-white/10 bg-black/20"
                   />
                   {index < 3 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">

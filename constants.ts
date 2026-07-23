@@ -297,14 +297,18 @@ const generateQuestionsForCompany = (companyId: string, focus: string[]): Interv
   const questionsList1 = TOPIC_QUESTION_MAP[focus[0]] || ['Explain core concept', 'Solve basic problem', 'Design system component', 'Optimize algorithm', 'Debug edge case'];
   const questionsList2 = TOPIC_QUESTION_MAP[focus[1]] || questionsList1;
   
-  const allQuestions = [...questionsList1, ...questionsList2];
+  // Combine and deduplicate
+  const allQuestions = Array.from(new Set([...questionsList1, ...questionsList2]));
+  
+  // Shuffle exactly once
+  const shuffledQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
   
   return Array.from({ length: 10 }).map((_, i) => {
-    // Pick a random question title from the combined pool
-    const randomTitle = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+    // Safely pick unique questions if there are enough, otherwise wrap around
+    const title = shuffledQuestions[i % shuffledQuestions.length];
     return {
       id: `${companyId}-q${i + 1}`,
-      title: randomTitle,
+      title: title,
       difficulty: diffs[i],
       tags: [focus[i % 2 === 0 ? 0 : 1] || 'General'],
       answer: `
@@ -339,14 +343,14 @@ const COMPANY_LIST = [
   { name: 'Palantir', focus: ['Data Processing', 'Algorithms'], domain: 'palantir.com' },
 ];
 
-export const COMPANIES: Company[] = COMPANY_LIST.map(c => ({
+export const COMPANIES: Company[] = COMPANY_LIST.map((c, index) => ({
   id: c.name.toLowerCase().replace(/\s+/g, '-'),
   name: c.name,
   // Reliable mock logos using UI Avatars
   logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&rounded=true&bold=true&size=128`, 
   description: `Prepare for ${c.name} with curated questions focusing on ${c.focus.join(' and ')}.`,
   roles: ['SDE I', 'SDE II', 'Frontend', 'Backend'],
-  difficulty: Math.random() > 0.5 ? 'Very Hard' : Math.random() > 0.5 ? 'Hard' : 'Moderate',
+  difficulty: index % 3 === 0 ? 'Very Hard' : index % 3 === 1 ? 'Hard' : 'Moderate',
   focus: c.focus,
   questions: generateQuestionsForCompany(c.name.toLowerCase().replace(/\s+/g, '-'), c.focus),
 }));

@@ -35,7 +35,7 @@ export const CategoryView: React.FC = () => {
             <Link
               key={course.id}
               to={`/course/${course.id}`}
-              className={`relative bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-white/40 hover:shadow-xl group overflow-hidden`}
+              className={`relative bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-black/20 dark:border-white/40 hover:shadow-xl group overflow-hidden`}
             >
               {isPassed && (
                 <div className="absolute top-4 right-4 text-success">

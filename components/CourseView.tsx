@@ -172,7 +172,7 @@ export const CourseView: React.FC = () => {
           <ArrowLeft size={20} className="mr-2" /> Back
         </Link>
 
-        <div className="bg-glass border border-white/20 dark:border-white/10 rounded-2xl p-6 sticky top-28">
+        <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 sticky top-28">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
             <BookOpen className="text-white" />
           </div>
@@ -198,7 +198,7 @@ export const CourseView: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="lg:col-span-3">
-        <div className="bg-glass border border-white/20 dark:border-white/10 rounded-3xl p-8 md:p-12 min-h-[600px]">
+        <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-8 md:p-12 min-h-[600px]">
 
           {activeTab === 'learn' ? (
             <div className="animate-fade-in space-y-8">
@@ -207,11 +207,11 @@ export const CourseView: React.FC = () => {
                 <div dangerouslySetInnerHTML={{ __html: course.content }} />
               </div>
 
-              <div className="border-t border-black/5 dark:border-white/10 pt-8 mt-12">
+              <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">
                 <h3 className="text-lg font-bold text-textMain mb-4">External Resources</h3>
                 <div className="flex flex-wrap gap-4">
                   {course.resources.map((res, i) => (
-                    <a key={i} href={res.url} className="px-4 py-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 rounded-lg text-primaryLight text-sm transition-colors">
+                    <a key={i} href={res.url} className="px-4 py-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-lg text-primaryLight text-sm transition-colors">
                       {res.title} ↗
                     </a>
                   ))}
@@ -252,7 +252,7 @@ export const CourseView: React.FC = () => {
 
                       let btnClass = isSelected
                         ? 'bg-primary/20 border-primaryLight text-textMain'
-                        : 'bg-white/50 dark:bg-white/5 border-black/5 dark:border-white/10 text-textMuted hover:bg-white/80 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20';
+                        : 'bg-white/50 dark:bg-white/5 border-black/20 dark:border-white/10 text-textMuted hover:bg-white/80 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-black/20 dark:border-white/20';
                       let iconBorder = isSelected ? 'border-primaryLight' : 'border-black/20 dark:border-white/20';
 
                       if (showInstant) {
@@ -311,7 +311,7 @@ export const CourseView: React.FC = () => {
                 </>
               ) : (
                 <div className="text-center py-10">
-                  <div className="mb-6 inline-flex p-4 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10">
+                  <div className="mb-6 inline-flex p-4 rounded-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10">
                     {passed ? <Award size={64} className="text-yellow-400" /> : <XCircle size={64} className="text-red-400" />}
                   </div>
 
@@ -366,10 +366,10 @@ export const CourseView: React.FC = () => {
                   </div>
 
                   {settings?.showAnswers && (
-                    <div className="mt-16 space-y-6 text-left border-t border-black/5 dark:border-white/10 pt-10">
+                    <div className="mt-16 space-y-6 text-left border-t border-black/20 dark:border-white/10 pt-10">
                       <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Answers</h3>
                       {course.quiz.map((q, qIdx) => (
-                        <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10">
+                        <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/20 dark:border-white/10">
                           <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
                           <div className="space-y-3">
                             {q.options.map((opt, oIdx) => {

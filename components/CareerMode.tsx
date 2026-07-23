@@ -14,6 +14,7 @@ import { Company, InterviewQuestion, CareerProgress } from '../types';
 import { auth, db } from '../firebase/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { Typewriter } from './Typewriter';
+import Editor from '@monaco-editor/react';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -84,10 +85,10 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
   return (
     <div 
       onClick={onClick}
-      className="group bg-glass border border-black/5 dark:border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:bg-glass-hover hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden"
+      className="group bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:bg-glass-hover hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden"
     >
       <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
-        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/5 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/20 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
            <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
@@ -130,7 +131,7 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
   };
 
   return (
-    <div className="border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/20 hover:bg-black/10 dark:hover:bg-white/10">
+    <div className="border border-black/20 dark:border-white/10 bg-black/5 dark:bg-white/5 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/20 hover:bg-black/10 dark:hover:bg-white/10">
       <div 
         className="p-4 cursor-pointer flex items-start gap-4"
         onClick={() => setIsOpen(!isOpen)}
@@ -160,7 +161,7 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
                     'text-red-500 bg-red-500/10 border-red-500/20'}
                `}>{question.difficulty}</span>
                {question.tags.map(tag => (
-                 <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/5 dark:border-white/5 whitespace-nowrap">{tag}</span>
+                 <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
                ))}
             </div>
             <h4 className="font-bold text-textMain text-sm md:text-base pr-2 truncate md:whitespace-normal">{question.title}</h4>
@@ -180,7 +181,7 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
       </div>
 
       <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-         <div className="p-4 pt-0 border-t border-black/5 dark:border-white/5">
+         <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
             <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
                <div dangerouslySetInnerHTML={{ __html: question.answer }} />
             </div>
@@ -218,6 +219,7 @@ export const CareerMode: React.FC = () => {
   const [textReport, setTextReport] = useState("");
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [editorLanguage, setEditorLanguage] = useState<string>('javascript');
 
   // Voice State
   const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([]);
@@ -229,14 +231,62 @@ export const CareerMode: React.FC = () => {
   const synthRef = React.useRef<SpeechSynthesis | null>(window.speechSynthesis);
   const silenceTimerRef = React.useRef<any>(null);
   const currentSpeechRef = React.useRef("");
+  const [extraTimeUsed, setExtraTimeUsed] = useState(0); // tracks extra minutes requested
+  const [voiceType, setVoiceType] = useState<'robin' | 'elisa'>('robin');
+  const voiceTypeRef = React.useRef<'robin' | 'elisa'>('robin');
+  const [showVoiceSelectModal, setShowVoiceSelectModal] = useState(false);
+
+  const handleRequestTime = () => {
+    if (extraTimeUsed >= 30) return;
+    
+    const input = window.prompt("How many extra minutes do you need? (Max 30)");
+    if (!input) return;
+    
+    let requested = parseInt(input);
+    if (isNaN(requested) || requested <= 0) return;
+    
+    let responseText = "";
+    if (requested > 30) {
+      requested = 30;
+      responseText = "I can only grant a maximum of 30 additional minutes. I have added 30 minutes to your clock.";
+    } else {
+      responseText = `I have granted you ${requested} extra minutes. Good luck.`;
+    }
+    
+    if (requested + extraTimeUsed > 30) {
+      requested = 30 - extraTimeUsed;
+      responseText = `You can only request up to 30 minutes total. I have added your remaining ${requested} minutes to your clock.`;
+    }
+    
+    setExtraTimeUsed(prev => prev + requested);
+    setTimer(prev => prev + (requested * 60));
+    
+    // Play Robin's Voice
+    if (synthRef.current) {
+      synthRef.current.cancel();
+      const utterance = new SpeechSynthesisUtterance(responseText);
+      synthRef.current.speak(utterance);
+    }
+  };
 
   // Search Filter
   const [search, setSearch] = useState('');
+  
   // Timer logic
   useEffect(() => {
     let interval: any;
     if (mockState === 'active' || mockState === 'active_voice') {
-      interval = setInterval(() => setTimer(t => t + 1), 1000);
+      interval = setInterval(() => {
+        setTimer(t => {
+          if (t <= 1) {
+            clearInterval(interval);
+            if (mockState === 'active') finishMockInterview();
+            if (mockState === 'active_voice') stopListeningAndSubmit(true);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
     }
     return () => clearInterval(interval);
   }, [mockState]);
@@ -251,13 +301,23 @@ export const CareerMode: React.FC = () => {
             const data = doc.data();
             // find the original company icon/desc if it exists in local constants, else default
             const localMatch = COMPANIES.find(c => c.name.toLowerCase() === data.name.toLowerCase());
+            // Deduplicate questions from Firebase just in case they were saved previously with the duplicate bug
+            const rawQuestions = data.questions && data.questions.length > 0 ? data.questions : (localMatch?.questions || []);
+            const uniqueQuestionsMap = new Map();
+            rawQuestions.forEach((q: any) => {
+              if (!uniqueQuestionsMap.has(q.title)) {
+                uniqueQuestionsMap.set(q.title, q);
+              }
+            });
+            const safeQuestions = Array.from(uniqueQuestionsMap.values());
+
             return {
               id: doc.id,
               name: data.name || localMatch?.name || doc.id,
               logo: localMatch?.logo || 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', // generic default
               description: localMatch?.description || 'Top tech company',
               focus: localMatch?.focus || ['Algorithms', 'System Design'],
-              questions: data.questions || []
+              questions: safeQuestions
             } as Company;
           });
           setCompaniesList(liveData);
@@ -304,11 +364,12 @@ export const CareerMode: React.FC = () => {
 
   const startMockInterview = () => {
     if (!selectedCompany) return;
-    // Shuffle and pick up to 10 random questions
+    // Shuffle and pick up to 5 random unique questions for the mock interview
     const shuffled = [...selectedCompany.questions].sort(() => 0.5 - Math.random());
-    setMockQuestions(shuffled.slice(0, 10));
+    setMockQuestions(shuffled.slice(0, 5));
     setMockState('active');
-    setTimer(0);
+    setTimer(9000); // 150 minutes
+    setExtraTimeUsed(0);
     setCurrentMockIndex(0);
     setMockAnswers([]);
     setIsFullScreen(true);
@@ -318,7 +379,7 @@ export const CareerMode: React.FC = () => {
     setIsGeneratingText(true);
     
     const userName = auth.currentUser?.displayName || 'candidate';
-    let transcriptText = `Candidate Name: ${userName}\nInterviewer Name: Robin\nCompany: ${selectedCompany?.name}\n\n`;
+    let transcriptText = `Candidate Name: ${userName}\nInterviewer Name: Robin\nCompany: ${selectedCompany?.name}\nLanguage Used: ${editorLanguage}\n\n`;
     mockQuestions.forEach((q, i) => {
       transcriptText += `Q${i+1} (${q.difficulty}): ${q.title}\nUser's Code/Approach:\n${mockAnswers[i] || 'No answer provided.'}\n\n`;
     });
@@ -329,7 +390,8 @@ Here is the transcript of the questions and the code/approach they typed:
 ${transcriptText}
 
 Provide a brutally honest, highly technical Markdown report evaluating their performance.
-Focus on time/space complexity, edge cases missed, and system design flaws.
+Focus on time/space complexity (Big O), edge cases missed, and syntax errors.
+Since they typed code in ${editorLanguage}, specifically evaluate their idiomatic use of the language.
 IMPORTANT STYLING RULES:
 - Use very simple, precise, and easy-to-understand English.
 - NEVER write dense paragraphs. Every single sentence or point MUST be separated by a double newline (blank line).
@@ -379,7 +441,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     setVoiceStatus('speaking');
     setTurnCount(1);
     setVoiceReport("");
-    setTimer(0);
+    setTimer(2700); // 45 minutes
+    setExtraTimeUsed(0);
     setCurrentSpeech("");
     currentSpeechRef.current = "";
     setIsFullScreen(true);
@@ -388,7 +451,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     const timeOfDay = getTimeOfDay();
     
     // Hardcode the first greeting to guarantee it plays
-    const greetingMsg = `Good ${timeOfDay}, ${userName}! I am Robin, your interviewer. Let's start our interview. Could you please introduce yourself and tell me about your most recent project?`;
+    const interviewerName = voiceTypeRef.current === 'robin' ? 'Robin' : 'Elisa';
+    const greetingMsg = `Good ${timeOfDay}, ${userName}! I am ${interviewerName}, your interviewer. Let's start our interview. Could you please introduce yourself and tell me about your most recent project?`;
     
     setChatHistory([{ role: 'assistant', content: greetingMsg }]);
     
@@ -399,7 +463,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
   const generateAIResponse = async (history: any[]) => {
     setVoiceStatus('generating');
-    const systemPrompt = `You are Robin, a Senior Engineer at ${selectedCompany?.name} conducting a verbal technical interview.
+    const interviewerName = voiceTypeRef.current === 'robin' ? 'Robin' : 'Elisa';
+    const systemPrompt = `You are ${interviewerName}, a Senior Engineer at ${selectedCompany?.name} conducting a verbal technical interview.
     If the user gives a wrong answer, gently push back and ask them to reconsider.
     Use simple, precise, and highly conversational English.
     Use conversational filler words like 'um', 'hmm', and 'I see' so you sound human when your text is spoken via TTS.
@@ -443,6 +508,16 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     if (synthRef.current) {
       synthRef.current.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
+      
+      const voices = synthRef.current.getVoices();
+      if (voiceTypeRef.current === 'robin') {
+        const maleVoice = voices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('guy') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('mark') || v.name.toLowerCase().includes('google uk english male'));
+        if (maleVoice) utterance.voice = maleVoice;
+      } else {
+        const femaleVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('girl') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('woman') || v.name.toLowerCase().includes('hazel') || v.name.toLowerCase().includes('victoria')) || voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('guy') && !v.name.toLowerCase().includes('david'));
+        if (femaleVoice) utterance.voice = femaleVoice;
+      }
+      
       utterance.onend = () => {
         startListening();
       };
@@ -473,8 +548,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     silenceTimerRef.current = setTimeout(() => {
-       stopListeningAndSubmit();
-    }, 8000); // 8 second fallback if they never speak
+       speakQuestion("Are you there? Take your time, let me know if you need me to repeat the question.");
+    }, 60000); // 60 second idle detection
     
     recognition.onresult = (event: any) => {
       let finalTranscript = '';
@@ -617,7 +692,7 @@ ${transcriptText}`;
              </p>
           </div>
           
-          <div className="flex items-center gap-6 bg-glass border border-black/5 dark:border-white/10 p-4 rounded-2xl w-full md:w-auto justify-between md:justify-start">
+          <div className="flex items-center gap-6 bg-glass border border-black/20 dark:border-white/10 p-4 rounded-2xl w-full md:w-auto justify-between md:justify-start">
              <div className="text-right">
                 <div className="text-xs text-textMuted uppercase font-bold tracking-wider mb-1">Overall Readiness</div>
                 <div className="text-sm font-medium text-textMain">{totalPracticed} / {totalQuestions} Questions</div>
@@ -642,7 +717,7 @@ ${transcriptText}`;
        {isLoadingCompanies ? (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
            {[...Array(8)].map((_, i) => (
-             <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-3xl h-[280px]"></div>
+             <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/20 dark:border-white/5 rounded-3xl h-[280px]"></div>
            ))}
          </div>
        ) : (
@@ -651,7 +726,7 @@ ${transcriptText}`;
     Array.from({ length: 8 }).map((_, index) => (
       <div
         key={index}
-        className="bg-glass border border-black/5 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse"
+        className="bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse"
       >
         {/* Logo & Badge */}
         <div className="flex items-start justify-between mb-5 sm:mb-6">
@@ -705,7 +780,7 @@ ${transcriptText}`;
             <div className="absolute inset-0 bg-white/90 dark:bg-[#0B1220]/90 backdrop-blur-md animate-fade-in" onClick={() => setSelectedCompany(null)} />
             
             {/* Modal Content: Adaptive Light/Dark */}
-            <div className={`relative z-10 bg-background border border-black/10 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col animate-fade-in-up transition-all duration-300 ${isFullScreen ? 'w-full h-full rounded-none' : 'w-full max-w-6xl h-[85vh] md:h-[90vh] rounded-2xl md:rounded-3xl'}`}>
+            <div className={`relative z-10 bg-background border border-black/20 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col animate-fade-in-up transition-all duration-300 ${isFullScreen ? 'w-full h-full rounded-none' : 'w-full max-w-6xl h-[85vh] md:h-[90vh] rounded-2xl md:rounded-3xl'}`}>
                
                {/* Floating Close Buttons in FullScreen */}
                {isFullScreen && (
@@ -721,16 +796,16 @@ ${transcriptText}`;
 
                {/* Modal Header (Hidden in FullScreen) */}
                {!isFullScreen && (
-                 <div className="shrink-0 p-5 md:p-8 border-b border-black/10 dark:border-white/10 bg-white dark:bg-gradient-to-r dark:from-[#1E293B] dark:to-[#0B1220] flex items-center justify-between">
+                 <div className="shrink-0 p-5 md:p-8 border-b border-black/20 dark:border-white/10 bg-white dark:bg-gradient-to-r dark:from-[#1E293B] dark:to-[#0B1220] flex items-center justify-between">
                   <div className="flex items-center gap-4 md:gap-6">
-                     <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white border border-black/5 p-3 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
+                     <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white border border-black/20 p-3 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
                         <img src={selectedCompany.logo} alt={selectedCompany.name} className="w-full h-full object-contain" />
                      </div>
                      <div>
                         <h2 className="text-xl md:text-3xl font-display font-bold text-textMain mb-1 md:mb-2">{selectedCompany.name}</h2>
                         <div className="flex flex-wrap gap-2">
                            {selectedCompany.focus.map(f => (
-                             <span key={f} className="px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-[10px] md:text-xs text-textMuted border border-black/5 dark:border-white/10 whitespace-nowrap">{f}</span>
+                             <span key={f} className="px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-[10px] md:text-xs text-textMuted border border-black/20 dark:border-white/10 whitespace-nowrap">{f}</span>
                            ))}
                         </div>
                      </div>
@@ -754,11 +829,21 @@ ${transcriptText}`;
                        <div className={`h-full bg-primaryLight transition-all duration-1000 ${getPercentClass(((currentMockIndex + 1) / 5) * 100)}`} />
                     </div>
 
-                    <div className="absolute top-6 right-6 md:right-8 flex items-center gap-2 font-mono text-lg md:text-xl text-primaryLight animate-pulse">
-                       <Timer /> {formatTime(timer)}
+                    <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
+                       <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                          <Timer /> {formatTime(timer)}
+                       </div>
+                       
+                       <button
+                         onClick={() => handleRequestTime()}
+                         disabled={extraTimeUsed >= 30}
+                         className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${extraTimeUsed >= 30 ? 'bg-black/5 dark:bg-white/5 border-transparent text-textMuted cursor-not-allowed' : 'bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-textMain hover:bg-primary/20 hover:text-primaryLight hover:border-primary/30 backdrop-blur-sm'}`}
+                       >
+                         Ask Robin for Time
+                       </button>
                     </div>
 
-                    <div className="max-w-3xl w-full mt-10 md:mt-0">
+                    <div className="max-w-3xl w-full mt-16 md:mt-0">
                        {isGeneratingText ? (
                          <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fade-in text-center">
                             <Loader2 size={64} className="text-primaryLight animate-spin" />
@@ -774,18 +859,41 @@ ${transcriptText}`;
                               </h3>
                            </div>
                            
-                           <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-4 md:p-6 min-h-[200px] mb-6 md:mb-8 relative group shadow-sm">
-                              <textarea 
-                                className="w-full h-full bg-transparent border-none focus:ring-0 text-textMain resize-none placeholder-textMuted/50 text-sm md:text-base outline-none"
-                                placeholder="Type your notes, pseudo-code, or approach here (optional)..."
-                                value={mockAnswers[currentMockIndex] || ''}
-                                onChange={(e) => {
-                                  const newA = [...mockAnswers];
-                                  newA[currentMockIndex] = e.target.value;
-                                  setMockAnswers(newA);
-                                }}
-                              />
-                              <div className="absolute bottom-4 right-4 text-xs text-textMuted opacity-50">Drafting Space</div>
+                           <div className="bg-white dark:bg-[#1E1E1E] border border-black/20 dark:border-white/10 rounded-2xl p-4 min-h-[400px] h-[50vh] mb-6 md:mb-8 relative group shadow-sm flex flex-col">
+                              <div className="flex justify-end mb-2">
+                                <select 
+                                  value={editorLanguage}
+                                  onChange={(e) => setEditorLanguage(e.target.value)}
+                                  className="bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-lg text-xs md:text-sm font-bold text-textMain px-4 py-2 focus:ring-2 focus:ring-primaryLight outline-none cursor-pointer backdrop-blur-sm shadow-sm appearance-none hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                                >
+                                  <option value="javascript" className="bg-background text-textMain">JavaScript</option>
+                                  <option value="python" className="bg-background text-textMain">Python</option>
+                                  <option value="java" className="bg-background text-textMain">Java</option>
+                                  <option value="cpp" className="bg-background text-textMain">C++</option>
+                                  <option value="typescript" className="bg-background text-textMain">TypeScript</option>
+                                </select>
+                              </div>
+                              <div className="flex-1 w-full rounded-xl overflow-hidden border border-black/20 dark:border-white/5">
+                                <Editor
+                                  height="100%"
+                                  language={editorLanguage}
+                                  theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'light'}
+                                  value={mockAnswers[currentMockIndex] || ''}
+                                  onChange={(value) => {
+                                    const newA = [...mockAnswers];
+                                    newA[currentMockIndex] = value || '';
+                                    setMockAnswers(newA);
+                                  }}
+                                  options={{
+                                    minimap: { enabled: false },
+                                    fontSize: 14,
+                                    lineNumbers: 'on',
+                                    scrollBeyondLastLine: false,
+                                    wordWrap: 'on',
+                                    padding: { top: 16 }
+                                  }}
+                                />
+                              </div>
                            </div>
 
                            <div className="flex justify-center gap-4">
@@ -816,11 +924,21 @@ ${transcriptText}`;
                         <div className={`h-full bg-gradient-main transition-all duration-1000 ${getPercentClass((turnCount / 10) * 100)}`} />
                      </div>
 
-                     <div className="absolute top-6 right-6 md:right-8 flex items-center gap-2 font-mono text-lg md:text-xl text-primaryLight animate-pulse">
-                        <Timer /> {formatTime(timer)}
+                     <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
+                        <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                           <Timer /> {formatTime(timer)}
+                        </div>
+                        
+                        <button
+                          onClick={() => handleRequestTime()}
+                          disabled={extraTimeUsed >= 30}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${extraTimeUsed >= 30 ? 'bg-black/5 dark:bg-white/5 border-transparent text-textMuted cursor-not-allowed' : 'bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-textMain hover:bg-primary/20 hover:text-primaryLight hover:border-primary/30 backdrop-blur-sm'}`}
+                        >
+                          Ask {voiceType === 'robin' ? 'Robin' : 'Elisa'} for Time
+                        </button>
                      </div>
 
-                     <div className="max-w-3xl w-full mt-10 md:mt-0 flex flex-col items-center">
+                     <div className="max-w-3xl w-full mt-16 md:mt-0 flex flex-col items-center">
                         <div className="text-center mb-10">
                            <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Live Voice Interview - Turn {turnCount} of 10</span>
                            <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
@@ -850,7 +968,7 @@ ${transcriptText}`;
                                 </div>
                              </div>
                              
-                             <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
+                             <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
                                 <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> Your Answer:</div>
                                 <p className="text-textMain text-lg italic">
                                    {currentSpeech || (voiceStatus === 'listening' ? "Listening (speaking will auto-detect)..." : "Wait for AI to finish...")}
@@ -885,13 +1003,13 @@ ${transcriptText}`;
                        <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center">AI Interview Report</h2>
                        <p className="text-textMuted mb-8 text-center">Comprehensive analysis of your spoken responses.</p>
 
-                       <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/10 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert max-w-none mb-10 shadow-inner overflow-hidden">
+                       <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert max-w-none mb-10 shadow-inner overflow-hidden">
                           <ReactMarkdown>{voiceReport}</ReactMarkdown>
                        </div>
 
                        <button 
                          onClick={() => { setMockState('idle'); setActiveTab('study'); }}
-                         className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
+                         className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
                        >
                          Back to Study Mode
                        </button>
@@ -908,23 +1026,23 @@ ${transcriptText}`;
                        <p className="text-textMuted mb-8 text-center animate-fade-in-up [animation-delay:200ms]">AI Assessment of your coding approach.</p>
 
                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8 w-full max-w-xl animate-fade-in-up [animation-delay:400ms]">
-                          <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 rounded-xl text-center">
+                          <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-4 rounded-xl text-center">
                              <div className="text-2xl font-bold text-textMain">{formatTime(timer)}</div>
                              <div className="text-xs text-textMuted uppercase tracking-wider">Total Time</div>
                           </div>
-                          <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 rounded-xl text-center">
+                          <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-4 rounded-xl text-center">
                              <div className="text-2xl font-bold text-primaryLight">5/5</div>
                              <div className="text-xs text-textMuted uppercase tracking-wider">Questions</div>
                           </div>
                        </div>
 
-                       <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/10 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert prose-emerald max-w-none mb-10 shadow-inner overflow-hidden">
+                       <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert prose-emerald max-w-none mb-10 shadow-inner overflow-hidden">
                           <ReactMarkdown>{textReport}</ReactMarkdown>
                        </div>
 
                        <button 
                          onClick={() => { setMockState('idle'); setActiveTab('study'); }}
-                         className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
+                         className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
                        >
                          Back to Study Mode
                        </button>
@@ -933,7 +1051,7 @@ ${transcriptText}`;
                ) : (
                  // Standard View (Tabs)
                  <div className="flex-1 flex flex-col overflow-hidden">
-                    <div className="flex border-b border-black/10 dark:border-white/10 px-4 md:px-8">
+                    <div className="flex border-b border-black/20 dark:border-white/10 px-4 md:px-8">
                        <button 
                          onClick={() => setActiveTab('study')}
                          className={`py-3 md:py-4 px-4 md:px-6 font-bold border-b-2 transition-colors text-sm md:text-base ${activeTab === 'study' ? 'border-primaryLight text-primaryLight' : 'border-transparent text-textMuted hover:text-textMain'}`}
@@ -981,7 +1099,7 @@ ${transcriptText}`;
                              
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 mb-10">
                                 {/* Option 1: Standard Text */}
-                                <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-6 rounded-2xl flex flex-col h-full hover:border-primaryLight/50 transition-colors">
+                                <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-6 rounded-2xl flex flex-col h-full hover:border-primaryLight/50 transition-colors">
                                    <div className="flex items-center gap-3 mb-4">
                                       <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl"><Briefcase size={24} /></div>
                                       <h4 className="text-xl font-bold text-textMain text-left">Standard Technical</h4>
@@ -1011,7 +1129,7 @@ ${transcriptText}`;
                                       Real-time spoken conversation with our AI recruiter. Answers 10 behavioral & HR questions. Evaluates your English vocabulary, fluency, and content accuracy.
                                    </p>
                                    <button 
-                                     onClick={startVoiceInterview}
+                                     onClick={() => setShowVoiceSelectModal(true)}
                                      className="w-full py-3 bg-gradient-main text-white rounded-xl font-bold shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                                    >
                                       <Sparkles size={18} /> Start Voice Interview
@@ -1019,12 +1137,46 @@ ${transcriptText}`;
                                 </div>
                              </div>
 
-                             <div className="mt-auto"></div>
-                          </div>
-                       )}
-                    </div>
-                 </div>
-               )}
+                              <div className="mt-auto"></div>
+                           </div>
+                        )}
+                     </div>
+                  </div>
+                )}
+                  
+                  {/* Voice Select Modal (Rendered inside the portal to be on top) */}
+                  {showVoiceSelectModal && (
+                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowVoiceSelectModal(false)}></div>
+                        <div className="relative bg-glass border border-black/20 dark:border-white/20 p-8 rounded-3xl max-w-lg w-full text-center animate-fade-in-up shadow-2xl">
+                           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                              <Mic size={32} className="text-primaryLight" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-textMain mb-2">Choose your Interviewer</h3>
+                           <p className="text-textMuted mb-8">Select the AI persona for your live voice interview.</p>
+                           
+                           <div className="grid grid-cols-2 gap-4">
+                              <button 
+                                onClick={() => { setVoiceType('robin'); voiceTypeRef.current = 'robin'; setShowVoiceSelectModal(false); startVoiceInterview(); }}
+                                className="flex flex-col items-center p-6 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 hover:border-primaryLight/50 rounded-2xl transition-all group"
+                              >
+                                 <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">👨</span>
+                                 <span className="font-bold text-textMain text-lg">Robin</span>
+                                 <span className="text-xs text-textMuted mt-1">Male Voice</span>
+                              </button>
+                              
+                              <button 
+                                onClick={() => { setVoiceType('elisa'); voiceTypeRef.current = 'elisa'; setShowVoiceSelectModal(false); startVoiceInterview(); }}
+                                className="flex flex-col items-center p-6 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 hover:border-primaryLight/50 rounded-2xl transition-all group"
+                              >
+                                 <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">👩</span>
+                                 <span className="font-bold text-textMain text-lg">Elisa</span>
+                                 <span className="text-xs text-textMuted mt-1">Female Voice</span>
+                              </button>
+                           </div>
+                        </div>
+                     </div>
+                  )}
             </div>
          </div>,
          document.body

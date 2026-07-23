@@ -7,6 +7,7 @@ import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
+import { getRecommendedCourses } from '../utils/recommendations';
 
 interface DashboardProps {
   user: User;
@@ -30,6 +31,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   }, [user.settings?.reminders, user.settings?.dailyGoal]);
 
   const allProgress = storageService.getAllProgress();
+  const recommendedCourses = useMemo(
+    () => getRecommendedCourses(user.settings, allProgress),
+    [user.settings, allProgress]
+  );
   const completedCount = allProgress.filter(p => p.passed).length;
   const totalCourses = COURSES.length;
   const completionPercentage = Math.round((completedCount / totalCourses) * 100);
@@ -199,6 +204,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
         </div>
       </div>
+      
+      {/* Recommended For You */}
+      {recommendedCourses.length > 0 && (
+        <div id="dash-recommended">
+          <h3 className="text-xl font-display font-bold text-textMain mb-6 flex items-center gap-2">
+            <span className="w-2 h-6 rounded-full bg-primaryLight" />
+            Recommended for You
+          </h3>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {recommendedCourses.map(course => (
+              <Link
+                key={course.id}
+                to={`/course/${course.id}`}
+                className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-white/20 dark:border-white/10 p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="text-xs font-bold text-primaryLight uppercase tracking-wider mb-2">
+                  {course.level}
+                </div>
+                <h4 className="text-base font-bold text-textMain leading-snug">
+                  {course.title}
+                </h4>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Categories Cards */}
       <div id="dash-categories">

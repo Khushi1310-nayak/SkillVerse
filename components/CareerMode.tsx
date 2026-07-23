@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo} from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Briefcase, Search, CheckCircle, Clock, 
@@ -10,7 +10,8 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
-import { Company, InterviewQuestion, CareerProgress } from '../types';
+import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
+import { getRecommendedCompanies } from '../utils/recommendations';
 import { auth, db } from '../firebase/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { Typewriter } from './Typewriter';
@@ -202,9 +203,16 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
 };
 
 // --- MAIN COMPONENT ---
+interface CareerModeProps {
+  user?: AppUser;
+}
 
-export const CareerMode: React.FC = () => {
+export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
+  const recommendedCompanies = useMemo(
+      () => getRecommendedCompanies(user?.settings, progress),
+      [user?.settings, progress]
+  );
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [companiesList, setCompaniesList] = useState<Company[]>(COMPANIES);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
@@ -712,6 +720,37 @@ ${transcriptText}`;
             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
           />
        </div>
+
+       {/* Recommended Companies */}
+       {!isLoadingCompanies && recommendedCompanies.length > 0 && (
+         <div>
+            <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
+               <span className="w-2 h-5 rounded-full bg-primaryLight" />
+               Recommended for You
+            </h3>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+               {recommendedCompanies.map(company => (
+                 <div
+                   key={company.id}
+                   onClick={() => {
+                     setSelectedCompany(company);
+                     setActiveTab('study');
+                     setMockState('idle');
+                   }}
+                   className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
+                 >
+                    <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
+                       <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="min-w-0">
+                       <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">{company.name}</h4>
+                       <p className="text-xs text-textMuted truncate">{company.focus.join(', ')}</p>
+                    </div>
+                 </div>
+               ))}
+            </div>
+         </div>
+       )}
 
        {/* Company Grid */}
        {isLoadingCompanies ? (

@@ -78,7 +78,7 @@ const AppRoutes = () => {
                     <Routes>
                       <Route path="/" element={<Dashboard user={appUser} />} />
                       <Route path="/courses" element={<CoursesList />} />
-                      <Route path="/career" element={<CareerMode />} />
+                      <Route path="/career" element={<CareerMode user={appUser} />} />
                       <Route path="/certifications" element={<CertificationsList />} />
                       <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
                       <Route path="/category/:id" element={<CategoryView />} />

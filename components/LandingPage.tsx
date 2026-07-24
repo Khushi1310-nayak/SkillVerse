@@ -10,6 +10,7 @@ import {
 import { GoldSnow } from './GoldSnow';
 import { AIAssistant } from './AIAssistant';
 import { FeatureCard } from './ui/FeatureCard';
+import { FAQSection } from './FAQSection';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -417,6 +418,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
          </div>
       </section>
+      
+      {/* FAQ */}
+      <FAQSection />
 
       {/* Footer */}
       <footer className="border-t border-black/20 dark:border-white/10 bg-black/5 dark:bg-[#050911] pt-16 pb-8 px-6">

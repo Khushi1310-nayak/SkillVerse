@@ -1,4 +1,4 @@
-import { Category, Course, Company, InterviewQuestion } from './types';
+import { Category, Course, Company, InterviewQuestion, FAQItem } from './types';
 
 export const CATEGORIES: Category[] = [
   {
@@ -18,6 +18,59 @@ export const CATEGORIES: Category[] = [
     title: 'Design',
     description: 'Create intuitive and beautiful user experiences.',
     icon: 'Palette',
+  },
+];
+
+export const FAQ_ITEMS: FAQItem[] = [
+  {
+    id: 'faq-1',
+    question: 'Is SkillVerse really free to use?',
+    answer: "Yes — the Starter plan gives you free access to basic courses, quizzes, and mobile access, forever. A paid Pro plan is available if you want unlimited courses, verified certificates, unlimited AI tutoring, and Career Mode access."
+  },
+  {
+    id: 'faq-2',
+    question: 'What subjects can I learn on SkillVerse?',
+    answer: "Programming, Data Structures & Algorithms (DSA), and Design — with more categories planned as the platform grows."
+  },
+  {
+    id: 'faq-3',
+    question: 'Are the certificates actually recognized or verifiable?',
+    answer: "Yes. Each certificate has a unique verification ID and can be checked independently, so you can confidently share it on LinkedIn or your resume."
+  },
+  {
+    id: 'faq-4',
+    question: 'Do I need prior coding experience to get started?',
+    answer: "No — courses are structured for a range of levels, from complete beginners to more advanced learners, and you can pick your starting point during onboarding."
+  },
+  {
+    id: 'faq-5',
+    question: 'What is Career Mode?',
+    answer: "A dedicated interview-prep space with real company-style questions, study mode, and mock interviews (including an AI voice interview option) to help you prepare for actual job interviews."
+  },
+  {
+    id: 'faq-6',
+    question: 'Is my progress saved if I come back later?',
+    answer: "Yes, your course progress, quiz scores, and Career Mode activity are all saved to your account so you can pick up right where you left off."
+  },
+  {
+    id: 'faq-7',
+    question: "What's the AI Assistant, and is it available to free users?",
+    answer: "It's a built-in AI tutor that explains concepts and answers questions as you learn. Free users get limited access; Pro users get unlimited access."
+  },
+  {
+    id: 'faq-8',
+    question: 'How does XP and leveling work?',
+    answer: "You earn XP for completing quizzes, practicing interview questions, and maintaining daily learning streaks — leveling up as you go to track your overall progress and stay motivated."
+  },
+  {
+    id: 'faq-9',
+    question: 'Can I use SkillVerse on my phone?',
+    answer: "Yes, the platform is fully accessible on mobile browsers alongside desktop."
+  },
+  {
+    id: 'faq-10',
+    question: 'Is my personal data safe?',
+    answer: "Yes — SkillVerse doesn't sell or share your learning data with third parties, and you have control to manage or reset your data from your account settings."
   },
 ];
 

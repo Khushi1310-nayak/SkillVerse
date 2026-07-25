@@ -54,6 +54,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unsubscribeSnapshot = onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
            if (docSnap.exists()) {
              const data = docSnap.data();
+
+             // --- Streak calculation ---
+             // "Activity" = an authenticated session load for the calendar day.
+             const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+             const storedStreak: number = data.streak || 0;
+             const storedLastActiveDate: string | null = data.lastActiveDate || null;
+
+             let computedStreak = storedStreak;
+
+             if (storedLastActiveDate !== todayStr) {
+                if (storedLastActiveDate) {
+                  const prevDate = new Date(storedLastActiveDate);
+                  const currDate = new Date(todayStr);
+                  const dayDiff = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+                  computedStreak = dayDiff === 1 ? storedStreak + 1 : 1;
+                } else {
+                  // No lastActiveDate yet — first visit ever, or a
+                  // pre-existing account created before this feature shipped.
+                  computedStreak = 1;
+                }
+
+                // Persist the update. This will cause onSnapshot to fire again,
+                // but on that second pass storedLastActiveDate will equal
+                // todayStr, so the block above will be skipped — no infinite loop.
+                setDoc(
+                  doc(db, "users", currentUser.uid),
+                  { streak: computedStreak, lastActiveDate: todayStr },
+                  { merge: true }
+                ).catch(err => console.error("Error updating streak:", err));
+             }
+
              const mappedAppUser: AppUser = {
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
@@ -62,7 +93,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 xp: data.xp || 0,
                 level: data.level || 1,
                 courses: data.courses || [],
-                photoURL: data.photoURL || currentUser.photoURL || ""
+                photoURL: data.photoURL || currentUser.photoURL || "",
+                streak: computedStreak,
+                lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -76,7 +109,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 xp: 0,
                 level: 1,
                 courses: [],
-                photoURL: currentUser.photoURL || ""
+                photoURL: currentUser.photoURL || "",
+                streak: 0,
+                lastActiveDate: ""
              });
              setLoading(false);
            }

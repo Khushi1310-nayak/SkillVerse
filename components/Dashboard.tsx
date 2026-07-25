@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map } from 'lucide-react';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame } from 'lucide-react';
 import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
@@ -200,7 +200,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         {/* Main Stats Card */}
         <div id="dash-stats" className="lg:col-span-2 bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
           <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-textMain mb-2">Keep it up, {user.username}!</h2>
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-textMain">Keep it up, {user.username}!</h2>
+              {user.streak > 0 && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold">
+                  <Flame size={14} className="fill-orange-500" />
+                  {user.streak} day{user.streak !== 1 ? 's' : ''} streak
+                </div>
+              )}
+            </div>
             <p className="text-textMuted mb-6 max-w-lg">
               You've completed <span className="text-textMain font-bold">{completedCount}</span> out of <span className="text-textMain font-bold">{totalCourses}</span> available courses.
             </p>

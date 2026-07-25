@@ -45,6 +45,8 @@ export interface User {
   level: number;
   courses: string[];
   photoURL?: string;
+  streak: number;
+  lastActiveDate: string;
 }
 
 export interface Category {

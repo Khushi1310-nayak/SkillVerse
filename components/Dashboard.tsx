@@ -31,6 +31,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   }, [user.settings?.reminders, user.settings?.dailyGoal]);
 
   const allProgress = storageService.getAllProgress();
+
+  const lastVisited = storageService.getLastVisited();
+  const lastVisitedCourse = lastVisited
+    ? COURSES.find(c => c.id === lastVisited.courseId)
+    : undefined;
+  const lastVisitedProgress = lastVisitedCourse
+    ? allProgress.find(p => p.courseId === lastVisitedCourse.id)
+    : undefined;
+  const showContinueWidget = !!lastVisitedCourse && !lastVisitedProgress?.passed;
+
   const recommendedCourses = useMemo(
     () => getRecommendedCourses(user.settings, allProgress),
     [user.settings, allProgress]
@@ -159,6 +169,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 )}
         </div>
       </div>
+
+      {/* Continue Where You Left Off */}
+      {showContinueWidget && lastVisitedCourse && (
+        <div className="bg-glass border border-primary/30 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <PlayCircle className="text-primaryLight" size={22} />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-primaryLight uppercase tracking-wider mb-0.5">
+                Continue where you left off
+              </div>
+              <div className="text-base font-bold text-textMain">
+                {lastVisitedCourse.title}
+              </div>
+            </div>
+          </div>
+          <Link
+            to={`/course/${lastVisitedCourse.id}`}
+            className="shrink-0 px-5 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all"
+          >
+            Resume
+          </Link>
+        </div>
+      )}
 
       {/* Stats & Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -53,6 +53,12 @@ export const CourseView: React.FC = () => {
   }, [id, settings?.autoSave]);
 
   useEffect(() => {
+    if (id) {
+      storageService.setLastVisited(id);
+    }
+  }, [id]);
+
+  useEffect(() => {
     if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
       localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
     }

@@ -4,6 +4,7 @@ import { Progress, CareerProgress } from '../types';
 
 const PROGRESS_KEY = 'skillverse_progress';
 const CAREER_KEY = 'skillverse_career';
+const LAST_VISITED_KEY = 'skillverse_last_visited';
 
 const DEFAULT_CAREER_PROGRESS: CareerProgress = {
   practicedQuestions: [],
@@ -60,6 +61,18 @@ export const storageService = {
   getProgress: (courseId: string): Progress | undefined => {
     const all = storageService.getAllProgress();
     return all.find(p => p.courseId === courseId);
+  },
+
+  // --- LAST VISITED (Continue where you left off) ---
+
+  setLastVisited: (courseId: string) => {
+    const record = { courseId, visitedAt: new Date().toISOString() };
+    localStorage.setItem(LAST_VISITED_KEY, JSON.stringify(record));
+  },
+
+  getLastVisited: (): { courseId: string; visitedAt: string } | null => {
+    const data = localStorage.getItem(LAST_VISITED_KEY);
+    return data ? JSON.parse(data) : null;
   },
 
   resetProgress: () => {

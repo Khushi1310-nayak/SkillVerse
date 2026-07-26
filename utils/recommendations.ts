@@ -1,5 +1,4 @@
 import { Course, Company, UserSettings, Progress, CareerProgress } from '../types';
-import { COURSES, COMPANIES } from '../constants';
 
 const COURSE_RECOMMENDATION_LIMIT = 5;
 const COMPANY_RECOMMENDATION_LIMIT = 3;
@@ -27,13 +26,14 @@ const ROLE_TO_FOCUS_MAP: Record<string, string[]> = {
  */
 export const getRecommendedCourses = (
   settings: UserSettings | undefined,
-  allProgress: Progress[]
+  allProgress: Progress[],
+  coursesList: Course[]
 ): Course[] => {
   const completedIds = new Set(
     allProgress.filter(p => p.passed).map(p => p.courseId)
   );
 
-  const candidates = COURSES.filter(c => !completedIds.has(c.id));
+  const candidates = (coursesList || []).filter(c => !completedIds.has(c.id));
 
   const scored = candidates.map(course => {
     let score = 0;
@@ -74,13 +74,14 @@ export const getRecommendedCourses = (
  */
 export const getRecommendedCompanies = (
   settings: UserSettings | undefined,
-  careerProgress: CareerProgress
+  careerProgress: CareerProgress,
+  companiesList: Company[]
 ): Company[] => {
   const practicedCompanyIds = new Set(
     careerProgress.mockInterviewScores.map(s => s.companyId)
   );
 
-  const candidates = COMPANIES.filter(c => !practicedCompanyIds.has(c.id));
+  const candidates = (companiesList || []).filter(c => !practicedCompanyIds.has(c.id));
 
   const scored = candidates.map(company => {
     let score = 0;

@@ -1,23 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, PlayCircle, CheckCircle, ChevronDown } from 'lucide-react';
-import { COURSES, CATEGORIES } from '../constants';
+import { CATEGORIES } from '../constants';
 import { storageService } from '../services/storageService';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 
 export const CoursesList: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const data = await firestoreService.getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('Error fetching courses from Firestore:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCourses();
   }, []);
+
   const progress = storageService.getAllProgress();
 
-  const filtered = COURSES.filter(course => {
+  const filtered = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
     const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
     return matchesSearch && matchesCat;

@@ -2,13 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { 
   User, Palette, BookOpen, Brain, Award, Shield, 
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2, 
-  LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2
+  LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
+  Trophy, Lock, Footprints, Flame, Briefcase
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
+import { BADGE_DEFINITIONS } from '../constants';
 import { User as UserType, UserSettings } from '../types';
 
 interface SettingsProps {
@@ -25,6 +27,10 @@ const AVATARS = [
   { id: '4', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Milo' },
   { id: '5', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha' },
 ];
+
+const BADGE_ICONS: Record<string, any> = {
+  Footprints, Award, Flame, Briefcase,
+};
 
 export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpdateUser, onLogout }) => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -238,6 +244,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             <TabButton id="learning" icon={BookOpen} label="Learning" />
             <TabButton id="quiz" icon={Brain} label="Quiz" />
             <TabButton id="certificate" icon={Award} label="Certificate" />
+            <TabButton id="achievements" icon={Trophy} label="Achievements" />
             <TabButton id="account" icon={Shield} label="Account" />
           </div>
         </div>
@@ -567,6 +574,42 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     </div>
                  </div>
                </div>
+            )}
+
+            {/* Achievements Section */}
+            {activeTab === 'achievements' && (
+              <div className="space-y-8 animate-fade-in">
+                <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
+                  <Trophy className="text-primaryLight" /> Achievements
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {BADGE_DEFINITIONS.map(badge => {
+                    const earned = (formData.badges || []).includes(badge.id);
+                    const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                    return (
+                      <div
+                        key={badge.id}
+                        className={`flex items-center gap-4 p-4 rounded-xl border transition-all
+                          ${earned
+                            ? 'bg-primary/10 border-primary/20'
+                            : 'bg-white/50 dark:bg-white/5 border-black/20 dark:border-white/10 opacity-50'
+                          }`}
+                      >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0
+                          ${earned ? 'bg-gradient-main text-white' : 'bg-black/10 dark:bg-white/10 text-textMuted'}`}
+                        >
+                          {earned ? <BadgeIcon size={22} /> : <Lock size={20} />}
+                        </div>
+                        <div>
+                          <div className="font-bold text-textMain">{badge.name}</div>
+                          <div className="text-sm text-textMuted">{badge.description}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
             {/* Account Section */}

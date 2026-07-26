@@ -10,7 +10,8 @@ import {
   Menu, 
   X, 
   AlertTriangle,
-  Briefcase 
+  Briefcase,
+  Shield
 } from 'lucide-react';
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
@@ -69,6 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
   const opacityClass = getOpacityClass();
 
   const isActive = (path: string) => location.pathname === path;
+  const showAdminLink = user?.role === 'admin' || user?.role === 'instructor';
 
   const NavItem = ({ to, icon: Icon, label, id }: { to: string; icon: any; label: string; id?: string }) => (
     <Link
@@ -144,6 +146,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <NavItem to="/courses" icon={BookOpen} label="Courses" id="nav-courses" />
           <NavItem to="/career" icon={Briefcase} label="Career Mode" id="nav-career" />
           <NavItem to="/certifications" icon={Award} label="Certifications" id="nav-certs" />
+          {showAdminLink && (
+            <NavItem to="/admin" icon={Shield} label="Admin" id="nav-admin" />
+          )}
           <NavItem to="/settings" icon={Settings} label="Settings" id="nav-settings" />
         </nav>
 
@@ -191,6 +196,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                 <NavItem to="/courses" icon={BookOpen} label="Courses" />
                 <NavItem to="/career" icon={Briefcase} label="Career Mode" />
                 <NavItem to="/certifications" icon={Award} label="Certifications" />
+                {showAdminLink && (
+                  <NavItem to="/admin" icon={Shield} label="Admin" />
+                )}
                 <NavItem to="/settings" icon={Settings} label="Settings" />
              </nav>
              <button 

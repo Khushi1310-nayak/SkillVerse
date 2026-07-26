@@ -1,20 +1,47 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Printer, CheckCircle, Loader2, Link as LinkIcon, Award } from 'lucide-react';
-import { COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { CertificateDisplay, CertificateData } from './CertificateDisplay';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 
 export const Certificate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { appUser: user } = useAuth();
   const componentRef = useRef<HTMLDivElement>(null);
-  const course = COURSES.find(c => c.id === id);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCourse = async () => {
+      if (!id) return;
+      try {
+        const c = await firestoreService.getCourse(id);
+        setCourse(c);
+      } catch (err) {
+        console.error('Failed to load course for certificate:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCourse();
+  }, [id]);
+
   const progress = storageService.getProgress(id || '');
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading certificate details...</div>
+      </div>
+    );
+  }
 
   if (!course || !user || !progress || !progress.passed) {
     return (

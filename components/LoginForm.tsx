@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowRight, Lock, Mail, Eye, EyeOff, AlertTriangle, Check, Github, Chrome } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Lock, Mail, Eye, EyeOff, Github, Chrome } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../contexts/ToastContext';
 import { validateEmail } from '../utils/validators';
 import { AuthView } from './Auth';
 
@@ -11,26 +12,20 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
   const { login, loginWithGoogle, loginWithGithub } = useAuth();
-  
+  const { showToast } = useToast();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-
-  const shakeAnimation = {
-    shake: { x: [0, -10, 10, -10, 10, 0], transition: { duration: 0.4 } }
-  };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
-    setError(null);
     setLoading(true);
     try {
       if (provider === 'google') await loginWithGoogle();
       if (provider === 'github') await loginWithGithub();
     } catch (err: any) {
-      setError(err.message);
+      showToast({ message: err.message, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -38,17 +33,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccessMsg(null);
 
     const eValid = validateEmail(email);
-    if (!eValid.valid) return setError(eValid.error || "Invalid email");
+    if (!eValid.valid) return showToast({ message: eValid.error || "Invalid email", type: 'error' });
 
     setLoading(true);
     try {
       await login(email, password);
     } catch (err: any) {
-      setError(err.message);
+      showToast({ message: err.message, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -56,33 +49,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        {error && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto', ...shakeAnimation.shake }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-6 overflow-hidden"
-          >
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2">
-              <AlertTriangle size={16} className="shrink-0" /> {error}
-            </div>
-          </motion.div>
-        )}
-        {successMsg && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0, scale: 0.95 }}
-            animate={{ opacity: 1, height: 'auto', scale: 1 }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-6 overflow-hidden"
-          >
-            <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-sm flex items-center gap-2">
-              <Check size={16} className="shrink-0" /> {successMsg}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-10">
         <div className="space-y-2 px-1">
           <label className="text-xs font-semibold uppercase tracking-wider text-textMuted pl-1">Email Address</label>

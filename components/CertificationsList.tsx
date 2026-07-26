@@ -1,17 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Award } from 'lucide-react';
-import { COURSES } from '../constants';
+import { Award, Loader2 } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import { BadgeCard } from './ui/BadgeCard';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 
 export const CertificationsList: React.FC = () => {
   const { appUser: user } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const data = await firestoreService.getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('Error fetching courses for certifications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCourses();
+  }, []);
+
   const progress = storageService.getAllProgress();
   const passedCourses = progress.filter(p => p.passed);
 
   if (!user) return null;
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading certifications...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -23,7 +50,7 @@ export const CertificationsList: React.FC = () => {
        {passedCourses.length > 0 ? (
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {passedCourses.map(p => {
-               const course = COURSES.find(c => c.id === p.courseId);
+               const course = courses.find(c => c.id === p.courseId);
                if (!course) return null;
                
                return <BadgeCard key={p.courseId} course={course} progress={p} user={user} />;

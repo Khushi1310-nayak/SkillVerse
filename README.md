@@ -43,47 +43,70 @@ It is built to demonstrate **real-world product thinking**, combining UX psychol
 
 ```mermaid
 graph TD
-    Client["Client Browser (React SPA)"]
+    %% Styling Themes
+    classDef client fill:#f8fafc,stroke:#94a3b8,stroke-width:2px,color:#0f172a;
+    classDef hosting fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px,color:#0f172a;
+    classDef module fill:#ffffff,stroke:#bae6fd,stroke-width:1px,color:#0f172a;
+    classDef firebase fill:#fff7ed,stroke:#f97316,stroke-width:2px,color:#0f172a;
+    classDef external fill:#f0fdf4,stroke:#22c55e,stroke-width:2px,color:#0f172a;
 
-    subgraph CloudRun ["Google Cloud Run (Hosting)"]
-        AppRouter["App.tsx (React Router)"]
+    Client(["💻 Client Browser (React SPA)"]):::client
+
+    subgraph Hosting ["🌐 Frontend Hosting (Vercel)"]
+        AppRouter["App.tsx (React Router)"]:::module
         
-        subgraph UI_Modules ["UI & Application Modules"]
-            AuthModule["Auth.tsx & Onboarding.tsx"]
-            DashModule["Dashboard.tsx"]
-            LearnModule["CourseView.tsx & CoursesList.tsx"]
-            CareerModule["CareerMode.tsx"]
-            AIAssistant["AIAssistant.tsx"]
+        subgraph UI_Modules ["UI & Application Core"]
+            LandingModule["LandingPage & FAQSection"]:::module
+            AuthModule["Auth & Onboarding"]:::module
+            DashModule["Dashboard & Recommendations"]:::module
+            LearnModule["Courses (Constants Data)"]:::module
+            CareerModule["CareerMode & AIAssistant"]:::module
+            LeaderboardModule["Real-Time Leaderboard"]:::module
+            SettingsModule["Settings & Profile"]:::module
         end
     end
 
-    subgraph Firebase ["Firebase Cloud Services"]
-        FirebaseAuth["Firebase Auth (Identity)"]
-        Firestore["Firestore DB (NoSQL)"]
+    subgraph FirebaseCloud ["🔥 Firebase Backend Services"]
+        FirebaseAuth["Authentication"]:::firebase
+        Firestore["Firestore DB (NoSQL)"]:::firebase
+        FirebaseStorage["Cloud Storage (Avatars)"]:::firebase
     end
     
-    subgraph External ["External & Local Services"]
-        Gemini["Google Gemini API (AI Tutor)"]
-        PDF["jsPDF & html2canvas"]
-        LocalStorage["Browser LocalStorage (Cache)"]
+    subgraph External ["🔗 External & Native APIs"]
+        OpenRouter["OpenRouter API (Gemini AI)"]:::external
+        WebSpeech["Browser Web Speech API"]:::external
+        PDF["jsPDF & html2canvas"]:::external
     end
 
-    Client -- "HTTP / UI Interactions" --> AppRouter
+    %% Client Entry Point
+    Client -- "UI Interactions" --> AppRouter
+
+    %% Internal Routing
+    AppRouter --> LandingModule
     AppRouter --> AuthModule
     AppRouter --> DashModule
     AppRouter --> LearnModule
     AppRouter --> CareerModule
+    AppRouter --> LeaderboardModule
+    AppRouter --> SettingsModule
+
+    %% Data Flow & External Interactions
+    AuthModule -- "Verify Identity" --> FirebaseAuth
+    AuthModule -- "Save Preferences" --> Firestore
     
-    LearnModule --> AIAssistant
-    DashModule --> PDF
+    DashModule -- "Fetch Streaks/XP" --> Firestore
+    DashModule -- "Download Certificate" --> PDF
     
-    AuthModule -- "Identity Verification" --> FirebaseAuth
-    DashModule -- "Read/Write Progress" --> Firestore
-    LearnModule -- "Track Completion" --> Firestore
+    LearnModule -- "Update Course XP" --> Firestore
+    
     CareerModule -- "Save Mock Scores" --> Firestore
+    CareerModule -- "Chat Completions" --> OpenRouter
+    CareerModule -- "Voice TTS/STT" --> WebSpeech
     
-    AIAssistant -- "Contextual Prompts" --> Gemini
-    UI_Modules -. "State Persistence" .-> LocalStorage
+    LeaderboardModule -- "Live Snapshot Sync" --> Firestore
+    
+    SettingsModule -- "Update User Metadata" --> Firestore
+    SettingsModule -- "Upload Images" --> FirebaseStorage
 ```
 
 ---

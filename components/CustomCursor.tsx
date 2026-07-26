@@ -16,6 +16,7 @@ export const CustomCursor: React.FC = () => {
   const ringPos = useRef({ x: 0, y: 0 });
 
   const [enabled, setEnabled] = useState(false);
+  const [keyboardMode, setKeyboardMode] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
 
@@ -27,9 +28,19 @@ export const CustomCursor: React.FC = () => {
     document.documentElement.classList.add('custom-cursor-active');
 
     const handleMove = (e: MouseEvent) => {
+      if (keyboardMode) {
+        setKeyboardMode(false);
+        document.documentElement.classList.add('custom-cursor-active');
+      }
       mouse.current = { x: e.clientX, y: e.clientY };
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        setKeyboardMode(true);
+        document.documentElement.classList.remove('custom-cursor-active');
       }
     };
 
@@ -43,6 +54,7 @@ export const CustomCursor: React.FC = () => {
     const handleLeave = () => setIsHovering(false);
 
     window.addEventListener('mousemove', handleMove, { passive: true });
+    window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('mouseover', handleOver, { passive: true });
     window.addEventListener('mousedown', handleDown, { passive: true });
     window.addEventListener('mouseup', handleUp, { passive: true });
@@ -62,7 +74,9 @@ export const CustomCursor: React.FC = () => {
 
     return () => {
       document.documentElement.classList.remove('custom-cursor-active');
+      
       window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('mouseover', handleOver);
       window.removeEventListener('mousedown', handleDown);
       window.removeEventListener('mouseup', handleUp);
@@ -72,7 +86,7 @@ export const CustomCursor: React.FC = () => {
   }, []);
 
   // On touch devices we render nothing, so the native cursor/touch behavior is untouched
-  if (!enabled) return null;
+  if (!enabled || keyboardMode) return null;
 
   return (
     <>

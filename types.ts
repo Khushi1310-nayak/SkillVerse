@@ -47,6 +47,7 @@ export interface User {
   photoURL?: string;
   streak: number;
   lastActiveDate: string;
+  badges: string[];
 }
 
 export interface Category {
@@ -60,6 +61,13 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
+}
+
+export interface BadgeDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon: string; // lucide-react icon name
 }
 
 export interface QuizQuestion {

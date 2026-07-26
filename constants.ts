@@ -1,4 +1,4 @@
-import { Category, Course, Company, InterviewQuestion, FAQItem } from './types';
+import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 
 export const CATEGORIES: Category[] = [
   {
@@ -71,6 +71,33 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-10',
     question: 'Is my personal data safe?',
     answer: "Yes — SkillVerse doesn't sell or share your learning data with third parties, and you have control to manage or reset your data from your account settings."
+  },
+];
+
+export const BADGE_DEFINITIONS: BadgeDefinition[] = [
+  {
+    id: 'first-steps',
+    name: 'First Steps',
+    description: 'Complete your first course',
+    icon: 'Footprints',
+  },
+  {
+    id: 'certified',
+    name: 'Certified',
+    description: 'Earn your first certificate',
+    icon: 'Award',
+  },
+  {
+    id: 'on-fire',
+    name: 'On Fire',
+    description: 'Reach a 3-day streak',
+    icon: 'Flame',
+  },
+  {
+    id: 'interview-ready',
+    name: 'Interview Ready',
+    description: 'Complete a mock interview',
+    icon: 'Briefcase',
   },
 ];
 

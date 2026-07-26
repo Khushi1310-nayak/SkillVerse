@@ -16,6 +16,8 @@ import { googleProvider, githubProvider } from '../firebase/providers';
 import { createUserDocument } from '../services/authService';
 import { mapFirebaseError } from '../utils/firebaseErrors';
 import { User as AppUser, UserSettings, DEFAULT_SETTINGS } from '../types';
+import { BADGE_DEFINITIONS } from '../constants';
+import { storageService } from '../services/storageService';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -85,6 +87,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ).catch(err => console.error("Error updating streak:", err));
              }
 
+             // --- Badge calculation ---
+             const existingBadges: string[] = data.badges || [];
+             const courseCount = (data.courses || []).length;
+             const careerProgress = storageService.getCareerProgress();
+             const hasMockInterview = careerProgress.mockInterviewScores.length > 0;
+
+             const earnedNow: string[] = [];
+             if (courseCount >= 1) earnedNow.push('first-steps');
+             if (courseCount >= 1) earnedNow.push('certified');
+             if (computedStreak >= 3) earnedNow.push('on-fire');
+             if (hasMockInterview) earnedNow.push('interview-ready');
+
+             const newBadges = earnedNow.filter(id => !existingBadges.includes(id));
+             const allBadges = newBadges.length > 0 ? [...existingBadges, ...newBadges] : existingBadges;
+
+             if (newBadges.length > 0) {
+                setDoc(
+                  doc(db, "users", currentUser.uid),
+                  { badges: allBadges },
+                  { merge: true }
+                ).catch(err => console.error("Error updating badges:", err));
+             }
+
              const mappedAppUser: AppUser = {
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
@@ -95,7 +120,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 courses: data.courses || [],
                 photoURL: data.photoURL || currentUser.photoURL || "",
                 streak: computedStreak,
-                lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr
+                lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
+                badges: allBadges
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -111,7 +137,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 courses: [],
                 photoURL: currentUser.photoURL || "",
                 streak: 0,
-                lastActiveDate: ""
+                lastActiveDate: "",
+                badges: []
              });
              setLoading(false);
            }

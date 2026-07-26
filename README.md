@@ -63,7 +63,7 @@ graph TD
     end
     
     subgraph External ["External & Local Services"]
-        Gemini["Google Gemini API (AI Tutor)"]
+        OpenRouter["Open Router API (AI Tutor)"]
         PDF["jsPDF & html2canvas"]
         LocalStorage["Browser LocalStorage (Cache)"]
     end

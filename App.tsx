@@ -15,6 +15,7 @@ import { Onboarding } from './components/Onboarding';
 import { CredentialVerification } from './components/CredentialVerification';
 import { DocumentationPage } from './components/DocumentationPage';
 import { CustomCursor } from './components/CustomCursor';import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { storageService } from './services/storageService'; // Will clean up storageService next
@@ -97,12 +98,14 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-       <HashRouter>
-          <AppRoutes />
-       </HashRouter>
-       <CustomCursor />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+         <HashRouter>
+            <AppRoutes />
+         </HashRouter>
+         <CustomCursor />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

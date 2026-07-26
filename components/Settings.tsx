@@ -37,8 +37,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   return localStorage.getItem('settings_active_tab') || 'profile';
 });
   const [formData, setFormData] = useState<UserType>(user);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | null }>({ type: null });
+  const { showToast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -101,10 +101,10 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
         await updateProfile(currentUser, { photoURL: '' });
         await setDoc(doc(db, 'users', currentUser.uid), { photoURL: '' }, { merge: true });
         await onUpdateUser(updatedUser);
-        showToast('Custom Avatar Removed');
+        showToast({ message: 'Custom Avatar Removed', type: 'success' });
       } catch (err) {
         console.error('Error removing custom avatar:', err);
-        showToast('Failed to remove custom avatar');
+        showToast({ message: 'Failed to remove custom avatar', type: 'error' });
       }
     }
   };
@@ -159,7 +159,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
           onPreviewUpdate(updatedUser);
           await onUpdateUser(updatedUser);
 
-          showToast('Custom Avatar Uploaded Successfully!');
+          showToast({ message: 'Custom Avatar Uploaded Successfully!', type: 'success' });
         } catch (err) {
           console.error('Error finalizing avatar upload:', err);
           setUploadError('Error updating profile after upload.');
@@ -173,27 +173,22 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     );
   };
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2000);
-  };
-
   const saveSettings = async () => {
     try {
       onPreviewUpdate(formData);
       await storageService.updateUser(formData);
       await onUpdateUser(formData);
-      showToast('Settings Saved Successfully');
+      showToast({ message: 'Settings Saved Successfully', type: 'success' });
     } catch (error) {
       console.error('Error saving user settings:', error);
-      showToast('Failed to Save Settings');
+      showToast({ message: 'Failed to Save Settings', type: 'error' });
     }
   };
 
   const handleResetProgress = () => {
     storageService.resetProgress();
     setModal({ type: null });
-    showToast('Progress Reset Successfully');
+    showToast({ message: 'Progress Reset Successfully', type: 'success' });
   };
 
   const handleClearData = () => {
@@ -252,13 +247,6 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
         {/* Settings Content */}
         <div className="lg:col-span-3">
           <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-8 min-h-[500px] relative">
-            
-            {/* Save Toast */}
-            {toastMessage && (
-              <div className="absolute top-4 right-4 bg-success text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg animate-fade-in z-20">
-                <CheckCircle size={16} /> {toastMessage}
-              </div>
-            )}
 
             {/* Profile Section */}
             {activeTab === 'profile' && (

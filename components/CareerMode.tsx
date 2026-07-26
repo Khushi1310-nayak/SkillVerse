@@ -670,7 +670,7 @@ ${transcriptText}`;
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const s = secs % 60;
-    return `${mins}:${s < 10 ? '0' : ''}${s}`;
+    return `${mins < 10 ? '0' : ''}${mins}:${s < 10 ? '0' : ''}${s}`;
   };
 
   // Readiness Score Calculation
@@ -869,7 +869,7 @@ ${transcriptText}`;
                     </div>
 
                     <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                       <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                       <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
                           <Timer /> {formatTime(timer)}
                        </div>
                        
@@ -964,7 +964,7 @@ ${transcriptText}`;
                      </div>
 
                      <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                        <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                        <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
                            <Timer /> {formatTime(timer)}
                         </div>
                         

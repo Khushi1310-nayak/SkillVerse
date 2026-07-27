@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Briefcase, Search, CheckCircle, Clock, 
@@ -15,6 +15,7 @@ import { firestoreService } from '../services/firestoreService';
 import { auth } from '../firebase/firebase';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -242,6 +243,10 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [voiceType, setVoiceType] = useState<'robin' | 'elisa'>('robin');
   const voiceTypeRef = React.useRef<'robin' | 'elisa'>('robin');
   const [showVoiceSelectModal, setShowVoiceSelectModal] = useState(false);
+  // Ref for the Voice Persona Selection modal container (used by the focus trap)
+  const voiceSelectModalRef = useRef<HTMLDivElement>(null);
+  // Trap focus inside the Voice Select modal while it is open
+  useFocusTrap(voiceSelectModalRef, showVoiceSelectModal, () => setShowVoiceSelectModal(false));
 
   const handleRequestTime = () => {
     if (extraTimeUsed >= 30) return;
@@ -1154,17 +1159,23 @@ ${transcriptText}`;
                         )}
                      </div>
                   </div>
-                )}
-                  
+                 )}
                   {/* Voice Select Modal (Rendered inside the portal to be on top) */}
                   {showVoiceSelectModal && (
                      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowVoiceSelectModal(false)}></div>
-                        <div className="relative bg-glass border border-black/20 dark:border-white/20 p-8 rounded-3xl max-w-lg w-full text-center animate-fade-in-up shadow-2xl">
+                         <div
+                            ref={voiceSelectModalRef}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="voice-select-title"
+                            tabIndex={-1}
+                            className="relative bg-glass border border-black/20 dark:border-white/20 p-8 rounded-3xl max-w-lg w-full text-center animate-fade-in-up shadow-2xl"
+                         >
                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                               <Mic size={32} className="text-primaryLight" />
                            </div>
-                           <h3 className="text-2xl font-bold text-textMain mb-2">Choose your Interviewer</h3>
+                            <h3 id="voice-select-title" className="text-2xl font-bold text-textMain mb-2">Choose your Interviewer</h3>
                            <p className="text-textMuted mb-8">Select the AI persona for your live voice interview.</p>
                            
                            <div className="grid grid-cols-2 gap-4">

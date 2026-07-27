@@ -408,6 +408,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
          storageService.saveMockInterviewScore(selectedCompany.id, parsedScore);
          setProgress(storageService.getCareerProgress());
       }
+      // Resolved React state bug: setMockState('finished') is kept in the try block (not finally)
+      // to avoid overwriting setMockState('idle') in the catch block on completions request failures.
       setMockState('finished');
     } catch (err) {
       console.error(err);
@@ -642,6 +644,8 @@ ${transcriptText}`;
       const data = await res.json();
       const report = data.choices?.[0]?.message?.content || "Could not generate report.";
       setVoiceReport(report);
+      // Resolved React state bug: setMockState('finished_voice') is kept in the try block (not finally)
+      // to avoid overwriting setMockState('idle') in the catch block on completions request failures.
       setMockState('finished_voice');
       if (selectedCompany) {
          storageService.saveMockInterviewScore(selectedCompany.id, Math.floor(Math.random() * (100 - 70 + 1) + 70));

@@ -27,8 +27,8 @@ const Onboarding = lazy(() => import('./components/Onboarding').then(m => ({ def
 const CredentialVerification = lazy(() => import('./components/CredentialVerification').then(m => ({ default: m.CredentialVerification })));
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
 
-const PageLoader = () => (
-  <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
+const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
+  <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
     <div className="bg-glass border border-black/20 dark:border-white/10 p-8 rounded-3xl backdrop-blur-md flex flex-col items-center shadow-xl">
       <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
       <p className="mt-4 text-textMuted font-display font-medium text-lg tracking-wide animate-pulse">
@@ -93,7 +93,7 @@ const AppRoutes = () => {
           ) : (
             <ProtectedRoute>
               {appUser && (
-                  <Layout user={appUser} onLogout={handleLogout}>
+                  <Layout user={appUser} onLogout={handleLogout} fallback={<PageLoader fullscreen={false} />}>
                     <Routes>
                       <Route path="/" element={<Dashboard user={appUser} />} />
                       <Route path="/courses" element={<CoursesList />} />

@@ -10,6 +10,7 @@ import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
 import { getRecommendedCourses } from '../utils/recommendations';
+import { useToast } from '../contexts/ToastContext';
 
 interface DashboardProps {
   user: User;
@@ -17,9 +18,9 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [showTour, setShowTour] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,9 +42,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     if (user.settings?.reminders) {
       const hasStudiedToday = sessionStorage.getItem('studied_today');
       if (!hasStudiedToday) {
-        setToastMessage(`Reminder: Hit your daily goal of ${user.settings.dailyGoal} minutes to keep your streak!`);
+        showToast({ message: `Reminder: Hit your daily goal of ${user.settings.dailyGoal} minutes to keep your streak!`, type: 'info', duration: 5000 });
         sessionStorage.setItem('studied_today', 'true');
-        setTimeout(() => setToastMessage(null), 5000);
       }
     }
   }, [user.settings?.reminders, user.settings?.dailyGoal]);
@@ -131,17 +131,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   return (
     <div className="space-y-8 animate-fade-in pb-20 relative">
-      {/* Tour Overlay */}
       {showTour && <TourOverlay onClose={handleTourComplete} />}
-
-      {/* Reminder Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-8 right-8 z-50 bg-primary/20 backdrop-blur-md border border-primary/50 text-white px-6 py-4 rounded-xl shadow-lg animate-fade-in flex items-center gap-3">
-          <Clock className="text-primaryLight" />
-          <span className="font-medium">{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="ml-4 opacity-70 hover:opacity-100">✕</button>
-        </div>
-      )}
 
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">

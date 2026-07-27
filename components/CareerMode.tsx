@@ -12,6 +12,7 @@ import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
 import { getRecommendedCompanies } from '../utils/recommendations';
 import { firestoreService } from '../services/firestoreService';
+import { auth } from '../firebase/firebase';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 

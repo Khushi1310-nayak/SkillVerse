@@ -190,20 +190,6 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
                  </span>
                )}
             </div>
-          )}
-        </button>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap gap-2 mb-2">
-            <span className={`text-[10px] px-2 py-0.5 rounded border font-bold uppercase whitespace-nowrap
-                  ${question.difficulty === 'Easy' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' :
-                question.difficulty === 'Medium' ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 border-yellow-500/20' :
-                  'text-red-500 bg-red-500/10 border-red-500/20'}
-               `}>{question.difficulty}</span>
-            {question.tags.map(tag => (
-              <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
-            ))}
-          </div>
           <h4 className="font-bold text-textMain text-sm md:text-base pr-2 truncate md:whitespace-normal">{question.title}</h4>
         </div>
 
@@ -1329,31 +1315,18 @@ ${transcriptText}`;
                           </button>
                         </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                       {activeTab === 'study' ? (
-                          <div className="max-w-4xl mx-auto space-y-4">
-                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="font-bold text-lg md:text-xl text-textMain">Question Bank</h3>
-                                <div className="text-sm text-textMuted">
-                                   {selectedCompany.questions.filter(q => progress.practicedQuestions.includes(q.id)).length} / {selectedCompany.questions.length} Practiced
-                                </div>
-                             </div>
-                             
-                             {selectedCompany.questions.map(question => (
-                               <QuestionItem 
-                                 key={question.id} 
-                                 question={question} 
-                                 isPracticed={progress.practicedQuestions.includes(question.id)}
-                                 isSaved={progress.savedQuestions.includes(question.id)}
-                                 onTogglePractice={() => handleTogglePractice(question.id)}
-                                 onToggleSave={() => handleToggleSave(question.id)}
-                                 srsData={progress.srsData?.[question.id]}
-                                 onSrsUpdate={(gotRight) => handleSrsUpdate(question.id, gotRight)}
-                               />
-                             ))}
+                        {/* Option 2: AI Voice */}
+                        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 p-6 rounded-2xl flex flex-col h-full hover:shadow-lg hover:shadow-primary/20 transition-all relative overflow-hidden">
+                          <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-[40px] pointer-events-none"></div>
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-3 bg-gradient-main text-white rounded-xl shadow-lg shadow-primary/20"><Mic size={24} /></div>
+                              <h4 className="text-xl font-bold text-textMain text-left">AI Voice Interview</h4>
+                            </div>
+                            <span className="px-2 py-1 bg-gradient-main text-white text-[10px] font-bold uppercase rounded-full shadow-lg">New</span>
                           </div>
                           <p className="text-sm text-textMuted text-left mb-6 flex-1">
-                            Real-time spoken conversation with our AI recruiter. Answers 10 behavioral & HR questions. Evaluates your English vocabulary, fluency, and content accuracy.
+                            Real-time spoken conversation with our AI recruiter. Answers 10 behavioral &amp; HR questions. Evaluates your English vocabulary, fluency, and content accuracy.
                           </p>
                           <button
                             onClick={() => setShowVoiceSelectModal(true)}

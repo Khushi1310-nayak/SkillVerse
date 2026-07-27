@@ -3,15 +3,17 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield, 
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2, 
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
-import { BADGE_DEFINITIONS } from '../constants';
+import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPStoreCursor } from '../constants';
 import { User as UserType, UserSettings } from '../types';
+import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../hooks/useAuth';
 
 interface SettingsProps {
   user: UserType;
@@ -39,6 +41,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [formData, setFormData] = useState<UserType>(user);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | null }>({ type: null });
   const { showToast } = useToast();
+  const { purchaseItem } = useAuth();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -236,6 +239,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
           <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
             <TabButton id="profile" icon={User} label="Profile" />
             <TabButton id="appearance" icon={Palette} label="Appearance" />
+            <TabButton id="xpstore" icon={ShoppingBag} label="XP Store" />
             <TabButton id="learning" icon={BookOpen} label="Learning" />
             <TabButton id="quiz" icon={Brain} label="Quiz" />
             <TabButton id="certificate" icon={Award} label="Certificate" />
@@ -436,7 +440,224 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                        <span className="text-white font-bold text-lg mix-blend-overlay">SkillVerse Premium UI</span>
                     </div>
                  </div>
-               </div>
+                </div>
+            )}
+
+            {/* XP Store Section */}
+            {activeTab === 'xpstore' && (
+              <div className="space-y-8 animate-fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-black/20 dark:border-white/10 pb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-textMain flex items-center gap-2">
+                      <ShoppingBag className="text-primaryLight" /> XP Store
+                    </h2>
+                    <p className="text-textMuted">Unlock exclusive themes and custom cursor styles using your learning XP.</p>
+                  </div>
+                  <div className="bg-primary/10 border border-primary/20 rounded-2xl px-6 py-3 flex items-center gap-2 self-start sm:self-auto shadow-sm">
+                    <Trophy className="text-amber-400 fill-amber-400/20" size={20} />
+                    <div>
+                      <div className="text-[10px] uppercase font-bold text-textMuted tracking-wider">Your XP Balance</div>
+                      <div className="text-lg font-extrabold text-textMain">{formData.xp} XP</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Themes Shelf */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+                    <Palette size={18} className="text-primaryLight" /> Unlockable Themes
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {XP_STORE_THEMES.map(theme => {
+                      const isUnlocked = formData.settings.unlockedThemes?.includes(theme.id) ?? ['dark', 'light'].includes(theme.id);
+                      const isActive = formData.settings.activeTheme === theme.id || (!formData.settings.activeTheme && theme.id === 'dark');
+                      const canAfford = formData.xp >= theme.cost;
+
+                      const handleSelectTheme = () => {
+                        const updatedUser = {
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            activeTheme: theme.id,
+                            theme: theme.themeMode
+                          }
+                        };
+                        setFormData(updatedUser);
+                        onPreviewUpdate(updatedUser);
+                      };
+
+                      const handleUnlockTheme = async () => {
+                        try {
+                          await purchaseItem(theme.id, theme.cost, 'theme');
+                          showToast({ message: `Unlocked ${theme.name} Theme!`, type: 'success' });
+                          setFormData(prev => ({
+                            ...prev,
+                            xp: prev.xp - theme.cost,
+                            settings: {
+                              ...prev.settings,
+                              unlockedThemes: [...(prev.settings.unlockedThemes || ['dark', 'light']), theme.id],
+                              activeTheme: theme.id,
+                              theme: theme.themeMode
+                            }
+                          }));
+                        } catch (err: any) {
+                          showToast({ message: err.message || 'Failed to unlock theme', type: 'error' });
+                        }
+                      };
+
+                      return (
+                        <div 
+                          key={theme.id}
+                          className={`p-5 rounded-2xl border transition-all flex flex-col justify-between h-48 bg-white/30 dark:bg-white/5
+                            ${isActive ? 'border-primaryLight shadow-lg shadow-primary/10' : 'border-black/10 dark:border-white/10'}`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-bold text-textMain">{theme.name}</span>
+                              {isUnlocked ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Owned</span>
+                              ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">{theme.cost} XP</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-2 line-clamp-2">{theme.description}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-black/10 dark:border-white/5">
+                            <div className="flex gap-1.5">
+                              <div className="w-5 h-5 rounded-full border border-black/10" style={{ backgroundColor: `rgb(${theme.primary})` }} />
+                              <div className="w-5 h-5 rounded-full border border-black/10" style={{ backgroundColor: `rgb(${theme.primaryLight})` }} />
+                            </div>
+
+                            {isUnlocked ? (
+                              isActive ? (
+                                <span className="text-xs font-bold text-primaryLight uppercase tracking-wider flex items-center gap-1"><CheckCircle size={14} /> Active</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={handleSelectTheme}
+                                  className="px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-black/20 dark:border-white/10 text-textMain rounded-lg text-xs font-bold transition-all"
+                                >
+                                  Select
+                                </button>
+                              )
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={handleUnlockTheme}
+                                disabled={!canAfford}
+                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all
+                                  ${canAfford 
+                                    ? 'bg-gradient-main text-white hover:shadow-md active:scale-95' 
+                                    : 'bg-black/10 dark:bg-white/5 text-textMuted cursor-not-allowed'}`}
+                              >
+                                Buy Theme
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cursors Shelf */}
+                <div className="space-y-4 pt-4 border-t border-black/20 dark:border-white/10">
+                  <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+                    <Zap size={18} className="text-primaryLight" /> Custom Cursors
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {XP_STORE_CURSORS.map(cursor => {
+                      const isUnlocked = formData.settings.unlockedCursors?.includes(cursor.id) ?? (cursor.id === 'default');
+                      const isActive = formData.settings.activeCursor === cursor.id || (!formData.settings.activeCursor && cursor.id === 'default');
+                      const canAfford = formData.xp >= cursor.cost;
+
+                      const handleSelectCursor = () => {
+                        const updatedUser = {
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            activeCursor: cursor.id
+                          }
+                        };
+                        setFormData(updatedUser);
+                        onPreviewUpdate(updatedUser);
+                      };
+
+                      const handleUnlockCursor = async () => {
+                        try {
+                          await purchaseItem(cursor.id, cursor.cost, 'cursor');
+                          showToast({ message: `Unlocked ${cursor.name} Cursor!`, type: 'success' });
+                          setFormData(prev => ({
+                            ...prev,
+                            xp: prev.xp - cursor.cost,
+                            settings: {
+                              ...prev.settings,
+                              unlockedCursors: [...(prev.settings.unlockedCursors || ['default']), cursor.id],
+                              activeCursor: cursor.id
+                            }
+                          }));
+                        } catch (err: any) {
+                          showToast({ message: err.message || 'Failed to unlock cursor', type: 'error' });
+                        }
+                      };
+
+                      return (
+                        <div 
+                          key={cursor.id}
+                          className={`p-5 rounded-2xl border transition-all flex flex-col justify-between h-48 bg-white/30 dark:bg-white/5
+                            ${isActive ? 'border-primaryLight shadow-lg shadow-primary/10' : 'border-black/10 dark:border-white/10'}`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-bold text-textMain">{cursor.name}</span>
+                              {isUnlocked ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Owned</span>
+                              ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">{cursor.cost} XP</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-2 line-clamp-2">{cursor.description}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-black/10 dark:border-white/5">
+                            <div className="flex items-center justify-center w-12 h-6 border border-black/10 dark:border-white/5 rounded bg-black/5 dark:bg-black/20 gap-2">
+                              <div className={`w-2 h-2 rounded-full ${cursor.dotClass}`} />
+                              <div className={`w-4 h-4 rounded-full border-2 ${cursor.ringClass}`} />
+                            </div>
+
+                            {isUnlocked ? (
+                              isActive ? (
+                                <span className="text-xs font-bold text-primaryLight uppercase tracking-wider flex items-center gap-1"><CheckCircle size={14} /> Active</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={handleSelectCursor}
+                                  className="px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-black/20 dark:border-white/10 text-textMain rounded-lg text-xs font-bold transition-all"
+                                >
+                                  Select
+                                </button>
+                              )
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={handleUnlockCursor}
+                                disabled={!canAfford}
+                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all
+                                  ${canAfford 
+                                    ? 'bg-gradient-main text-white hover:shadow-md active:scale-95' 
+                                    : 'bg-black/10 dark:bg-white/5 text-textMuted cursor-not-allowed'}`}
+                              >
+                                Buy Cursor
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Learning Section */}

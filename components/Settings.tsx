@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
@@ -37,6 +38,7 @@ const BADGE_ICONS: Record<string, any> = {
 };
 
 export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpdateUser, onLogout }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
@@ -243,14 +245,14 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
         {/* Settings Navigation */}
         <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
           <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
-            <TabButton id="profile" icon={User} label="Profile" />
-            <TabButton id="appearance" icon={Palette} label="Appearance" />
-            <TabButton id="xpstore" icon={ShoppingBag} label="XP Store" />
-            <TabButton id="learning" icon={BookOpen} label="Learning" />
-            <TabButton id="quiz" icon={Brain} label="Quiz" />
-            <TabButton id="certificate" icon={Award} label="Certificate" />
-            <TabButton id="achievements" icon={Trophy} label="Achievements" />
-            <TabButton id="account" icon={Shield} label="Account" />
+<TabButton id="profile" icon={User} label={t('settings.tabs.profile')} />
+<TabButton id="appearance" icon={Palette} label={t('settings.tabs.appearance')} />
+<TabButton id="xpstore" icon={ShoppingBag} label="XP Store" />
+<TabButton id="learning" icon={BookOpen} label={t('settings.tabs.learning')} />
+<TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
+<TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
+<TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
+<TabButton id="account" icon={Shield} label={t('settings.tabs.account')} />
           </div>
         </div>
 

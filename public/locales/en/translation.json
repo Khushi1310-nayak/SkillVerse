@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "courses": "Courses",
+    "career": "Career Mode",
+    "certifications": "Certifications",
+    "admin": "Admin",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "menu": "Menu"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "logout": {
+    "title": "Log Out?",
+    "body": "Are you sure you want to log out of your account?"
+  },
+  "settings": {
+  "tabs": {
+    "profile": "Profile",
+    "appearance": "Appearance",
+    "learning": "Learning",
+    "quiz": "Quiz",
+    "certificate": "Certificate",
+    "achievements": "Achievements",
+    "account": "Account"
+  }
+}
+}

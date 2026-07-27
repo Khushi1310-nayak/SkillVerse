@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "courses": "Cursos",
+    "career": "Modo Carrera",
+    "certifications": "Certificaciones",
+    "admin": "Administración",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
+    "menu": "Menú"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "logout": {
+    "title": "¿Cerrar Sesión?",
+    "body": "¿Estás seguro de que deseas cerrar sesión?"
+  }
+}

@@ -15,6 +15,7 @@ import { firestoreService } from '../services/firestoreService';
 import { auth } from '../firebase/firebase';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
+import { useToast } from '../contexts/ToastContext';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -207,6 +208,7 @@ interface CareerModeProps {
 }
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
+  const { showToast } = useToast();
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
   const [companiesList, setCompaniesList] = useState<Company[]>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
@@ -406,12 +408,15 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
          storageService.saveMockInterviewScore(selectedCompany.id, parsedScore);
          setProgress(storageService.getCareerProgress());
       }
+      setMockState('finished');
     } catch (err) {
       console.error(err);
+      showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
       setTextReport("There was an error generating your technical report. Please check your API key or internet connection.");
+      setMockState('idle');
+      setIsFullScreen(false);
     } finally {
       setIsGeneratingText(false);
-      setMockState('finished');
     }
   };
 
@@ -480,7 +485,16 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       speakQuestion(aiText);
     } catch (err) {
       console.error(err);
-      speakQuestion("Sorry, I'm having connection issues. Can you repeat that?");
+      showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
+      setMockState('idle');
+      setIsFullScreen(false);
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch(e){}
+      }
+      if (synthRef.current) {
+        try { synthRef.current.cancel(); } catch(e){}
+      }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
   };
 
@@ -628,15 +642,24 @@ ${transcriptText}`;
       const data = await res.json();
       const report = data.choices?.[0]?.message?.content || "Could not generate report.";
       setVoiceReport(report);
-    } catch (err) {
-      console.error(err);
-      setVoiceReport("There was an error generating your report. Please check your API key or internet connection.");
-    } finally {
       setMockState('finished_voice');
       if (selectedCompany) {
          storageService.saveMockInterviewScore(selectedCompany.id, Math.floor(Math.random() * (100 - 70 + 1) + 70));
          setProgress(storageService.getCareerProgress());
       }
+    } catch (err) {
+      console.error(err);
+      showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
+      setVoiceReport("There was an error generating your report. Please check your API key or internet connection.");
+      setMockState('idle');
+      setIsFullScreen(false);
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch(e){}
+      }
+      if (synthRef.current) {
+        try { synthRef.current.cancel(); } catch(e){}
+      }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
   };
 

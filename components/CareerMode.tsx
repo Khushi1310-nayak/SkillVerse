@@ -13,7 +13,7 @@ import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
 import { getRecommendedCompanies } from '../utils/recommendations';
 import { auth, db } from '../firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 
@@ -217,6 +217,11 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [companiesList, setCompaniesList] = useState<Company[]>(COMPANIES);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const [activeTab, setActiveTab] = useState<'study' | 'mock'>('study');
+
+  const [selectedCompanyQuestions, setSelectedCompanyQuestions] = useState<InterviewQuestion[]>([]);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState<string | null>(null);
+  const [companiesError, setCompaniesError] = useState<string | null>(null);
   
   // Mock Interview State
   const [mockState, setMockState] = useState<'idle' | 'active' | 'finished' | 'active_voice' | 'finished_voice'>('idle');
@@ -302,6 +307,8 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   // Fetch Live Firestore Companies
   useEffect(() => {
     const fetchLiveCompanies = async () => {
+      setIsLoadingCompanies(true);
+      setCompaniesError(null);
       try {
         const snapshot = await getDocs(collection(db, 'companies'));
         if (!snapshot.empty) {
@@ -322,16 +329,21 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
             return {
               id: doc.id,
               name: data.name || localMatch?.name || doc.id,
-              logo: localMatch?.logo || 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', // generic default
+              logo: localMatch?.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || doc.id)}&background=random&color=fff&rounded=true&bold=true&size=128`,
               description: localMatch?.description || 'Top tech company',
               focus: localMatch?.focus || ['Algorithms', 'System Design'],
+              difficulty: data.difficulty || localMatch?.difficulty || 'Moderate',
+              roles: data.roles || localMatch?.roles || ['SDE I', 'SDE II'],
               questions: safeQuestions
             } as Company;
           });
           setCompaniesList(liveData);
+        } else {
+          setCompaniesList([]);
         }
       } catch (error) {
         console.error("Error fetching live companies:", error);
+        setCompaniesError("Failed to load companies. Please check your database connection.");
       } finally {
         // Keep the skeleton visible briefly for a smoother loading experience
           setTimeout(() => {
@@ -341,6 +353,44 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     };
     fetchLiveCompanies();
   }, []);
+
+  // Fetch company-specific questions dynamically from Firestore when selected
+  useEffect(() => {
+    if (!selectedCompany) {
+      setSelectedCompanyQuestions([]);
+      return;
+    }
+
+    const fetchQuestions = async () => {
+      setIsLoadingQuestions(true);
+      setQuestionsError(null);
+      try {
+        const docRef = doc(db, 'companies', selectedCompany.id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const rawQuestions = data.questions || [];
+          const uniqueQuestionsMap = new Map();
+          rawQuestions.forEach((q: any) => {
+            if (!uniqueQuestionsMap.has(q.title)) {
+              uniqueQuestionsMap.set(q.title, q);
+            }
+          });
+          const safeQuestions = Array.from(uniqueQuestionsMap.values());
+          setSelectedCompanyQuestions(safeQuestions);
+        } else {
+          setQuestionsError("Company details not found in Firestore.");
+        }
+      } catch (err: any) {
+        console.error("Error fetching company questions from Firestore:", err);
+        setQuestionsError("Failed to load questions from Firestore.");
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [selectedCompany]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -371,9 +421,9 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   };
 
   const startMockInterview = () => {
-    if (!selectedCompany) return;
+    if (!selectedCompany || selectedCompanyQuestions.length === 0) return;
     // Shuffle and pick up to 5 random unique questions for the mock interview
-    const shuffled = [...selectedCompany.questions].sort(() => 0.5 - Math.random());
+    const shuffled = [...selectedCompanyQuestions].sort(() => 0.5 - Math.random());
     setMockQuestions(shuffled.slice(0, 5));
     setMockState('active');
     setTimer(9000); // 150 minutes
@@ -752,65 +802,64 @@ ${transcriptText}`;
          </div>
        )}
 
-       {/* Company Grid */}
-       {isLoadingCompanies ? (
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-           {[...Array(8)].map((_, i) => (
-             <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/20 dark:border-white/5 rounded-3xl h-[280px]"></div>
-           ))}
-         </div>
-       ) : (
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-  {isLoadingCompanies ? (
-    Array.from({ length: 8 }).map((_, index) => (
-      <div
-        key={index}
-        className="bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse"
-      >
-        {/* Logo & Badge */}
-        <div className="flex items-start justify-between mb-5 sm:mb-6">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
-          <div className="h-6 w-20 rounded-full bg-white/10" />
-        </div>
+        {/* Company Grid */}
+        {isLoadingCompanies ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse flex flex-col"
+              >
+                {/* Logo & Badge */}
+                <div className="flex items-start justify-between mb-5 sm:mb-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
+                  <div className="h-6 w-20 rounded-full bg-white/10" />
+                </div>
 
-        {/* Title */}
-        <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
+                {/* Title */}
+                <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
 
-        {/* Description */}
-        <div className="h-4 w-full rounded bg-white/10 mb-2" />
-        <div className="h-4 w-5/6 rounded bg-white/10 mb-6" />
+                {/* Description */}
+                <div className="h-4 w-full rounded bg-white/10 mb-2" />
+                <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
 
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <div className="h-3 w-16 rounded bg-white/10" />
-            <div className="h-3 w-12 rounded bg-white/10" />
+                {/* Progress */}
+                <div className="space-y-2 pt-4 border-t border-black/20 dark:border-white/5">
+                  <div className="flex justify-between">
+                    <div className="h-3 w-16 rounded bg-white/10" />
+                    <div className="h-3 w-12 rounded bg-white/10" />
+                  </div>
+                  <div className="h-2 rounded-full bg-white/10" />
+                </div>
+              </div>
+            ))}
           </div>
-
-          <div className="h-2 rounded-full bg-white/10" />
-        </div>
-      </div>
-    ))
-  ) : filteredCompanies.length > 0 ? (
-    filteredCompanies.map(company => (
-      <CompanyCard
-        key={company.id}
-        company={company}
-        progress={progress}
-        onClick={() => {
-          setSelectedCompany(company);
-          setActiveTab('study');
-          setMockState('idle');
-        }}
-      />
-    ))
-  ) : (
-    <div className="col-span-full text-center py-20 text-textMuted">
-      No companies found matching your criteria.
-    </div>
-  )}
-</div>
-       )}
+        ) : companiesError ? (
+          <div className="col-span-full text-center py-10 text-red-500 font-medium bg-red-500/10 border border-red-500/20 rounded-2xl p-6">
+            {companiesError}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredCompanies.length > 0 ? (
+              filteredCompanies.map(company => (
+                <CompanyCard
+                  key={company.id}
+                  company={company}
+                  progress={progress}
+                  onClick={() => {
+                    setSelectedCompany(company);
+                    setActiveTab('study');
+                    setMockState('idle');
+                  }}
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20 text-textMuted">
+                No companies found matching your criteria.
+              </div>
+            )}
+          </div>
+        )}
 
        {/* COMPANY MODAL - Uses Portal to escape sidebar stacking context */}
        {selectedCompany && createPortal(
@@ -1106,26 +1155,43 @@ ${transcriptText}`;
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-                       {activeTab === 'study' ? (
-                          <div className="max-w-4xl mx-auto space-y-4">
-                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="font-bold text-lg md:text-xl text-textMain">Question Bank</h3>
-                                <div className="text-sm text-textMuted">
-                                   {selectedCompany.questions.filter(q => progress.practicedQuestions.includes(q.id)).length} / {selectedCompany.questions.length} Practiced
+                        {activeTab === 'study' ? (
+                           <div className="max-w-4xl mx-auto space-y-4">
+                              {isLoadingQuestions ? (
+                                <div className="flex justify-center items-center py-20">
+                                  <Loader2 size={40} className="text-primaryLight animate-spin" />
                                 </div>
-                             </div>
-                             
-                             {selectedCompany.questions.map(question => (
-                               <QuestionItem 
-                                 key={question.id} 
-                                 question={question} 
-                                 isPracticed={progress.practicedQuestions.includes(question.id)}
-                                 isSaved={progress.savedQuestions.includes(question.id)}
-                                 onTogglePractice={() => handleTogglePractice(question.id)}
-                                 onToggleSave={() => handleToggleSave(question.id)}
-                               />
-                             ))}
-                          </div>
+                              ) : questionsError ? (
+                                <div className="text-center py-10 text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                                  {questionsError}
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex justify-between items-center mb-6">
+                                     <h3 className="font-bold text-lg md:text-xl text-textMain">Question Bank</h3>
+                                     <div className="text-sm text-textMuted">
+                                        {selectedCompanyQuestions.filter(q => progress.practicedQuestions.includes(q.id)).length} / {selectedCompanyQuestions.length} Practiced
+                                     </div>
+                                  </div>
+                                  
+                                  {selectedCompanyQuestions.map(question => (
+                                    <QuestionItem 
+                                      key={question.id} 
+                                      question={question} 
+                                      isPracticed={progress.practicedQuestions.includes(question.id)}
+                                      isSaved={progress.savedQuestions.includes(question.id)}
+                                      onTogglePractice={() => handleTogglePractice(question.id)}
+                                      onToggleSave={() => handleToggleSave(question.id)}
+                                    />
+                                  ))}
+                                  {selectedCompanyQuestions.length === 0 && (
+                                    <div className="text-center py-10 text-textMuted">
+                                      No questions found for this company.
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                           </div>
                        ) : (
                           <div className="min-h-full flex flex-col items-center justify-center max-w-4xl mx-auto text-center py-12">
                              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 animate-pulse-slow shrink-0 mt-auto">

@@ -1,22 +1,69 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock } from 'lucide-react';
-import { COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
+import { db } from '../firebase/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const course = COURSES.find(c => c.id === id);
-  if (!course) {
-    return <NotFound />;
-  }
+  const [course, setCourse] = useState<Course | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const { appUser: user, completeCourse } = useAuth();
   const settings = user?.settings;
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchCourseData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const courseDocRef = doc(db, 'courses', id);
+        const courseSnap = await getDoc(courseDocRef);
+
+        if (!courseSnap.exists()) {
+          setError("Course not found");
+          setIsLoading(false);
+          return;
+        }
+
+        const courseData = courseSnap.data();
+
+        // Fetch quiz questions from separate 'quizzes' collection
+        const quizDocRef = doc(db, 'quizzes', id);
+        const quizSnap = await getDoc(quizDocRef);
+        const quizQuestions = quizSnap.exists() ? (quizSnap.data().questions || []) : [];
+
+        setCourse({
+          id: courseSnap.id,
+          categoryId: courseData.categoryId,
+          title: courseData.title,
+          description: courseData.description,
+          icon: courseData.icon,
+          duration: courseData.duration,
+          level: courseData.level,
+          content: courseData.content,
+          resources: courseData.resources || [],
+          quiz: quizQuestions,
+        });
+      } catch (err: any) {
+        console.error("Error loading course details from Firestore:", err);
+        setError("Error loading course details. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [id]);
 
   const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
   const cooldownKey = `cooldown_${id}`;
@@ -97,7 +144,24 @@ export const CourseView: React.FC = () => {
     };
   }, [id]);
 
-  if (!course) return <div>Course not found</div>;
+  if (isLoading) {
+    return (
+      <div className="bg-glass border border-black/20 dark:border-white/20 rounded-3xl p-8 flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryLight"></div>
+      </div>
+    );
+  }
+
+  if (error || !course) {
+    return (
+      <div className="text-center py-20 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold text-textMain mb-4">{error || "Course not found"}</h2>
+        <Link to="/courses" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-main text-white rounded-xl font-bold shadow-lg hover:shadow-primary/25 transition-all">
+          Back to Courses
+        </Link>
+      </div>
+    );
+  }
 
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;

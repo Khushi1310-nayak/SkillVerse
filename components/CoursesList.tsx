@@ -1,23 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, PlayCircle, CheckCircle, ChevronDown } from 'lucide-react';
-import { COURSES, CATEGORIES } from '../constants';
+import { Search, Filter, PlayCircle, CheckCircle, ChevronDown, Loader2 } from 'lucide-react';
+import { CATEGORIES } from '../constants';
 import { storageService } from '../services/storageService';
+import { db } from '../firebase/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { Course } from '../types';
 
 export const CoursesList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
+  const [coursesList, setCoursesList] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+  const [error, setError] = useState<string | null>(null);
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'courses'));
+        const courses: Course[] = [];
+        querySnapshot.forEach((doc) => {
+          courses.push({ id: doc.id, ...doc.data() } as Course);
+        });
+        setCoursesList(courses);
+      } catch (err: any) {
+        console.error("Error fetching courses from Firestore:", err);
+        setError("Failed to load courses. Please check your database connection.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourses();
   }, []);
+
   const progress = storageService.getAllProgress();
 
-  const filtered = COURSES.filter(course => {
+  const filtered = coursesList.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
     const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
     return matchesSearch && matchesCat;
@@ -82,6 +103,10 @@ export const CoursesList: React.FC = () => {
         </div>
       </div>
     ))
+  ) : error ? (
+    <div className="col-span-full text-center py-10 text-red-500 font-medium bg-red-500/10 border border-red-500/20 rounded-2xl p-6">
+      {error}
+    </div>
   ) : (
     <>
       {filtered.map(course => {

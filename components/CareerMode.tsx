@@ -8,6 +8,7 @@ import {
   Mic, MicOff, Volume2, User, Loader2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useSearchParams } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
 import { getRecommendedCompanies } from '../utils/recommendations';
@@ -119,7 +120,25 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
   );
 };
 
-const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean; isSaved: boolean; onTogglePractice: () => void; onToggleSave: () => void }> = ({ question, isPracticed, isSaved, onTogglePractice, onToggleSave }) => {
+interface QuestionItemProps {
+  question: InterviewQuestion;
+  isPracticed: boolean;
+  isSaved: boolean;
+  onTogglePractice: () => void;
+  onToggleSave: () => void;
+  srsData?: any;
+  onSrsUpdate?: (gotRight: boolean) => void;
+}
+
+const QuestionItem: React.FC<QuestionItemProps> = ({ 
+  question, 
+  isPracticed, 
+  isSaved, 
+  onTogglePractice, 
+  onToggleSave,
+  srsData,
+  onSrsUpdate
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showXp, setShowXp] = useState(false);
 
@@ -164,6 +183,11 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
                {question.tags.map(tag => (
                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
                ))}
+               {srsData && (
+                 <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 font-bold uppercase whitespace-nowrap">
+                   Box {srsData.srsInterval}
+                 </span>
+               )}
             </div>
             <h4 className="font-bold text-textMain text-sm md:text-base pr-2 truncate md:whitespace-normal">{question.title}</h4>
          </div>
@@ -181,11 +205,47 @@ const QuestionItem: React.FC<{ question: InterviewQuestion; isPracticed: boolean
          </div>
       </div>
 
-      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
          <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
             <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
                <div dangerouslySetInnerHTML={{ __html: question.answer }} />
             </div>
+            
+            <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">
+               <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">SRS Stage:</span>
+                  {srsData ? (
+                     <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded">
+                           Box {srsData.srsInterval}
+                        </span>
+                        <span className="text-[10px] text-textMuted">
+                           Next review: {new Date(srsData.nextReviewDate).toLocaleDateString()}
+                        </span>
+                     </div>
+                  ) : (
+                     <span className="text-xs text-textMuted italic">Not scheduled yet</span>
+                  )}
+               </div>
+               
+               {onSrsUpdate && (
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                     <button
+                       onClick={() => onSrsUpdate(false)}
+                       className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold text-xs transition-colors"
+                     >
+                        Forgot / Wrong
+                     </button>
+                     <button
+                       onClick={() => onSrsUpdate(true)}
+                       className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 font-bold text-xs transition-colors"
+                     >
+                        Remembered / Right
+                     </button>
+                  </div>
+               )}
+            </div>
+
             <div className="mt-4 flex justify-end">
                <a 
                  href={question.resourceLink} 
@@ -209,9 +269,30 @@ interface CareerModeProps {
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showReviewQueue = searchParams.get('review') === 'true';
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
   const [companiesList, setCompaniesList] = useState<Company[]>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
+
+  const dueQuestions = useMemo(() => {
+    const list: { question: InterviewQuestion; company: Company }[] = [];
+    const now = new Date();
+    const srsMap = progress.srsData || {};
+    
+    companiesList.forEach(company => {
+      company.questions.forEach(q => {
+        const srs = srsMap[q.id];
+        if (srs) {
+          const nextReview = new Date(srs.nextReviewDate);
+          if (nextReview <= now) {
+            list.push({ question: q, company });
+          }
+        }
+      });
+    });
+    return list;
+  }, [companiesList, progress]);
   const recommendedCompanies = useMemo(
       () => getRecommendedCompanies(user?.settings, progress, companiesList),
       [user?.settings, progress, companiesList]
@@ -343,6 +424,17 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const handleToggleSave = (qId: string) => {
     const newProgress = storageService.toggleQuestionSave(qId);
     setProgress(newProgress);
+  };
+
+  const handleSrsUpdate = (qId: string, gotRight: boolean) => {
+    const newProgress = storageService.updateQuestionSRS(qId, gotRight);
+    setProgress(newProgress);
+    showToast({
+      message: gotRight 
+        ? "Question review scheduled further out! Keep it up." 
+        : "Interval reset. You will review this question again tomorrow.",
+      type: gotRight ? "success" : "info"
+    });
   };
 
   const startMockInterview = () => {
@@ -680,6 +772,70 @@ ${transcriptText}`;
 
   // Filter Companies
   const filteredCompanies = companiesList.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
+
+  if (showReviewQueue) {
+    return (
+      <div className="space-y-8 animate-fade-in pb-20">
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+               <button 
+                 onClick={() => setSearchParams({})} 
+                 className="flex items-center gap-2 text-primaryLight font-bold text-sm mb-2 hover:underline"
+               >
+                  &larr; Back to Companies
+               </button>
+               <h2 className="text-3xl font-display font-bold text-textMain flex items-center gap-2">
+                  <Clock size={28} className="text-orange-500" />
+                  Spaced Repetition Review Queue
+               </h2>
+               <p className="text-textMuted mt-1">Review questions you previously practiced using the Leitner system.</p>
+            </div>
+         </div>
+
+         <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8">
+            {dueQuestions.length > 0 ? (
+               <div className="space-y-4 max-w-4xl">
+                  <p className="text-sm text-textMuted mb-4">
+                     Answer these questions today. Mark them as **Right** to move them to a longer interval, or **Wrong** to review them again tomorrow.
+                  </p>
+                  {dueQuestions.map(({ question, company }) => (
+                     <div key={question.id} className="relative">
+                        <div className="absolute top-4 right-12 bg-primary/10 text-primaryLight text-[10px] px-2 py-0.5 rounded border border-primary/20 font-bold uppercase z-10">
+                           {company.name}
+                        </div>
+                        <QuestionItem 
+                          question={question}
+                          isPracticed={progress.practicedQuestions.includes(question.id)}
+                          isSaved={progress.savedQuestions.includes(question.id)}
+                          onTogglePractice={() => handleTogglePractice(question.id)}
+                          onToggleSave={() => handleToggleSave(question.id)}
+                          srsData={progress.srsData?.[question.id]}
+                          onSrsUpdate={(gotRight) => handleSrsUpdate(question.id, gotRight)}
+                        />
+                     </div>
+                  ))}
+               </div>
+            ) : (
+               <div className="text-center py-16">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
+                     <CheckCircle size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-textMain mb-2">You're all caught up!</h3>
+                  <p className="text-textMuted max-w-md mx-auto mb-6">
+                     No questions are currently due for review. Practice more questions in Career Mode to build your review queue!
+                  </p>
+                  <button 
+                    onClick={() => setSearchParams({})}
+                    className="px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium transition-all"
+                  >
+                     Explore Companies
+                  </button>
+               </div>
+            )}
+         </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-8 pb-20 relative">
@@ -1123,6 +1279,8 @@ ${transcriptText}`;
                                  isSaved={progress.savedQuestions.includes(question.id)}
                                  onTogglePractice={() => handleTogglePractice(question.id)}
                                  onToggleSave={() => handleToggleSave(question.id)}
+                                 srsData={progress.srsData?.[question.id]}
+                                 onSrsUpdate={(gotRight) => handleSrsUpdate(question.id, gotRight)}
                                />
                              ))}
                           </div>

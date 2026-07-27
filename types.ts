@@ -142,8 +142,15 @@ export interface Company {
   questions: InterviewQuestion[];
 }
 
+export interface QuestionSRSData {
+  questionId: string;
+  srsInterval: number; // Leitner box (1 to 5)
+  nextReviewDate: string; // ISO string format
+}
+
 export interface CareerProgress {
   practicedQuestions: string[]; // Array of question IDs
   savedQuestions: string[];
   mockInterviewScores: { companyId: string; score: number; date: string }[];
+  srsData?: Record<string, QuestionSRSData>; // Map of questionId to SRS progress
 }

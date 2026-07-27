@@ -34,15 +34,20 @@ export const CustomCursor: React.FC = () => {
     document.documentElement.classList.add('custom-cursor-active');
 
     const handleMove = (e: MouseEvent) => {
-      if (keyboardMode) {
-        setKeyboardMode(false);
-        document.documentElement.classList.add('custom-cursor-active');
-      }
+      setKeyboardMode(prev => {
+        if (prev) {
+          document.documentElement.classList.add('custom-cursor-active');
+          return false;
+        }
+        return prev;
+      });
+
       mouse.current = { x: e.clientX, y: e.clientY };
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
       }
     };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         setKeyboardMode(true);

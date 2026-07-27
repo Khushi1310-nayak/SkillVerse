@@ -56,6 +56,19 @@ export interface User {
   streak: number;
   lastActiveDate: string;
   badges: string[];
+  role?: 'admin' | 'instructor' | 'user';
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface Chapter {
+  id: string;
+  title: string;
+  lessons: Lesson[];
 }
 
 export interface Category {
@@ -96,6 +109,7 @@ export interface Course {
   content: string; // HTML content
   resources: { title: string; url: string }[];
   quiz: QuizQuestion[];
+  chapters?: Chapter[];
 }
 
 export interface Progress {

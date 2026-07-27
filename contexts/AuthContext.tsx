@@ -121,7 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 photoURL: data.photoURL || currentUser.photoURL || "",
                 streak: computedStreak,
                 lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
-                badges: allBadges
+                badges: allBadges,
+                role: data.role || 'user'
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -138,7 +139,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 photoURL: currentUser.photoURL || "",
                 streak: 0,
                 lastActiveDate: "",
-                badges: []
+                badges: [],
+                role: 'user'
              });
              setLoading(false);
            }

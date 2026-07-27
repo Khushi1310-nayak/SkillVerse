@@ -8,12 +8,11 @@ import {
   Mic, MicOff, Volume2, User, Loader2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
 import { getRecommendedCompanies } from '../utils/recommendations';
-import { auth, db } from '../firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { firestoreService } from '../services/firestoreService';
+import { auth } from '../firebase/firebase';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 
@@ -209,13 +208,13 @@ interface CareerModeProps {
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
+  const [companiesList, setCompaniesList] = useState<Company[]>([]);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const recommendedCompanies = useMemo(
-      () => getRecommendedCompanies(user?.settings, progress),
-      [user?.settings, progress]
+      () => getRecommendedCompanies(user?.settings, progress, companiesList),
+      [user?.settings, progress, companiesList]
   );
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [companiesList, setCompaniesList] = useState<Company[]>(COMPANIES);
-  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const [activeTab, setActiveTab] = useState<'study' | 'mock'>('study');
   
   // Mock Interview State
@@ -303,41 +302,15 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   useEffect(() => {
     const fetchLiveCompanies = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'companies'));
-        if (!snapshot.empty) {
-          const liveData = snapshot.docs.map(doc => {
-            const data = doc.data();
-            // find the original company icon/desc if it exists in local constants, else default
-            const localMatch = COMPANIES.find(c => c.name.toLowerCase() === data.name.toLowerCase());
-            // Deduplicate questions from Firebase just in case they were saved previously with the duplicate bug
-            const rawQuestions = data.questions && data.questions.length > 0 ? data.questions : (localMatch?.questions || []);
-            const uniqueQuestionsMap = new Map();
-            rawQuestions.forEach((q: any) => {
-              if (!uniqueQuestionsMap.has(q.title)) {
-                uniqueQuestionsMap.set(q.title, q);
-              }
-            });
-            const safeQuestions = Array.from(uniqueQuestionsMap.values());
-
-            return {
-              id: doc.id,
-              name: data.name || localMatch?.name || doc.id,
-              logo: localMatch?.logo || 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', // generic default
-              description: localMatch?.description || 'Top tech company',
-              focus: localMatch?.focus || ['Algorithms', 'System Design'],
-              questions: safeQuestions
-            } as Company;
-          });
-          setCompaniesList(liveData);
-        }
+        const liveData = await firestoreService.getCompanies();
+        setCompaniesList(liveData);
       } catch (error) {
-        console.error("Error fetching live companies:", error);
+        console.error("Error fetching live companies from Firestore:", error);
       } finally {
-        // Keep the skeleton visible briefly for a smoother loading experience
-          setTimeout(() => {
-            setIsLoadingCompanies(false);
-          }, 1500);
-        }
+        setTimeout(() => {
+          setIsLoadingCompanies(false);
+        }, 1000);
+      }
     };
     fetchLiveCompanies();
   }, []);
@@ -670,7 +643,7 @@ ${transcriptText}`;
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const s = secs % 60;
-    return `${mins}:${s < 10 ? '0' : ''}${s}`;
+    return `${mins < 10 ? '0' : ''}${mins}:${s < 10 ? '0' : ''}${s}`;
   };
 
   // Readiness Score Calculation
@@ -869,7 +842,7 @@ ${transcriptText}`;
                     </div>
 
                     <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                       <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                       <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
                           <Timer /> {formatTime(timer)}
                        </div>
                        
@@ -964,7 +937,7 @@ ${transcriptText}`;
                      </div>
 
                      <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                        <div className={`flex items-center gap-2 font-mono text-lg md:text-xl ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+                        <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
                            <Timer /> {formatTime(timer)}
                         </div>
                         

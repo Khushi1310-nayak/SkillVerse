@@ -1,17 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CheckCircle, PlayCircle, Lock, ArrowLeft } from 'lucide-react';
-import { CATEGORIES, COURSES } from '../constants';
+import { CheckCircle, PlayCircle, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { CATEGORIES } from '../constants';
 import { storageService } from '../services/storageService';
 import NotFound from './NotFound';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 
 export const CategoryView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const category = CATEGORIES.find(c => c.id === id);
-  const courses = COURSES.filter(c => c.categoryId === id);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCategoryCourses = async () => {
+      try {
+        const all = await firestoreService.getCourses();
+        const filtered = all.filter(c => c.categoryId === id);
+        setCourses(filtered);
+      } catch (error) {
+        console.error('Error fetching courses for category:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCategoryCourses();
+  }, [id]);
+
   const progress = storageService.getAllProgress();
+
   if (!category) {
     return <NotFound />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading category courses...</div>
+      </div>
+    );
   }
 
 

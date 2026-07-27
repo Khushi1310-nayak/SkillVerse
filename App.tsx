@@ -7,6 +7,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './guards/ProtectedRoute';
+import { AdminRoute } from './guards/AdminRoute';
+import { AdminDashboard } from './components/AdminDashboard';
 import { storageService } from './services/storageService'; // Will clean up storageService next
 import NotFound from './components/NotFound';
 import { Loader2 } from 'lucide-react';
@@ -101,6 +103,11 @@ const AppRoutes = () => {
                       <Route path="/category/:id" element={<CategoryView />} />
                       <Route path="/course/:id" element={<CourseView />} />
                       <Route path="/certificate/:id" element={<Certificate />} />
+                      <Route path="/admin" element={
+                        <AdminRoute>
+                          <AdminDashboard />
+                        </AdminRoute>
+                      } />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Layout>

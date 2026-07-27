@@ -1,13 +1,17 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame } from 'lucide-react';
-import { CATEGORIES, COURSES } from '../constants';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2 } from 'lucide-react';
+import { CATEGORIES } from '../constants';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
 import { getRecommendedCourses } from '../utils/recommendations';
+import { useToast } from '../contexts/ToastContext';
+import { StreakCelebration } from './StreakCelebration';
 
 interface DashboardProps {
   user: User;
@@ -15,17 +19,74 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [showTour, setShowTour] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [dueQuestionsCount, setDueQuestionsCount] = useState(0);
+
+  useEffect(() => {
+    const loadCompaniesAndCalculateDue = async () => {
+      try {
+        const companyList = await firestoreService.getCompanies();
+        const careerProgress = storageService.getCareerProgress();
+        const srsMap = careerProgress.srsData || {};
+        
+        let count = 0;
+        const now = new Date();
+        
+        companyList.forEach(company => {
+          company.questions.forEach(q => {
+            const srs = srsMap[q.id];
+            if (srs) {
+              const nextReview = new Date(srs.nextReviewDate);
+              if (nextReview <= now) {
+                count++;
+              }
+            }
+          });
+        });
+        setDueQuestionsCount(count);
+      } catch (error) {
+        console.error("Error calculating due questions in Dashboard:", error);
+      }
+    };
+    loadCompaniesAndCalculateDue();
+  }, []);
+
+  useEffect(() => {
+    if (user.streak > 0) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const hasCelebratedToday = localStorage.getItem(`streak_celebrated_${user.username}_${todayStr}`);
+      if (!hasCelebratedToday) {
+        setShowStreakModal(true);
+        localStorage.setItem(`streak_celebrated_${user.username}_${todayStr}`, 'true');
+      }
+    }
+  }, [user.streak, user.username]);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const data = await firestoreService.getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('Error fetching courses in Dashboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCourses();
+  }, []);
 
   useEffect(() => {
     if (user.settings?.reminders) {
       const hasStudiedToday = sessionStorage.getItem('studied_today');
       if (!hasStudiedToday) {
-        setToastMessage(`Reminder: Hit your daily goal of ${user.settings.dailyGoal} minutes to keep your streak!`);
+        showToast({ message: `Reminder: Hit your daily goal of ${user.settings.dailyGoal} minutes to keep your streak!`, type: 'info', duration: 5000 });
         sessionStorage.setItem('studied_today', 'true');
-        setTimeout(() => setToastMessage(null), 5000);
       }
     }
   }, [user.settings?.reminders, user.settings?.dailyGoal]);
@@ -34,7 +95,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const lastVisited = storageService.getLastVisited();
   const lastVisitedCourse = lastVisited
-    ? COURSES.find(c => c.id === lastVisited.courseId)
+    ? courses.find(c => c.id === lastVisited.courseId)
     : undefined;
   const lastVisitedProgress = lastVisitedCourse
     ? allProgress.find(p => p.courseId === lastVisitedCourse.id)
@@ -42,15 +103,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const showContinueWidget = !!lastVisitedCourse && !lastVisitedProgress?.passed;
 
   const recommendedCourses = useMemo(
-    () => getRecommendedCourses(user.settings, allProgress),
-    [user.settings, allProgress]
+    () => getRecommendedCourses(user.settings, allProgress, courses),
+    [user.settings, allProgress, courses]
   );
   const completedCount = allProgress.filter(p => p.passed).length;
-  const totalCourses = COURSES.length;
-  const completionPercentage = Math.round((completedCount / totalCourses) * 100);
+  const totalCourses = courses.length;
+  const completionPercentage = totalCourses ? Math.round((completedCount / totalCourses) * 100) : 0;
 
   const getCategoryProgress = (catId: string) => {
-    const catCourses = COURSES.filter(c => c.categoryId === catId);
+    const catCourses = courses.filter(c => c.categoryId === catId);
     const catPassed = catCourses.filter(c => allProgress.find(p => p.courseId === c.id)?.passed).length;
     return { 
       total: catCourses.length, 
@@ -64,12 +125,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       label: cat.title,
       ...getCategoryProgress(cat.id)
     }));
-  }, [allProgress]);
+  }, [allProgress, courses]);
 
   const filteredCourses = useMemo(() => {
     if (!searchQuery) return [];
-    return COURSES.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
-  }, [searchQuery]);
+    return courses.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
+  }, [searchQuery, courses]);
 
   const getIcon = (name: string) => {
     switch (name) {
@@ -102,19 +163,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     return type === 'h' ? hMap[rounded] : wMap[rounded];
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading dashboard...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-fade-in pb-20 relative">
-      {/* Tour Overlay */}
       {showTour && <TourOverlay onClose={handleTourComplete} />}
-
-      {/* Reminder Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-8 right-8 z-50 bg-primary/20 backdrop-blur-md border border-primary/50 text-white px-6 py-4 rounded-xl shadow-lg animate-fade-in flex items-center gap-3">
-          <Clock className="text-primaryLight" />
-          <span className="font-medium">{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="ml-4 opacity-70 hover:opacity-100">✕</button>
-        </div>
-      )}
 
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
@@ -195,6 +255,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       )}
 
+      {/* Spaced Repetition Review Queue Widget */}
+      {dueQuestionsCount > 0 && (
+        <div className="bg-glass border border-orange-500/30 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+              <Clock className="text-orange-500 animate-pulse-slow" size={22} />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-0.5 animate-pulse">
+                Spaced Repetition Review
+              </div>
+              <div className="text-base font-bold text-textMain">
+                You have {dueQuestionsCount} question{dueQuestionsCount !== 1 ? 's' : ''} due for review today!
+              </div>
+            </div>
+          </div>
+          <Link
+            to="/career?review=true"
+            className="shrink-0 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-lg font-medium shadow-lg hover:shadow-orange-500/25 transition-all text-center w-full sm:w-auto"
+          >
+            Review Now
+          </Link>
+        </div>
+      )}
+
       {/* Stats & Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Stats Card */}
@@ -203,10 +288,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <div className="flex flex-wrap items-center gap-3 mb-2">
               <h2 className="text-2xl font-bold text-textMain">Keep it up, {user.username}!</h2>
               {user.streak > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold">
+                <button 
+                  onClick={() => setShowStreakModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer hover:scale-105 transition-all hover:bg-orange-500/20 active:scale-95"
+                  title="Click to view streak celebration"
+                >
                   <Flame size={14} className="fill-orange-500" />
                   {user.streak} day{user.streak !== 1 ? 's' : ''} streak
-                </div>
+                </button>
               )}
             </div>
             <p className="text-textMuted mb-6 max-w-lg">
@@ -311,6 +400,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       <div id="dash-leaderboard" className="mt-8">
         <Leaderboard />
       </div>
+      
+      {showStreakModal && (
+        <StreakCelebration user={user} onClose={() => setShowStreakModal(false)} />
+      )}
     </div>
   );
 };

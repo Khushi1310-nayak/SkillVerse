@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../contexts/ToastContext';
 
 interface VerifyEmailProps {
   email: string;
@@ -9,19 +10,16 @@ interface VerifyEmailProps {
 
 export const VerifyEmail: React.FC<VerifyEmailProps> = ({ email }) => {
   const { resendVerificationEmail, user } = useAuth();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const handleResendVerify = async () => {
-    setError(null);
-    setSuccessMsg(null);
     setLoading(true);
     try {
       await resendVerificationEmail();
-      setSuccessMsg("Verification email sent! Please check your inbox.");
+      showToast({ message: "Verification email sent! Please check your inbox.", type: 'success' });
     } catch (err: any) {
-      setError(err.message);
+      showToast({ message: err.message, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -42,8 +40,6 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ email }) => {
           We've sent a verification link to <span className="font-bold text-white">{user?.email || email}</span>. 
           Please verify your email to access the platform.
         </p>
-        {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
-        {successMsg && <div className="mb-4 text-green-500 text-sm">{successMsg}</div>}
         <button 
           onClick={handleResendVerify}
           disabled={loading}

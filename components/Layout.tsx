@@ -10,15 +10,18 @@ import {
   Menu, 
   X, 
   AlertTriangle,
-  Briefcase 
+  Briefcase,
+  Shield
 } from 'lucide-react';
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
+import { XP_STORE_THEMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
   onLogout: () => void;
+  fallback: React.ReactNode;
 }
 
 const AVATARS: Record<string, string> = {
@@ -29,7 +32,7 @@ const AVATARS: Record<string, string> = {
   '5': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha',
 };
 
-export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallback }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,29 +40,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
 
   // Apply theme and gradient intensity
   useEffect(() => {
-    if (user?.settings?.theme === 'light') {
+    const activeThemeId = user?.settings?.activeTheme || (user?.settings?.theme === 'light' ? 'light' : 'dark');
+    const matchedTheme = XP_STORE_THEMES.find(t => t.id === activeThemeId) || XP_STORE_THEMES[0];
+
+    if (matchedTheme.themeMode === 'light') {
       document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');
     }
 
     // Colors must be space-separated RGB values for Tailwind opacity to work
-    let primary = '105 104 166'; // #6968A6
-    let primaryLight = '207 152 147'; // #CF9893
+    let primary = matchedTheme.primary;
+    let primaryLight = matchedTheme.primaryLight;
 
     if (user?.settings?.gradientIntensity === 'low') {
-      // Subtle
-      primary = '139 138 174'; // #8b8aae
-      primaryLight = '220 189 187'; // #dcbdbb
+      if (activeThemeId === 'dark' || activeThemeId === 'light') {
+        primary = '139 138 174'; // #8b8aae
+        primaryLight = '220 189 187'; // #dcbdbb
+      }
     } else if (user?.settings?.gradientIntensity === 'high') {
-      // Vibrant
-      primary = '81 78 204'; // #514ecc
-      primaryLight = '239 107 94'; // #ef6b5e
+      if (activeThemeId === 'dark' || activeThemeId === 'light') {
+        primary = '81 78 204'; // #514ecc
+        primaryLight = '239 107 94'; // #ef6b5e
+      }
     }
 
     document.documentElement.style.setProperty('--color-primary', primary);
     document.documentElement.style.setProperty('--color-primary-light', primaryLight);
-  }, [user?.settings?.theme, user?.settings?.gradientIntensity]);
+  }, [user?.settings?.theme, user?.settings?.gradientIntensity, user?.settings?.activeTheme]);
 
   const getOpacityClass = () => {
     if (user?.settings?.gradientIntensity === 'low') return 'opacity-30';
@@ -69,6 +77,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
   const opacityClass = getOpacityClass();
 
   const isActive = (path: string) => location.pathname === path;
+  const showAdminLink = user?.role === 'admin' || user?.role === 'instructor';
 
   const NavItem = ({ to, icon: Icon, label, id }: { to: string; icon: any; label: string; id?: string }) => (
     <Link
@@ -144,6 +153,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           <NavItem to="/courses" icon={BookOpen} label="Courses" id="nav-courses" />
           <NavItem to="/career" icon={Briefcase} label="Career Mode" id="nav-career" />
           <NavItem to="/certifications" icon={Award} label="Certifications" id="nav-certs" />
+          {showAdminLink && (
+            <NavItem to="/admin" icon={Shield} label="Admin" id="nav-admin" />
+          )}
           <NavItem to="/settings" icon={Settings} label="Settings" id="nav-settings" />
         </nav>
 
@@ -193,6 +205,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                 <NavItem to="/courses" icon={BookOpen} label="Courses" />
                 <NavItem to="/career" icon={Briefcase} label="Career Mode" />
                 <NavItem to="/certifications" icon={Award} label="Certifications" />
+                {showAdminLink && (
+                  <NavItem to="/admin" icon={Shield} label="Admin" />
+                )}
                 <NavItem to="/settings" icon={Settings} label="Settings" />
              </nav>
              <button 
@@ -208,7 +223,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {/* Main Content */}
       <main className="flex-1 relative z-10 w-full min-w-0 transition-all duration-300">
          <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
-            {children}
+            <React.Suspense fallback={fallback}>
+               {children}
+            </React.Suspense>
          </div>
       </main>
 

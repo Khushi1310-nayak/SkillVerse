@@ -238,6 +238,40 @@ npm run dev
 
 ---
 
+## 🤖 Local Setup for AI Features
+
+SkillVerse's AI-powered features (such as Career Mode and AI Assistant) use **OpenRouter** with the **Gemini** model.
+
+### 1. Create an OpenRouter account
+
+1. Visit **https://openrouter.ai**.
+2. Sign up for a free account.
+3. Navigate to the **API Keys** section.
+4. Generate a new API key.
+
+### 2. Configure your environment
+
+Copy `.env.example` to `.env` (or create a new `.env` file in the project root).
+
+Then add the following variable:
+
+```env
+VITE_OPENROUTER_API_KEY=your_openrouter_api_key
+```
+
+Replace `your_openrouter_api_key` with the API key you generated from OpenRouter.
+
+### 3. Restart the development server
+
+After saving your `.env` file, restart the application:
+
+```bash
+npm run dev
+```
+
+Without a valid `VITE_OPENROUTER_API_KEY`, AI-powered features will not work locally.
+
+
 # 🤝 Contributing
 
 Contributions are welcome! If you’d like to improve UI, animations, features, or performance:
@@ -286,3 +320,5 @@ Passionate about:
 ---
 
 ### ⭐ If you found this project interesting, consider giving it a Star!
+
+

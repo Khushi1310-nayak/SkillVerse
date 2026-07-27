@@ -1,25 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Auth } from './components/Auth';
-import { LandingPage } from './components/LandingPage';
-import { Dashboard } from './components/Dashboard';
-import { CategoryView } from './components/CategoryView';
-import { CourseView } from './components/CourseView';
-import { Certificate } from './components/Certificate';
-import { Settings } from './components/Settings';
-import { CoursesList } from './components/CoursesList';
-import { CertificationsList } from './components/CertificationsList';
-import { CareerMode } from './components/CareerMode';
-import { Onboarding } from './components/Onboarding';
-import { CredentialVerification } from './components/CredentialVerification';
-import { DocumentationPage } from './components/DocumentationPage';
-import { CustomCursor } from './components/CustomCursor';import { AuthProvider } from './contexts/AuthContext';
+import { CustomCursor } from './components/CustomCursor';
+import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './guards/ProtectedRoute';
+import { AdminRoute } from './guards/AdminRoute';
+import { AdminDashboard } from './components/AdminDashboard';
 import { storageService } from './services/storageService'; // Will clean up storageService next
-import  NotFound  from './components/NotFound';
+import NotFound from './components/NotFound';
+import { Loader2 } from 'lucide-react';
+
+// Lazy loaded page components
+const LandingPage = lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
+const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
+const CategoryView = lazy(() => import('./components/CategoryView').then(m => ({ default: m.CategoryView })));
+const CourseView = lazy(() => import('./components/CourseView').then(m => ({ default: m.CourseView })));
+const Certificate = lazy(() => import('./components/Certificate').then(m => ({ default: m.Certificate })));
+const Settings = lazy(() => import('./components/Settings').then(m => ({ default: m.Settings })));
+const CoursesList = lazy(() => import('./components/CoursesList').then(m => ({ default: m.CoursesList })));
+const CertificationsList = lazy(() => import('./components/CertificationsList').then(m => ({ default: m.CertificationsList })));
+const CareerMode = lazy(() => import('./components/CareerMode').then(m => ({ default: m.CareerMode })));
+const Onboarding = lazy(() => import('./components/Onboarding').then(m => ({ default: m.Onboarding })));
+const CredentialVerification = lazy(() => import('./components/CredentialVerification').then(m => ({ default: m.CredentialVerification })));
+const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
+
+const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
+  <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
+    <div className="bg-glass border border-black/20 dark:border-white/10 p-8 rounded-3xl backdrop-blur-md flex flex-col items-center shadow-xl">
+      <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+      <p className="mt-4 text-textMuted font-display font-medium text-lg tracking-wide animate-pulse">
+        Loading...
+      </p>
+    </div>
+  </div>
+);
 
 const AppRoutes = () => {
   const { user, appUser, logout, updateUserSettings, updateUserAccount, updateLocalUser, } = useAuth();
@@ -53,6 +70,7 @@ const AppRoutes = () => {
   };
 
   return (
+    <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/docs" element={<DocumentationPage />} />
         <Route path="/credential/:token" element={<CredentialVerification />} />
@@ -75,7 +93,7 @@ const AppRoutes = () => {
           ) : (
             <ProtectedRoute>
               {appUser && (
-                  <Layout user={appUser} onLogout={handleLogout}>
+                  <Layout user={appUser} onLogout={handleLogout} fallback={<PageLoader fullscreen={false} />}>
                     <Routes>
                       <Route path="/" element={<Dashboard user={appUser} />} />
                       <Route path="/courses" element={<CoursesList />} />
@@ -85,6 +103,11 @@ const AppRoutes = () => {
                       <Route path="/category/:id" element={<CategoryView />} />
                       <Route path="/course/:id" element={<CourseView />} />
                       <Route path="/certificate/:id" element={<Certificate />} />
+                      <Route path="/admin" element={
+                        <AdminRoute>
+                          <AdminDashboard />
+                        </AdminRoute>
+                      } />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Layout>
@@ -93,6 +116,7 @@ const AppRoutes = () => {
           )
         } />
       </Routes>
+    </Suspense>
   );
 };
 

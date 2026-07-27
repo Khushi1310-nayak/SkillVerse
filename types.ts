@@ -19,6 +19,10 @@ export interface UserSettings {
   targetRoles?: string[];
   motivation?: string;
   learningStyle?: string;
+  unlockedThemes?: string[];
+  unlockedCursors?: string[];
+  activeTheme?: string;
+  activeCursor?: string;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -33,7 +37,11 @@ export const DEFAULT_SETTINGS: UserSettings = {
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,
-  hasSeenTour: false
+  hasSeenTour: false,
+  unlockedThemes: ['dark', 'light'],
+  unlockedCursors: ['default'],
+  activeTheme: 'dark',
+  activeCursor: 'default'
 };
 
 export interface User {
@@ -48,6 +56,19 @@ export interface User {
   streak: number;
   lastActiveDate: string;
   badges: string[];
+  role?: 'admin' | 'instructor' | 'user';
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface Chapter {
+  id: string;
+  title: string;
+  lessons: Lesson[];
 }
 
 export interface Category {
@@ -88,6 +109,7 @@ export interface Course {
   content: string; // HTML content
   resources: { title: string; url: string }[];
   quiz: QuizQuestion[];
+  chapters?: Chapter[];
 }
 
 export interface Progress {
@@ -120,8 +142,15 @@ export interface Company {
   questions: InterviewQuestion[];
 }
 
+export interface QuestionSRSData {
+  questionId: string;
+  srsInterval: number; // Leitner box (1 to 5)
+  nextReviewDate: string; // ISO string format
+}
+
 export interface CareerProgress {
   practicedQuestions: string[]; // Array of question IDs
   savedQuestions: string[];
   mockInterviewScores: { companyId: string; score: number; date: string }[];
+  srsData?: Record<string, QuestionSRSData>; // Map of questionId to SRS progress
 }

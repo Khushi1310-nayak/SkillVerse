@@ -32,10 +32,10 @@ interface AuthContextType {
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
-updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
-updateLocalUser: (updatedUser: AppUser) => void; 
-completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
-
+  updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
+  updateLocalUser: (updatedUser: AppUser) => void; 
+  completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
+  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -121,7 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 photoURL: data.photoURL || currentUser.photoURL || "",
                 streak: computedStreak,
                 lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
-                badges: allBadges
+                badges: allBadges,
+                role: data.role || 'user'
              };
              setAppUser(mappedAppUser);
              setLoading(false);
@@ -138,7 +139,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 photoURL: currentUser.photoURL || "",
                 streak: 0,
                 lastActiveDate: "",
-                badges: []
+                badges: [],
+                role: 'user'
              });
              setLoading(false);
            }
@@ -308,6 +310,63 @@ const completeCourse = async (courseId: string, xpEarned: number) => {
   }
 };
 
+const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor') => {
+  if (!auth.currentUser || !appUser) return;
+  if (appUser.xp < cost) {
+    throw new Error("Insufficient XP");
+  }
+
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  const updatedSettings = { ...appUser.settings };
+  
+  if (type === 'theme') {
+    const unlocked = updatedSettings.unlockedThemes || ['dark', 'light'];
+    if (!unlocked.includes(itemId)) {
+      unlocked.push(itemId);
+    }
+    updatedSettings.unlockedThemes = unlocked;
+    updatedSettings.activeTheme = itemId;
+    if (itemId === 'light') {
+      updatedSettings.theme = 'light';
+    } else {
+      updatedSettings.theme = 'dark';
+    }
+  } else if (type === 'cursor') {
+    const unlocked = updatedSettings.unlockedCursors || ['default'];
+    if (!unlocked.includes(itemId)) {
+      unlocked.push(itemId);
+    }
+    updatedSettings.unlockedCursors = unlocked;
+    updatedSettings.activeCursor = itemId;
+  }
+
+  const previousAppUser = appUser;
+  const updatedAppUser: AppUser = {
+    ...appUser,
+    xp: appUser.xp - cost,
+    settings: updatedSettings
+  };
+
+  setAppUser(updatedAppUser);
+
+  try {
+    await setDoc(
+      userRef,
+      {
+        xp: increment(-cost),
+        preferences: {
+          settings: updatedSettings
+        }
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    setAppUser(previousAppUser);
+    console.error("Error purchasing item:", error);
+    throw error;
+  }
+};
+
 const value: AuthContextType = {
   user,
   appUser,
@@ -324,6 +383,7 @@ const value: AuthContextType = {
   updateUserAccount,
   updateLocalUser,
   completeCourse,
+  purchaseItem,
 };
 
 return (

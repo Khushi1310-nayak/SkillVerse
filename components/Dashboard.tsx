@@ -11,6 +11,7 @@ import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
+import { StreakCelebration } from './StreakCelebration';
 
 interface DashboardProps {
   user: User;
@@ -23,6 +24,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [showTour, setShowTour] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+
+  useEffect(() => {
+    if (user.streak > 0) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const hasCelebratedToday = localStorage.getItem(`streak_celebrated_${user.username}_${todayStr}`);
+      if (!hasCelebratedToday) {
+        setShowStreakModal(true);
+        localStorage.setItem(`streak_celebrated_${user.username}_${todayStr}`, 'true');
+      }
+    }
+  }, [user.streak, user.username]);
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -220,10 +233,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <div className="flex flex-wrap items-center gap-3 mb-2">
               <h2 className="text-2xl font-bold text-textMain">Keep it up, {user.username}!</h2>
               {user.streak > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold">
+                <button 
+                  onClick={() => setShowStreakModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer hover:scale-105 transition-all hover:bg-orange-500/20 active:scale-95"
+                  title="Click to view streak celebration"
+                >
                   <Flame size={14} className="fill-orange-500" />
                   {user.streak} day{user.streak !== 1 ? 's' : ''} streak
-                </div>
+                </button>
               )}
             </div>
             <p className="text-textMuted mb-6 max-w-lg">
@@ -328,6 +345,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       <div id="dash-leaderboard" className="mt-8">
         <Leaderboard />
       </div>
+      
+      {showStreakModal && (
+        <StreakCelebration user={user} onClose={() => setShowStreakModal(false)} />
+      )}
     </div>
   );
 };

@@ -16,6 +16,7 @@ import {
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
+import { XP_STORE_THEMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
@@ -38,29 +39,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
 
   // Apply theme and gradient intensity
   useEffect(() => {
-    if (user?.settings?.theme === 'light') {
+    const activeThemeId = user?.settings?.activeTheme || (user?.settings?.theme === 'light' ? 'light' : 'dark');
+    const matchedTheme = XP_STORE_THEMES.find(t => t.id === activeThemeId) || XP_STORE_THEMES[0];
+
+    if (matchedTheme.themeMode === 'light') {
       document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');
     }
 
     // Colors must be space-separated RGB values for Tailwind opacity to work
-    let primary = '105 104 166'; // #6968A6
-    let primaryLight = '207 152 147'; // #CF9893
+    let primary = matchedTheme.primary;
+    let primaryLight = matchedTheme.primaryLight;
 
     if (user?.settings?.gradientIntensity === 'low') {
-      // Subtle
-      primary = '139 138 174'; // #8b8aae
-      primaryLight = '220 189 187'; // #dcbdbb
+      if (activeThemeId === 'dark' || activeThemeId === 'light') {
+        primary = '139 138 174'; // #8b8aae
+        primaryLight = '220 189 187'; // #dcbdbb
+      }
     } else if (user?.settings?.gradientIntensity === 'high') {
-      // Vibrant
-      primary = '81 78 204'; // #514ecc
-      primaryLight = '239 107 94'; // #ef6b5e
+      if (activeThemeId === 'dark' || activeThemeId === 'light') {
+        primary = '81 78 204'; // #514ecc
+        primaryLight = '239 107 94'; // #ef6b5e
+      }
     }
 
     document.documentElement.style.setProperty('--color-primary', primary);
     document.documentElement.style.setProperty('--color-primary-light', primaryLight);
-  }, [user?.settings?.theme, user?.settings?.gradientIntensity]);
+  }, [user?.settings?.theme, user?.settings?.gradientIntensity, user?.settings?.activeTheme]);
 
   const getOpacityClass = () => {
     if (user?.settings?.gradientIntensity === 'low') return 'opacity-30';

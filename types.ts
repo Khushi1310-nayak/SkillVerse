@@ -19,6 +19,10 @@ export interface UserSettings {
   targetRoles?: string[];
   motivation?: string;
   learningStyle?: string;
+  unlockedThemes?: string[];
+  unlockedCursors?: string[];
+  activeTheme?: string;
+  activeCursor?: string;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -33,7 +37,11 @@ export const DEFAULT_SETTINGS: UserSettings = {
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,
-  hasSeenTour: false
+  hasSeenTour: false,
+  unlockedThemes: ['dark', 'light'],
+  unlockedCursors: ['default'],
+  activeTheme: 'dark',
+  activeCursor: 'default'
 };
 
 export interface User {

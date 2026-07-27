@@ -8,12 +8,10 @@ import {
   Mic, MicOff, Volume2, User, Loader2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { COMPANIES, VOICE_INTERVIEW_QUESTIONS } from '../constants';
 import { storageService } from '../services/storageService';
 import { Company, InterviewQuestion, CareerProgress, User as AppUser} from '../types';
 import { getRecommendedCompanies } from '../utils/recommendations';
-import { auth, db } from '../firebase/firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 
@@ -209,13 +207,13 @@ interface CareerModeProps {
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [progress, setProgress] = useState<CareerProgress>(storageService.getCareerProgress());
+  const [companiesList, setCompaniesList] = useState<Company[]>([]);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const recommendedCompanies = useMemo(
-      () => getRecommendedCompanies(user?.settings, progress),
-      [user?.settings, progress]
+      () => getRecommendedCompanies(user?.settings, progress, companiesList),
+      [user?.settings, progress, companiesList]
   );
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [companiesList, setCompaniesList] = useState<Company[]>(COMPANIES);
-  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const [activeTab, setActiveTab] = useState<'study' | 'mock'>('study');
 
   const [selectedCompanyQuestions, setSelectedCompanyQuestions] = useState<InterviewQuestion[]>([]);
@@ -310,46 +308,12 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
       setIsLoadingCompanies(true);
       setCompaniesError(null);
       try {
-        const snapshot = await getDocs(collection(db, 'companies'));
-        if (!snapshot.empty) {
-          const liveData = snapshot.docs.map(doc => {
-            const data = doc.data();
-            // find the original company icon/desc if it exists in local constants, else default
-            const localMatch = COMPANIES.find(c => c.name.toLowerCase() === data.name.toLowerCase());
-            // Deduplicate questions from Firebase just in case they were saved previously with the duplicate bug
-            const rawQuestions = data.questions && data.questions.length > 0 ? data.questions : (localMatch?.questions || []);
-            const uniqueQuestionsMap = new Map();
-            rawQuestions.forEach((q: any) => {
-              if (!uniqueQuestionsMap.has(q.title)) {
-                uniqueQuestionsMap.set(q.title, q);
-              }
-            });
-            const safeQuestions = Array.from(uniqueQuestionsMap.values());
 
-            return {
-              id: doc.id,
-              name: data.name || localMatch?.name || doc.id,
-              logo: localMatch?.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || doc.id)}&background=random&color=fff&rounded=true&bold=true&size=128`,
-              description: localMatch?.description || 'Top tech company',
-              focus: localMatch?.focus || ['Algorithms', 'System Design'],
-              difficulty: data.difficulty || localMatch?.difficulty || 'Moderate',
-              roles: data.roles || localMatch?.roles || ['SDE I', 'SDE II'],
-              questions: safeQuestions
-            } as Company;
-          });
-          setCompaniesList(liveData);
-        } else {
-          setCompaniesList([]);
-        }
-      } catch (error) {
-        console.error("Error fetching live companies:", error);
-        setCompaniesError("Failed to load companies. Please check your database connection.");
       } finally {
-        // Keep the skeleton visible briefly for a smoother loading experience
-          setTimeout(() => {
-            setIsLoadingCompanies(false);
-          }, 1500);
-        }
+        setTimeout(() => {
+          setIsLoadingCompanies(false);
+        }, 1000);
+      }
     };
     fetchLiveCompanies();
   }, []);

@@ -1,44 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, PlayCircle, CheckCircle, ChevronDown, Loader2 } from 'lucide-react';
-import { CATEGORIES } from '../constants';
-import { storageService } from '../services/storageService';
-import { db } from '../firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+
 import { Course } from '../types';
 
 export const CoursesList: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
   const [coursesList, setCoursesList] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const querySnapshot = await getDocs(collection(db, 'courses'));
-        const courses: Course[] = [];
-        querySnapshot.forEach((doc) => {
-          courses.push({ id: doc.id, ...doc.data() } as Course);
-        });
-        setCoursesList(courses);
-      } catch (err: any) {
-        console.error("Error fetching courses from Firestore:", err);
-        setError("Failed to load courses. Please check your database connection.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCourses();
   }, []);
 
   const progress = storageService.getAllProgress();
 
-  const filtered = coursesList.filter(course => {
+
     const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
     const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
     return matchesSearch && matchesCat;

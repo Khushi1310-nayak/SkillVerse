@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock } from 'lucide-react';
+
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
@@ -13,8 +14,6 @@ export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [course, setCourse] = useState<Course | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const { appUser: user, completeCourse } = useAuth();
   const settings = user?.settings;
@@ -229,8 +228,21 @@ export const CourseView: React.FC = () => {
     return wMap[rounded];
   };
 
+  if (loadingCourse) {
+    return (
+      <div className="min-h-screen bg-[#03060C] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading course material...</div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return <NotFound />;
+  }
+
   // Remove HTML tags for raw context for AI
-  const cleanContent = course.content.replace(/<[^>]*>?/gm, '');
+  const cleanContent = course.content ? course.content.replace(/<[^>]*>?/gm, '') : '';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in relative">

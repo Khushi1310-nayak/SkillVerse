@@ -1,8 +1,10 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame } from 'lucide-react';
-import { CATEGORIES, COURSES } from '../constants';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2 } from 'lucide-react';
+import { CATEGORIES } from '../constants';
+import { firestoreService } from '../services/firestoreService';
+import { Course } from '../types';
 import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
@@ -18,6 +20,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showTour, setShowTour] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const data = await firestoreService.getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('Error fetching courses in Dashboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCourses();
+  }, []);
 
   useEffect(() => {
     if (user.settings?.reminders) {
@@ -34,7 +52,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const lastVisited = storageService.getLastVisited();
   const lastVisitedCourse = lastVisited
-    ? COURSES.find(c => c.id === lastVisited.courseId)
+    ? courses.find(c => c.id === lastVisited.courseId)
     : undefined;
   const lastVisitedProgress = lastVisitedCourse
     ? allProgress.find(p => p.courseId === lastVisitedCourse.id)
@@ -42,15 +60,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const showContinueWidget = !!lastVisitedCourse && !lastVisitedProgress?.passed;
 
   const recommendedCourses = useMemo(
-    () => getRecommendedCourses(user.settings, allProgress),
-    [user.settings, allProgress]
+    () => getRecommendedCourses(user.settings, allProgress, courses),
+    [user.settings, allProgress, courses]
   );
   const completedCount = allProgress.filter(p => p.passed).length;
-  const totalCourses = COURSES.length;
-  const completionPercentage = Math.round((completedCount / totalCourses) * 100);
+  const totalCourses = courses.length;
+  const completionPercentage = totalCourses ? Math.round((completedCount / totalCourses) * 100) : 0;
 
   const getCategoryProgress = (catId: string) => {
-    const catCourses = COURSES.filter(c => c.categoryId === catId);
+    const catCourses = courses.filter(c => c.categoryId === catId);
     const catPassed = catCourses.filter(c => allProgress.find(p => p.courseId === c.id)?.passed).length;
     return { 
       total: catCourses.length, 
@@ -64,12 +82,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       label: cat.title,
       ...getCategoryProgress(cat.id)
     }));
-  }, [allProgress]);
+  }, [allProgress, courses]);
 
   const filteredCourses = useMemo(() => {
     if (!searchQuery) return [];
-    return COURSES.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
-  }, [searchQuery]);
+    return courses.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5);
+  }, [searchQuery, courses]);
 
   const getIcon = (name: string) => {
     switch (name) {
@@ -101,6 +119,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     };
     return type === 'h' ? hMap[rounded] : wMap[rounded];
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in pb-20 relative">

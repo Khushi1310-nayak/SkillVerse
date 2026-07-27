@@ -283,6 +283,7 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   timerRef
 }) => {
   const [localTimer, setLocalTimer] = useState(initialTime);
+  const onTimeUpRef = useRef(onTimeUp);
 
   // Sync ref with local timer state so parent can read the latest value
   useEffect(() => {
@@ -298,6 +299,9 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
     }
     prevExtraTimeRef.current = extraTimeSeconds;
   }, [extraTimeSeconds]);
+  useEffect(() => {
+  onTimeUpRef.current = onTimeUp;
+}, [onTimeUp]);
 
   // Tick down
   useEffect(() => {
@@ -307,7 +311,7 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
         setLocalTimer(t => {
           if (t <= 1) {
             clearInterval(interval);
-            onTimeUp();
+            onTimeUpRef.current();
             return 0;
           }
           return t - 1;
@@ -315,7 +319,7 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [mockState, onTimeUp]);
+  }, [mockState]);
 
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);

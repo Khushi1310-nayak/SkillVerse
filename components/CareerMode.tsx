@@ -81,13 +81,13 @@ const ReadinessScore: React.FC<{ percentage: number }> = ({ percentage }) => {
 
 // --- SUB-COMPONENTS ---
 
-const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClick: () => void }> = ({ company, progress, onClick }) => {
+const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgress; onClick: (company: Company) => void }> = ({ company, progress, onClick }) => {
   const practicedCount = company.questions.filter(q => progress.practicedQuestions.includes(q.id)).length;
   const progressPercent = Math.round((practicedCount / company.questions.length) * 100);
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => onClick(company)}
       className="group bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:bg-glass-hover hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden"
     >
       <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
@@ -121,17 +121,19 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
   );
 };
 
+const CompanyCard = React.memo(CompanyCardComponent);
+
 interface QuestionItemProps {
   question: InterviewQuestion;
   isPracticed: boolean;
   isSaved: boolean;
-  onTogglePractice: () => void;
-  onToggleSave: () => void;
+  onTogglePractice: (qId: string) => void;
+  onToggleSave: (qId: string) => void;
   srsData?: any;
-  onSrsUpdate?: (gotRight: boolean) => void;
+  onSrsUpdate?: (qId: string, gotRight: boolean) => void;
 }
 
-const QuestionItem: React.FC<QuestionItemProps> = ({ 
+const QuestionItemComponent: React.FC<QuestionItemProps> = ({ 
   question, 
   isPracticed, 
   isSaved, 
@@ -148,7 +150,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       setShowXp(true);
       setTimeout(() => setShowXp(false), 2000);
     }
-    onTogglePractice();
+    onTogglePractice(question.id);
   };
 
   return (
@@ -195,7 +197,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
 
         <div className="flex flex-col gap-2 shrink-0">
           <button
-            onClick={(e) => { e.stopPropagation(); onToggleSave(); }}
+            onClick={(e) => { e.stopPropagation(); onToggleSave(question.id); }}
             className={`p-1 hover:scale-110 transition-transform ${isSaved ? 'text-primaryLight fill-primaryLight' : 'text-textMuted hover:text-textMain'}`}
             title={isSaved ? "Remove from saved" : "Save question"}
             aria-label={isSaved ? "Remove from saved" : "Save question"}
@@ -232,13 +234,13 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
                {onSrsUpdate && (
                   <div className="flex items-center gap-3 w-full sm:w-auto">
                      <button
-                       onClick={() => onSrsUpdate(false)}
+                       onClick={() => onSrsUpdate(question.id, false)}
                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold text-xs transition-colors"
                      >
                         Forgot / Wrong
                      </button>
                      <button
-                       onClick={() => onSrsUpdate(true)}
+                       onClick={() => onSrsUpdate(question.id, true)}
                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 font-bold text-xs transition-colors"
                      >
                         Remembered / Right
@@ -262,6 +264,89 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
     </div>
   );
 };
+
+const QuestionItem = React.memo(QuestionItemComponent);
+
+interface InterviewTimerProps {
+  initialTime: number;
+  extraTimeSeconds: number;
+  mockState: 'idle' | 'active' | 'finished' | 'active_voice' | 'finished_voice';
+  onTimeUp: () => void;
+  timerRef: React.MutableRefObject<number>;
+}
+
+const InterviewTimer: React.FC<InterviewTimerProps> = ({
+  initialTime,
+  extraTimeSeconds,
+  mockState,
+  onTimeUp,
+  timerRef
+}) => {
+  const [localTimer, setLocalTimer] = useState(initialTime);
+
+  // Sync ref with local timer state so parent can read the latest value
+  useEffect(() => {
+    timerRef.current = localTimer;
+  }, [localTimer, timerRef]);
+
+  // Handle when parent adds extra time
+  const prevExtraTimeRef = useRef(extraTimeSeconds);
+  useEffect(() => {
+    const diff = extraTimeSeconds - prevExtraTimeRef.current;
+    if (diff > 0) {
+      setLocalTimer(prev => prev + diff);
+    }
+    prevExtraTimeRef.current = extraTimeSeconds;
+  }, [extraTimeSeconds]);
+
+  // Tick down
+  useEffect(() => {
+    let interval: any;
+    if (mockState === 'active' || mockState === 'active_voice') {
+      interval = setInterval(() => {
+        setLocalTimer(t => {
+          if (t <= 1) {
+            clearInterval(interval);
+            onTimeUp();
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [mockState, onTimeUp]);
+
+  const formatTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${mins < 10 ? '0' : ''}${mins}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${localTimer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
+      <Timer /> {formatTime(localTimer)}
+    </div>
+  );
+};
+
+interface VoiceChatProps {
+  chatHistory: { role: string; content: string }[];
+}
+
+const VoiceChatComponent: React.FC<VoiceChatProps> = ({ chatHistory }) => {
+  return (
+    <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
+      {chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
+        ? <Typewriter text={chatHistory[chatHistory.length - 1].content} speed={50} />
+        : chatHistory.length > 1 ? <Typewriter text={chatHistory[chatHistory.length - 2].content} speed={50} /> : "Connecting..."}
+    </h3>
+  );
+};
+
+const VoiceChat = React.memo(VoiceChatComponent, (prevProps, nextProps) => {
+  return prevProps.chatHistory === nextProps.chatHistory;
+});
 
 // --- MAIN COMPONENT ---
 interface CareerModeProps {
@@ -306,11 +391,28 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [mockQuestions, setMockQuestions] = useState<InterviewQuestion[]>([]);
   const [currentMockIndex, setCurrentMockIndex] = useState(0);
   const [timer, setTimer] = useState(0); // seconds
+  const timerRef = useRef(0);
+
+  // References to keep callbacks stable and break circular dependency
+  const startListeningRef = useRef<() => void>(() => {});
+  const stopListeningAndSubmitRef = useRef<(forceEnd?: boolean) => Promise<void>>(async () => {});
+  const speakQuestionRef = useRef<(text: string) => void>(() => {});
+  const generateAIResponseRef = useRef<(history: any[]) => Promise<void>>(async () => {});
+  const generateVoiceReportRef = useRef<(history: any[]) => Promise<void>>(async () => {});
   const [mockAnswers, setMockAnswers] = useState<string[]>([]); // user text answers
   const [textReport, setTextReport] = useState("");
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [editorLanguage, setEditorLanguage] = useState<string>('javascript');
+
+  const editorOptions = useMemo(() => ({
+    minimap: { enabled: false },
+    fontSize: 14,
+    lineNumbers: 'on' as const,
+    scrollBeyondLastLine: false,
+    wordWrap: 'on' as const,
+    padding: { top: 16 }
+  }), []);
 
   // Voice State
   const [chatHistory, setChatHistory] = useState<{ role: string, content: string }[]>([]);
@@ -331,7 +433,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   // Trap focus inside the Voice Select modal while it is open
   useFocusTrap(voiceSelectModalRef, showVoiceSelectModal, () => setShowVoiceSelectModal(false));
 
-  const handleRequestTime = () => {
+  const handleRequestTime = useCallback(() => {
     if (extraTimeUsed >= 30) return;
 
     const input = window.prompt("How many extra minutes do you need? (Max 30)");
@@ -354,7 +456,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     }
 
     setExtraTimeUsed(prev => prev + requested);
-    setTimer(prev => prev + (requested * 60));
+    timerRef.current = timerRef.current + (requested * 60);
 
     // Play Robin's Voice
     if (synthRef.current) {
@@ -362,29 +464,16 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
       const utterance = new SpeechSynthesisUtterance(responseText);
       synthRef.current.speak(utterance);
     }
-  };
+  }, [extraTimeUsed]);
 
   // Search Filter
   const [search, setSearch] = useState('');
 
-  // Timer logic
-  useEffect(() => {
-    let interval: any;
-    if (mockState === 'active' || mockState === 'active_voice') {
-      interval = setInterval(() => {
-        setTimer(t => {
-          if (t <= 1) {
-            clearInterval(interval);
-            if (mockState === 'active') finishMockInterview();
-            if (mockState === 'active_voice') stopListeningAndSubmit(true);
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [mockState]);
+  // Timer handleTimeUp callback
+  const handleTimeUp = useCallback(() => {
+    if (mockState === 'active') finishMockInterview();
+    if (mockState === 'active_voice') stopListeningAndSubmit(true);
+  }, [mockState, finishMockInterview, stopListeningAndSubmit]);
 
   // Fetch Live Firestore Companies
   useEffect(() => {
@@ -421,17 +510,30 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     };
   }, [selectedCompany]);
 
-  const handleTogglePractice = (qId: string) => {
+  // Assign ref implementations on every render to ensure they capture latest closure state
+  speakQuestionRef.current = speakQuestion;
+  startListeningRef.current = startListening;
+  stopListeningAndSubmitRef.current = stopListeningAndSubmit;
+  generateAIResponseRef.current = generateAIResponse;
+  generateVoiceReportRef.current = generateVoiceReport;
+
+  const handleSelectCompany = useCallback((company: Company) => {
+    setSelectedCompany(company);
+    setActiveTab('study');
+    setMockState('idle');
+  }, []);
+
+  const handleTogglePractice = useCallback((qId: string) => {
     const newProgress = storageService.toggleQuestionPractice(qId);
     setProgress(newProgress);
-  };
+  }, []);
 
-  const handleToggleSave = (qId: string) => {
+  const handleToggleSave = useCallback((qId: string) => {
     const newProgress = storageService.toggleQuestionSave(qId);
     setProgress(newProgress);
-  };
+  }, []);
 
-  const handleSrsUpdate = (qId: string, gotRight: boolean) => {
+  const handleSrsUpdate = useCallback((qId: string, gotRight: boolean) => {
     const newProgress = storageService.updateQuestionSRS(qId, gotRight);
     setProgress(newProgress);
     showToast({
@@ -440,22 +542,42 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
         : "Interval reset. You will review this question again tomorrow.",
       type: gotRight ? "success" : "info"
     });
-  };
+  }, [showToast]);
 
-  const startMockInterview = () => {
+  const handleExitInterview = useCallback(() => {
+    setSelectedCompany(null);
+    setIsFullScreen(false);
+    setMockState('idle');
+  }, []);
+
+  const handleEndInterviewEarly = useCallback(() => {
+    stopListeningAndSubmitRef.current(true);
+  }, []);
+
+  const handleSendNowOverride = useCallback(() => {
+    stopListeningAndSubmitRef.current();
+  }, []);
+
+  const handleBackToStudy = useCallback(() => {
+    setMockState('idle');
+    setActiveTab('study');
+  }, []);
+
+  const startMockInterview = useCallback(() => {
     if (!selectedCompany) return;
     // Shuffle and pick up to 5 random unique questions for the mock interview
     const shuffled = [...selectedCompany.questions].sort(() => 0.5 - Math.random());
     setMockQuestions(shuffled.slice(0, 5));
     setMockState('active');
+    timerRef.current = 9000;
     setTimer(9000); // 150 minutes
     setExtraTimeUsed(0);
     setCurrentMockIndex(0);
     setMockAnswers([]);
     setIsFullScreen(true);
-  };
+  }, [selectedCompany]);
 
-  const finishMockInterview = async () => {
+  const finishMockInterview = useCallback(async () => {
     setIsGeneratingText(true);
 
     const userName = auth.currentUser?.displayName || 'candidate';
@@ -505,6 +627,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
         storageService.saveMockInterviewScore(selectedCompany.id, parsedScore);
         setProgress(storageService.getCareerProgress());
       }
+      setTimer(timerRef.current);
       // Resolved React state bug: setMockState('finished') is kept in the try block (not finally)
       // to avoid overwriting setMockState('idle') in the catch block on completions request failures.
       setMockState('finished');
@@ -517,15 +640,16 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     } finally {
       setIsGeneratingText(false);
     }
-  };
+  }, [selectedCompany, editorLanguage, mockQuestions, mockAnswers, setProgress, showToast]);
 
   // --- VOICE INTERVIEW LOGIC ---
-  const startVoiceInterview = () => {
+  const startVoiceInterview = useCallback(() => {
     if (!selectedCompany) return;
     setMockState('active_voice');
     setVoiceStatus('speaking');
     setTurnCount(1);
     setVoiceReport("");
+    timerRef.current = 2700;
     setTimer(2700); // 45 minutes
     setExtraTimeUsed(0);
     setCurrentSpeech("");
@@ -542,11 +666,11 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     setChatHistory([{ role: 'assistant', content: greetingMsg }]);
 
     setTimeout(() => {
-      speakQuestion(greetingMsg);
+      speakQuestionRef.current(greetingMsg);
     }, 500);
-  };
+  }, [selectedCompany]);
 
-  const generateAIResponse = async (history: any[]) => {
+  const generateAIResponse = useCallback(async (history: any[]) => {
     setVoiceStatus('generating');
     const interviewerName = voiceTypeRef.current === 'robin' ? 'Robin' : 'Elisa';
     const systemPrompt = `You are ${interviewerName}, a Senior Engineer at ${selectedCompany?.name} conducting a verbal technical interview.
@@ -581,7 +705,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       setChatHistory(updatedHistory);
       setTurnCount(prev => prev + 1);
 
-      speakQuestion(aiText);
+      speakQuestionRef.current(aiText);
     } catch (err) {
       console.error(err);
       showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
@@ -595,9 +719,9 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       }
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
-  };
+  }, [selectedCompany, showToast]);
 
-  const speakQuestion = (text: string) => {
+  const speakQuestion = useCallback((text: string) => {
     setVoiceStatus('speaking');
     if (synthRef.current) {
       synthRef.current.cancel();
@@ -613,15 +737,15 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       }
 
       utterance.onend = () => {
-        startListening();
+        startListeningRef.current();
       };
       synthRef.current.speak(utterance);
     } else {
-      startListening();
+      startListeningRef.current();
     }
-  };
+  }, []);
 
-  const startListening = () => {
+  const startListening = useCallback(() => {
     setVoiceStatus('listening');
     setCurrentSpeech("");
     currentSpeechRef.current = "";
@@ -642,7 +766,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     silenceTimerRef.current = setTimeout(() => {
-      speakQuestion("Are you there? Take your time, let me know if you need me to repeat the question.");
+      speakQuestionRef.current("Are you there? Take your time, let me know if you need me to repeat the question.");
     }, 60000); // 60 second idle detection
 
     recognition.onresult = (event: any) => {
@@ -660,16 +784,16 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       // Reset silence timer on any audio activity
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = setTimeout(() => {
-        stopListeningAndSubmit();
+        stopListeningAndSubmitRef.current();
       }, 3000);
     };
 
     recognition.onerror = (event: any) => console.error("Speech recognition error", event.error);
     recognitionRef.current = recognition;
     recognition.start();
-  };
+  }, []);
 
-  const stopListeningAndSubmit = async (forceEnd = false) => {
+  const stopListeningAndSubmit = useCallback(async (forceEnd = false) => {
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (e) { }
     }
@@ -678,7 +802,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
     const finalSpeech = currentSpeechRef.current;
 
     if (!finalSpeech.trim() && !forceEnd) {
-      startListening();
+      startListeningRef.current();
       return;
     }
 
@@ -689,9 +813,9 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
       setTimeout(() => {
         if (turnCount >= 10 || forceEnd) {
-          generateVoiceReport(newHistory);
+          generateVoiceReportRef.current(newHistory);
         } else {
-          generateAIResponse(newHistory);
+          generateAIResponseRef.current(newHistory);
         }
       }, 0);
 
@@ -700,9 +824,9 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
     setCurrentSpeech("");
     currentSpeechRef.current = "";
-  };
+  }, [turnCount]);
 
-  const generateVoiceReport = async (history: any[]) => {
+  const generateVoiceReport = useCallback(async (history: any[]) => {
     const userName = auth.currentUser?.displayName || 'candidate';
     const transcriptText = history.map(h => `${h.role === 'user' ? userName : 'Robin'}: ${h.content}`).join('\n\n');
 
@@ -762,7 +886,9 @@ ${transcriptText}`;
       }
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
-  };
+  }, [selectedCompany, showToast, progress]);
+
+
 
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
@@ -812,10 +938,10 @@ ${transcriptText}`;
                           question={question}
                           isPracticed={progress.practicedQuestions.includes(question.id)}
                           isSaved={progress.savedQuestions.includes(question.id)}
-                          onTogglePractice={() => handleTogglePractice(question.id)}
-                          onToggleSave={() => handleToggleSave(question.id)}
+                          onTogglePractice={handleTogglePractice}
+                          onToggleSave={handleToggleSave}
                           srsData={progress.srsData?.[question.id]}
-                          onSrsUpdate={(gotRight) => handleSrsUpdate(question.id, gotRight)}
+                          onSrsUpdate={handleSrsUpdate}
                         />
                      </div>
                   ))}
@@ -893,11 +1019,7 @@ ${transcriptText}`;
             {recommendedCompanies.map(company => (
               <div
                 key={company.id}
-                onClick={() => {
-                  setSelectedCompany(company);
-                  setActiveTab('study');
-                  setMockState('idle');
-                }}
+                onClick={() => handleSelectCompany(company)}
                 className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
               >
                 <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
@@ -958,11 +1080,7 @@ ${transcriptText}`;
                 key={company.id}
                 company={company}
                 progress={progress}
-                onClick={() => {
-                  setSelectedCompany(company);
-                  setActiveTab('study');
-                  setMockState('idle');
-                }}
+                onClick={handleSelectCompany}
               />
             ))
           ) : (
@@ -988,7 +1106,7 @@ ${transcriptText}`;
                 <button onClick={() => setIsFullScreen(false)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Exit Fullscreen" aria-label="Exit Fullscreen">
                   <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                 </button>
-                <button onClick={() => { setSelectedCompany(null); setIsFullScreen(false); setMockState('idle'); }} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                <button onClick={handleExitInterview} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Close modal" aria-label="Close modal">
                   <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                 </button>
               </div>
@@ -1014,7 +1132,7 @@ ${transcriptText}`;
                   <button onClick={() => setIsFullScreen(!isFullScreen)} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"} aria-label="Toggle fullscreen">
                     {isFullScreen ? <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" /> : <Maximize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />}
                   </button>
-                  <button onClick={() => { setSelectedCompany(null); setIsFullScreen(false); setMockState('idle'); }} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                  <button onClick={handleExitInterview} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title="Close modal" aria-label="Close modal">
                     <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                   </button>
                 </div>
@@ -1030,9 +1148,13 @@ ${transcriptText}`;
                 </div>
 
                 <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                  <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
-                    <Timer /> {formatTime(timer)}
-                  </div>
+                  <InterviewTimer
+                    initialTime={9000}
+                    extraTimeSeconds={extraTimeUsed * 60}
+                    mockState={mockState}
+                    onTimeUp={handleTimeUp}
+                    timerRef={timerRef}
+                  />
 
                   <button
                     onClick={() => handleRequestTime()}
@@ -1084,14 +1206,7 @@ ${transcriptText}`;
                               newA[currentMockIndex] = value || '';
                               setMockAnswers(newA);
                             }}
-                            options={{
-                              minimap: { enabled: false },
-                              fontSize: 14,
-                              lineNumbers: 'on',
-                              scrollBeyondLastLine: false,
-                              wordWrap: 'on',
-                              padding: { top: 16 }
-                            }}
+                            options={editorOptions}
                           />
                         </div>
                       </div>
@@ -1125,9 +1240,13 @@ ${transcriptText}`;
                 </div>
 
                 <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
-                  <div className={`flex items-center gap-2 font-mono text-lg md:text-xl bg-white/5 border border-white/10 rounded-full px-4 py-2 ${timer < 300 ? 'text-red-500 animate-pulse' : 'text-primaryLight'}`}>
-                    <Timer /> {formatTime(timer)}
-                  </div>
+                  <InterviewTimer
+                    initialTime={2700}
+                    extraTimeSeconds={extraTimeUsed * 60}
+                    mockState={mockState}
+                    onTimeUp={handleTimeUp}
+                    timerRef={timerRef}
+                  />
 
                   <button
                     onClick={() => handleRequestTime()}
@@ -1141,11 +1260,7 @@ ${transcriptText}`;
                 <div className="max-w-3xl w-full mt-16 md:mt-0 flex flex-col items-center">
                   <div className="text-center mb-10">
                     <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Live Voice Interview - Turn {turnCount} of 10</span>
-                    <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
-                      {chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
-                        ? <Typewriter text={chatHistory[chatHistory.length - 1].content} speed={50} />
-                        : chatHistory.length > 1 ? <Typewriter text={chatHistory[chatHistory.length - 2].content} speed={50} /> : "Connecting..."}
-                    </h3>
+                    <VoiceChat chatHistory={chatHistory} />
                   </div>
 
                   {voiceStatus === 'generating' ? (
@@ -1177,13 +1292,13 @@ ${transcriptText}`;
 
                       <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                         <button
-                          onClick={() => { stopListeningAndSubmit(true); }}
+                          onClick={handleEndInterviewEarly}
                           className="px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 hover:bg-red-500/10 hover:text-red-500 text-textMuted"
                         >
                           End Interview Early
                         </button>
                         <button
-                          onClick={() => { stopListeningAndSubmit(); }}
+                          onClick={handleSendNowOverride}
                           disabled={voiceStatus !== 'listening'}
                           className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voiceStatus !== 'listening' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
                         >
@@ -1208,7 +1323,7 @@ ${transcriptText}`;
                   </div>
 
                   <button
-                    onClick={() => { setMockState('idle'); setActiveTab('study'); }}
+                    onClick={handleBackToStudy}
                     className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
                   >
                     Back to Study Mode
@@ -1241,7 +1356,7 @@ ${transcriptText}`;
                   </div>
 
                   <button
-                    onClick={() => { setMockState('idle'); setActiveTab('study'); }}
+                    onClick={handleBackToStudy}
                     className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
                   >
                     Back to Study Mode
@@ -1282,8 +1397,8 @@ ${transcriptText}`;
                           question={question}
                           isPracticed={progress.practicedQuestions.includes(question.id)}
                           isSaved={progress.savedQuestions.includes(question.id)}
-                          onTogglePractice={() => handleTogglePractice(question.id)}
-                          onToggleSave={() => handleToggleSave(question.id)}
+                          onTogglePractice={handleTogglePractice}
+                          onToggleSave={handleToggleSave}
                         />
                       ))}
                     </div>

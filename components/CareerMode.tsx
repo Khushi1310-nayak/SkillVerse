@@ -283,10 +283,11 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   timerRef
 }) => {
   const [localTimer, setLocalTimer] = useState(initialTime);
-  const onTimeUpRef = useRef(onTimeUp);
+const onTimeUpRef = useRef(onTimeUp);
 
-    timerRef.current = localTimer;
-  }, [localTimer, timerRef]);
+useEffect(() => {
+  timerRef.current = localTimer;
+}, [localTimer, timerRef]);
 
   // Handle when parent adds extra time
 // Handle when parent adds extra time

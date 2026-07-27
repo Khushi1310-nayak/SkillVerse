@@ -82,6 +82,36 @@ export const firestoreService = {
     }
   },
 
+  forceReseedDatabase: async (): Promise<void> => {
+    try {
+      console.log('Force re-seeding courses to Firestore...');
+      for (const course of COURSES) {
+        const initialChapters = generateInitialChapters(course.title);
+        const { quiz, ...courseData } = course;
+        
+        await setDoc(doc(db, 'courses', course.id), {
+          ...courseData,
+          chapters: initialChapters,
+        }, { merge: true });
+
+        await setDoc(doc(db, 'quizzes', course.id), {
+          id: course.id,
+          courseId: course.id,
+          title: `${course.title} Quiz`,
+          questions: quiz
+        }, { merge: true });
+      }
+
+      console.log('Force re-seeding companies to Firestore...');
+      for (const company of COMPANIES) {
+        await setDoc(doc(db, 'companies', company.id), company, { merge: true });
+      }
+    } catch (error) {
+      console.error('Error force re-seeding database:', error);
+      throw error;
+    }
+  },
+
   // --- COURSES CRUD ---
   getCourses: async (): Promise<Course[]> => {
     const querySnapshot = await getDocs(collection(db, 'courses'));

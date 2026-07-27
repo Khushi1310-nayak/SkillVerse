@@ -12,6 +12,7 @@ import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { BADGE_DEFINITIONS } from '../constants';
 import { User as UserType, UserSettings } from '../types';
+import { useToast } from '../contexts/ToastContext';
 
 interface SettingsProps {
   user: UserType;

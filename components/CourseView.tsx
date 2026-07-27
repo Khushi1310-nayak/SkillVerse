@@ -7,9 +7,6 @@ import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -248,38 +245,8 @@ export const CourseView: React.FC = () => {
           {activeTab === 'learn' ? (
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
-                <ReactMarkdown
-                  components={{
-                    code(props) {
-                      const { children, className, node, ...rest } = props;
-                      const match = /language-(\w+)/.exec(className || '');
-                      return match ? (
-                        <SyntaxHighlighter
-                          {...rest}
-                          PreTag="div"
-                          language={match[1]}
-                          style={atomDark}
-                          customStyle={{
-                            background: '#0f1623',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '0.75rem',
-                            padding: '1.25rem',
-                            fontFamily: 'monospace',
-                            fontSize: '0.875rem'
-                          }}
-                        >
-                          {String(children).replace(/\n$/, '')}
-                        </SyntaxHighlighter>
-                      ) : (
-                        <code {...rest} className={className}>
-                          {children}
-                        </code>
-                      );
-                    }
-                  }}
-                >
-                  {course.content}
-                </ReactMarkdown>
+                {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
+                <div dangerouslySetInnerHTML={{ __html: course.content }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">

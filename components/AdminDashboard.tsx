@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { 
   Plus, Edit, Trash2, Save, X, BookOpen, Brain, 
   Briefcase, Shield, ChevronRight, PlayCircle, Loader2,
-  Trash, ArrowRight, Eye, CheckCircle, AlertTriangle
+  Trash, ArrowRight, Eye, CheckCircle, AlertTriangle, RefreshCcw
 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { Course, Company, QuizQuestion, Chapter, Lesson, Category } from '../types';
@@ -484,6 +484,26 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <p className="text-textMuted mt-1">Manage courses, quizzes, and company preparation contents.</p>
         </div>
+        <button
+          onClick={async () => {
+            if(!confirm("Warning: This will overwrite all courses with the default templates. Any custom changes to default courses will be lost! Are you sure?")) return;
+            try {
+              setSeeding(true);
+              await firestoreService.forceReseedDatabase();
+              await refreshData();
+              alert("Successfully re-seeded the database!");
+            } catch(e) {
+              console.error(e);
+              alert("Error re-seeding database.");
+            } finally {
+              setSeeding(false);
+            }
+          }}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 font-bold transition-all shadow-lg"
+        >
+          <RefreshCcw size={18} />
+          Force Reseed Database
+        </button>
       </div>
 
       {/* Tabs Selector */}
@@ -1005,39 +1025,39 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Course Edit/Create Modal */}
       {courseModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCourseModalOpen(false)} />
-          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-lg w-full shadow-2xl space-y-6">
-            <h3 className="text-xl font-bold text-textMain font-display">{selectedCourse ? 'Edit Course Details' : 'Create New Course'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setCourseModalOpen(false)} />
+          <div className="relative bg-background border border-primary/20 rounded-3xl p-8 max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-[0_0_40px_rgba(var(--color-primary),0.15)] space-y-6 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-textMain font-display bg-gradient-to-r from-primary to-primaryLight bg-clip-text text-transparent">{selectedCourse ? 'Edit Course Details' : 'Create New Course'}</h3>
             <div className="space-y-4">
               {!selectedCourse && (
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Unique Course ID (e.g. dynamic-dsa)</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Unique Course ID (e.g. dynamic-dsa)</label>
                   <input
                     type="text"
                     value={courseForm.id || ''}
                     onChange={e => setCourseForm({ ...courseForm, id: e.target.value })}
-                    className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   />
                 </div>
               )}
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Title</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Title</label>
                 <input
                   type="text"
                   value={courseForm.title || ''}
                   onChange={e => setCourseForm({ ...courseForm, title: e.target.value })}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Category</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Category</label>
                   <select
                     value={courseForm.categoryId || 'programming'}
                     onChange={e => setCourseForm({ ...courseForm, categoryId: e.target.value })}
                     title="Course category"
-                    className="w-full bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   >
                     {CATEGORIES.map(c => (
                       <option key={c.id} value={c.id} className="bg-background text-textMain">{c.title}</option>
@@ -1045,12 +1065,12 @@ export const AdminDashboard: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Level</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Level</label>
                   <select
                     value={courseForm.level || 'Beginner'}
                     onChange={e => setCourseForm({ ...courseForm, level: e.target.value as any })}
                     title="Course level"
-                    className="w-full bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   >
                     <option value="Beginner" className="bg-background text-textMain">Beginner</option>
                     <option value="Intermediate" className="bg-background text-textMain">Intermediate</option>
@@ -1060,37 +1080,37 @@ export const AdminDashboard: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Duration (e.g. 10 Hours)</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Duration (e.g. 10 Hours)</label>
                   <input
                     type="text"
                     value={courseForm.duration || ''}
                     onChange={e => setCourseForm({ ...courseForm, duration: e.target.value })}
-                    className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Icon</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Icon</label>
                   <input
                     type="text"
                     value={courseForm.icon || 'BookOpen'}
                     onChange={e => setCourseForm({ ...courseForm, icon: e.target.value })}
-                    className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Short Description</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Short Description</label>
                 <textarea
                   value={courseForm.description || ''}
                   onChange={e => setCourseForm({ ...courseForm, description: e.target.value })}
                   rows={3}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                 />
               </div>
             </div>
-            <div className="flex gap-4">
-              <button onClick={handleSaveCourse} className="flex-1 py-3 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg transition-all">Save</button>
-              <button onClick={() => setCourseModalOpen(false)} className="flex-1 py-3 bg-white/5 border border-black/20 dark:border-white/10 text-textMuted rounded-xl font-bold transition-all">Cancel</button>
+            <div className="flex gap-4 pt-2">
+              <button onClick={handleSaveCourse} className="flex-1 py-3.5 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold shadow-[0_0_20px_rgba(var(--color-primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--color-primary),0.5)] transition-all">Save Changes</button>
+              <button onClick={() => setCourseModalOpen(false)} className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold transition-all">Cancel</button>
             </div>
           </div>
         </div>
@@ -1098,25 +1118,25 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Chapter Modal */}
       {chapterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setChapterModalOpen(false)} />
-          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl space-y-6">
-            <h3 className="text-xl font-bold text-textMain font-display">{selectedChapter ? 'Edit Chapter Title' : 'Add New Chapter'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setChapterModalOpen(false)} />
+          <div className="relative bg-background border border-primary/20 rounded-3xl p-8 max-w-sm w-full max-h-[85vh] overflow-y-auto shadow-[0_0_40px_rgba(var(--color-primary),0.15)] space-y-6 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-textMain font-display bg-gradient-to-r from-primary to-primaryLight bg-clip-text text-transparent">{selectedChapter ? 'Edit Chapter Title' : 'Add New Chapter'}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Chapter Title</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Chapter Title</label>
                 <input
                   type="text"
                   value={chapterForm.title || ''}
                   onChange={e => setChapterForm({ ...chapterForm, title: e.target.value })}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   placeholder="e.g. 1. Setup Environment"
                 />
               </div>
             </div>
-            <div className="flex gap-4">
-              <button onClick={handleSaveChapter} className="flex-1 py-3 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg transition-all">Save</button>
-              <button onClick={() => setChapterModalOpen(false)} className="flex-1 py-3 bg-white/5 border border-black/20 dark:border-white/10 text-textMuted rounded-xl font-bold transition-all">Cancel</button>
+            <div className="flex gap-4 pt-2">
+              <button onClick={handleSaveChapter} className="flex-1 py-3.5 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold shadow-[0_0_20px_rgba(var(--color-primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--color-primary),0.5)] transition-all">Save Changes</button>
+              <button onClick={() => setChapterModalOpen(false)} className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold transition-all">Cancel</button>
             </div>
           </div>
         </div>
@@ -1124,35 +1144,35 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Lesson Modal */}
       {lessonModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setLessonModalOpen(false)} />
-          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-lg w-full shadow-2xl space-y-6">
-            <h3 className="text-xl font-bold text-textMain font-display">{selectedLesson ? 'Edit Lesson' : 'Add New Lesson'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setLessonModalOpen(false)} />
+          <div className="relative bg-background border border-primary/20 rounded-3xl p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-[0_0_40px_rgba(var(--color-primary),0.15)] space-y-6 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-textMain font-display bg-gradient-to-r from-primary to-primaryLight bg-clip-text text-transparent">{selectedLesson ? 'Edit Lesson' : 'Add New Lesson'}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Lesson Title</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Lesson Title</label>
                 <input
                   type="text"
                   value={lessonForm.title || ''}
                   onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   placeholder="e.g. Introduction to Variables"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Lesson Content (HTML supported)</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Lesson Content (HTML supported)</label>
                 <textarea
                   value={lessonForm.content || ''}
                   onChange={e => setLessonForm({ ...lessonForm, content: e.target.value })}
                   rows={8}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain font-mono text-sm focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain font-mono text-sm focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all custom-scrollbar"
                   placeholder="e.g. <p>In this lesson, we will explore variables...</p>"
                 />
               </div>
             </div>
-            <div className="flex gap-4">
-              <button onClick={handleSaveLesson} className="flex-1 py-3 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg transition-all">Save</button>
-              <button onClick={() => setLessonModalOpen(false)} className="flex-1 py-3 bg-white/5 border border-black/20 dark:border-white/10 text-textMuted rounded-xl font-bold transition-all">Cancel</button>
+            <div className="flex gap-4 pt-2">
+              <button onClick={handleSaveLesson} className="flex-1 py-3.5 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold shadow-[0_0_20px_rgba(var(--color-primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--color-primary),0.5)] transition-all">Save Changes</button>
+              <button onClick={() => setLessonModalOpen(false)} className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold transition-all">Cancel</button>
             </div>
           </div>
         </div>
@@ -1160,39 +1180,39 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Company Modal */}
       {companyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCompanyModalOpen(false)} />
-          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-lg w-full shadow-2xl space-y-6">
-            <h3 className="text-xl font-bold text-textMain font-display">{selectedCompany ? 'Edit Company Info' : 'Create New Company'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setCompanyModalOpen(false)} />
+          <div className="relative bg-background border border-primary/20 rounded-3xl p-8 max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-[0_0_40px_rgba(var(--color-primary),0.15)] space-y-6 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-textMain font-display bg-gradient-to-r from-primary to-primaryLight bg-clip-text text-transparent">{selectedCompany ? 'Edit Company Info' : 'Create New Company'}</h3>
             <div className="space-y-4">
               {!selectedCompany && (
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Company ID / Key (e.g. google, microsoft)</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Company ID / Key (e.g. google, microsoft)</label>
                   <input
                     type="text"
                     value={companyForm.id || ''}
                     onChange={e => setCompanyForm({ ...companyForm, id: e.target.value })}
-                    className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   />
                 </div>
               )}
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Name</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Name</label>
                 <input
                   type="text"
                   value={companyForm.name || ''}
                   onChange={e => setCompanyForm({ ...companyForm, name: e.target.value })}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Difficulty</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Difficulty</label>
                   <select
                     value={companyForm.difficulty || 'Moderate'}
                     onChange={e => setCompanyForm({ ...companyForm, difficulty: e.target.value as any })}
                     title="Company difficulty"
-                    className="w-full bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   >
                     <option value="Moderate" className="bg-background text-textMain">Moderate</option>
                     <option value="Hard" className="bg-background text-textMain">Hard</option>
@@ -1200,39 +1220,39 @@ export const AdminDashboard: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-textMuted uppercase mb-2">Custom Logo URL (Optional)</label>
+                  <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Custom Logo URL (Optional)</label>
                   <input
                     type="text"
                     value={companyForm.logo || ''}
                     onChange={e => setCompanyForm({ ...companyForm, logo: e.target.value })}
-                    className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                     placeholder="https://example.com/logo.png"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Focus Areas (Comma-separated)</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Focus Areas (Comma-separated)</label>
                 <input
                   type="text"
                   value={(companyForm.focus || []).join(', ')}
                   onChange={e => setCompanyForm({ ...companyForm, focus: e.target.value.split(',').map(s => s.trim()) })}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                   placeholder="e.g. DSA, System Design"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Short Description</label>
+                <label className="block text-xs font-bold text-primaryLight uppercase mb-2 tracking-wider">Short Description</label>
                 <textarea
                   value={companyForm.description || ''}
                   onChange={e => setCompanyForm({ ...companyForm, description: e.target.value })}
                   rows={3}
-                  className="w-full bg-gradient-input border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
                 />
               </div>
             </div>
-            <div className="flex gap-4">
-              <button onClick={handleSaveCompany} className="flex-1 py-3 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg transition-all">Save</button>
-              <button onClick={() => setCompanyModalOpen(false)} className="flex-1 py-3 bg-white/5 border border-black/20 dark:border-white/10 text-textMuted rounded-xl font-bold transition-all">Cancel</button>
+            <div className="flex gap-4 pt-2">
+              <button onClick={handleSaveCompany} className="flex-1 py-3.5 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold shadow-[0_0_20px_rgba(var(--color-primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--color-primary),0.5)] transition-all">Save Changes</button>
+              <button onClick={() => setCompanyModalOpen(false)} className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold transition-all">Cancel</button>
             </div>
           </div>
         </div>

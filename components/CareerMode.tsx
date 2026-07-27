@@ -285,41 +285,45 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   const [localTimer, setLocalTimer] = useState(initialTime);
   const onTimeUpRef = useRef(onTimeUp);
 
-  // Sync ref with local timer state so parent can read the latest value
-  useEffect(() => {
     timerRef.current = localTimer;
   }, [localTimer, timerRef]);
 
   // Handle when parent adds extra time
-  const prevExtraTimeRef = useRef(extraTimeSeconds);
-  useEffect(() => {
-    const diff = extraTimeSeconds - prevExtraTimeRef.current;
-    if (diff > 0) {
-      setLocalTimer(prev => prev + diff);
-    }
-    prevExtraTimeRef.current = extraTimeSeconds;
-  }, [extraTimeSeconds]);
-  useEffect(() => {
+// Handle when parent adds extra time
+const prevExtraTimeRef = useRef(extraTimeSeconds);
+
+useEffect(() => {
+  const diff = extraTimeSeconds - prevExtraTimeRef.current;
+  if (diff > 0) {
+    setLocalTimer(prev => prev + diff);
+  }
+  prevExtraTimeRef.current = extraTimeSeconds;
+}, [extraTimeSeconds]);
+
+// Keep the latest callback in the ref
+useEffect(() => {
   onTimeUpRef.current = onTimeUp;
 }, [onTimeUp]);
 
-  // Tick down
-  useEffect(() => {
-    let interval: any;
-    if (mockState === 'active' || mockState === 'active_voice') {
-      interval = setInterval(() => {
-        setLocalTimer(t => {
-          if (t <= 1) {
-            clearInterval(interval);
-            onTimeUpRef.current();
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [mockState]);
+// Tick down
+useEffect(() => {
+  let interval: any;
+
+  if (mockState === 'active' || mockState === 'active_voice') {
+    interval = setInterval(() => {
+      setLocalTimer(t => {
+        if (t <= 1) {
+          clearInterval(interval);
+          onTimeUpRef.current();
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+  }
+
+  return () => clearInterval(interval);
+}, [mockState]);
 
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);

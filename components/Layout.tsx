@@ -132,7 +132,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo">
            <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
-              <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" />
+              <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" width={48} height={48} />
            </div>
            <span className="text-2xl font-display font-bold bg-gradient-main bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               SkillVerse
@@ -153,6 +153,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                src={user.photoURL || AVATARS[user.settings.avatarId || '1']} 
                alt="Avatar" 
                className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
+               width={40}
+               height={40}
              />
              <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="font-bold text-textMain truncate">{user.username}</div>

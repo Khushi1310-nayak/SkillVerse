@@ -90,7 +90,7 @@ const CompanyCard: React.FC<{ company: Company; progress: CareerProgress; onClic
     >
       <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/20 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
-           <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+           <img src={company.logo} alt={company.name} className="w-full h-full object-contain" loading="lazy" width={64} height={64} />
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
            ${company.difficulty === 'Moderate' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
@@ -740,7 +740,7 @@ ${transcriptText}`;
                    className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
                  >
                     <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
-                       <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                       <img src={company.logo} alt={company.name} className="w-full h-full object-contain" loading="lazy" width={40} height={40} />
                     </div>
                     <div className="min-w-0">
                        <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">{company.name}</h4>
@@ -838,7 +838,7 @@ ${transcriptText}`;
                  <div className="shrink-0 p-5 md:p-8 border-b border-black/20 dark:border-white/10 bg-white dark:bg-gradient-to-r dark:from-[#1E293B] dark:to-[#0B1220] flex items-center justify-between">
                   <div className="flex items-center gap-4 md:gap-6">
                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white border border-black/20 p-3 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
-                        <img src={selectedCompany.logo} alt={selectedCompany.name} className="w-full h-full object-contain" />
+                        <img src={selectedCompany.logo} alt={selectedCompany.name} className="w-full h-full object-contain" loading="lazy" width={64} height={64} />
                      </div>
                      <div>
                         <h2 className="text-xl md:text-3xl font-display font-bold text-textMain mb-1 md:mb-2">{selectedCompany.name}</h2>

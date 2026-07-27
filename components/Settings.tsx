@@ -15,7 +15,7 @@ import { User as UserType, UserSettings } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
-import { useToast } from '../contexts/ToastContext';
+
 
 interface SettingsProps {
   user: UserType;

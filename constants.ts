@@ -200,94 +200,47 @@ const generateQuiz = (subject: string): any[] => {
 
 const generateRichContent = (topic: string, categoryId: string) => {
     const sections = [
-        { title: "1. Introduction & Origins", icon: "🚀", delay: 0 },
-        { title: "2. Environment Setup", icon: "⚙️", delay: 100 },
-        { title: "3. Core Syntax & Variables", icon: "📝", delay: 200 },
-        { title: "4. Control Flow Logic", icon: "🔀", delay: 300 },
-        { title: "5. Functions & Modularity", icon: "📦", delay: 400 },
-        { title: "6. Data Structures", icon: "📊", delay: 500 },
-        { title: "7. Advanced Patterns", icon: "🧠", delay: 600 },
-        { title: "8. Best Practices & Optimization", icon: "✨", delay: 700 },
+        { title: "1. Introduction & Origins", icon: "🚀" },
+        { title: "2. Environment Setup", icon: "⚙️" },
+        { title: "3. Core Syntax & Variables", icon: "📝" },
+        { title: "4. Control Flow Logic", icon: "🔀" },
+        { title: "5. Functions & Modularity", icon: "📦" },
+        { title: "6. Data Structures", icon: "📊" },
+        { title: "7. Advanced Patterns", icon: "🧠" },
+        { title: "8. Best Practices & Optimization", icon: "✨" },
     ];
 
     const link = getDocLink(topic);
 
-    return `
-      <div class="space-y-8">
-        <div class="p-8 bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-primaryLight rounded-r-3xl mb-12 animate-fade-in shadow-lg">
-            <h1 class="text-4xl font-display font-bold text-textMain mb-3">Mastering ${topic}</h1>
-            <p class="text-textMuted text-xl leading-relaxed">A comprehensive 8-module journey to becoming proficient in ${topic}. Each section below is designed to build your expertise step-by-step.</p>
-        </div>
+    return `# Mastering ${topic}
 
-        <div class="grid gap-8">
-        ${sections.map((sec, i) => `
-            <div class="group relative bg-glass border border-white/10 rounded-3xl p-8 hover:bg-glass-hover hover:border-primary/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl animate-fade-in-up" style="animation-delay: ${sec.delay}ms">
-                <!-- Decorative number background -->
-                <div class="absolute -right-4 -top-4 text-9xl font-bold text-white/5 group-hover:text-primary/10 transition-colors pointer-events-none select-none z-0">
-                  ${i + 1}
-                </div>
+A comprehensive 8-module journey to becoming proficient in ${topic}. Each section below is designed to build your expertise step-by-step.
 
-                <div class="relative z-10">
-                  <div class="flex items-center gap-5 mb-6">
-                      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">
-                          ${sec.icon}
-                      </div>
-                      <h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">
-                          ${sec.title}
-                      </h2>
-                  </div>
-                  
-                  <div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">
-                      <p>
-                          In this module, we dissect <strong>${sec.title.split('. ')[1]}</strong>. 
-                          Understanding this concept is fundamental to writing clean, efficient, and scalable ${topic} code. 
-                          We explore not just the "how", but the "why" behind these patterns.
-                      </p>
-                      <ul class="list-none pl-0 space-y-2 mt-4">
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Theoretical foundations</li>
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Practical implementation strategies</li>
-                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Common industry use-cases</li>
-                      </ul>
-                  </div>
+${sections.map((sec, i) => `## ${sec.title} ${sec.icon}
 
-                  <div class="bg-[#0f1623] rounded-xl p-5 border border-white/10 font-mono text-sm text-blue-300 mb-6 overflow-x-auto shadow-inner group-hover:border-primary/20 transition-colors">
-                      <div class="flex gap-2 mb-3 opacity-50">
-                          <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                          <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                      </div>
-                      <code>
-  // ${topic} - ${sec.title.split('. ')[1]}
-  function learnModule() {
-    const status = "Mastering ${sec.title}";
-    return {
-      progress: "100%",
-      certified: true
-    };
-  }
-                      </code>
-                  </div>
+In this module, we dissect **${sec.title.split('. ')[1]}**. Understanding this concept is fundamental to writing clean, efficient, and scalable ${topic} code. We explore not just the "how", but the "why" behind these patterns.
 
-                  <div class="flex items-center justify-between border-t border-white/10 pt-6">
-                    <span class="text-xs font-bold text-textMuted uppercase tracking-widest">Module ${i + 1} of 8</span>
-                    <a href="${link}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all group-hover:translate-x-1">
-                        Official Docs <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                    </a>
-                  </div>
-                </div>
-            </div>
-        `).join('')}
-        </div>
-        
-        <div class="p-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl text-center mt-12 animate-fade-in-up border border-white/10" style="animation-delay: 900ms">
-            <div class="inline-block p-4 rounded-full bg-white/10 mb-4 animate-bounce">
-              <span class="text-4xl">🎓</span>
-            </div>
-            <h3 class="text-3xl font-display font-bold text-white mb-4">Ready to certify your skills?</h3>
-            <p class="text-textMuted text-lg mb-0 max-w-2xl mx-auto">You've reviewed all 8 modules. Take the comprehensive 12-question quiz below to verify your mastery and earn your certificate.</p>
-        </div>
-      </div>
-    `;
+* Theoretical foundations
+* Practical implementation strategies
+* Common industry use-cases
+
+\`\`\`javascript
+// ${topic} - ${sec.title.split('. ')[1]}
+function learnModule() {
+  const status = "Mastering ${sec.title}";
+  return {
+    progress: "100%",
+    certified: true
+  };
+}
+\`\`\`
+
+[Official ${topic} Documentation](${link})
+
+---`).join('\n\n')}
+
+### Ready to certify your skills?
+You've reviewed all 8 modules. Take the comprehensive 12-question quiz below to verify your mastery and earn your certificate.`;
 };
 
 const PROG_LANGS = [

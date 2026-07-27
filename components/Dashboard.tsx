@@ -271,6 +271,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       )}
 
+      {/* Spaced Repetition Review Queue Widget */}
+      {dueQuestionsCount > 0 && (
+        <div className="bg-glass border border-orange-500/30 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+              <Clock className="text-orange-500 animate-pulse-slow" size={22} />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-0.5 animate-pulse">
+                Spaced Repetition Review
+              </div>
+              <div className="text-base font-bold text-textMain">
+                You have {dueQuestionsCount} question{dueQuestionsCount !== 1 ? 's' : ''} due for review today!
+              </div>
+            </div>
+          </div>
+          <Link
+            to="/career?review=true"
+            className="shrink-0 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-lg font-medium shadow-lg hover:shadow-orange-500/25 transition-all text-center w-full sm:w-auto"
+          >
+            Review Now
+          </Link>
+        </div>
+      )}
+
       {/* Stats & Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Stats Card */}

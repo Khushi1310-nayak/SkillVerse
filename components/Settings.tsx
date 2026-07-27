@@ -14,7 +14,8 @@ import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPS
 import { User as UserType, UserSettings } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
-import { useToast } from '../contexts/ToastContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+
 
 interface SettingsProps {
   user: UserType;
@@ -56,6 +57,10 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   useEffect(() => {
     localStorage.setItem('settings_active_tab', activeTab);
   }, [activeTab]);
+
+  // Ref and focus trap for the confirmation modal (Reset / Clear)
+  const confirmModalRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(confirmModalRef, !!modal.type, () => setModal({ type: null }));
 
   const handleChange = (field: keyof UserSettings, value: any) => {
     const updatedUser = {
@@ -878,11 +883,18 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
       {modal.type && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setModal({ type: null })} />
-          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
+          <div
+            ref={confirmModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-modal-title"
+            tabIndex={-1}
+            className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up"
+          >
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
               <AlertTriangle size={24} />
             </div>
-            <h3 className="text-xl font-bold text-textMain text-center mb-2">
+            <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
               {modal.type === 'reset' ? 'Reset Progress?' : 'Clear All Data?'}
             </h3>
             <p className="text-textMuted text-center mb-6">

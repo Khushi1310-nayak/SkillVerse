@@ -10,6 +10,7 @@ const DEFAULT_CAREER_PROGRESS: CareerProgress = {
   practicedQuestions: [],
   savedQuestions: [],
   mockInterviewScores: [],
+  srsData: {},
 };
 
 export const storageService = {
@@ -126,6 +127,50 @@ export const storageService = {
       score,
       date: new Date().toISOString()
     });
+    localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
+    return progress;
+  },
+
+  updateQuestionSRS: (questionId: string, gotRight: boolean) => {
+    const progress = storageService.getCareerProgress();
+    if (!progress.srsData) {
+      progress.srsData = {};
+    }
+    
+    const current = progress.srsData[questionId] || {
+      questionId,
+      srsInterval: 0,
+      nextReviewDate: new Date().toISOString()
+    };
+    
+    let newInterval = 1;
+    if (gotRight) {
+      newInterval = Math.min(5, current.srsInterval + 1);
+    } else {
+      newInterval = 1;
+    }
+    
+    const daysMap: Record<number, number> = {
+      1: 1,
+      2: 3,
+      3: 7,
+      4: 14,
+      5: 30
+    };
+    const days = daysMap[newInterval] || 1;
+    const nextDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    
+    progress.srsData[questionId] = {
+      questionId,
+      srsInterval: newInterval,
+      nextReviewDate: nextDate.toISOString()
+    };
+    
+    // Automatically mark as practiced if answered in SRS
+    if (!progress.practicedQuestions.includes(questionId)) {
+      progress.practicedQuestions.push(questionId);
+    }
+    
     localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
     return progress;
   }

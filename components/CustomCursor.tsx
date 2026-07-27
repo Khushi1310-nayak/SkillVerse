@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { XP_STORE_CURSORS } from '../constants';
 
 // Elements that should trigger the "hover" cursor state
 const INTERACTIVE_SELECTOR =
@@ -9,6 +11,7 @@ const isTouchDevice = () =>
   (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window);
 
 export const CustomCursor: React.FC = () => {
+  const { appUser } = useAuth();
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const rafId = useRef<number>(0);
@@ -19,6 +22,9 @@ export const CustomCursor: React.FC = () => {
   const [keyboardMode, setKeyboardMode] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+
+  const activeCursorId = appUser?.settings?.activeCursor || 'default';
+  const cursorConfig = XP_STORE_CURSORS.find(c => c.id === activeCursorId) || XP_STORE_CURSORS[0];
 
   useEffect(() => {
     // Custom cursor is desktop-only — leave touch devices with the native cursor
@@ -88,7 +94,7 @@ export const CustomCursor: React.FC = () => {
       window.removeEventListener('mouseleave', handleLeave);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, []);
+  }, [keyboardMode]);
 
   // On touch devices we render nothing, so the native cursor/touch behavior is untouched
   if (!enabled || keyboardMode) return null;
@@ -98,14 +104,14 @@ export const CustomCursor: React.FC = () => {
       {/* Small dot: follows the mouse instantly, no lag */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 z-[99999] w-2 h-2 rounded-full bg-primaryLight pointer-events-none"
+        className={`fixed top-0 left-0 z-[99999] w-2 h-2 rounded-full pointer-events-none ${cursorConfig.dotClass}`}
       />
 
       {/* Outer ring: trails slightly behind, scales up on hover, shrinks on click */}
       <div ref={ringRef} className="fixed top-0 left-0 z-[99999] pointer-events-none">
         <div
-          className={`rounded-full border-2 border-primary transition-all duration-200 ease-out
-            ${isHovering ? 'w-12 h-12 border-primaryLight bg-primary/10' : 'w-8 h-8'}
+          className={`rounded-full border-2 transition-all duration-200 ease-out ${cursorConfig.ringClass}
+            ${isHovering ? 'w-12 h-12 bg-white/10' : 'w-8 h-8'}
             ${isClicking ? 'scale-75' : 'scale-100'}`}
         />
       </div>

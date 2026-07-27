@@ -447,3 +447,105 @@ export const VOICE_INTERVIEW_QUESTIONS = [
   "Tell me about a time you made a mistake at work. What did you learn from it?",
   "How do you prioritize your tasks when you have multiple urgent deadlines?"
 ];
+
+export interface XPStoreTheme {
+  id: string;
+  name: string;
+  cost: number;
+  description: string;
+  primary: string;
+  primaryLight: string;
+  themeMode: 'dark' | 'light';
+}
+
+export interface XPStoreCursor {
+  id: string;
+  name: string;
+  cost: number;
+  description: string;
+  dotClass: string;
+  ringClass: string;
+}
+
+export const XP_STORE_THEMES: XPStoreTheme[] = [
+  {
+    id: 'dark',
+    name: 'Default Dark',
+    cost: 0,
+    description: 'The standard dark theme of SkillVerse.',
+    primary: '105 104 166', // #6968A6
+    primaryLight: '207 152 147', // #CF9893
+    themeMode: 'dark',
+  },
+  {
+    id: 'light',
+    name: 'Default Light',
+    cost: 0,
+    description: 'The standard light theme of SkillVerse.',
+    primary: '105 104 166',
+    primaryLight: '207 152 147',
+    themeMode: 'light',
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald Forest',
+    cost: 300,
+    description: 'A soothing green theme inspired by lush woodlands.',
+    primary: '16 185 129', // #10B981
+    primaryLight: '110 231 183', // #6EE7B7
+    themeMode: 'dark',
+  },
+  {
+    id: 'cyberpunk',
+    name: 'Cyberpunk Neon',
+    cost: 500,
+    description: 'Futuristic vibes with high-contrast violet and neon yellow.',
+    primary: '139 92 246', // #8B5CF6
+    primaryLight: '245 158 11', // #F59E0B
+    themeMode: 'dark',
+  },
+  {
+    id: 'oceanic',
+    name: 'Deep Oceanic',
+    cost: 400,
+    description: 'Calming blues reminiscent of deep underwater trenches.',
+    primary: '14 165 233', // #0EA5E9
+    primaryLight: '56 189 248', // #38BDF8
+    themeMode: 'dark',
+  }
+];
+
+export const XP_STORE_CURSORS: XPStoreCursor[] = [
+  {
+    id: 'default',
+    name: 'Classic Dot',
+    cost: 0,
+    description: 'The classic primary-colored custom dot and ring cursor.',
+    dotClass: 'bg-primaryLight',
+    ringClass: 'border-primary',
+  },
+  {
+    id: 'neon-emerald',
+    name: 'Neon Emerald',
+    cost: 200,
+    description: 'Bright green cursor with a glowing ring.',
+    dotClass: 'bg-emerald-400',
+    ringClass: 'border-emerald-400',
+  },
+  {
+    id: 'ruby-laser',
+    name: 'Ruby Laser',
+    cost: 300,
+    description: 'Deep red high-precision dot and laser outer ring.',
+    dotClass: 'bg-rose-500',
+    ringClass: 'border-rose-500',
+  },
+  {
+    id: 'cyber-gold',
+    name: 'Cyber Gold',
+    cost: 450,
+    description: 'Gleaming gold cursor for elite learners.',
+    dotClass: 'bg-amber-400',
+    ringClass: 'border-amber-400',
+  }
+];

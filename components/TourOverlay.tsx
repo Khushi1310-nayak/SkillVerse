@@ -153,6 +153,7 @@ const handlePrev = useCallback(() => {
                src={currentSlide.imageUrl} 
                alt={currentSlide.title}
                className="absolute inset-0 w-full h-full object-cover animate-fade-in transition-transform duration-1000 group-hover:scale-110" 
+               loading="lazy"
              />
              {/* Subtle overlay for blending into right side */}
              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#0B1220] opacity-90" />

@@ -99,7 +99,7 @@ const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgres
   loading="lazy"
   width={64}
   height={64}
-/> main
+/>
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
            ${company.difficulty === 'Moderate' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :

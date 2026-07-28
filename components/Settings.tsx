@@ -326,6 +326,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                         src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url}
                         alt="Current Avatar"
                         className="w-20 h-20 rounded-full object-cover bg-white/10 border-2 border-primaryLight shadow-md"
+                        width={80}
+                        height={80}
                       />
                       {formData.photoURL && (
                         <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
@@ -398,7 +400,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                           onClick={() => handleAvatarSelect(avatar.id)}
                           className={`p-1 rounded-full border-2 transition-all ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-black/20 dark:border-white/20'}`}
                         >
-                          <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" />
+                          <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" loading="lazy" width={48} height={48} />
                         </button>
                       ))}
                     </div>

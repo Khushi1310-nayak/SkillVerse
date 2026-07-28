@@ -351,12 +351,21 @@ interface VoiceChatProps {
 }
 
 const VoiceChatComponent: React.FC<VoiceChatProps> = ({ chatHistory }) => {
+  const currentMessage = chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
+    ? chatHistory[chatHistory.length - 1].content
+    : chatHistory.length > 1 ? chatHistory[chatHistory.length - 2].content : "Connecting...";
+
   return (
-    <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
-      {chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
-        ? <Typewriter text={chatHistory[chatHistory.length - 1].content} speed={50} />
-        : chatHistory.length > 1 ? <Typewriter text={chatHistory[chatHistory.length - 2].content} speed={50} /> : "Connecting..."}
-    </h3>
+    <>
+      {/* Hidden live region for screen readers to announce the full response at once */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {currentMessage}
+      </div>
+      {/* Visual typewriter effect hidden from screen readers to prevent character-by-character spelling */}
+      <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]" aria-hidden="true">
+        <Typewriter text={currentMessage} speed={50} />
+      </h3>
+    </>
   );
 };
 

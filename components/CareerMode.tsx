@@ -1079,29 +1079,30 @@ ${transcriptText}`;
   </div>
 )}
 
-{/* Company Grid */}
-{isLoadingCompanies ? (
-  ...
-                  </div>
+      {/* Company Grid */}
+      {isLoadingCompanies ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/20 dark:border-white/5 rounded-3xl h-[280px]"></div>
+          ))}
+        </div>
+      ) : filteredCompanies.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredCompanies.map(company => (
+            <CompanyCard
+              key={company.id}
+              company={company}
+              progress={progress}
+              onClick={handleSelectCompany}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="col-span-full text-center py-20 text-textMuted">
+          No companies found matching your criteria.
+        </div>
+      )}
 
-                  <div className="h-2 rounded-full bg-white/10" />
-                </div>
-              </div>
-            ))
-          ) : filteredCompanies.length > 0 ? (
-            filteredCompanies.map(company => (
-              <CompanyCard
-                key={company.id}
-                company={company}
-                progress={progress}
-                onClick={handleSelectCompany}
-              />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20 text-textMuted">
-              No companies found matching your criteria.
-            </div>
-          )}
         </div>
       )}
 

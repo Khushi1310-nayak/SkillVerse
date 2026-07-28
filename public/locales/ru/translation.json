@@ -18,14 +18,96 @@
     "body": "Are you sure you want to log out of your account?"
   },
   "settings": {
+    "title": "Settings",
   "tabs": {
     "profile": "Profile",
     "appearance": "Appearance",
+    "xpStore": "XP Store",
     "learning": "Learning",
     "quiz": "Quiz",
     "certificate": "Certificate",
     "achievements": "Achievements",
     "account": "Account"
-  }
+  },
+  "actions": {
+  "save": "Save Changes",
+  "reset": "Reset to Defaults"
+},
+"profile": {
+  "title": "Profile Settings",
+  "displayName": "Display Name",
+  "displayNamePlaceholder": "Enter display name",
+  "email": "Email Address",
+  "emailPlaceholder": "Enter email address",
+  "memberSince": "Member since",
+  "avatar": "Avatar",
+  "uploadAvatar": "Upload Custom Avatar",
+  "removeAvatar": "Remove Custom",
+  "custom": "Custom",
+  "currentAvatar": "Current Avatar",
+  "uploading": "Uploading",
+  "presetAvatar": "Or Select Preset Avatar",
+  "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+},
+"appearance": {
+  "title": "Appearance",
+  "themeMode": "Theme Mode",
+  "themeModeDesc": "Toggle between dark and light mode",
+  "light": "Light",
+  "dark": "Dark",
+  "gradientIntensity": "Gradient Intensity",
+  "subtle": "Subtle",
+  "balanced": "Balanced",
+  "vibrant": "Vibrant",
+  "language": "Language",
+"languageDesc": "Choose your preferred language"
+},
+"learning": {
+  "title": "Learning Preferences",
+  "dailyGoal": "Daily Study Goal",
+  "reminders": "Progress Reminders",
+  "remindersDesc": "Get notified to keep your streak",
+  "autoSave": "Auto-save Notes",
+  "autoSaveDesc": "Automatically save your progress"
+},
+"quiz": {
+  "title": "Quiz Preferences",
+  "instantFeedback": "Instant Feedback",
+  "instantFeedbackDesc": "Show correct/incorrect immediately",
+  "showAnswers": "Show Correct Answers",
+  "showAnswersDesc": "Reveal answers after quiz completion",
+  "allowRetry": "Allow Retry",
+  "allowRetryDesc": "Permit retaking quizzes immediately"
+},
+"certificate": {
+  "title": "Certificate Settings",
+  "nameLabel": "Name on Certificate",
+  "namePlaceholder": "Legal Name",
+  "nameHint": "This name will appear on all your earned certificates.",
+  "format": "Default Format",
+  "pdf": "PDF (Standard)",
+  "image": "Image (Pro)"
+},
+"achievements": { "title": "Achievements" },
+"account": {
+  "title": "Account Management",
+  "resetProgress": "Reset Progress",
+  "resetProgressDesc": "Clear all course progress and quiz scores",
+  "reset": "Reset",
+  "clearData": "Clear Local Data",
+  "clearDataDesc": "Remove all account data from this device",
+  "clear": "Clear"
+},
+"xpStore": { "title": "XP Store" },
+"modals": {
+  "resetTitle": "Reset Progress?",
+  "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
+  "clearTitle": "Clear All Data?",
+  "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
+  "unsavedTitle": "Unsaved Changes",
+"unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
+"stay": "Stay",
+"leave": "Leave"
+}
 }
 }

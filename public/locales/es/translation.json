@@ -18,14 +18,100 @@
     "body": "¿Estás seguro de que deseas cerrar sesión?"
   },
   "settings": {
+  "title": "Configuración",
   "tabs": {
-    "profile": "Profile",
-    "appearance": "Appearance",
-    "learning": "Learning",
-    "quiz": "Quiz",
-    "certificate": "Certificate",
-    "achievements": "Achievements",
-    "account": "Account"
+    "profile": "Perfil",
+    "appearance": "Apariencia",
+    "xpStore": "Tienda XP",
+    "learning": "Aprendizaje",
+    "quiz": "Cuestionarios",
+    "certificate": "Certificado",
+    "achievements": "Logros",
+    "account": "Cuenta"
+  },
+  "actions": {
+    "save": "Guardar cambios",
+    "reset": "Restablecer valores predeterminados"
+  },
+  "profile": {
+    "title": "Configuración del perfil",
+    "displayName": "Nombre para mostrar",
+    "displayNamePlaceholder": "Ingrese el nombre para mostrar",
+    "email": "Dirección de correo electrónico",
+    "emailPlaceholder": "Ingrese la dirección de correo electrónico",
+    "memberSince": "Miembro desde",
+    "avatar": "Avatar",
+    "uploadAvatar": "Subir avatar personalizado",
+    "removeAvatar": "Eliminar avatar personalizado",
+    "custom": "Personalizado",
+    "currentAvatar": "Avatar actual",
+    "uploading": "Subiendo",
+    "presetAvatar": "O seleccionar un avatar predeterminado",
+    "uploadHint": "Sube una imagen PNG o JPEG (máx. 2MB), o selecciona un avatar predefinido a continuación."
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "themeMode": "Modo de tema",
+    "themeModeDesc": "Cambiar entre el modo claro y oscuro",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "gradientIntensity": "Intensidad del degradado",
+    "subtle": "Sutil",
+    "balanced": "Equilibrado",
+    "vibrant": "Vibrante",
+    "language": "Idioma",
+"languageDesc": "Elige tu idioma preferido"
+  },
+  "learning": {
+    "title": "Preferencias de aprendizaje",
+    "dailyGoal": "Objetivo diario de estudio",
+    "reminders": "Recordatorios de progreso",
+    "remindersDesc": "Reciba notificaciones para mantener su racha",
+    "autoSave": "Guardar notas automáticamente",
+    "autoSaveDesc": "Guardar automáticamente su progreso"
+  },
+  "quiz": {
+    "title": "Preferencias de cuestionarios",
+    "instantFeedback": "Retroalimentación inmediata",
+    "instantFeedbackDesc": "Mostrar inmediatamente las respuestas correctas e incorrectas",
+    "showAnswers": "Mostrar respuestas correctas",
+    "showAnswersDesc": "Revelar las respuestas después de completar el cuestionario",
+    "allowRetry": "Permitir reintentos",
+    "allowRetryDesc": "Permitir volver a realizar los cuestionarios inmediatamente"
+  },
+  "certificate": {
+    "title": "Configuración del certificado",
+    "nameLabel": "Nombre en el certificado",
+    "namePlaceholder": "Nombre legal",
+    "nameHint": "Este nombre aparecerá en todos los certificados obtenidos.",
+    "format": "Formato predeterminado",
+    "pdf": "PDF (Estándar)",
+    "image": "Imagen (Pro)"
+  },
+  "achievements": {
+    "title": "Logros"
+  },
+  "account": {
+    "title": "Administración de la cuenta",
+    "resetProgress": "Restablecer progreso",
+    "resetProgressDesc": "Borrar todo el progreso de los cursos y las puntuaciones de los cuestionarios",
+    "reset": "Restablecer",
+    "clearData": "Borrar datos locales",
+    "clearDataDesc": "Eliminar todos los datos de la cuenta de este dispositivo",
+    "clear": "Borrar"
+  },
+  "xpStore": {
+    "title": "Tienda XP"
+  },
+  "modals": {
+    "resetTitle": "¿Restablecer el progreso?",
+    "resetBody": "Esto eliminará todo el progreso de sus cursos y las puntuaciones de los cuestionarios. Esta acción no se puede deshacer.",
+    "clearTitle": "¿Borrar todos los datos?",
+    "clearBody": "Esto eliminará su cuenta y todos los datos asociados de este navegador. Se cerrará su sesión.",
+    "unsavedTitle": "Cambios sin guardar",
+    "unsavedBody": "Tiene cambios sin guardar. ¿Está seguro de que desea salir sin guardar?",
+    "stay": "Permanecer",
+    "leave": "Salir"
   }
 }
 }

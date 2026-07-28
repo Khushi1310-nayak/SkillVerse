@@ -11,7 +11,7 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className =
 
   return (
     <select
-      value={i18n.resolvedLanguage || 'en'}
+      value={i18n.language}
       onChange={handleChange}
       title="Select language"
       aria-label="Select language"

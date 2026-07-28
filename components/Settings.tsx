@@ -17,6 +17,7 @@ import { User as UserType, UserSettings } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 
 interface SettingsProps {
@@ -359,6 +360,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                                 ? `${t('settings.profile.uploading')} (${uploadProgress}%)`
                                 : t('settings.profile.uploadAvatar')}
                           </span>
+                          </button>
 
                         {formData.photoURL && (
                           <button
@@ -368,7 +370,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                             className="flex items-center gap-1.5 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium transition-all"
                           >
                             <Trash2 size={16} />
-                            <span>Remove Custom</span>
+                            <span>{t('settings.profile.removeAvatar')}</span>
                           </button>
                         )}
                       </div>
@@ -389,14 +391,14 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       )}
 
                       <p className="text-xs text-textMuted">
-                        Upload a PNG or JPEG image (max 2MB), or select a preset avatar below.
+                        {t('settings.profile.uploadHint')}
                       </p>
                     </div>
                   </div>
 
                   {/* DiceBear Avatars Grid */}
                   <div className="space-y-2 pt-2">
-                    <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">Or Select Preset Avatar</span>
+                    <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">{t('settings.profile.presetAvatar')}</span>
                     <div className="flex flex-wrap gap-4">
                       {AVATARS.map(avatar => (
                         <button
@@ -414,33 +416,33 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label htmlFor="profileUsername" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Display Name</label>
+                    <label htmlFor="profileUsername" className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.profile.displayName')}</label>
                     <input
                       id="profileUsername"
                       type="text"
                       value={formData.username}
                       onChange={(e) => handleProfileChange('username', e.target.value)}
-                      title="Display Name"
-                      placeholder="Enter display name"
+                      title={t('settings.profile.displayName')}
+                      placeholder={t('settings.profile.displayNamePlaceholder')}
                       className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="profileEmail" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Email Address</label>
+                    <label htmlFor="profileEmail" className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.profile.email')}</label>
                     <input
                       id="profileEmail"
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleProfileChange('email', e.target.value)}
-                      title="Email Address"
-                      placeholder="Enter email address"
+                      title={t('settings.profile.email')}
+                      placeholder={t('settings.profile.emailPlaceholder')}
                       className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-black/20 dark:border-white/10">
-                  <p className="text-sm text-textMuted">Member since: <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString()}</span></p>
+                  <p className="text-sm text-textMuted">{t('settings.profile.memberSince')} <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString()}</span></p>
                 </div>
               </div>
             )}
@@ -456,8 +458,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <div className="flex items-center gap-3">
                     {formData.settings.theme === 'dark' ? <Moon size={24} className="text-purple-400" /> : <Sun size={24} className="text-yellow-400" />}
                     <div>
-                      <div className="font-bold text-textMain">Theme Mode</div>
-                      <div className="text-sm text-textMuted">Toggle between dark and light mode</div>
+                      <div className="font-bold text-textMain">{t('settings.appearance.themeMode')}</div>
+                      <div className="text-sm text-textMuted">{t('settings.appearance.themeModeDesc')}</div>
                     </div>
                   </div>
                   <div className="flex self-start sm:self-auto bg-black/5 dark:bg-black/30 rounded-lg p-1 shrink-0">
@@ -465,19 +467,19 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       onClick={() => handleChange('theme', 'light')}
                       className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${formData.settings.theme === 'light' ? 'bg-white text-black shadow-md' : 'text-textMuted hover:text-textMain'}`}
                     >
-                      Light
+                      {t('settings.appearance.light')}
                     </button>
                     <button
                       onClick={() => handleChange('theme', 'dark')}
                       className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${formData.settings.theme === 'dark' ? 'bg-gray-700 text-white shadow-md' : 'text-textMuted hover:text-textMain'}`}
                     >
-                      Dark
+                      {t('settings.appearance.dark')}
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <label htmlFor="gradientIntensity" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Gradient Intensity</label>
+                  <label htmlFor="gradientIntensity" className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.appearance.gradientIntensity')}</label>
                   <input
                     id="gradientIntensity"
                     type="range"
@@ -492,9 +494,9 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primaryLight"
                   />
                   <div className="flex justify-between text-xs text-textMuted">
-                    <span>Subtle</span>
-                    <span>Balanced</span>
-                    <span>Vibrant</span>
+                    <span>{t('settings.appearance.subtle')}</span>
+                    <span>{t('settings.appearance.balanced')}</span>
+                    <span>{t('settings.appearance.vibrant')}</span>
                   </div>
                 </div>
 
@@ -503,6 +505,13 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <div className="h-24 rounded-xl bg-gradient-main flex items-center justify-center shadow-lg shadow-primary/20">
                     <span className="text-white font-bold text-lg mix-blend-overlay">SkillVerse Premium UI</span>
                   </div>
+                </div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                  <div>
+                    <div className="font-bold text-textMain">{t('settings.appearance.language')}</div>
+                    <div className="text-sm text-textMuted">{t('settings.appearance.languageDesc')}</div>
+                  </div>
+                  <LanguageSwitcher />
                 </div>
               </div>
             )}
@@ -732,7 +741,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </h2>
 
                 <div className="space-y-2">
-                  <label htmlFor="dailyGoal" className="text-sm font-semibold text-textMuted uppercase tracking-wider">Daily Study Goal</label>
+                  <label htmlFor="dailyGoal" className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.learning.dailyGoal')}</label>
                   <div className="flex items-center gap-4">
                     <input
                       id="dailyGoal"
@@ -740,8 +749,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       min="10" max="120" step="10"
                       value={formData.settings.dailyGoal}
                       onChange={(e) => handleChange('dailyGoal', Number(e.target.value))}
-                      title="Daily Study Goal"
-                      placeholder="Daily Study Goal"
+                      title={t('settings.learning.dailyGoal')}
+                      placeholder={t('settings.learning.dailyGoal')}
                       className="flex-1 h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primaryLight"
                     />
                     <span className="w-24 text-center font-mono text-textMain bg-white/50 dark:bg-white/5 py-2 rounded-lg border border-black/20 dark:border-white/10">
@@ -755,8 +764,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <Smartphone className="text-blue-500 dark:text-blue-400" />
                       <div>
-                        <div className="font-bold text-textMain">Progress Reminders</div>
-                        <div className="text-sm text-textMuted">Get notified to keep your streak</div>
+                        <div className="font-bold text-textMain">{t('settings.learning.reminders')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.learning.remindersDesc')}</div>
                       </div>
                     </div>
                     <Toggle checked={formData.settings.reminders} onChange={(v) => handleChange('reminders', v)} />
@@ -766,8 +775,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <Save className="text-emerald-500 dark:text-emerald-400" />
                       <div>
-                        <div className="font-bold text-textMain">Auto-save Notes</div>
-                        <div className="text-sm text-textMuted">Automatically save your progress</div>
+                        <div className="font-bold text-textMain">{t('settings.learning.autoSave')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.learning.autoSaveDesc')}</div>
                       </div>
                     </div>
                     <Toggle checked={formData.settings.autoSave} onChange={(v) => handleChange('autoSave', v)} />
@@ -788,8 +797,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <Zap className="text-yellow-500 dark:text-yellow-400" />
                       <div>
-                        <div className="font-bold text-textMain">Instant Feedback</div>
-                        <div className="text-sm text-textMuted">Show correct/incorrect immediately</div>
+                        <div className="font-bold text-textMain">{t('settings.quiz.instantFeedback')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.quiz.instantFeedbackDesc')}</div>
                       </div>
                     </div>
                     <Toggle checked={formData.settings.instantFeedback} onChange={(v) => handleChange('instantFeedback', v)} />
@@ -799,8 +808,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <CheckCircle className="text-success" />
                       <div>
-                        <div className="font-bold text-textMain">Show Correct Answers</div>
-                        <div className="text-sm text-textMuted">Reveal answers after quiz completion</div>
+                        <div className="font-bold text-textMain">{t('settings.quiz.showAnswers')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.quiz.showAnswersDesc')}</div>
                       </div>
                     </div>
                     <Toggle checked={formData.settings.showAnswers} onChange={(v) => handleChange('showAnswers', v)} />
@@ -810,8 +819,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <RefreshCcw className="text-purple-500 dark:text-purple-400" />
                       <div>
-                        <div className="font-bold text-textMain">Allow Retry</div>
-                        <div className="text-sm text-textMuted">Permit retaking quizzes immediately</div>
+                        <div className="font-bold text-textMain">{t('settings.quiz.allowRetry')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.quiz.allowRetryDesc')}</div>
                       </div>
                     </div>
                     <Toggle checked={formData.settings.retryQuiz} onChange={(v) => handleChange('retryQuiz', v)} />
@@ -828,22 +837,22 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </h2>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Name on Certificate</label>
+                  <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.certificate.nameLabel')}</label>
                   <input
                     type="text"
                     value={formData.settings.certificateName}
                     onChange={(e) => handleChange('certificateName', e.target.value)}
-                    placeholder="Legal Name"
+                    placeholder={t('settings.certificate.namePlaceholder')}
                     className="w-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl px-4 py-3 text-textMain focus:border-primaryLight focus:outline-none transition-colors"
                   />
-                  <p className="text-xs text-textMuted">This name will appear on all your earned certificates.</p>
+                  <p className="text-xs text-textMuted">{t('settings.certificate.nameHint')}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Default Format</label>
+                  <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.certificate.format')}</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="p-4 rounded-xl border border-primaryLight bg-primary/10 text-primaryLight font-bold">PDF (Standard)</button>
-                    <button className="p-4 rounded-xl border border-black/20 dark:border-white/10 bg-black/5 dark:bg-white/5 text-textMuted hover:bg-black/10 dark:hover:bg-white/10 cursor-not-allowed">Image (Pro)</button>
+                    <button className="p-4 rounded-xl border border-primaryLight bg-primary/10 text-primaryLight font-bold">{t('settings.certificate.pdf')}</button>
+                    <button className="p-4 rounded-xl border border-black/20 dark:border-white/10 bg-black/5 dark:bg-white/5 text-textMuted hover:bg-black/10 dark:hover:bg-white/10 cursor-not-allowed">{t('settings.certificate.image')}</button>
                   </div>
                 </div>
               </div>
@@ -900,11 +909,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <RefreshCcw className="text-orange-500 dark:text-orange-400" />
                       <div className="text-left">
-                        <div className="font-bold text-textMain">Reset Progress</div>
-                        <div className="text-sm text-textMuted">Clear all course progress and quiz scores</div>
+                        <div className="font-bold text-textMain">{t('settings.account.resetProgress')}</div>
+                        <div className="text-sm text-textMuted">{t('settings.account.resetProgressDesc')}</div>
                       </div>
                     </div>
-                    <span className="text-textMuted group-hover:text-textMain">Reset</span>
+                    <span className="text-textMuted group-hover:text-textMain">{t('settings.account.reset')}</span>
                   </button>
 
                   <button
@@ -914,11 +923,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <div className="flex items-center gap-3">
                       <Trash2 className="text-red-500 dark:text-red-400" />
                       <div className="text-left">
-                        <div className="font-bold text-textMain group-hover:text-red-500 dark:group-hover:text-red-400">Clear Local Data</div>
-                        <div className="text-sm text-textMuted group-hover:text-red-400 dark:group-hover:text-red-300">Remove all account data from this device</div>
+                        <div className="font-bold text-textMain group-hover:text-red-500 dark:group-hover:text-red-400">{t('settings.account.clearData')}</div>
+                        <div className="text-sm text-textMuted group-hover:text-red-400 dark:group-hover:text-red-300">{t('settings.account.clearDataDesc')}</div>
                       </div>
                     </div>
-                    <span className="text-textMuted group-hover:text-red-500 dark:group-hover:text-red-400">Clear</span>
+                    <span className="text-textMuted group-hover:text-red-500 dark:group-hover:text-red-400">{t('settings.account.clear')}</span>
                   </button>
                 </div>
               </div>
@@ -955,23 +964,23 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <AlertTriangle size={24} />
                 </div>
                 <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
-                  Unsaved Changes
+                  {t('settings.modals.unsavedTitle')}
                 </h3>
                 <p className="text-textMuted text-center mb-6">
-                  You have unsaved changes. Are you sure you want to leave without saving?
+                  {t('settings.modals.unsavedBody')}
                 </p>
                 <div className="flex gap-4">
                   <button
                     onClick={() => setModal({ type: null })}
                     className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
                   >
-                    Stay
+                    {t('settings.modals.stay')}
                   </button>
                   <button
                     onClick={handleLeave}
                     className="flex-1 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-colors"
                   >
-                    Leave
+                    {t('settings.modals.leave')}
                   </button>
                 </div>
               </>
@@ -981,26 +990,26 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <AlertTriangle size={24} />
                 </div>
                 <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
-                  {modal.type === 'reset' ? 'Reset Progress?' : 'Clear All Data?'}
+                  {modal.type === 'reset' ? t('settings.modals.resetTitle') : t('settings.modals.clearTitle')}
                 </h3>
                 <p className="text-textMuted text-center mb-6">
                   {modal.type === 'reset'
-                    ? 'This will delete all your course progress and quiz scores. This action cannot be undone.'
-                    : 'This will remove your account and all associated data from this browser. You will be logged out.'
-                  }
+                    ? t('settings.modals.resetBody')
+                    : t('settings.modals.clearBody')}
+                  
                 </p>
                 <div className="flex gap-4">
                   <button
                     onClick={() => setModal({ type: null })}
                     className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={modal.type === 'reset' ? handleResetProgress : handleClearData}
                     className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
                   >
-                    Confirm
+                    {t('common.confirm')}
                   </button>
                 </div>
               </>

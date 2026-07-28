@@ -1080,31 +1080,44 @@ ${transcriptText}`;
 )}
 
       {/* Company Grid */}
-      {isLoadingCompanies ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/20 dark:border-white/5 rounded-3xl h-[280px]"></div>
-          ))}
-        </div>
-      ) : filteredCompanies.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredCompanies.map(company => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {isLoadingCompanies ? (
+          [...Array(8)].map((_, idx) => (
+            <div
+              key={idx}
+              className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-4 sm:p-6 animate-pulse flex flex-col"
+            >
+              <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
+                <div className="h-6 w-20 rounded-full bg-white/10" />
+              </div>
+              <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
+              <div className="h-4 w-full rounded bg-white/10 mb-2" />
+              <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-medium text-textMuted">
+                  <div className="h-4 w-16 rounded bg-white/10" />
+                  <div className="h-4 w-10 rounded bg-white/10" />
+                </div>
+                <div className="h-2 rounded-full bg-white/10" />
+              </div>
+            </div>
+          ))
+        ) : filteredCompanies.length > 0 ? (
+          filteredCompanies.map(company => (
             <CompanyCard
               key={company.id}
               company={company}
               progress={progress}
               onClick={handleSelectCompany}
             />
-          ))}
-        </div>
-      ) : (
-        <div className="col-span-full text-center py-20 text-textMuted">
-          No companies found matching your criteria.
-        </div>
-      )}
-
-        </div>
-      )}
+          ))
+        ) : (
+          <div className="col-span-full text-center py-20 text-textMuted">
+            No companies found matching your criteria.
+          </div>
+        )}
+      </div>
 
       {/* COMPANY MODAL - Uses Portal to escape sidebar stacking context */}
       {selectedCompany && createPortal(

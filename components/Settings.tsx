@@ -322,9 +322,19 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   {/* Current Active Avatar Display & Upload Controls */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-black/20 dark:border-white/10">
                     <div className="relative group">
+<<<<<<< HEAD
 <img src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url} alt="Current Avatar" className="w-20 h-20 rounded-full object-cover bg-white/10 border-2 border-primaryLight shadow-md" width={80} height={80} />
 
                     
+=======
+<img
+  src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url}
+  alt="Current Avatar"
+  className="w-20 h-20 rounded-full object-cover bg-white/10 border-2 border-primaryLight shadow-md"
+  width={80}
+  height={80}
+/>
+>>>>>>> d062df8 (fix: resolve merge artifacts after lazy loading optimization)
                       {formData.photoURL && (
                         <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
                           Custom

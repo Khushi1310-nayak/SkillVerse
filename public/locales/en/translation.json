@@ -18,14 +18,53 @@
     "body": "Are you sure you want to log out of your account?"
   },
   "settings": {
+    "title": "Settings",
   "tabs": {
     "profile": "Profile",
     "appearance": "Appearance",
+    "xpStore": "XP Store",
     "learning": "Learning",
     "quiz": "Quiz",
     "certificate": "Certificate",
     "achievements": "Achievements",
     "account": "Account"
-  }
+  },
+  "actions": {
+  "save": "Save Changes",
+  "reset": "Reset to Defaults"
+},
+"profile": {
+  "title": "Profile Settings",
+  "displayName": "Display Name",
+  "email": "Email Address",
+  "memberSince": "Member since",
+  "avatar": "Avatar",
+  "uploadAvatar": "Upload Custom Avatar",
+  "removeAvatar": "Remove Custom Avatar"
+},
+"appearance": {
+  "title": "Appearance",
+  "theme": "Theme Mode",
+  "accent": "Accent Color",
+  "cursor": "Custom Cursor"
+},
+"learning": {
+  "title": "Learning Preferences"
+},
+"quiz": {
+  "title": "Quiz Preferences"
+},
+"certificate": {
+  "title": "Certificate Settings"
+},
+"achievements": {
+  "title": "Achievements"
+},
+"account": {
+  "title": "Account Management"
+},
+"xpStore": {
+  "title": "XP Store"
+}
 }
 }

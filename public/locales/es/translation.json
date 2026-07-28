@@ -16,5 +16,16 @@
   "logout": {
     "title": "¿Cerrar Sesión?",
     "body": "¿Estás seguro de que deseas cerrar sesión?"
+  },
+  "settings": {
+  "tabs": {
+    "profile": "Profile",
+    "appearance": "Appearance",
+    "learning": "Learning",
+    "quiz": "Quiz",
+    "certificate": "Certificate",
+    "achievements": "Achievements",
+    "account": "Account"
   }
+}
 }

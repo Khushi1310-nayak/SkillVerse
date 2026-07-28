@@ -239,7 +239,9 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
   return (
     <div className="animate-fade-in relative">
-      <h1 className="text-3xl font-display font-bold text-textMain mb-8">Settings</h1>
+      <h1 className="text-3xl font-display font-bold text-textMain mb-8">
+  {t('settings.title')}
+</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
@@ -247,7 +249,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
           <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
 <TabButton id="profile" icon={User} label={t('settings.tabs.profile')} />
 <TabButton id="appearance" icon={Palette} label={t('settings.tabs.appearance')} />
-<TabButton id="xpstore" icon={ShoppingBag} label="XP Store" />
+<TabButton id="xpstore" icon={ShoppingBag} label={t('settings.tabs.xpStore')} />
 <TabButton id="learning" icon={BookOpen} label={t('settings.tabs.learning')} />
 <TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
 <TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
@@ -264,23 +266,23 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'profile' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <User className="text-primaryLight" /> Profile Settings
+                  <User className="text-primaryLight" /> {t('settings.profile.title')}
                 </h2>
 
                 <div className="space-y-4">
-                  <label className="block text-sm font-semibold text-textMuted uppercase tracking-wider">Avatar</label>
+                  <label className="block text-sm font-semibold text-textMuted uppercase tracking-wider">{t('settings.profile.avatar')}</label>
 
                   {/* Current Active Avatar Display & Upload Controls */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-black/20 dark:border-white/10">
                     <div className="relative group">
                       <img
                         src={formData.photoURL || AVATARS.find(a => a.id === formData.settings.avatarId)?.url || AVATARS[0].url}
-                        alt="Current Avatar"
+                        alt={t('settings.profile.currentAvatar')}
                         className="w-20 h-20 rounded-full object-cover bg-white/10 border-2 border-primaryLight shadow-md"
                       />
                       {formData.photoURL && (
                         <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
-                          Custom
+                          {t('settings.profile.custom')}
                         </span>
                       )}
                     </div>
@@ -301,8 +303,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                           className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primaryLight border border-primary/20 rounded-xl font-medium transition-all shadow-sm active:scale-95 disabled:opacity-50"
                         >
                           {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
-                          <span>{uploading ? `Uploading (${uploadProgress}%)` : 'Upload Custom Avatar'}</span>
-                        </button>
+                          <span>
+                             {uploading
+                                ? `${t('settings.profile.uploading')} (${uploadProgress}%)`
+                                : t('settings.profile.uploadAvatar')}
+                          </span>
 
                         {formData.photoURL && (
                           <button
@@ -393,7 +398,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'appearance' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Palette className="text-primaryLight" /> Appearance
+                  <Palette className="text-primaryLight" /> {t('settings.appearance.title')}
                 </h2>
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
@@ -457,7 +462,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-black/20 dark:border-white/10 pb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-textMain flex items-center gap-2">
-                      <ShoppingBag className="text-primaryLight" /> XP Store
+                      <ShoppingBag className="text-primaryLight" /> {t('settings.xpStore.title')}
                     </h2>
                     <p className="text-textMuted">Unlock exclusive themes and custom cursor styles using your learning XP.</p>
                   </div>
@@ -672,7 +677,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'learning' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <BookOpen className="text-primaryLight" /> Learning Preferences
+                  <BookOpen className="text-primaryLight" /> {t('settings.learning.title')}
                 </h2>
 
                 <div className="space-y-2">
@@ -724,7 +729,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'quiz' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Brain className="text-primaryLight" /> Quiz Preferences
+                  <Brain className="text-primaryLight" /> {t('settings.quiz.title')}
                 </h2>
 
                 <div className="space-y-4">
@@ -768,7 +773,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'certificate' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Award className="text-primaryLight" /> Certificate Settings
+                  <Award className="text-primaryLight" /> {t('settings.certificate.title')}
                 </h2>
 
                 <div className="space-y-2">
@@ -797,7 +802,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'achievements' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Trophy className="text-primaryLight" /> Achievements
+                  <Trophy className="text-primaryLight" /> {t('settings.achievements.title')}
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -833,7 +838,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {activeTab === 'account' && (
               <div className="space-y-8 animate-fade-in">
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Shield className="text-primaryLight" /> Account Management
+                  <Shield className="text-primaryLight" /> {t('settings.account.title')}
                 </h2>
 
                 <div className="space-y-4">

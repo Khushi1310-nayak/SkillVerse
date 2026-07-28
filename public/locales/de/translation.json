@@ -16,5 +16,16 @@
   "logout": {
     "title": "Log Out?",
     "body": "Are you sure you want to log out of your account?"
+  },
+  "settings": {
+  "tabs": {
+    "profile": "Profile",
+    "appearance": "Appearance",
+    "learning": "Learning",
+    "quiz": "Quiz",
+    "certificate": "Certificate",
+    "achievements": "Achievements",
+    "account": "Account"
   }
+}
 }

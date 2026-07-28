@@ -11,15 +11,15 @@ import {
 interface SkillRadarChartProps {
   programming?: number;
   dsa?: number;
-  systemDesign?: number;
-  frontend?: number;
+  design?: number;
+  
 }
 
 const SkillRadarChart = ({
   programming = 0,
   dsa = 0,
-  systemDesign = 0,
-  frontend = 0,
+  design = 0,
+  
 }: SkillRadarChartProps) => {
   const data = [
     {
@@ -31,12 +31,8 @@ const SkillRadarChart = ({
       score: dsa,
     },
     {
-      skill: "System Design",
-      score: systemDesign,
-    },
-    {
-      skill: "Frontend",
-      score: frontend,
+      skill: "Design",
+      score: design,
     },
   ];
 
@@ -123,7 +119,7 @@ const SkillRadarChart = ({
       </div>
 
       {/* Skill Summary */}
-      <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-4 sm:grid-cols-4 ">
         {data.map((item) => (
           <div
             key={item.skill}

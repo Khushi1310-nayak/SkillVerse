@@ -435,21 +435,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/*Radar Chart*/}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-white">
-            Skill Profile
-          </h2>
-
-          <p className="mt-1 text-sm text-purple-200/70">
-            Your learning progress across key technical skills
-          </p>
-        </div>
 
         <SkillRadarChart
           programming={getCategoryProgress('programming').passed > 0 ? getCategoryProgress('programming').percent : 0}
           dsa={getCategoryProgress('dsa').passed > 0 ? getCategoryProgress('dsa').percent : 0}
-          systemDesign={getCategoryProgress('system-design').passed > 0 ? getCategoryProgress('system-design').percent : 0}
-          frontend={getCategoryProgress('frontend').passed > 0 ? getCategoryProgress('frontend').percent : 0}
+          design={getCategoryProgress('design').passed > 0 ? getCategoryProgress('system-design').percent : 0}
+          
         />
       </div>
 

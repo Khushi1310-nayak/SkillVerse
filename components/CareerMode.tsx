@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Briefcase, Search, CheckCircle, Clock,
@@ -494,53 +494,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   // Search Filter
   const [search, setSearch] = useState('');
 
-  // Timer handleTimeUp callback
-  const handleTimeUp = useCallback(() => {
-    if (mockState === 'active') finishMockInterview();
-    if (mockState === 'active_voice') stopListeningAndSubmit(true);
-  }, [mockState, finishMockInterview, stopListeningAndSubmit]);
 
-  // Fetch Live Firestore Companies
-  useEffect(() => {
-    const fetchLiveCompanies = async () => {
-      try {
-        const liveData = await firestoreService.getCompanies();
-        setCompaniesList(liveData);
-      } catch (error) {
-        console.error("Error fetching live companies from Firestore:", error);
-      } finally {
-        setTimeout(() => {
-          setIsLoadingCompanies(false);
-        }, 1000);
-      }
-    };
-    fetchLiveCompanies();
-  }, []);
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (selectedCompany) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-      if (synthRef.current) synthRef.current.cancel();
-      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch (e) { } }
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      if (synthRef.current) synthRef.current.cancel();
-      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch (e) { } }
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    };
-  }, [selectedCompany]);
-
-  // Assign ref implementations on every render to ensure they capture latest closure state
-  speakQuestionRef.current = speakQuestion;
-  startListeningRef.current = startListening;
-  stopListeningAndSubmitRef.current = stopListeningAndSubmit;
-  generateAIResponseRef.current = generateAIResponse;
-  generateVoiceReportRef.current = generateVoiceReport;
 
   const handleSelectCompany = useCallback((company: Company) => {
     setSelectedCompany(company);
@@ -906,12 +860,57 @@ ${transcriptText}`;
       if (recognitionRef.current) {
         try { recognitionRef.current.stop(); } catch (e) { }
       }
-      if (synthRef.current) {
-        try { synthRef.current.cancel(); } catch (e) { }
-      }
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     }
   }, [selectedCompany, showToast, progress]);
+
+  // Assign ref implementations on every render to ensure they capture latest closure state
+  speakQuestionRef.current = speakQuestion;
+  startListeningRef.current = startListening;
+  stopListeningAndSubmitRef.current = stopListeningAndSubmit;
+  generateAIResponseRef.current = generateAIResponse;
+  generateVoiceReportRef.current = generateVoiceReport;
+
+  // Timer handleTimeUp callback
+  const handleTimeUp = useCallback(() => {
+    if (mockState === 'active') finishMockInterview();
+    if (mockState === 'active_voice') stopListeningAndSubmitRef.current(true);
+  }, [mockState, finishMockInterview]);
+
+  // Fetch Live Firestore Companies
+  useEffect(() => {
+    const fetchLiveCompanies = async () => {
+      try {
+        const liveData = await firestoreService.getCompanies();
+        setCompaniesList(liveData);
+      } catch (error) {
+        console.error("Error fetching live companies from Firestore:", error);
+      } finally {
+        setTimeout(() => {
+          setIsLoadingCompanies(false);
+        }, 1000);
+      }
+    };
+    fetchLiveCompanies();
+  }, []);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedCompany) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+      if (synthRef.current) synthRef.current.cancel();
+      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch (e) { } }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      if (synthRef.current) synthRef.current.cancel();
+      if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch (e) { } }
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    };
+  }, [selectedCompany]);
 
 
 

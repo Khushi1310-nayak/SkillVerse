@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
@@ -43,9 +44,14 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
   const [formData, setFormData] = useState<UserType>(user);
-  const [modal, setModal] = useState<{ type: 'reset' | 'clear' | null }>({ type: null });
+  const [modal, setModal] = useState<{ type: 'reset' | 'clear' | 'unsaved' | null }>({ type: null });
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
   const { showToast } = useToast();
   const { purchaseItem } = useAuth();
+  const navigate = useNavigate();
+
+  // Compute dirty state by comparing current formData with original user prop
+  const isDirty = JSON.stringify(formData) !== JSON.stringify(user);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -60,9 +66,47 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     localStorage.setItem('settings_active_tab', activeTab);
   }, [activeTab]);
 
-  // Ref and focus trap for the confirmation modal (Reset / Clear)
+  // Ref and focus trap for the confirmation modal
   const confirmModalRef = useRef<HTMLDivElement>(null);
   useFocusTrap(confirmModalRef, !!modal.type, () => setModal({ type: null }));
+
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      // Ignore modifier clicks, middle clicks, or links meant to open elsewhere
+      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+      const target = (e.target as HTMLElement).closest('a');
+      if (!target || !target.href) return;
+      if (target.target === '_blank' || target.hasAttribute('download')) return;
+
+      if (target.href.includes('#/')) {
+        const url = new URL(target.href);
+        
+        if (url.origin === window.location.origin && url.hash !== window.location.hash && url.hash !== '#/settings') {
+          e.preventDefault();
+          e.stopPropagation();
+          const hashPath = url.hash.replace(/^#/, '');
+          setPendingPath(hashPath || '/');
+          setModal({ type: 'unsaved' });
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('click', handleClick, true);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [isDirty]);
 
   const handleChange = (field: keyof UserSettings, value: any) => {
     const updatedUser = {
@@ -207,6 +251,13 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     setModal({ type: null });
     // Resetting app state via logout ensures clean slate without hard browser reload
     onLogout();
+  };
+
+  const handleLeave = () => {
+    setModal({ type: null });
+    if (pendingPath) {
+      navigate(pendingPath);
+    }
   };
 
   const TabButton = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => (
@@ -898,32 +949,62 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             tabIndex={-1}
             className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up"
           >
-            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
-              <AlertTriangle size={24} />
-            </div>
-            <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
-              {modal.type === 'reset' ? 'Reset Progress?' : 'Clear All Data?'}
-            </h3>
-            <p className="text-textMuted text-center mb-6">
-              {modal.type === 'reset'
-                ? 'This will delete all your course progress and quiz scores. This action cannot be undone.'
-                : 'This will remove your account and all associated data from this browser. You will be logged out.'
-              }
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setModal({ type: null })}
-                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={modal.type === 'reset' ? handleResetProgress : handleClearData}
-                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
-              >
-                Confirm
-              </button>
-            </div>
+            {modal.type === 'unsaved' ? (
+              <>
+                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 mb-4 mx-auto">
+                  <AlertTriangle size={24} />
+                </div>
+                <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
+                  Unsaved Changes
+                </h3>
+                <p className="text-textMuted text-center mb-6">
+                  You have unsaved changes. Are you sure you want to leave without saving?
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setModal({ type: null })}
+                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
+                  >
+                    Stay
+                  </button>
+                  <button
+                    onClick={handleLeave}
+                    className="flex-1 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-colors"
+                  >
+                    Leave
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
+                  <AlertTriangle size={24} />
+                </div>
+                <h3 id="confirm-modal-title" className="text-xl font-bold text-textMain text-center mb-2">
+                  {modal.type === 'reset' ? 'Reset Progress?' : 'Clear All Data?'}
+                </h3>
+                <p className="text-textMuted text-center mb-6">
+                  {modal.type === 'reset'
+                    ? 'This will delete all your course progress and quiz scores. This action cannot be undone.'
+                    : 'This will remove your account and all associated data from this browser. You will be logged out.'
+                  }
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setModal({ type: null })}
+                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={modal.type === 'reset' ? handleResetProgress : handleClearData}
+                    className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

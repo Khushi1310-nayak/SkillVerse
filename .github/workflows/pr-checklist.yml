@@ -1,0 +1,24 @@
+name: PR Checklist Enforcer
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check-pr-template:
+    name: Verify Mandatory Testing Checklist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Body for Mandatory Checkbox
+        run: |
+          # Read the PR body from the GitHub context
+          PR_BODY="${{ github.event.pull_request.body }}"
+          
+          # Check if the specific mandatory string with an [x] exists
+          if echo "$PR_BODY" | grep -q "\- \[x\] \*\*MANDATORY: I have tested these changes locally and verified that they do not break existing functionality or UX.\*\*"; then
+            echo "Success: Mandatory testing checkbox is checked!"
+            exit 0
+          else
+            echo "::error::PR Validation Failed: The mandatory testing checkbox must be checked. Please test your code locally, check the box, and update the PR."
+            exit 1
+          fi

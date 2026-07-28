@@ -21,6 +21,7 @@ interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
   onLogout: () => void;
+  fallback: React.ReactNode;
 }
 
 const AVATARS: Record<string, string> = {
@@ -31,7 +32,7 @@ const AVATARS: Record<string, string> = {
   '5': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha',
 };
 
-export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallback }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -220,7 +221,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       {/* Main Content */}
       <main className="flex-1 relative z-10 w-full min-w-0 transition-all duration-300">
          <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
-            {children}
+            <React.Suspense fallback={fallback}>
+               {children}
+            </React.Suspense>
          </div>
       </main>
 

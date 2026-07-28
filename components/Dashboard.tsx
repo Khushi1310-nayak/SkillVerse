@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2 } from 'lucide-react';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
@@ -26,12 +26,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [showStreakModal, setShowStreakModal] = useState(false);
-  const [dueQuestionsCount, setDueQuestionsCount] = useState(0);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
 
-  useEffect(() => {
-    const loadCompaniesAndCalculateDue = async () => {
+    useEffect(() => {
+    const loadCompanies = async () => {
       try {
         const companyList = await firestoreService.getCompanies();
+        setCompanies(companyList);
+
+        // Calculate SRS Due Questions
         const careerProgress = storageService.getCareerProgress();
         const srsMap = careerProgress.srsData || {};
 
@@ -51,10 +55,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         });
         setDueQuestionsCount(count);
       } catch (error) {
-        console.error("Error calculating due questions in Dashboard:", error);
+        console.error('Error fetching companies in Dashboard:', error);
       }
     };
-    loadCompaniesAndCalculateDue();
+    loadCompanies();
   }, []);
 
   useEffect(() => {
@@ -107,6 +111,38 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     () => getRecommendedCourses(user.settings, allProgress, courses),
     [user.settings, allProgress, courses]
   );
+
+  const savedQuestionsList = useMemo(() => {
+    const list: { question: any; companyName: string }[] = [];
+    const savedIds = careerProgress.savedQuestions || [];
+    
+    if (savedIds.length === 0 || companies.length === 0) return [];
+    
+    companies.forEach(company => {
+      company.questions.forEach((q: any) => {
+        if (savedIds.includes(q.id)) {
+          list.push({ question: q, companyName: company.name });
+        }
+      });
+    });
+    return list;
+  }, [careerProgress.savedQuestions, companies]);
+
+  const mockHistoryList = useMemo(() => {
+    const scores = careerProgress.mockInterviewScores || [];
+    if (scores.length === 0) return [];
+    
+    const sorted = [...scores].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    return sorted.map((attempt: any) => {
+      const company = companies.find(c => c.id === attempt.companyId);
+      return {
+        ...attempt,
+        companyName: company ? company.name : attempt.companyId,
+        companyLogo: company ? company.logo : ''
+      };
+    });
+  }, [careerProgress.mockInterviewScores, companies]);
   const completedCount = allProgress.filter(p => p.passed).length;
   const totalCourses = courses.length;
   const completionPercentage = totalCourses ? Math.round((completedCount / totalCourses) * 100) : 0;
@@ -417,6 +453,114 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         />
       </div>
 
+
+      {/* Career Mode Widgets (Saved Questions & Mock Interview History) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        {/* Saved Questions Widget */}
+        <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 flex flex-col justify-between min-h-[300px]">
+          <div>
+            <h3 className="text-xl font-display font-bold text-textMain mb-4 flex items-center gap-2">
+              <Bookmark className="text-primaryLight" size={22} />
+              Saved Questions
+            </h3>
+            {savedQuestionsList.length > 0 ? (
+              <div className="space-y-3">
+                {savedQuestionsList.slice(0, 3).map(({ question, companyName }) => (
+                  <div 
+                    key={question.id}
+                    className="p-3.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-xl flex items-center justify-between hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="min-w-0 flex-1 pr-3">
+                      <h4 className="text-sm font-bold text-textMain truncate">{question.title}</h4>
+                      <span className="text-[10px] text-textMuted uppercase font-semibold">{companyName}</span>
+                    </div>
+                    <Link 
+                      to={`/career`}
+                      className="text-xs font-bold text-primaryLight shrink-0 hover:underline"
+                    >
+                      Practice &rarr;
+                    </Link>
+                  </div>
+                ))}
+                {savedQuestionsList.length > 3 && (
+                  <div className="text-right">
+                    <Link to="/career" className="text-xs font-bold text-primaryLight hover:underline">
+                      View all {savedQuestionsList.length} saved questions &rarr;
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center py-6 text-center">
+                <Bookmark className="text-textMuted/30 mb-3" size={48} />
+                <p className="text-sm text-textMuted max-w-sm mb-4">
+                  You haven't saved any questions yet! Head to Career Mode to start practicing.
+                </p>
+                <Link
+                  to="/career"
+                  className="px-4 py-2 bg-gradient-main text-white text-xs font-bold rounded-lg shadow hover:shadow-primary/20 transition-all"
+                >
+                  Explore Questions
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mock Interview History Widget */}
+        <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 flex flex-col justify-between min-h-[300px]">
+          <div>
+            <h3 className="text-xl font-display font-bold text-textMain mb-4 flex items-center gap-2">
+              <History className="text-primaryLight" size={22} />
+              Mock Interview History
+            </h3>
+            {mockHistoryList.length > 0 ? (
+              <div className="space-y-3">
+                {mockHistoryList.slice(0, 3).map((attempt, index) => {
+                  const dateStr = new Date(attempt.date).toLocaleDateString(undefined, { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric' 
+                  });
+                  return (
+                    <div 
+                      key={index}
+                      className="p-3.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-xl flex items-center justify-between"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-textMain">{attempt.companyName} Mock</h4>
+                        </div>
+                        <span className="text-[10px] text-textMuted">{dateStr}</span>
+                      </div>
+                      <div className={`px-2.5 py-1 rounded-lg text-xs font-bold 
+                        ${attempt.score >= 70 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                          attempt.score >= 50 ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+                          'bg-red-500/10 text-red-500 border border-red-500/20'}
+                      `}>
+                        {attempt.score}%
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center py-6 text-center">
+                <History className="text-textMuted/30 mb-3" size={48} />
+                <p className="text-sm text-textMuted max-w-sm mb-4">
+                  Start a Mock Interview in Career Mode to test your skills under real-world conditions.
+                </p>
+                <Link
+                  to="/career"
+                  className="px-4 py-2 bg-gradient-main text-white text-xs font-bold rounded-lg shadow hover:shadow-primary/20 transition-all"
+                >
+                  Start Mock Interview
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Global Leaderboard */}
       <div id="dash-leaderboard" className="mt-8">

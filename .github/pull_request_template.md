@@ -15,6 +15,7 @@ Closes #<!-- Issue Number -->
 ## Verification & Testing
 <!-- Check off the items that apply to this PR. -->
 
+- [ ] **MANDATORY: I have tested these changes locally and verified that they do not break existing functionality or UX.**
 - [ ] **React Architecture**: State is localized where possible, and unnecessary re-renders are avoided.
 - [ ] **TypeScript**: Strict types are used. `any` is avoided. No compilation errors (`npm run build`).
 - [ ] **Responsive Design**: Tested on mobile (320px), tablet, and desktop viewports.

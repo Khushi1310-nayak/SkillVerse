@@ -28,11 +28,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [companies, setCompanies] = useState<any[]>([]);
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
 
-  useEffect(() => {
+    useEffect(() => {
     const loadCompanies = async () => {
       try {
-        const data = await firestoreService.getCompanies();
-        setCompanies(data);
+        const companyList = await firestoreService.getCompanies();
+        setCompanies(companyList);
+
+        // Calculate SRS Due Questions
+        const careerProgress = storageService.getCareerProgress();
+        const srsMap = careerProgress.srsData || {};
+        let count = 0;
+        const now = new Date();
+
+        companyList.forEach(company => {
+          company.questions.forEach(q => {
+            const srs = srsMap[q.id];
+            if (srs) {
+              const nextReview = new Date(srs.nextReviewDate);
+              if (nextReview <= now) {
+                count++;
+              }
+            }
+          });
+        });
+        setDueQuestionsCount(count);
       } catch (error) {
         console.error('Error fetching companies in Dashboard:', error);
       }

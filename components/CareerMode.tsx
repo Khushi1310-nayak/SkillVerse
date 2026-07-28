@@ -92,7 +92,14 @@ const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgres
     >
       <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/20 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
-          <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+<img
+  src={company.logo}
+  alt={company.name}
+  className="w-full h-full object-contain"
+  loading="lazy"
+  width={64}
+  height={64}
+/>
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
            ${company.difficulty === 'Moderate' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
@@ -922,6 +929,9 @@ ${transcriptText}`;
   // Filter Companies
   const filteredCompanies = companiesList.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
+
+
+
   if (showReviewQueue) {
     return (
       <div className="space-y-8 animate-fade-in pb-20">
@@ -1014,100 +1024,100 @@ ${transcriptText}`;
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative max-w-md group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={20} />
-        <input
-          type="text"
-          placeholder="Search companies (e.g. Google, Amazon)..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
-        />
-      </div>
+{/* Search Bar */}
+<div className="relative max-w-md group">
+  <Search
+    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors"
+    size={20}
+  />
+  <input
+    type="text"
+    placeholder="Search companies (e.g. Google, Amazon)..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+  />
+</div>
 
-      {/* Recommended Companies */}
-      {!isLoadingCompanies && recommendedCompanies.length > 0 && (
-        <div>
-          <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
-            <span className="w-2 h-5 rounded-full bg-primaryLight" />
-            Recommended for You
-          </h3>
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {recommendedCompanies.map(company => (
-              <div
-                key={company.id}
-                onClick={() => handleSelectCompany(company)}
-                className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
-                  <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
-                </div>
-                <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">{company.name}</h4>
-                  <p className="text-xs text-textMuted truncate">{company.focus.join(', ')}</p>
-                </div>
-              </div>
-            ))}
+{/* Recommended Companies */}
+{!isLoadingCompanies && recommendedCompanies.length > 0 && (
+  <div>
+    <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
+      <span className="w-2 h-5 rounded-full bg-primaryLight" />
+      Recommended for You
+    </h3>
+
+    <div className="flex gap-4 overflow-x-auto pb-2">
+      {recommendedCompanies.map(company => (
+        <div
+          key={company.id}
+          onClick={() => handleSelectCompany(company)}
+          className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
+            <img
+              src={company.logo}
+              alt={company.name}
+              className="w-full h-full object-contain"
+              loading="lazy"
+              width={40}
+              height={40}
+            />
+          </div>
+
+          <div className="min-w-0">
+            <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">
+              {company.name}
+            </h4>
+            <p className="text-xs text-textMuted truncate">
+              {company.focus.join(', ')}
+            </p>
           </div>
         </div>
-      )}
+      ))}
+    </div>
+  </div>
+)}
 
       {/* Company Grid */}
-      {isLoadingCompanies ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-white/5 dark:bg-white/5 border border-black/20 dark:border-white/5 rounded-3xl h-[280px]"></div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {isLoadingCompanies ? (
-            Array.from({ length: 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="bg-glass border border-black/20 dark:border-white/20 rounded-2xl p-4 sm:p-6 animate-pulse"
-              >
-                {/* Logo & Badge */}
-                <div className="flex items-start justify-between mb-5 sm:mb-6">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
-                  <div className="h-6 w-20 rounded-full bg-white/10" />
-                </div>
-
-                {/* Title */}
-                <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
-
-                {/* Description */}
-                <div className="h-4 w-full rounded bg-white/10 mb-2" />
-                <div className="h-4 w-5/6 rounded bg-white/10 mb-6" />
-
-                {/* Progress */}
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <div className="h-3 w-16 rounded bg-white/10" />
-                    <div className="h-3 w-12 rounded bg-white/10" />
-                  </div>
-
-                  <div className="h-2 rounded-full bg-white/10" />
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {isLoadingCompanies ? (
+          [...Array(8)].map((_, idx) => (
+            <div
+              key={idx}
+              className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-4 sm:p-6 animate-pulse flex flex-col"
+            >
+              <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
+                <div className="h-6 w-20 rounded-full bg-white/10" />
               </div>
-            ))
-          ) : filteredCompanies.length > 0 ? (
-            filteredCompanies.map(company => (
-              <CompanyCard
-                key={company.id}
-                company={company}
-                progress={progress}
-                onClick={handleSelectCompany}
-              />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20 text-textMuted">
-              No companies found matching your criteria.
+              <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
+              <div className="h-4 w-full rounded bg-white/10 mb-2" />
+              <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-medium text-textMuted">
+                  <div className="h-4 w-16 rounded bg-white/10" />
+                  <div className="h-4 w-10 rounded bg-white/10" />
+                </div>
+                <div className="h-2 rounded-full bg-white/10" />
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          ))
+        ) : filteredCompanies.length > 0 ? (
+          filteredCompanies.map(company => (
+            <CompanyCard
+              key={company.id}
+              company={company}
+              progress={progress}
+              onClick={handleSelectCompany}
+            />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-20 text-textMuted">
+            No companies found matching your criteria.
+          </div>
+        )}
+      </div>
 
       {/* COMPANY MODAL - Uses Portal to escape sidebar stacking context */}
       {selectedCompany && createPortal(

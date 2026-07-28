@@ -28,6 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [companies, setCompanies] = useState<any[]>([]);
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
+  const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
 
     useEffect(() => {
     const loadCompanies = async () => {
@@ -434,15 +435,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       {/*Radar Chart*/}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-
-        <SkillRadarChart
-          programming={getCategoryProgress('programming').passed > 0 ? getCategoryProgress('programming').percent : 0}
-          dsa={getCategoryProgress('dsa').passed > 0 ? getCategoryProgress('dsa').percent : 0}
-          design={getCategoryProgress('design').passed > 0 ? getCategoryProgress('system-design').percent : 0}
-          
-        />
-      </div>
+      <SkillRadarChart
+        programming={getCategoryProgress('programming').passed > 0 ? getCategoryProgress('programming').percent : 0}
+        dsa={getCategoryProgress('dsa').passed > 0 ? getCategoryProgress('dsa').percent : 0}
+        design={getCategoryProgress('design').passed > 0 ? getCategoryProgress('design').percent : 0}
+      />
 
 
       {/* Career Mode Widgets (Saved Questions & Mock Interview History) */}

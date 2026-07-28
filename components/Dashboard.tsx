@@ -12,6 +12,7 @@ import { Leaderboard } from './Leaderboard';
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
+import SkillRadarChart from "../components/SkillRadarChart";
 
 interface DashboardProps {
   user: User;
@@ -27,6 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [companies, setCompanies] = useState<any[]>([]);
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
+  const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
 
     useEffect(() => {
     const loadCompanies = async () => {
@@ -37,6 +39,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         // Calculate SRS Due Questions
         const careerProgress = storageService.getCareerProgress();
         const srsMap = careerProgress.srsData || {};
+
         let count = 0;
         const now = new Date();
 
@@ -148,8 +151,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const getCategoryProgress = (catId: string) => {
     const catCourses = courses.filter(c => c.categoryId === catId);
     const catPassed = catCourses.filter(c => allProgress.find(p => p.courseId === c.id)?.passed).length;
-    return { 
-      total: catCourses.length, 
+    return {
+      total: catCourses.length,
       passed: catPassed,
       percent: catCourses.length ? Math.round((catPassed / catCourses.length) * 100) : 0
     };
@@ -177,14 +180,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   };
 
   const handleTourComplete = async () => {
-      setShowTour(false);
-      // Persist that user has seen tour
-      const updatedUser = { ...user, settings: { ...user.settings, hasSeenTour: true } };
-      try {
-        await storageService.updateUser(updatedUser);
-      } catch (error) {
-        console.error('Error persisting tour completion:', error);
-      }
+    setShowTour(false);
+    // Persist that user has seen tour
+    const updatedUser = { ...user, settings: { ...user.settings, hasSeenTour: true } };
+    try {
+      await storageService.updateUser(updatedUser);
+    } catch (error) {
+      console.error('Error persisting tour completion:', error);
+    }
   };
 
   const getPercentClass = (p: number, type: 'h' | 'w') => {
@@ -214,54 +217,54 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
-           <div className="flex flex-wrap items-center gap-3 mb-1">
-               <h2 className="text-3xl font-display font-bold text-textMain">Dashboard</h2>
-               <button 
-                 onClick={() => setShowTour(true)}
-                 className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primaryLight text-xs font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors border border-primary/20"
-               >
-                  <Map size={14} /> Take a Tour
-               </button>
-           </div>
-           <p className="text-textMuted">Overview of your learning journey</p>
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <h2 className="text-3xl font-display font-bold text-textMain">Dashboard</h2>
+            <button
+              onClick={() => setShowTour(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primaryLight text-xs font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors border border-primary/20"
+            >
+              <Map size={14} /> Take a Tour
+            </button>
+          </div>
+          <p className="text-textMuted">Overview of your learning journey</p>
         </div>
         <div className="relative w-full md:w-80 group">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={20} />
-           <input 
-             type="text" 
-             placeholder="Search courses..." 
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
-           />
-           {searchQuery.trim() !== "" && (
-  <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-black/20 dark:border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden">
-    {filteredCourses.length > 0 ? (
-      <>
-        {filteredCourses.map(course => (
-          <Link
-            key={course.id}
-            to={`/course/${course.id}`}
-            className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors border-b border-black/20 dark:border-white/5 last:border-0"
-          >
-            <span className="text-textMain text-sm font-medium">{course.title}</span>
-            <ChevronRight size={16} className="text-textMuted" />
-          </Link>
-        ))}
-        <Link
-          to="/courses"
-          className="block p-3 text-center text-xs font-bold text-primaryLight uppercase tracking-wider bg-white/5 hover:bg-white/10"
-        >
-          View All Results
-        </Link>
-      </>
-    ) : (
-      <div className="p-4 text-center text-textMuted">
-        No courses found matching your criteria.
-      </div>
-    )}
-  </div>
-)}
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={20} />
+          <input
+            type="text"
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+          />
+          {searchQuery.trim() !== "" && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-black/20 dark:border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden">
+              {filteredCourses.length > 0 ? (
+                <>
+                  {filteredCourses.map(course => (
+                    <Link
+                      key={course.id}
+                      to={`/course/${course.id}`}
+                      className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors border-b border-black/20 dark:border-white/5 last:border-0"
+                    >
+                      <span className="text-textMain text-sm font-medium">{course.title}</span>
+                      <ChevronRight size={16} className="text-textMuted" />
+                    </Link>
+                  ))}
+                  <Link
+                    to="/courses"
+                    className="block p-3 text-center text-xs font-bold text-primaryLight uppercase tracking-wider bg-white/5 hover:bg-white/10"
+                  >
+                    View All Results
+                  </Link>
+                </>
+              ) : (
+                <div className="p-4 text-center text-textMuted">
+                  No courses found matching your criteria.
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -323,7 +326,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <div className="flex flex-wrap items-center gap-3 mb-2">
               <h2 className="text-2xl font-bold text-textMain">Keep it up, {user.username}!</h2>
               {user.streak > 0 && (
-                <button 
+                <button
                   onClick={() => setShowStreakModal(true)}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer hover:scale-105 transition-all hover:bg-orange-500/20 active:scale-95"
                   title="Click to view streak celebration"
@@ -336,14 +339,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <p className="text-textMuted mb-6 max-w-lg">
               You've completed <span className="text-textMain font-bold">{completedCount}</span> out of <span className="text-textMain font-bold">{totalCourses}</span> available courses.
             </p>
-            
+
             <div className="flex flex-wrap gap-4">
-               <Link to="/courses" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/20 text-textMain rounded-lg font-medium transition-colors">
-                  Continue Learning
-               </Link>
-               <Link to="/certifications" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all">
-                  View Certificates
-               </Link>
+              <Link to="/courses" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/20 text-textMain rounded-lg font-medium transition-colors">
+                Continue Learning
+              </Link>
+              <Link to="/certifications" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all">
+                View Certificates
+              </Link>
             </div>
           </div>
           <div className="absolute right-0 top-0 h-full w-2/3 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
@@ -355,23 +358,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <div className="flex-1 flex items-end gap-2 sm:gap-4 min-h-[130px] sm:min-h-[150px]">
             {chartData.map((data, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                 <div className="relative w-full bg-black/5 dark:bg-white/5 rounded-t-lg h-32 flex items-end overflow-hidden">
-                    <div 
-                      className={`w-full transition-all duration-1000 ease-out group-hover:opacity-80
+                <div className="relative w-full bg-black/5 dark:bg-white/5 rounded-t-lg h-32 flex items-end overflow-hidden">
+                  <div
+                    className={`w-full transition-all duration-1000 ease-out group-hover:opacity-80
                         ${idx === 0 ? 'bg-primaryLight' : idx === 1 ? 'bg-blue-400' : 'bg-pink-400'}
                         ${getPercentClass(Math.max(data.percent, 5), 'h')}
                       `}
-                    />
-                 </div>
-                 <div className="text-[10px] sm:text-xs text-textMuted text-center font-medium truncate w-full" title={data.label}>
-                   {data.label.split(' ')[0]}
-                 </div>
+                  />
+                </div>
+                <div className="text-[10px] sm:text-xs text-textMuted text-center font-medium truncate w-full" title={data.label}>
+                  {data.label.split(' ')[0]}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-      
+
       {/* Recommended For You */}
       {recommendedCourses.length > 0 && (
         <div id="dash-recommended">
@@ -408,28 +411,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           {CATEGORIES.map(category => {
             const stats = getCategoryProgress(category.id);
             return (
-              <Link 
-                key={category.id} 
+              <Link
+                key={category.id}
                 to={`/category/${category.id}`}
                 className="group bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/20 dark:border-white/10 p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
               >
                 <div className="flex items-center justify-between mb-4">
-                   <div className="w-12 h-12 rounded-xl bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/20 dark:border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                     {getIcon(category.icon)}
-                   </div>
-                   <div className="text-xs font-bold bg-white/50 dark:bg-white/5 px-3 py-1 rounded-full text-textMuted">
-                      {stats.passed}/{stats.total}
-                   </div>
+                  <div className="w-12 h-12 rounded-xl bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/20 dark:border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    {getIcon(category.icon)}
+                  </div>
+                  <div className="text-xs font-bold bg-white/50 dark:bg-white/5 px-3 py-1 rounded-full text-textMuted">
+                    {stats.passed}/{stats.total}
+                  </div>
                 </div>
                 <h4 className="text-lg font-bold text-textMain mb-1">{category.title}</h4>
                 <div className="w-full bg-black/5 dark:bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
-                   <div className={`h-full bg-gradient-to-r from-primary to-primaryLight transition-all duration-500 ${getPercentClass(stats.percent, 'w')}`} />
+                  <div className={`h-full bg-gradient-to-r from-primary to-primaryLight transition-all duration-500 ${getPercentClass(stats.percent, 'w')}`} />
                 </div>
               </Link>
             );
           })}
         </div>
       </div>
+
+      {/*Radar Chart*/}
+      <SkillRadarChart
+        programming={getCategoryProgress('programming').passed > 0 ? getCategoryProgress('programming').percent : 0}
+        dsa={getCategoryProgress('dsa').passed > 0 ? getCategoryProgress('dsa').percent : 0}
+        design={getCategoryProgress('design').passed > 0 ? getCategoryProgress('design').percent : 0}
+      />
+
 
       {/* Career Mode Widgets (Saved Questions & Mock Interview History) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -543,7 +554,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       <div id="dash-leaderboard" className="mt-8">
         <Leaderboard />
       </div>
-      
+
       {showStreakModal && (
         <StreakCelebration user={user} onClose={() => setShowStreakModal(false)} />
       )}

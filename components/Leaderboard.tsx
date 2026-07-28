@@ -120,6 +120,9 @@ export const Leaderboard: React.FC = () => {
                     src={user.photoURL || AVATARS[user.avatarId || '1']}
                     alt={user.username}
                     className="w-12 h-12 rounded-full object-cover border border-black/20 dark:border-white/10 bg-black/20"
+                    loading="lazy"
+                    width={48}
+                    height={48}
                   />
                   {index < 3 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">

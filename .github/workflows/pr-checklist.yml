@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check PR Body for Mandatory Checkbox
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Read the PR body from the GitHub context
-          PR_BODY="${{ github.event.pull_request.body }}"
-          
           # Check if the specific mandatory string with an [x] exists
           if echo "$PR_BODY" | grep -q "\- \[x\] \*\*MANDATORY: I have tested these changes locally and verified that they do not break existing functionality or UX.\*\*"; then
             echo "Success: Mandatory testing checkbox is checked!"

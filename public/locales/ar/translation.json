@@ -7,7 +7,9 @@
     "admin": "Admin",
     "settings": "Settings",
     "logout": "Log Out",
-    "menu": "Menu"
+    "menu": "Menu",
+    "openMenu": "Open Menu",
+"closeMenu": "Close Menu"
   },
   "common": {
     "cancel": "Cancel",

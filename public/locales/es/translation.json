@@ -7,7 +7,9 @@
     "admin": "Administración",
     "settings": "Configuración",
     "logout": "Cerrar Sesión",
-    "menu": "Menú"
+    "menu": "Menú",
+    "openMenu": "Abrir Menú",
+"closeMenu": "Cerrar Menú"
   },
   "common": {
     "cancel": "Cancelar",
@@ -36,9 +38,9 @@
   "profile": {
     "title": "Configuración del perfil",
     "displayName": "Nombre para mostrar",
-    "displayNamePlaceholder": "Ingrese el nombre para mostrar",
+    "displayNamePlaceholder": "Ingresa el nombre para mostrar",
     "email": "Dirección de correo electrónico",
-    "emailPlaceholder": "Ingrese la dirección de correo electrónico",
+    "emailPlaceholder": "Ingresa la dirección de correo electrónico",
     "memberSince": "Miembro desde",
     "avatar": "Avatar",
     "uploadAvatar": "Subir avatar personalizado",
@@ -66,9 +68,9 @@
     "title": "Preferencias de aprendizaje",
     "dailyGoal": "Objetivo diario de estudio",
     "reminders": "Recordatorios de progreso",
-    "remindersDesc": "Reciba notificaciones para mantener su racha",
+    "remindersDesc": "Recibe notificaciones para mantener tu racha",
     "autoSave": "Guardar notas automáticamente",
-    "autoSaveDesc": "Guardar automáticamente su progreso"
+    "autoSaveDesc": "Guarda automáticamente tu progreso"
   },
   "quiz": {
     "title": "Preferencias de cuestionarios",
@@ -109,7 +111,7 @@
     "clearTitle": "¿Borrar todos los datos?",
     "clearBody": "Esto eliminará su cuenta y todos los datos asociados de este navegador. Se cerrará su sesión.",
     "unsavedTitle": "Cambios sin guardar",
-    "unsavedBody": "Tiene cambios sin guardar. ¿Está seguro de que desea salir sin guardar?",
+    "unsavedBody": "Tienes cambios sin guardar. ¿Estás seguro de que deseas salir sin guardar?",
     "stay": "Permanecer",
     "leave": "Salir"
   }

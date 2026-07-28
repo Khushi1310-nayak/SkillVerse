@@ -188,7 +188,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
          <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
-         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title="Open Menu" aria-label="Open Menu">
+         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
             <Menu />
          </button>
       </div>
@@ -200,7 +200,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-black/20 dark:border-white/10 p-6 flex flex-col animate-slide-right">
              <div className="flex justify-between items-center mb-8">
                 <span className="text-xl font-bold text-textMain">{t('nav.menu')}</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title="Close Menu" aria-label="Close Menu"><X /></button>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title={t('nav.closeMenu')} aria-label={t('nav.closeMenu')}><X /></button>
              </div>
              <nav className="space-y-2 flex-1">
                 <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />

@@ -40,7 +40,7 @@ const BADGE_ICONS: Record<string, any> = {
 };
 
 export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpdateUser, onLogout }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
@@ -444,7 +444,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </div>
 
                 <div className="pt-4 border-t border-black/20 dark:border-white/10">
-                  <p className="text-sm text-textMuted">{t('settings.profile.memberSince')} <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString()}</span></p>
+                  <p className="text-sm text-textMuted">{t('settings.profile.memberSince')} <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString(i18n.language)}</span></p>
                 </div>
               </div>
             )}

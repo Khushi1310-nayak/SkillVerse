@@ -15,6 +15,64 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar"
   },
+  "dashboard": {
+    "loading": "Cargando panel...",
+    "header": {
+      "title": "Panel",
+      "tourButton": "Hacer un recorrido",
+      "subtitle": "Resumen de tu viaje de aprendizaje"
+    },
+    "search": {
+      "placeholder": "Buscar cursos...",
+      "viewAll": "Ver todos los resultados",
+      "empty": "No se encontraron cursos que coincidan con tus criterios."
+    },
+    "continue": {
+      "title": "Continúa donde lo dejaste",
+      "button": "Reanudar"
+    },
+    "reviewQueue": {
+      "title": "Revisión de repetición espaciada",
+      "messageOne": "Tienes {{count}} pregunta pendiente para revisar hoy.",
+      "messageOther": "Tienes {{count}} preguntas pendientes para revisar hoy.",
+      "button": "Revisar ahora"
+    },
+    "stats": {
+      "greeting": "¡Sigue así, {{username}}!",
+      "streakTooltip": "Haz clic para ver la celebración de la racha",
+      "streakOne": "{{count}} día de racha",
+      "streakOther": "{{count}} días de racha",
+      "summary": "Has completado {{completedCount}} de {{totalCourses}} cursos disponibles.",
+      "continueLearning": "Seguir aprendiendo",
+      "viewCertificates": "Ver certificados",
+      "progressTitle": "Progreso por categoría"
+    },
+    "recommended": {
+      "title": "Recomendado para ti"
+    },
+    "categories": {
+      "title": "Acceso rápido",
+      "programming": "Programación",
+      "dsa": "DSA",
+      "design": "Diseño",
+      "default": "Categoría"
+    },
+    "reminder": {
+      "message": "Recordatorio: alcanza tu meta diaria de {{dailyGoal}} minutos para mantener tu racha."
+    },
+    "savedQuestions": {
+      "title": "Preguntas guardadas",
+      "practiceLink": "Practicar →",
+      "viewAll": "Ver las {{count}} preguntas guardadas →",
+      "emptyMessage": "¡Aún no has guardado ninguna pregunta! Dirígete al modo Carrera para empezar a practicar.",
+      "button": "Explorar preguntas"
+    },
+    "mockHistory": {
+      "title": "Historial de entrevistas simuladas",
+      "emptyMessage": "Inicia una entrevista simulada en el modo Carrera para poner a prueba tus habilidades en condiciones reales.",
+      "button": "Iniciar entrevista simulada"
+    }
+  },
   "logout": {
     "title": "¿Cerrar Sesión?",
     "body": "¿Estás seguro de que deseas cerrar sesión?"

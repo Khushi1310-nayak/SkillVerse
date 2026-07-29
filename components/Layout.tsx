@@ -13,6 +13,7 @@ import {
   Briefcase,
   Shield
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
@@ -33,6 +34,7 @@ const AVATARS: Record<string, string> = {
 };
 
 export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallback }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -149,14 +151,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
         </Link>
 
         <nav className="flex-1 space-y-2">
-          <NavItem to="/" icon={LayoutDashboard} label="Dashboard" id="nav-dashboard" />
-          <NavItem to="/courses" icon={BookOpen} label="Courses" id="nav-courses" />
-          <NavItem to="/career" icon={Briefcase} label="Career Mode" id="nav-career" />
-          <NavItem to="/certifications" icon={Award} label="Certifications" id="nav-certs" />
+          <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} id="nav-dashboard" />
+          <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} id="nav-courses" />
+          <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
+          <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
           {showAdminLink && (
-            <NavItem to="/admin" icon={Shield} label="Admin" id="nav-admin" />
+            <NavItem to="/admin" icon={Shield} label={t('nav.admin')} id="nav-admin" />
           )}
-          <NavItem to="/settings" icon={Settings} label="Settings" id="nav-settings" />
+          <NavItem to="/settings" icon={Settings} label={t('nav.settings')} id="nav-settings" />
         </nav>
 
         <div className="pt-6 border-t border-black/20 dark:border-white/5 overflow-hidden">
@@ -178,7 +180,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-red-500/10 hover:text-red-400 transition-all overflow-hidden"
           >
             <div className="min-w-[20px] flex items-center justify-center"><LogOut size={20} /></div>
-            <span className="font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Log Out</span>
+            <span className="font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">{t('nav.logout')}</span>
           </button>
         </div>
       </aside>
@@ -186,7 +188,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
          <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
-         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title="Open Menu" aria-label="Open Menu">
+         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
             <Menu />
          </button>
       </div>
@@ -197,24 +199,24 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-black/20 dark:border-white/10 p-6 flex flex-col animate-slide-right">
              <div className="flex justify-between items-center mb-8">
-                <span className="text-xl font-bold text-textMain">Menu</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title="Close Menu" aria-label="Close Menu"><X /></button>
+                <span className="text-xl font-bold text-textMain">{t('nav.menu')}</span>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title={t('nav.closeMenu')} aria-label={t('nav.closeMenu')}><X /></button>
              </div>
              <nav className="space-y-2 flex-1">
-                <NavItem to="/" icon={LayoutDashboard} label="Dashboard" />
-                <NavItem to="/courses" icon={BookOpen} label="Courses" />
-                <NavItem to="/career" icon={Briefcase} label="Career Mode" />
-                <NavItem to="/certifications" icon={Award} label="Certifications" />
+                <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
+                <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
+                <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
+                <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
                 {showAdminLink && (
-                  <NavItem to="/admin" icon={Shield} label="Admin" />
+                  <NavItem to="/admin" icon={Shield} label={t('nav.admin')} />
                 )}
-                <NavItem to="/settings" icon={Settings} label="Settings" />
+                <NavItem to="/settings" icon={Settings} label={t('nav.settings')} />
              </nav>
              <button 
                 onClick={() => setShowLogoutConfirm(true)}
                 className="flex items-center gap-3 px-4 py-3 text-red-400 font-medium"
               >
-                <LogOut size={20} /> Log Out
+                <LogOut size={20} /> {t('nav.logout')}
               </button>
           </div>
         </div>
@@ -237,20 +239,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
                  <AlertTriangle size={24} />
               </div>
-              <h3 className="text-xl font-bold text-textMain text-center mb-2">Log Out?</h3>
-              <p className="text-textMuted text-center mb-6">Are you sure you want to log out of your account?</p>
+              <h3 className="text-xl font-bold text-textMain text-center mb-2">{t('logout.title')}</h3>
+              <p className="text-textMuted text-center mb-6">{t('logout.body')}</p>
               <div className="flex gap-4">
                  <button 
                    onClick={() => setShowLogoutConfirm(false)}
                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
                  >
-                   Cancel
+                   {t('common.cancel')}
                  </button>
                  <button 
                    onClick={confirmLogout}
                    className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
                  >
-                   Log Out
+                   {t('nav.logout')}
                  </button>
               </div>
            </div>

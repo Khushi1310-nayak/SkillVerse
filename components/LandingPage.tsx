@@ -11,6 +11,7 @@ import { GoldSnow } from './GoldSnow';
 import { AIAssistant } from './AIAssistant';
 import { FeatureCard } from './ui/FeatureCard';
 import { FAQSection } from './FAQSection';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -460,8 +461,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   </ul>
                </div>
             </div>
-            <div className="border-t border-black/20 dark:border-white/10 pt-8 text-center text-sm text-textMuted animate-fade-in [animation-delay:400ms]">
-               © 2026 SkillVerse Inc. All rights reserved.
+            <div className="border-t border-black/20 dark:border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-textMuted animate-fade-in [animation-delay:400ms]">
+               <span>© 2026 SkillVerse Inc. All rights reserved.</span>
+               <LanguageSwitcher />
             </div>
          </div>
       </footer>

@@ -13,7 +13,12 @@
   },
   "common": {
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
   },
   "dashboard": {
     "loading": "Loading dashboard...",
@@ -71,6 +76,42 @@
       "title": "Mock Interview History",
       "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
       "button": "Start Mock Interview"
+    }
+  },
+  "courses": {
+    "title": "Explore Courses",
+    "subtitle": "Expand your knowledge with our premium curriculum.",
+    "searchPlaceholder": "Search courses...",
+    "filterTitle": "Filter by category",
+    "allCategories": "All Categories",
+    "categories": {
+      "programming": "Programming",
+      "dsa": "DSA",
+      "design": "Design",
+      "default": "Category"
+    },
+    "review": "Review",
+    "startLearning": "Start Learning",
+    "empty": "No courses found matching your criteria."
+  },
+  "categoryView": {
+    "loading": "Loading category courses...",
+    "backToDashboard": "Back to Dashboard",
+    "review": "Review",
+    "start": "Start",
+    "categories": {
+      "programming": {
+        "title": "Programming",
+        "description": "Build real-world technical skills through practical programming lessons and projects."
+      },
+      "dsa": {
+        "title": "DSA",
+        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+      },
+      "design": {
+        "title": "Design",
+        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+      }
     }
   },
   "logout": {

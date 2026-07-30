@@ -173,6 +173,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     }
   };
 
+  const getDifficultyLabel = (level: string) => {
+    switch (level) {
+      case 'Beginner': return t('common.difficulty.beginner');
+      case 'Intermediate': return t('common.difficulty.intermediate');
+      case 'Advanced': return t('common.difficulty.advanced');
+      default: return level;
+    }
+  };
+
   const chartData = useMemo(() => {
     return CATEGORIES.map(cat => ({
       label: getCategoryLabel(cat.id),
@@ -409,7 +418,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-white/20 dark:border-white/10 p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="text-xs font-bold text-primaryLight uppercase tracking-wider mb-2">
-                  {course.level}
+                  {getDifficultyLabel(course.level)}
                 </div>
                 <h4 className="text-base font-bold text-textMain leading-snug">
                   {course.title}

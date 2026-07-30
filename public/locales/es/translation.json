@@ -13,7 +13,12 @@
   },
   "common": {
     "cancel": "Cancelar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "difficulty": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    }
   },
   "dashboard": {
     "loading": "Cargando panel...",
@@ -71,6 +76,105 @@
       "title": "Historial de entrevistas simuladas",
       "emptyMessage": "Inicia una entrevista simulada en el modo Carrera para poner a prueba tus habilidades en condiciones reales.",
       "button": "Iniciar entrevista simulada"
+    }
+  },
+  "courses": {
+    "title": "Explorar cursos",
+    "subtitle": "Amplía tus conocimientos con nuestro plan de estudios premium.",
+    "searchPlaceholder": "Buscar cursos...",
+    "filterTitle": "Filtrar por categoría",
+    "allCategories": "Todas las categorías",
+    "categories": {
+      "programming": "Programación",
+      "dsa": "DSA",
+      "design": "Diseño",
+      "default": "Categoría"
+    },
+    "review": "Revisar",
+    "startLearning": "Empezar a aprender",
+    "empty": "No se encontraron cursos que coincidan con tus criterios."
+  },
+  "categoryView": {
+    "loading": "Cargando cursos de la categoría...",
+    "backToDashboard": "Volver al panel",
+    "review": "Revisar",
+    "start": "Empezar",
+    "categories": {
+      "programming": {
+        "title": "Programación",
+        "description": "Desarrolla habilidades técnicas del mundo real con lecciones y proyectos de programación prácticos."
+      },
+      "dsa": {
+        "title": "DSA",
+        "description": "Fortalece tu pensamiento algorítmico con estructuras de datos y práctica de resolución de problemas."
+      },
+      "design": {
+        "title": "Diseño",
+        "description": "Desarrolla tu intuición visual y de diseño de producto con lecciones creativas prácticas."
+      }
+    }
+  },
+  "courseView": {
+    "notFound": "No se encontró el curso",
+    "loading": "Cargando material del curso...",
+    "back": "Volver",
+    "navigation": {
+      "notesResources": "Notas y recursos",
+      "finalQuiz": "Examen final"
+    },
+    "resources": {
+      "title": "Recursos externos",
+      "proceed": "Continuar al examen"
+    },
+    "quiz": {
+      "question": "Pregunta {{current}}",
+      "questionCount": "{{total}}",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "submit": "Enviar examen",
+      "result": {
+        "congratulations": "¡Felicitaciones!",
+        "keepTrying": "¡Sigue intentando!",
+        "scorePrefix": "Obtuviste",
+        "earnedCertificate": "Has ganado un certificado.",
+        "need70": "Necesitas 70% para aprobar.",
+        "viewCertificate": "Ver certificado",
+        "retryReminder": "Tómate un momento para repasar el material del curso antes de intentarlo de nuevo.",
+        "retryCountdown": "⏳ Puedes volver a intentarlo en {{time}}",
+        "retry": "Reintentar examen",
+        "retryDisabled": "Reintentar exámenes está deshabilitado en tu configuración.",
+        "reviewAnswers": "Revisar respuestas"
+      }
+    }
+  },
+  "aiAssistant": {
+    "welcome": "¡Hola! Soy tu tutor de IA para **{{courseTitle}}**.\n\nPuedo explicarte conceptos, darte ejemplos o hacerte preguntas sobre lo que has aprendido. ¿Cómo puedo ayudarte hoy?",
+    "fallbackResponse": "No pude generar una respuesta. Inténtalo de nuevo.",
+    "header": {
+      "title": "Asistente de aprendizaje",
+      "collapse": "Contraer",
+      "expand": "Expandir",
+      "close": "Cerrar asistente de IA"
+    },
+    "status": {
+      "thinking": "Pensando..."
+    },
+    "input": {
+      "placeholder": "Haz una pregunta...",
+      "send": "Enviar mensaje"
+    },
+    "suggestions": {
+      "explain": "Explícame de forma sencilla",
+      "quiz": "Hazme una prueba",
+      "example": "Dame un ejemplo"
+    },
+    "toggle": {
+      "open": "Abrir asistente de IA"
+    },
+    "error": {
+      "connection": "Lo siento, estoy teniendo problemas para conectar en este momento. Revisa tu conexión o tu clave de API.",
+      "api": "¡Vaya! Hubo un problema con tu clave de API de OpenRouter (facturación o autenticación).\n\n*Respuesta de respaldo simulada*:\nLe preguntaste sobre: \"{{userMessage}}\". Como la API está caída, puedo ver que actualmente estás en el contexto de \"{{courseTitle}}\". ¡Sigue practicando!",
+      "defaultCourse": "tu panel"
     }
   },
   "logout": {

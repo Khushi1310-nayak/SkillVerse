@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
@@ -11,6 +12,7 @@ import NotFound from './NotFound';
 export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [course, setCourse] = useState<Course | null>(null);
   const [loadingCourse, setLoadingCourse] = useState(true);
 
@@ -120,7 +122,7 @@ export const CourseView: React.FC = () => {
     };
   }, [id]);
 
-  if (!course) return <div>Course not found</div>;
+  if (!course) return <div>{t('courseView.notFound')}</div>;
 
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
@@ -192,7 +194,7 @@ export const CourseView: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#03060C] flex flex-col items-center justify-center">
         <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading course material...</div>
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('courseView.loading')}</div>
       </div>
     );
   }
@@ -211,7 +213,7 @@ export const CourseView: React.FC = () => {
       {/* Sidebar Navigation */}
       <div className="lg:col-span-1 space-y-6">
         <Link to={`/category/${course.categoryId}`} className="inline-flex items-center text-textMuted hover:text-textMain transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Back
+          <ArrowLeft size={20} className="mr-2" /> {t('courseView.back')}
         </Link>
 
         <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 sticky top-28">
@@ -224,14 +226,14 @@ export const CourseView: React.FC = () => {
               onClick={() => setActiveTab('learn')}
               className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
             >
-              <span>Notes & Resources</span>
+              <span>{t('courseView.navigation.notesResources')}</span>
               {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
             </button>
             <button
               onClick={() => setActiveTab('quiz')}
               className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
             >
-              <span>Final Quiz</span>
+              <span>{t('courseView.navigation.finalQuiz')}</span>
               {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
             </button>
           </div>
@@ -250,7 +252,7 @@ export const CourseView: React.FC = () => {
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">
-                <h3 className="text-lg font-bold text-textMain mb-4">External Resources</h3>
+                <h3 className="text-lg font-bold text-textMain mb-4">{t('courseView.resources.title')}</h3>
                 <div className="flex flex-wrap gap-4">
                   {course.resources.map((res, i) => (
                     <a key={i} href={res.url} className="px-4 py-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-lg text-primaryLight text-sm transition-colors">
@@ -265,7 +267,7 @@ export const CourseView: React.FC = () => {
                   onClick={() => setActiveTab('quiz')}
                   className="bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
                 >
-                  Proceed to Quiz
+                  {t('courseView.resources.proceed')}
                 </button>
               </div>
             </div>
@@ -274,7 +276,10 @@ export const CourseView: React.FC = () => {
               {!quizSubmitted ? (
                 <>
                   <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-bold text-textMain">Question {currentQuestion + 1} <span className="text-textMuted text-lg">/ {course.quiz.length}</span></h2>
+                    <h2 className="text-2xl font-bold text-textMain">
+                      {t('courseView.quiz.question', { current: currentQuestion + 1 })}{' '}
+                      <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: course.quiz.length })}</span>
+                    </h2>
                     <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
                       <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
                     </div>
@@ -331,14 +336,14 @@ export const CourseView: React.FC = () => {
                       disabled={currentQuestion === 0}
                       className="px-6 py-2 rounded-lg text-textMuted hover:text-textMain disabled:opacity-50"
                     >
-                      Previous
+                      {t('courseView.quiz.previous')}
                     </button>
                     {currentQuestion < course.quiz.length - 1 ? (
                       <button
                         onClick={() => setCurrentQuestion(currentQuestion + 1)}
                         className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors"
                       >
-                        Next
+                        {t('courseView.quiz.next')}
                       </button>
                     ) : (
                       <button
@@ -346,7 +351,7 @@ export const CourseView: React.FC = () => {
                         disabled={selectedAnswers.length < course.quiz.length}
                         className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Submit Quiz
+                        {t('courseView.quiz.submit')}
                       </button>
                     )}
                   </div>
@@ -357,10 +362,11 @@ export const CourseView: React.FC = () => {
                     {passed ? <Award size={64} className="text-yellow-400" /> : <XCircle size={64} className="text-red-400" />}
                   </div>
 
-                  <h2 className="text-3xl font-bold text-textMain mb-2">{passed ? 'Congratulations!' : 'Keep Trying!'}</h2>
+                  <h2 className="text-3xl font-bold text-textMain mb-2">{passed ? t('courseView.quiz.result.congratulations') : t('courseView.quiz.result.keepTrying')}</h2>
                   <p className="text-textMuted mb-8">
-                    You scored <span className={`font-bold ${passed ? 'text-success' : 'text-red-400'}`}>{score}%</span>.
-                    {passed ? ' You have earned a certificate.' : ' You need 70% to pass.'}
+                    {t('courseView.quiz.result.scorePrefix')}{' '}
+                    <span className={`font-bold ${passed ? 'text-success' : 'text-red-400'}`}>{score}%</span>.
+                    {passed ? ` ${t('courseView.quiz.result.earnedCertificate')}` : ` ${t('courseView.quiz.result.need70')}`}
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -369,7 +375,7 @@ export const CourseView: React.FC = () => {
                         to={`/certificate/${course.id}`}
                         className="flex items-center justify-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
                       >
-                        <Download size={20} /> View Certificate
+                        <Download size={20} /> {t('courseView.quiz.result.viewCertificate')}
                       </Link>
                     ) : (
                       settings?.retryQuiz !== false ? (
@@ -377,7 +383,7 @@ export const CourseView: React.FC = () => {
                           {timeLeft > 0 && (
                             <p className="text-orange-400 text-sm font-medium flex items-center gap-2">
                               <Clock size={14} />
-                              Take a moment to review the course material before trying again!
+                              {t('courseView.quiz.result.retryReminder')}
                             </p>
                           )}
                           <button
@@ -392,24 +398,24 @@ export const CourseView: React.FC = () => {
                             {timeLeft > 0 ? (
                               <>
                                 <Clock size={20} className="text-orange-400" />
-                                ⏳ You can retry in {formatCooldown(timeLeft)}
+                                {t('courseView.quiz.result.retryCountdown', { time: formatCooldown(timeLeft) })}
                               </>
                             ) : (
                               <>
-                                <RefreshCcw size={20} /> Retry Quiz
+                                <RefreshCcw size={20} /> {t('courseView.quiz.result.retry')}
                               </>
                             )}
                           </button>
                         </div>
                       ) : (
-                        <p className="text-textMuted italic mt-4 w-full">Retrying quizzes is disabled in your settings.</p>
+                        <p className="text-textMuted italic mt-4 w-full">{t('courseView.quiz.result.retryDisabled')}</p>
                       )
                     )}
                   </div>
 
                   {settings?.showAnswers && (
                     <div className="mt-16 space-y-6 text-left border-t border-black/20 dark:border-white/10 pt-10">
-                      <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Answers</h3>
+                      <h3 className="text-2xl font-bold text-textMain text-center mb-8">{t('courseView.quiz.result.reviewAnswers')}</h3>
                       {course.quiz.map((q, qIdx) => (
                         <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/20 dark:border-white/10">
                           <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>

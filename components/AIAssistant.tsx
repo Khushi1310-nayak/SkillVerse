@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MessageCircle, X, Send, Sparkles, Bot, User, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { COURSES, COMPANIES, CATEGORIES } from '../constants';
 
@@ -13,11 +14,12 @@ interface Message {
 }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseTitle }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: `Hi there! I'm your AI tutor for **${courseTitle}**. \n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?` }
+    { role: 'model', text: t('aiAssistant.welcome', { courseTitle }) }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -95,16 +97,16 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       }
 
       const data = await res.json();
-      const text = data.choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
+      const text = data.choices?.[0]?.message?.content || t('aiAssistant.fallbackResponse');
       
       setMessages(prev => [...prev, { role: 'model', text }]);
     } catch (error: any) {
       console.error("AI Error:", error);
       
-      let errorMessage = "Sorry, I'm having trouble connecting right now. Please check your connection or API key.";
+      let errorMessage = t('aiAssistant.error.connection');
       
       if (error?.message?.includes('401') || error?.message?.includes('429')) {
-         errorMessage = `Whoops! There was an issue with your OpenRouter API key (billing or authentication). \n\n*Mock Response Fallback*:\nYou asked about: "${userMessage}". Since the API is down, I can see you're currently in the context of "${courseTitle || 'your dashboard'}". Keep practicing!`;
+         errorMessage = t('aiAssistant.error.api', { userMessage, courseTitle: courseTitle || t('aiAssistant.error.defaultCourse') });
       }
       
       setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
@@ -127,13 +129,13 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
           <div className="p-4 bg-gradient-main flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2 text-white">
               <Bot size={20} />
-              <span className="font-bold">Learning Assistant</span>
+              <span className="font-bold">{t('aiAssistant.header.title')}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
-              <button onClick={() => setIsExpanded(!isExpanded)} className="hover:text-white transition-colors p-1" title={isExpanded ? "Collapse" : "Expand"} aria-label={isExpanded ? "Collapse" : "Expand"}>
+              <button onClick={() => setIsExpanded(!isExpanded)} className="hover:text-white transition-colors p-1" title={isExpanded ? t('aiAssistant.header.collapse') : t('aiAssistant.header.expand')} aria-label={isExpanded ? t('aiAssistant.header.collapse') : t('aiAssistant.header.expand')}>
                 {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </button>
-              <button onClick={() => setIsOpen(false)} className="hover:text-white transition-colors p-1" title="Close AI Assistant" aria-label="Close AI Assistant">
+              <button onClick={() => setIsOpen(false)} className="hover:text-white transition-colors p-1" title={t('aiAssistant.header.close')} aria-label={t('aiAssistant.header.close')}>
                 <X size={18} />
               </button>
             </div>
@@ -179,7 +181,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                   </div>
                   <div className="bg-white dark:bg-[#2A303C] rounded-2xl rounded-tl-none p-3 border border-black/20 dark:border-white/5 flex items-center gap-2">
                      <Loader2 size={16} className="animate-spin text-primaryLight" />
-                     <span className="text-xs text-textMuted">Thinking...</span>
+                     <span className="text-xs text-textMuted">{t('aiAssistant.status.thinking')}</span>
                   </div>
                </div>
             )}
@@ -194,21 +196,21 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Ask a question..."
+                  placeholder={t('aiAssistant.input.placeholder')}
                   className="flex-1 bg-black/5 dark:bg-black/20 border border-transparent focus:border-primaryLight rounded-xl px-4 py-3 text-textMain placeholder-textMuted focus:outline-none transition-all pr-10"
                 />
                 <button 
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
-                  title="Send message"
-                  aria-label="Send message"
+                  title={t('aiAssistant.input.send')}
+                  aria-label={t('aiAssistant.input.send')}
                 >
                   <Send size={16} />
                 </button>
              </div>
              <div className="mt-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                {['Explain simply', 'Give me a quiz', 'Give an example'].map(hint => (
+                {[t('aiAssistant.suggestions.explain'), t('aiAssistant.suggestions.quiz'), t('aiAssistant.suggestions.example')].map(hint => (
                    <button 
                      key={hint}
                      onClick={() => { setInput(hint); }}
@@ -228,8 +230,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
             id="ai-assistant-toggle"
             onClick={() => setIsOpen(true)}
             className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-main text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-fade-in-up"
-            title="Open AI Assistant"
-            aria-label="Open AI Assistant"
+            title={t('aiAssistant.toggle.open')}
+            aria-label={t('aiAssistant.toggle.open')}
         >
             <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 animate-pulse"></div>
             <Sparkles size={28} className="animate-pulse-slow" />

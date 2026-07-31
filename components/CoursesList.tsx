@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Search, Filter, PlayCircle, CheckCircle, ChevronDown } from 'lucide-react';
 import { CATEGORIES } from '../constants';
@@ -7,6 +8,7 @@ import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 
 export const CoursesList: React.FC = () => {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
@@ -28,6 +30,32 @@ export const CoursesList: React.FC = () => {
 
   const progress = storageService.getAllProgress();
 
+  const getDifficultyLabel = (level: string) => {
+    switch (level) {
+      case 'Beginner':
+        return t('common.difficulty.beginner');
+      case 'Intermediate':
+        return t('common.difficulty.intermediate');
+      case 'Advanced':
+        return t('common.difficulty.advanced');
+      default:
+        return level;
+    }
+  };
+
+  const getCategoryLabel = (categoryId: string) => {
+    switch (categoryId) {
+      case 'programming':
+        return t('courses.categories.programming');
+      case 'dsa':
+        return t('courses.categories.dsa');
+      case 'design':
+        return t('courses.categories.design');
+      default:
+        return t('courses.categories.default');
+    }
+  };
+
   const filtered = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
     const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
@@ -38,8 +66,8 @@ export const CoursesList: React.FC = () => {
     <div className="animate-fade-in space-y-8">
        <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-display font-bold text-textMain mb-2">Explore Courses</h1>
-            <p className="text-textMuted">Expand your knowledge with our premium curriculum.</p>
+            <h1 className="text-3xl font-display font-bold text-textMain mb-2">{t('courses.title')}</h1>
+            <p className="text-textMuted">{t('courses.subtitle')}</p>
           </div>
           
           <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
@@ -47,7 +75,7 @@ export const CoursesList: React.FC = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={18} />
                 <input 
                   type="text" 
-                  placeholder="Search courses..." 
+                  placeholder={t('courses.searchPlaceholder')} 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-11 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
@@ -57,13 +85,13 @@ export const CoursesList: React.FC = () => {
                 <select 
                   value={filterCat}
                   onChange={e => setFilterCat(e.target.value)}
-                  title="Filter by category"
-                  aria-label="Filter by category"
+                  title={t('courses.filterTitle')}
+                  aria-label={t('courses.filterTitle')}
                   className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
                 >
-                  <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">All Categories</option>
+                  <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allCategories')}</option>
                   {CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id} className="bg-white dark:bg-[#0B1220] text-textMain">{c.title}</option>
+                    <option key={c.id} value={c.id} className="bg-white dark:bg-[#0B1220] text-textMain">{getCategoryLabel(c.id)}</option>
                   ))}
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors" size={16} />
@@ -114,7 +142,7 @@ export const CoursesList: React.FC = () => {
                     : "bg-purple-500/10 text-purple-500"
                 }`}
               >
-                {course.level}
+                {getDifficultyLabel(course.level)}
               </span>
 
               {isPassed && <CheckCircle className="text-success" size={20} />}
@@ -134,7 +162,7 @@ export const CoursesList: React.FC = () => {
               </span>
 
               <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
-                {isPassed ? "Review" : "Start Learning"}
+                {isPassed ? t('courses.review') : t('courses.startLearning')}
                 <PlayCircle size={16} className="ml-2" />
               </span>
             </div>
@@ -144,7 +172,7 @@ export const CoursesList: React.FC = () => {
 
       {filtered.length === 0 && (
         <div className="col-span-full text-center py-20 text-textMuted">
-          No courses found matching your criteria.
+          {t('courses.empty')}
         </div>
       )}
     </>

@@ -110,9 +110,16 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   }, [isDirty]);
 
   const handleChange = (field: keyof UserSettings, value: any) => {
+    const updatedSettings = {
+      ...formData.settings,
+      [field]: value
+    };
+    if (field === 'theme') {
+      updatedSettings.activeTheme = value === 'light' ? 'light' : 'dark';
+    }
     const updatedUser = {
       ...formData,
-      settings: { ...formData.settings, [field]: value }
+      settings: updatedSettings
     };
     setFormData(updatedUser);
 

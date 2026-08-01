@@ -1,3 +1,4 @@
+import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-react';
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 
 export const CATEGORIES: Category[] = [
@@ -547,5 +548,73 @@ export const XP_STORE_CURSORS: XPStoreCursor[] = [
     description: 'Gleaming gold cursor for elite learners.',
     dotClass: 'bg-amber-400',
     ringClass: 'border-amber-400',
+  }
+];
+
+export const TOUR_STEPS = [
+  {
+    id: 'overview',
+    title: "Welcome to SkillVerse",
+    description: "Your all-in-one platform to master coding, design, and interview skills.",
+    icon: LayoutDashboard,
+    color: "from-blue-500 to-cyan-500",
+    features: [
+      "Track daily progress & streaks",
+      "Visualize your learning curve",
+      "Earn XP and level up"
+    ],
+    imageUrl: "/assets/tour/tour_overview_1783097943357.png"
+  },
+  {
+    id: 'courses',
+    title: "Structured Courses",
+    description: "Dive into comprehensive modules designed by industry experts.",
+    icon: BookOpen,
+    color: "from-purple-500 to-pink-500",
+    features: [
+      "Interactive coding notes",
+      "Built-in AI Tutor support",
+      "Quizzes to test knowledge"
+    ],
+    imageUrl: "/assets/tour/tour_courses_1783097954059.png"
+  },
+  {
+    id: 'career',
+    title: "Career Mode",
+    description: "Prepare for your dream job with real-world simulations.",
+    icon: Briefcase,
+    color: "from-emerald-500 to-green-500",
+    features: [
+      "Mock Interview Simulator",
+      "Company-specific questions",
+      "Readiness Score tracking"
+    ],
+    imageUrl: "/assets/tour/tour_career_1783097968924.png"
+  },
+  {
+    id: 'certifications',
+    title: "Get Certified",
+    description: "Prove your mastery with verifiable credentials.",
+    icon: Award,
+    color: "from-yellow-400 to-orange-500",
+    features: [
+      "Pass final exams (70%+)",
+      "Download PDF certificates",
+      "Share directly to LinkedIn"
+    ],
+    imageUrl: "/assets/tour/tour_certs_1783097979805.png"
+  },
+  {
+    id: 'settings',
+    title: "Customize Everything",
+    description: "Make the learning experience truly yours.",
+    icon: Settings,
+    color: "from-gray-400 to-slate-400",
+    features: [
+      "Dark/Light themes",
+      "Custom avatars",
+      "Learning goal settings"
+    ],
+    imageUrl: "/assets/tour/tour_settings_1783097991800.png"
   }
 ];

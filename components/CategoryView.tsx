@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, PlayCircle, Lock, ArrowLeft, Loader2 } from 'lucide-react';
 import { CATEGORIES } from '../constants';
@@ -8,6 +9,7 @@ import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 
 export const CategoryView: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const category = CATEGORIES.find(c => c.id === id);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -30,6 +32,26 @@ export const CategoryView: React.FC = () => {
 
   const progress = storageService.getAllProgress();
 
+  const getDifficultyLabel = (level: string) => {
+    switch (level) {
+      case 'Beginner':
+        return t('common.difficulty.beginner');
+      case 'Intermediate':
+        return t('common.difficulty.intermediate');
+      case 'Advanced':
+        return t('common.difficulty.advanced');
+      default:
+        return level;
+    }
+  };
+
+  const categoryTitle = category
+    ? t(`categoryView.categories.${category.id}.title`, { defaultValue: category.title })
+    : '';
+  const categoryDescription = category
+    ? t(`categoryView.categories.${category.id}.description`, { defaultValue: category.description })
+    : '';
+
   if (!category) {
     return <NotFound />;
   }
@@ -38,7 +60,7 @@ export const CategoryView: React.FC = () => {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
         <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading category courses...</div>
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('categoryView.loading')}</div>
       </div>
     );
   }
@@ -47,12 +69,12 @@ export const CategoryView: React.FC = () => {
   return (
     <div className="animate-fade-in">
       <Link to="/" className="inline-flex items-center text-textMuted hover:text-textMain mb-8 transition-colors">
-        <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
+        <ArrowLeft size={20} className="mr-2" /> {t('categoryView.backToDashboard')}
       </Link>
 
       <div className="mb-12">
-        <h1 className="text-4xl font-display font-bold text-textMain mb-4">{category.title}</h1>
-        <p className="text-xl text-textMuted max-w-2xl">{category.description}</p>
+        <h1 className="text-4xl font-display font-bold text-textMain mb-4">{categoryTitle}</h1>
+        <p className="text-xl text-textMuted max-w-2xl">{categoryDescription}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -77,7 +99,7 @@ export const CategoryView: React.FC = () => {
                     course.level === 'Intermediate' ? 'bg-blue-500/20 text-blue-500 dark:text-blue-300' :
                       'bg-purple-500/20 text-purple-500 dark:text-purple-300'
                   }`}>
-                  {course.level}
+                  {getDifficultyLabel(course.level)}
                 </span>
               </div>
 
@@ -91,7 +113,7 @@ export const CategoryView: React.FC = () => {
               <div className="flex items-center justify-between text-sm text-textMuted">
                 <span>{course.duration}</span>
                 <span className="flex items-center text-textMain font-medium group-hover:translate-x-1 transition-transform">
-                  {isPassed ? 'Review' : 'Start'} <PlayCircle size={16} className="ml-2" />
+                  {isPassed ? t('categoryView.review') : t('categoryView.start')} <PlayCircle size={16} className="ml-2" />
                 </span>
               </div>
 

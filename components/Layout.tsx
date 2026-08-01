@@ -42,10 +42,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
   // Apply theme and gradient intensity
   useEffect(() => {
-    const activeThemeId = user?.settings?.activeTheme || (user?.settings?.theme === 'light' ? 'light' : 'dark');
+    const themePreference = user?.settings?.theme;
+    const activeThemeId = user?.settings?.activeTheme || (themePreference === 'light' ? 'light' : 'dark');
     const matchedTheme = XP_STORE_THEMES.find(t => t.id === activeThemeId) || XP_STORE_THEMES[0];
 
-    if (matchedTheme.themeMode === 'light') {
+    const effectiveMode = (activeThemeId === 'light' || activeThemeId === 'dark')
+      ? (themePreference || matchedTheme.themeMode)
+      : matchedTheme.themeMode;
+
+    if (effectiveMode === 'light') {
       document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');

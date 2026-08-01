@@ -13,7 +13,169 @@
   },
   "common": {
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "dashboard": {
+    "loading": "Loading dashboard...",
+    "header": {
+      "title": "Dashboard",
+      "tourButton": "Take a Tour",
+      "subtitle": "Overview of your learning journey"
+    },
+    "search": {
+      "placeholder": "Search courses...",
+      "viewAll": "View All Results",
+      "empty": "No courses found matching your criteria."
+    },
+    "continue": {
+      "title": "Continue where you left off",
+      "button": "Resume"
+    },
+    "reviewQueue": {
+      "title": "Spaced Repetition Review",
+      "messageOne": "You have {{count}} question due for review today!",
+      "messageOther": "You have {{count}} questions due for review today!",
+      "button": "Review Now"
+    },
+    "stats": {
+      "greeting": "Keep it up, {{username}}!",
+      "streakTooltip": "Click to view streak celebration",
+      "streakOne": "{{count}} day streak",
+      "streakOther": "{{count}} days streak",
+      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
+      "continueLearning": "Continue Learning",
+      "viewCertificates": "View Certificates",
+      "progressTitle": "Progress by Category"
+    },
+    "recommended": {
+      "title": "Recommended for You"
+    },
+    "categories": {
+      "title": "Quick Access",
+      "programming": "Programming",
+      "dsa": "DSA",
+      "design": "Design",
+      "default": "Category"
+    },
+    "reminder": {
+      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+    },
+    "savedQuestions": {
+      "title": "Saved Questions",
+      "practiceLink": "Practice →",
+      "viewAll": "View all {{count}} saved questions →",
+      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
+      "button": "Explore Questions"
+    },
+    "mockHistory": {
+      "title": "Mock Interview History",
+      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
+      "button": "Start Mock Interview"
+    }
+  },
+  "courses": {
+    "title": "Explore Courses",
+    "subtitle": "Expand your knowledge with our premium curriculum.",
+    "searchPlaceholder": "Search courses...",
+    "filterTitle": "Filter by category",
+    "allCategories": "All Categories",
+    "categories": {
+      "programming": "Programming",
+      "dsa": "DSA",
+      "design": "Design",
+      "default": "Category"
+    },
+    "review": "Review",
+    "startLearning": "Start Learning",
+    "empty": "No courses found matching your criteria."
+  },
+  "categoryView": {
+    "loading": "Loading category courses...",
+    "backToDashboard": "Back to Dashboard",
+    "review": "Review",
+    "start": "Start",
+    "categories": {
+      "programming": {
+        "title": "Programming",
+        "description": "Build real-world technical skills through practical programming lessons and projects."
+      },
+      "dsa": {
+        "title": "DSA",
+        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+      },
+      "design": {
+        "title": "Design",
+        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+      }
+    }
+  },
+  "courseView": {
+    "notFound": "Course not found",
+    "loading": "Loading course material...",
+    "back": "Back",
+    "navigation": {
+      "notesResources": "Notes & Resources",
+      "finalQuiz": "Final Quiz"
+    },
+    "resources": {
+      "title": "External Resources",
+      "proceed": "Proceed to Quiz"
+    },
+    "quiz": {
+      "question": "Question {{current}}",
+      "questionCount": "{{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Submit Quiz",
+      "result": {
+        "congratulations": "Congratulations!",
+        "keepTrying": "Keep Trying!",
+        "scorePrefix": "You scored",
+        "earnedCertificate": "You have earned a certificate.",
+        "need70": "You need 70% to pass.",
+        "viewCertificate": "View Certificate",
+        "retryReminder": "Take a moment to review the course material before trying again!",
+        "retryCountdown": "⏳ You can retry in {{time}}",
+        "retry": "Retry Quiz",
+        "retryDisabled": "Retrying quizzes is disabled in your settings.",
+        "reviewAnswers": "Review Answers"
+      }
+    }
+  },
+  "aiAssistant": {
+    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
+    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "header": {
+      "title": "Learning Assistant",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "close": "Close AI Assistant"
+    },
+    "status": {
+      "thinking": "Thinking..."
+    },
+    "input": {
+      "placeholder": "Ask a question...",
+      "send": "Send message"
+    },
+    "suggestions": {
+      "explain": "Explain simply",
+      "quiz": "Give me a quiz",
+      "example": "Give an example"
+    },
+    "toggle": {
+      "open": "Open AI Assistant"
+    },
+    "error": {
+      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
+      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
+      "defaultCourse": "your dashboard"
+    }
   },
   "logout": {
     "title": "Log Out?",

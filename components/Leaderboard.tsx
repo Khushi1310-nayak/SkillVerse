@@ -28,6 +28,8 @@ export const Leaderboard: React.FC = () => {
   useEffect(() => {
     const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(10));
     
+    // Subscribe to Firestore updates in real-time.
+    // We store the unsubscribe callback to properly clean up the listener.
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const topUsers: LeaderboardUser[] = [];
       snapshot.forEach((doc) => {
@@ -49,6 +51,7 @@ export const Leaderboard: React.FC = () => {
       setLoading(false);
     });
 
+    // Execute the unsubscribe function when the component unmounts.
     return () => unsubscribe();
   }, []);
 

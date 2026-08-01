@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase } from 'lucide-react';
 import { CATEGORIES } from '../constants';
@@ -20,6 +21,7 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [showTour, setShowTour] = useState(false);
@@ -91,11 +93,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     if (user.settings?.reminders) {
       const hasStudiedToday = sessionStorage.getItem('studied_today');
       if (!hasStudiedToday) {
-        showToast({ message: `Reminder: Hit your daily goal of ${user.settings.dailyGoal} minutes to keep your streak!`, type: 'info', duration: 5000 });
+        showToast({
+          message: t('dashboard.reminder.message', { dailyGoal: user.settings.dailyGoal }),
+          type: 'info',
+          duration: 5000
+        });
         sessionStorage.setItem('studied_today', 'true');
       }
     }
-  }, [user.settings?.reminders, user.settings?.dailyGoal]);
+  }, [user.settings?.reminders, user.settings?.dailyGoal, t]);
 
   const allProgress = storageService.getAllProgress();
 
@@ -158,12 +164,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     };
   };
 
+  const getCategoryLabel = (catId: string) => {
+    switch (catId) {
+      case 'programming': return t('dashboard.categories.programming');
+      case 'dsa': return t('dashboard.categories.dsa');
+      case 'design': return t('dashboard.categories.design');
+      default: return t('dashboard.categories.default');
+    }
+  };
+
+  const getDifficultyLabel = (level: string) => {
+    switch (level) {
+      case 'Beginner': return t('common.difficulty.beginner');
+      case 'Intermediate': return t('common.difficulty.intermediate');
+      case 'Advanced': return t('common.difficulty.advanced');
+      default: return level;
+    }
+  };
+
   const chartData = useMemo(() => {
     return CATEGORIES.map(cat => ({
-      label: cat.title,
+      label: getCategoryLabel(cat.id),
       ...getCategoryProgress(cat.id)
     }));
-  }, [allProgress, courses]);
+  }, [allProgress, courses, t]);
 
   const filteredCourses = useMemo(() => {
     if (!searchQuery) return [];
@@ -205,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
         <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading dashboard...</div>
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('dashboard.loading')}</div>
       </div>
     );
   }
@@ -218,21 +242,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-1">
-            <h2 className="text-3xl font-display font-bold text-textMain">Dashboard</h2>
+            <h2 className="text-3xl font-display font-bold text-textMain">{t('dashboard.header.title')}</h2>
             <button
               onClick={() => setShowTour(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primaryLight text-xs font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors border border-primary/20"
             >
-              <Map size={14} /> Take a Tour
+              <Map size={14} /> {t('dashboard.header.tourButton')}
             </button>
           </div>
-          <p className="text-textMuted">Overview of your learning journey</p>
+          <p className="text-textMuted">{t('dashboard.header.subtitle')}</p>
         </div>
         <div className="relative w-full md:w-80 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={20} />
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder={t('dashboard.search.placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
@@ -255,12 +279,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     to="/courses"
                     className="block p-3 text-center text-xs font-bold text-primaryLight uppercase tracking-wider bg-white/5 hover:bg-white/10"
                   >
-                    View All Results
+                    {t('dashboard.search.viewAll')}
                   </Link>
                 </>
               ) : (
                 <div className="p-4 text-center text-textMuted">
-                  No courses found matching your criteria.
+                  {t('dashboard.search.empty')}
                 </div>
               )}
             </div>
@@ -277,7 +301,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             </div>
             <div>
               <div className="text-xs font-bold text-primaryLight uppercase tracking-wider mb-0.5">
-                Continue where you left off
+                {t('dashboard.continue.title')}
               </div>
               <div className="text-base font-bold text-textMain">
                 {lastVisitedCourse.title}
@@ -288,7 +312,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             to={`/course/${lastVisitedCourse.id}`}
             className="shrink-0 px-5 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all"
           >
-            Resume
+            {t('dashboard.continue.button')}
           </Link>
         </div>
       )}
@@ -302,10 +326,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             </div>
             <div>
               <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-0.5 animate-pulse">
-                Spaced Repetition Review
+                {t('dashboard.reviewQueue.title')}
               </div>
               <div className="text-base font-bold text-textMain">
-                You have {dueQuestionsCount} question{dueQuestionsCount !== 1 ? 's' : ''} due for review today!
+                {dueQuestionsCount === 1
+                  ? t('dashboard.reviewQueue.messageOne', { count: dueQuestionsCount })
+                  : t('dashboard.reviewQueue.messageOther', { count: dueQuestionsCount })}
               </div>
             </div>
           </div>
@@ -313,7 +339,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             to="/career?review=true"
             className="shrink-0 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-lg font-medium shadow-lg hover:shadow-orange-500/25 transition-all text-center w-full sm:w-auto"
           >
-            Review Now
+            {t('dashboard.reviewQueue.button')}
           </Link>
         </div>
       )}
@@ -324,28 +350,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         <div id="dash-stats" className="lg:col-span-2 bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
           <div className="relative z-10">
             <div className="flex flex-wrap items-center gap-3 mb-2">
-              <h2 className="text-2xl font-bold text-textMain">Keep it up, {user.username}!</h2>
+              <h2 className="text-2xl font-bold text-textMain">{t('dashboard.stats.greeting', { username: user.username })}</h2>
               {user.streak > 0 && (
                 <button
                   onClick={() => setShowStreakModal(true)}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold cursor-pointer hover:scale-105 transition-all hover:bg-orange-500/20 active:scale-95"
-                  title="Click to view streak celebration"
+                  title={t('dashboard.stats.streakTooltip')}
                 >
                   <Flame size={14} className="fill-orange-500" />
-                  {user.streak} day{user.streak !== 1 ? 's' : ''} streak
+                  {user.streak === 1
+                    ? t('dashboard.stats.streakOne', { count: user.streak })
+                    : t('dashboard.stats.streakOther', { count: user.streak })}
                 </button>
               )}
             </div>
             <p className="text-textMuted mb-6 max-w-lg">
-              You've completed <span className="text-textMain font-bold">{completedCount}</span> out of <span className="text-textMain font-bold">{totalCourses}</span> available courses.
+              {t('dashboard.stats.summary', { completedCount, totalCourses })}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Link to="/courses" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-white/10 dark:bg-white/10 border border-black/20 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/20 text-textMain rounded-lg font-medium transition-colors">
-                Continue Learning
+                {t('dashboard.stats.continueLearning')}
               </Link>
               <Link to="/certifications" className="flex-1 min-w-[150px] text-center px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium shadow-lg hover:shadow-primary/25 transition-all">
-                View Certificates
+                {t('dashboard.stats.viewCertificates')}
               </Link>
             </div>
           </div>
@@ -354,7 +382,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
         {/* Progress Chart */}
         <div id="dash-progress-chart" className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 flex flex-col">
-          <h3 className="text-lg font-semibold text-textMain mb-6">Progress by Category</h3>
+          <h3 className="text-lg font-semibold text-textMain mb-6">{t('dashboard.stats.progressTitle')}</h3>
           <div className="flex-1 flex items-end gap-2 sm:gap-4 min-h-[130px] sm:min-h-[150px]">
             {chartData.map((data, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
@@ -380,7 +408,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         <div id="dash-recommended">
           <h3 className="text-xl font-display font-bold text-textMain mb-6 flex items-center gap-2">
             <span className="w-2 h-6 rounded-full bg-primaryLight" />
-            Recommended for You
+            {t('dashboard.recommended.title')}
           </h3>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {recommendedCourses.map(course => (
@@ -390,7 +418,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-white/20 dark:border-white/10 p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="text-xs font-bold text-primaryLight uppercase tracking-wider mb-2">
-                  {course.level}
+                  {getDifficultyLabel(course.level)}
                 </div>
                 <h4 className="text-base font-bold text-textMain leading-snug">
                   {course.title}
@@ -405,7 +433,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       <div id="dash-categories">
         <h3 className="text-xl font-display font-bold text-textMain mb-6 flex items-center gap-2">
           <span className="w-2 h-6 rounded-full bg-primaryLight" />
-          Quick Access
+          {t('dashboard.categories.title')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {CATEGORIES.map(category => {
@@ -424,7 +452,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     {stats.passed}/{stats.total}
                   </div>
                 </div>
-                <h4 className="text-lg font-bold text-textMain mb-1">{category.title}</h4>
+                <h4 className="text-lg font-bold text-textMain mb-1">{getCategoryLabel(category.id)}</h4>
                 <div className="w-full bg-black/5 dark:bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
                   <div className={`h-full bg-gradient-to-r from-primary to-primaryLight transition-all duration-500 ${getPercentClass(stats.percent, 'w')}`} />
                 </div>
@@ -449,7 +477,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <div>
             <h3 className="text-xl font-display font-bold text-textMain mb-4 flex items-center gap-2">
               <Bookmark className="text-primaryLight" size={22} />
-              Saved Questions
+              {t('dashboard.savedQuestions.title')}
             </h3>
             {savedQuestionsList.length > 0 ? (
               <div className="space-y-3">
@@ -466,14 +494,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                       to={`/career`}
                       className="text-xs font-bold text-primaryLight shrink-0 hover:underline"
                     >
-                      Practice &rarr;
+                      {t('dashboard.savedQuestions.practiceLink')}
                     </Link>
                   </div>
                 ))}
                 {savedQuestionsList.length > 3 && (
                   <div className="text-right">
                     <Link to="/career" className="text-xs font-bold text-primaryLight hover:underline">
-                      View all {savedQuestionsList.length} saved questions &rarr;
+                      {t('dashboard.savedQuestions.viewAll', { count: savedQuestionsList.length })}
                     </Link>
                   </div>
                 )}
@@ -482,13 +510,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               <div className="flex-1 flex flex-col items-center justify-center py-6 text-center">
                 <Bookmark className="text-textMuted/30 mb-3" size={48} />
                 <p className="text-sm text-textMuted max-w-sm mb-4">
-                  You haven't saved any questions yet! Head to Career Mode to start practicing.
+                  {t('dashboard.savedQuestions.emptyMessage')}
                 </p>
                 <Link
                   to="/career"
                   className="px-4 py-2 bg-gradient-main text-white text-xs font-bold rounded-lg shadow hover:shadow-primary/20 transition-all"
                 >
-                  Explore Questions
+                  {t('dashboard.savedQuestions.button')}
                 </Link>
               </div>
             )}
@@ -500,7 +528,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <div>
             <h3 className="text-xl font-display font-bold text-textMain mb-4 flex items-center gap-2">
               <History className="text-primaryLight" size={22} />
-              Mock Interview History
+              {t('dashboard.mockHistory.title')}
             </h3>
             {mockHistoryList.length > 0 ? (
               <div className="space-y-3">
@@ -536,13 +564,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               <div className="flex-1 flex flex-col items-center justify-center py-6 text-center">
                 <History className="text-textMuted/30 mb-3" size={48} />
                 <p className="text-sm text-textMuted max-w-sm mb-4">
-                  Start a Mock Interview in Career Mode to test your skills under real-world conditions.
+                  {t('dashboard.mockHistory.emptyMessage')}
                 </p>
                 <Link
                   to="/career"
                   className="px-4 py-2 bg-gradient-main text-white text-xs font-bold rounded-lg shadow hover:shadow-primary/20 transition-all"
                 >
-                  Start Mock Interview
+                  {t('dashboard.mockHistory.button')}
                 </Link>
               </div>
             )}

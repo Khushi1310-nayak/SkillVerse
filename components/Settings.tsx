@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, CalendarDays
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -18,6 +18,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { LearningStreakTab } from './LearningStreakTab';
 
 
 interface SettingsProps {
@@ -313,6 +314,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 <TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
 <TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
 <TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
+<TabButton id="streak" icon={CalendarDays} label="Learning Streak" />
 <TabButton id="account" icon={Shield} label={t('settings.tabs.account')} />
           </div>
         </div>
@@ -901,6 +903,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   })}
                 </div>
               </div>
+            )}
+
+            {/* Learning Streak Section */}
+            {activeTab === 'streak' && (
+              <LearningStreakTab user={user} />
             )}
 
             {/* Account Section */}

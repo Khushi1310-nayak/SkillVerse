@@ -18,7 +18,7 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className =
       className={`bg-white/5 border border-black/20 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-textMain focus:outline-none focus:border-primaryLight transition-colors ${className}`}
     >
       {SUPPORTED_LANGUAGES.map(lang => (
-        <option key={lang.code} value={lang.code}>
+        <option key={lang.code} value={lang.code} className="bg-white text-gray-900">
           {lang.flag} {lang.label}
         </option>
       ))}

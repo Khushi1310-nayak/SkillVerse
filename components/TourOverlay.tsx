@@ -2,93 +2,25 @@
 import React, { useState, useEffect,useCallback } from 'react';
 import { 
   X, ChevronRight, ChevronLeft, 
-  LayoutDashboard, BookOpen, Briefcase, 
-  Award, Settings, CheckCircle, Zap, Star,
+  CheckCircle, Zap, Star,
   BarChart, ArrowRight, MousePointer2
 } from 'lucide-react';
+import { TOUR_STEPS } from '../constants';
 
 interface TourOverlayProps {
   onClose: () => void;
 }
-
-const SLIDES = [
-  {
-    id: 'overview',
-    title: "Welcome to SkillVerse",
-    description: "Your all-in-one platform to master coding, design, and interview skills.",
-    icon: LayoutDashboard,
-    color: "from-blue-500 to-cyan-500",
-    features: [
-      "Track daily progress & streaks",
-      "Visualize your learning curve",
-      "Earn XP and level up"
-    ],
-    imageUrl: "/assets/tour/tour_overview_1783097943357.png"
-  },
-  {
-    id: 'courses',
-    title: "Structured Courses",
-    description: "Dive into comprehensive modules designed by industry experts.",
-    icon: BookOpen,
-    color: "from-purple-500 to-pink-500",
-    features: [
-      "Interactive coding notes",
-      "Built-in AI Tutor support",
-      "Quizzes to test knowledge"
-    ],
-    imageUrl: "/assets/tour/tour_courses_1783097954059.png"
-  },
-  {
-    id: 'career',
-    title: "Career Mode",
-    description: "Prepare for your dream job with real-world simulations.",
-    icon: Briefcase,
-    color: "from-emerald-500 to-green-500",
-    features: [
-      "Mock Interview Simulator",
-      "Company-specific questions",
-      "Readiness Score tracking"
-    ],
-    imageUrl: "/assets/tour/tour_career_1783097968924.png"
-  },
-  {
-    id: 'certifications',
-    title: "Get Certified",
-    description: "Prove your mastery with verifiable credentials.",
-    icon: Award,
-    color: "from-yellow-400 to-orange-500",
-    features: [
-      "Pass final exams (70%+)",
-      "Download PDF certificates",
-      "Share directly to LinkedIn"
-    ],
-    imageUrl: "/assets/tour/tour_certs_1783097979805.png"
-  },
-  {
-    id: 'settings',
-    title: "Customize Everything",
-    description: "Make the learning experience truly yours.",
-    icon: Settings,
-    color: "from-gray-400 to-slate-400",
-    features: [
-      "Dark/Light themes",
-      "Custom avatars",
-      "Learning goal settings"
-    ],
-    imageUrl: "/assets/tour/tour_settings_1783097991800.png"
-  }
-];
 
 export const TourOverlay: React.FC<TourOverlayProps> = ({ onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = useCallback(() => {
   setCurrentIndex((prev) => {
-    if (prev >= SLIDES.length - 1) {
+    if (prev >= TOUR_STEPS.length - 1) {
       onClose();
       return prev;
     }
-    return Math.min(prev + 1, SLIDES.length - 1);
+    return Math.min(prev + 1, TOUR_STEPS.length - 1);
   });
 }, [onClose]);
 
@@ -126,7 +58,7 @@ const handlePrev = useCallback(() => {
 
 
 
-  const currentSlide = SLIDES[currentIndex];
+  const currentSlide = TOUR_STEPS[currentIndex];
   const Icon = currentSlide.icon;
 
   return (
@@ -163,7 +95,7 @@ const handlePrev = useCallback(() => {
          <div className="w-full md:w-7/12 p-6 md:p-12 flex flex-col relative bg-glass overflow-y-auto">
              {/* Progress Dots */}
              <div className="flex gap-2 mb-6 md:mb-8 shrink-0">
-                {SLIDES.map((_, idx) => (
+                {TOUR_STEPS.map((_, idx) => (
                   <div 
                     key={idx}
                     className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-primaryLight' : 'w-2 bg-white/10'}`} 
@@ -204,8 +136,8 @@ const handlePrev = useCallback(() => {
                   onClick={handleNext}
                   className="flex items-center gap-2 bg-textMain text-background px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity text-sm md:text-base"
                 >
-                  {currentIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
-                  {currentIndex === SLIDES.length - 1 ? <Zap size={18} /> : <ChevronRight size={18} />}
+                  {currentIndex === TOUR_STEPS.length - 1 ? 'Get Started' : 'Next'}
+                  {currentIndex === TOUR_STEPS.length - 1 ? <Zap size={18} /> : <ChevronRight size={18} />}
                 </button>
              </div>
          </div>

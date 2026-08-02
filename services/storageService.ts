@@ -5,6 +5,20 @@ import { Progress, CareerProgress } from '../types';
 const PROGRESS_KEY = 'skillverse_progress';
 const CAREER_KEY = 'skillverse_career';
 const LAST_VISITED_KEY = 'skillverse_last_visited';
+const STREAK_KEY = 'skillverse_streak_data';
+
+// --- STREAK DATA TYPES ---
+export interface DailyActivity {
+  date: string;       // YYYY-MM-DD
+  xp: number;         // XP earned that day
+  courses: string[];  // course IDs completed that day
+  level: 0 | 1 | 2 | 3; // 0=none, 1=low, 2=medium, 3=high
+}
+
+export interface StreakData {
+  longestStreak: number;
+  activities: Record<string, DailyActivity>; // keyed by YYYY-MM-DD
+}
 
 const DEFAULT_CAREER_PROGRESS: CareerProgress = {
   practicedQuestions: [],
@@ -173,5 +187,28 @@ export const storageService = {
     
     localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
     return progress;
-  }
+  },
+
+  // --- STREAK CALENDAR ---
+
+  getStreakData: (): StreakData => {
+    const data = localStorage.getItem(STREAK_KEY);
+    return data ? JSON.parse(data) : { longestStreak: 0, activities: {} };
+  },
+
+  saveStreakData: (data: StreakData): void => {
+    localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+  },
+
+  /**
+   * Upsert today's activity entry. Called when the streak tab mounts.
+   * Derives activity level from xp: 0=none, 1=1-49, 2=50-99, 3=100+
+   */
+  recordDayActivity: (date: string, xp: number, courses: string[]): void => {
+    const data = storageService.getStreakData();
+    const level: 0 | 1 | 2 | 3 =
+      xp === 0 ? 0 : xp < 50 ? 1 : xp < 100 ? 2 : 3;
+    data.activities[date] = { date, xp, courses, level };
+    localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+  },
 };

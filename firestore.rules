@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.admin == true || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+
+    // --- USERS COLLECTION ---
+    match /users/{userId} {
+      // Authenticated users can read user profiles (needed for Leaderboard)
+      allow read: if isAuthenticated();
+      
+      // Users can create and update their own document
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && 
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
+      
+      // Users or admins can delete their own account profile
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // --- COURSES COLLECTION ---
+    match /courses/{courseId} {
+      // Public read access for course catalog
+      allow read: if true;
+      
+      // Admin-only write access
+      allow write: if isAdmin();
+    }
+
+    // --- QUIZZES COLLECTION ---
+    match /quizzes/{courseId} {
+      // Authenticated users can access quiz questions
+      allow read: if isAuthenticated();
+      
+      // Admin-only write access
+      allow write: if isAdmin();
+    }
+
+    // --- COMPANIES COLLECTION ---
+    match /companies/{companyId} {
+      // Public read access for interview preparation
+      allow read: if true;
+      
+      // Admin-only write access (Cloud Functions & Admins)
+      allow write: if isAdmin();
+    }
+  }
+}

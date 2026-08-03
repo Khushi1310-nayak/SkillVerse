@@ -1,5 +1,6 @@
 import React from 'react';
 import { Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface CertificateData {
   username: string;
@@ -15,6 +16,8 @@ interface CertificateDisplayProps {
 }
 
 export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, isPrinting = false }) => {
+  const { t } = useTranslation();
+
   return (
     <div 
       id="certificate-container" 
@@ -43,20 +46,20 @@ export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, is
       <div className="text-center mt-4 md:mt-8 w-full relative z-10 flex-shrink-0">
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6">
           <div className="w-8 md:w-10 h-8 md:h-10 rounded-lg bg-gradient-to-r from-[#6968A6] to-[#CF9893] flex items-center justify-center text-white font-bold shadow-lg text-sm md:text-lg">SV</div>
-          <span className="text-lg md:text-xl font-bold tracking-[0.2em] text-white uppercase">SkillVerse Academy</span>
+          <span className="text-lg md:text-xl font-bold tracking-[0.2em] text-white uppercase">{t('certificateDisplay.academyName')}</span>
         </div>
         
         <h1 className="font-display font-bold text-4xl md:text-6xl text-[#F5C97A] mb-2 md:mb-4 uppercase tracking-widest drop-shadow-sm">
-          Certificate
+          {t('certificateDisplay.title')}
         </h1>
         <h2 className="text-lg md:text-2xl font-light text-[#B9B6E3] uppercase tracking-[0.3em]">
-          of Completion
+          {t('certificateDisplay.subtitle')}
         </h2>
       </div>
 
       {/* Main Content */}
       <div className="text-center relative z-10 flex-1 flex flex-col justify-center px-8">
-        <p className="text-base md:text-lg text-gray-400 italic mb-2 md:mb-4">This is to certify that</p>
+        <p className="text-base md:text-lg text-gray-400 italic mb-2 md:mb-4">{t('certificateDisplay.certifyThat')}</p>
         
         <div className="text-3xl md:text-5xl font-display font-bold text-white mb-4 md:mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
           {data.username}
@@ -64,15 +67,14 @@ export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, is
         
         <div className="h-px w-48 md:w-64 bg-gradient-to-r from-transparent via-[#F5C97A] to-transparent mx-auto mb-4 md:mb-8 opacity-50"></div>
 
-        <p className="text-base md:text-lg text-gray-400 italic mb-2 md:mb-4">Has successfully demonstrated mastery in</p>
+        <p className="text-base md:text-lg text-gray-400 italic mb-2 md:mb-4">{t('certificateDisplay.demonstratedMastery')}</p>
         
         <div className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text mb-4 md:mb-8 bg-gradient-to-r from-[#6968A6] to-[#CF9893]">
           {data.courseTitle}
         </div>
 
         <p className="text-[#B9B6E3] max-w-2xl mx-auto leading-relaxed text-xs md:text-base px-4">
-          By passing the comprehensive assessment with a score of <strong className="text-[#F5C97A]">{data.score}%</strong> on {data.date}, 
-          affirming competence in the fundamental and advanced concepts of this subject.
+          {t('certificateDisplay.assessmentPrefix')} <strong className="text-[#F5C97A]">{data.score}%</strong> {t('certificateDisplay.assessmentSuffix', { date: data.date })}
         </p>
       </div>
 
@@ -81,7 +83,7 @@ export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, is
         <div className="text-center w-24 md:w-40">
            <div className="text-[#F5C97A] font-mono mb-2 text-sm md:text-lg">{data.date}</div>
            <div className="w-full border-t border-[#6968A6]/50 pt-2">
-              <p className="text-[10px] md:text-xs font-bold uppercase text-gray-500 tracking-wider">Date Issued</p>
+              <p className="text-[10px] md:text-xs font-bold uppercase text-gray-500 tracking-wider">{t('certificateDisplay.dateIssued')}</p>
            </div>
         </div>
         
@@ -92,12 +94,12 @@ export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, is
                 <div className="w-12 h-12 md:w-20 md:h-20 rounded-full border border-[#6968A6] flex items-center justify-center">
                    <div className="text-center">
                      <Award size={18} className="text-[#F5C97A] mx-auto mb-1 md:w-6 md:h-6" />
-                     <div className="text-[6px] md:text-[8px] font-bold text-[#B9B6E3] tracking-wider uppercase">Verified</div>
+                     <div className="text-[6px] md:text-[8px] font-bold text-[#B9B6E3] tracking-wider uppercase">{t('certificateDisplay.verified')}</div>
                    </div>
                 </div>
               </div>
            </div>
-           <div className="mt-2 md:mt-4 font-mono text-[10px] md:text-xs text-[#F5C97A] tracking-wider opacity-80 text-center">ID: {data.credentialId}</div>
+           <div className="mt-2 md:mt-4 font-mono text-[10px] md:text-xs text-[#F5C97A] tracking-wider opacity-80 text-center">{t('certificateDisplay.credentialId', { id: data.credentialId })}</div>
         </div>
 
         <div className="text-center w-24 md:w-40">
@@ -105,7 +107,7 @@ export const CertificateDisplay: React.FC<CertificateDisplayProps> = ({ data, is
              <span className="text-xl md:text-2xl text-white opacity-80 font-handwriting">SkillVerse</span>
            </div>
            <div className="w-full border-t border-[#6968A6]/50 pt-2">
-              <p className="text-[10px] md:text-xs font-bold uppercase text-gray-500 tracking-wider">Platform Director</p>
+              <p className="text-[10px] md:text-xs font-bold uppercase text-gray-500 tracking-wider">{t('certificateDisplay.platformDirector')}</p>
            </div>
         </div>
       </div>

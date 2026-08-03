@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
+import { aiService } from '../services/aiService';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
@@ -50,6 +51,9 @@ export const CourseView: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [openAiExplainFor, setOpenAiExplainFor] = useState<number | null>(null);
+  const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
+  const [aiExplainLoading, setAiExplainLoading] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState(0);
   const [passed, setPassed] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
@@ -160,8 +164,8 @@ export const CourseView: React.FC = () => {
     });
 
     if (isPassed && !user?.courses?.includes(course.id)) {
-       // Only award XP if the user hasn't completed this course before
-       completeCourse(course.id, 100).catch(console.error);
+      // Only award XP if the user hasn't completed this course before
+      completeCourse(course.id, 100).catch(console.error);
     }
   };
 
@@ -173,6 +177,34 @@ export const CourseView: React.FC = () => {
     setPassed(false);
     if (id) localStorage.removeItem(`quizState_${id}`);
     // Note: we do NOT clear the cooldown here — it must expire naturally
+  };
+
+  const handleAskAiWhy = async (qIdx: number) => {
+    // Toggle closed if already open
+    if (openAiExplainFor === qIdx) {
+      setOpenAiExplainFor(null);
+      return;
+    }
+    setOpenAiExplainFor(qIdx);
+    if (aiExplanations[qIdx] || !course) return;
+
+    setAiExplainLoading(prev => ({ ...prev, [qIdx]: true }));
+    try {
+      const q = course.quiz[qIdx];
+      const explanation = await aiService.explainQuizAnswer({
+        courseTitle: course.title,
+        question: q.question,
+        options: q.options,
+        selectedAnswerIndex: selectedAnswers[qIdx],
+        correctAnswerIndex: q.correctAnswer,
+      });
+      setAiExplanations(prev => ({ ...prev, [qIdx]: explanation }));
+    } catch (err) {
+      console.error('Ask AI Why error:', err);
+      setAiExplanations(prev => ({ ...prev, [qIdx]: "Sorry, I couldn't generate an explanation right now. Please try again in a moment." }));
+    } finally {
+      setAiExplainLoading(prev => ({ ...prev, [qIdx]: false }));
+    }
   };
 
   const formatCooldown = (seconds: number): string => {
@@ -435,6 +467,28 @@ export const CourseView: React.FC = () => {
                               )
                             })}
                           </div>
+                          {selectedAnswers[qIdx] !== undefined && selectedAnswers[qIdx] !== q.correctAnswer && (
+                            <div className="mt-4">
+                              <button
+                                onClick={() => handleAskAiWhy(qIdx)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primaryLight text-sm font-medium hover:bg-primary/20 transition-colors"
+                              >
+                                <Sparkles size={16} /> Ask AI Why
+                              </button>
+
+                              {openAiExplainFor === qIdx && (
+                                <div className="mt-3 p-4 rounded-xl bg-gradient-main/10 border border-primary/20 text-sm text-textMain leading-relaxed animate-fade-in">
+                                  {aiExplainLoading[qIdx] ? (
+                                    <span className="flex items-center gap-2 text-textMuted">
+                                      <Loader2 size={14} className="animate-spin" /> Thinking...
+                                    </span>
+                                  ) : (
+                                    aiExplanations[qIdx]
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

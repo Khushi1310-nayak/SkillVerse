@@ -1,14 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  LogOut, 
-  LayoutDashboard, 
-  BookOpen, 
-  Award, 
-  Settings, 
-  Menu, 
-  X, 
+import {
+  LogOut,
+  LayoutDashboard,
+  BookOpen,
+  Award,
+  Settings,
+  Menu,
+  X,
   AlertTriangle,
   Briefcase,
   Shield
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
+import { CommandPalette } from './CommandPalette';
 import { XP_STORE_THEMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
@@ -39,6 +40,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // Global Cmd/Ctrl + K shortcut to open the Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Apply theme and gradient intensity
   useEffect(() => {
@@ -92,19 +106,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
       id={id}
       onClick={() => setMobileMenuOpen(false)}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 overflow-hidden
-        ${isActive(to) 
-          ? 'bg-gradient-main text-white shadow-lg shadow-primary/20' 
+        ${isActive(to)
+          ? 'bg-gradient-main text-white shadow-lg shadow-primary/20'
           : 'text-textMuted hover:bg-white/5 hover:text-textMain'
         }`}
     >
       <div className="min-w-[20px] flex items-center justify-center"><Icon size={20} /></div>
-      
+
       {/* For mobile, always show text */}
       <span className="font-medium whitespace-nowrap lg:hidden">{label}</span>
-      
+
       {/* For desktop, show text only when sidebar is hovered */}
       <span className="font-medium whitespace-nowrap hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">{label}</span>
-      
+
       {isActive(to) && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300" />}
     </Link>
   );
@@ -132,27 +146,27 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
   return (
     <div className="min-h-screen font-sans text-textMain bg-background flex transition-colors duration-500">
-       <GoldSnow />
-       {/* Background Ambience */}
-       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div 
-            className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
-          />
-          <div 
-            className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
-          />
-        </div>
+      <GoldSnow />
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
+        />
+        <div
+          className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px] transition-opacity duration-700 ${opacityClass}`}
+        />
+      </div>
 
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-black/20 dark:border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
         <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo">
-           <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
-              <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" width={48} height={48} />
-           </div>
-           <span className="text-2xl font-display font-bold bg-gradient-main bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              SkillVerse
-           </span>
+          <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
+            <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" width={48} height={48} />
+          </div>
+          <span className="text-2xl font-display font-bold bg-gradient-main bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            SkillVerse
+          </span>
         </Link>
 
         <nav className="flex-1 space-y-2">
@@ -168,19 +182,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
         <div className="pt-6 border-t border-black/20 dark:border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
-             <img 
-               src={user.photoURL || AVATARS[user.settings.avatarId || '1']} 
-               alt="Avatar" 
-               className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
-               width={40}
-               height={40}
-             />
-             <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="font-bold text-textMain truncate">{user.username}</div>
-                <div className="text-xs text-textMuted truncate">{user.email}</div>
-             </div>
+            <img
+              src={user.photoURL || AVATARS[user.settings.avatarId || '1']}
+              alt="Avatar"
+              className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
+              width={40}
+              height={40}
+            />
+            <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="font-bold text-textMain truncate">{user.username}</div>
+              <div className="text-xs text-textMuted truncate">{user.email}</div>
+            </div>
           </div>
-          <button 
+          <button
             onClick={() => setShowLogoutConfirm(true)}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-red-500/10 hover:text-red-400 transition-all overflow-hidden"
           >
@@ -192,10 +206,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
-         <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
-         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
-            <Menu />
-         </button>
+        <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
+        <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
+          <Menu />
+        </button>
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -203,66 +217,67 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute top-0 bottom-0 left-0 w-3/4 max-w-sm bg-background border-r border-black/20 dark:border-white/10 p-6 flex flex-col animate-slide-right">
-             <div className="flex justify-between items-center mb-8">
-                <span className="text-xl font-bold text-textMain">{t('nav.menu')}</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title={t('nav.closeMenu')} aria-label={t('nav.closeMenu')}><X /></button>
-             </div>
-             <nav className="space-y-2 flex-1">
-                <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
-                <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
-                <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
-                <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
-                {showAdminLink && (
-                  <NavItem to="/admin" icon={Shield} label={t('nav.admin')} />
-                )}
-                <NavItem to="/settings" icon={Settings} label={t('nav.settings')} />
-             </nav>
-             <button 
-                onClick={() => setShowLogoutConfirm(true)}
-                className="flex items-center gap-3 px-4 py-3 text-red-400 font-medium"
-              >
-                <LogOut size={20} /> {t('nav.logout')}
-              </button>
+            <div className="flex justify-between items-center mb-8">
+              <span className="text-xl font-bold text-textMain">{t('nav.menu')}</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="text-textMuted" title={t('nav.closeMenu')} aria-label={t('nav.closeMenu')}><X /></button>
+            </div>
+            <nav className="space-y-2 flex-1">
+              <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
+              <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
+              <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
+              <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
+              {showAdminLink && (
+                <NavItem to="/admin" icon={Shield} label={t('nav.admin')} />
+              )}
+              <NavItem to="/settings" icon={Settings} label={t('nav.settings')} />
+            </nav>
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="flex items-center gap-3 px-4 py-3 text-red-400 font-medium"
+            >
+              <LogOut size={20} /> {t('nav.logout')}
+            </button>
           </div>
         </div>
       )}
 
       {/* Main Content */}
       <main className="flex-1 relative z-10 w-full min-w-0 transition-all duration-300">
-         <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
-            <React.Suspense fallback={fallback}>
-               {children}
-            </React.Suspense>
-         </div>
+        <div className="pt-24 lg:pt-10 px-6 lg:px-12 pb-12 mx-auto max-w-7xl">
+          <React.Suspense fallback={fallback}>
+            {children}
+          </React.Suspense>
+        </div>
       </main>
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
-           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
-           <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
-              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
-                 <AlertTriangle size={24} />
-              </div>
-              <h3 className="text-xl font-bold text-textMain text-center mb-2">{t('logout.title')}</h3>
-              <p className="text-textMuted text-center mb-6">{t('logout.body')}</p>
-              <div className="flex gap-4">
-                 <button 
-                   onClick={() => setShowLogoutConfirm(false)}
-                   className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
-                 >
-                   {t('common.cancel')}
-                 </button>
-                 <button 
-                   onClick={confirmLogout}
-                   className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
-                 >
-                   {t('nav.logout')}
-                 </button>
-              </div>
-           </div>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+          <div className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">
+              <AlertTriangle size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-textMain text-center mb-2">{t('logout.title')}</h3>
+            <p className="text-textMuted text-center mb-6">{t('logout.body')}</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
+              >
+                {t('nav.logout')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
+      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
       <ScrollToTop />
     </div>
   );

@@ -177,6 +177,123 @@
       "defaultCourse": "tu panel"
     }
   },
+  "careerMode": {
+    "header": {
+      "badge": "Modo de carrera beta",
+      "title": "Preparación para entrevistas",
+      "description": "Dirige tu atención a empresas específicas, practica preguntas reales y simula entornos de entrevista de alta presión.",
+      "readiness": "Preparación general",
+      "ready": "Listo",
+      "questionsLabel": "Preguntas"
+    },
+    "companyCards": {
+      "recommendedTitle": "Recomendado para ti",
+      "progress": "Progreso",
+      "searchPlaceholder": "Busca empresas (por ejemplo, Google, Amazon)...",
+      "emptyState": "No se encontraron empresas que coincidan con tus criterios."
+    },
+    "roleSearchFilters": {
+      "label": "Buscar empresas por rol",
+      "placeholder": "Busca empresas (por ejemplo, Google, Amazon)..."
+    },
+    "timer": {
+      "connecting": "Conectando...",
+      "requestTime": "Pedirle a {{interviewer}} más tiempo",
+      "analyzingCode": "Analizando tu código...",
+      "analysisDescription": "Nuestra IA está evaluando tu enfoque frente a complejidades temporales y espaciales óptimas.",
+      "questionProgress": "Pregunta {{current}} de {{total}}",
+      "nextQuestion": "Siguiente pregunta",
+      "finishInterview": "Finalizar entrevista",
+      "voiceTurnProgress": "Entrevista de voz en vivo - Turno {{current}} de {{total}}",
+      "aiThinking": "La IA está pensando...",
+      "listeningStatus": "Escuchando (hablar se detectará automáticamente)...",
+      "waitingStatus": "Espera a que la IA termine...",
+      "endInterviewEarly": "Finalizar entrevista antes de tiempo",
+      "sendNowOverride": "Enviar ahora (anular silencio)",
+      "totalTime": "Tiempo total",
+      "questions": "Preguntas",
+      "extraTimePrompt": "¿Cuántos minutos extra necesitas? (máx. 30)",
+      "extraTimeLimitReached": "Solo puedo conceder un máximo de {{max}} minutos adicionales. He agregado {{max}} minutos a tu reloj.",
+      "extraTimeGranted": "Te he concedido {{requested}} minutos extra. ¡Buena suerte!",
+      "extraTimeTotalLimitReached": "Solo puedes solicitar un máximo de 30 minutos en total. He agregado tus {{remaining}} minutos restantes a tu reloj.",
+      "fallbackSpeech": "No te entendí bien.",
+      "speechNotSupported": "El reconocimiento de voz no es compatible con este navegador. Usa Chrome."
+    },
+    "question": {
+      "difficulty": {
+        "easy": "Fácil",
+        "medium": "Intermedio",
+        "hard": "Difícil"
+      },
+      "saveQuestion": "Guardar pregunta",
+      "removeSaved": "Quitar de guardados",
+      "srsStage": "Etapa SRS",
+      "box": "Caja {{number}}",
+      "nextReview": "Próxima revisión:",
+      "notScheduled": "Aún no programado",
+      "forgotWrong": "Olvidé / Incorrecto",
+      "rememberedRight": "Recordé / Correcto",
+      "viewSolution": "Ver solución",
+      "xpAward": "+25 XP",
+      "toast": {
+        "reviewScheduled": "¡La revisión de esta pregunta se ha pospuesto! Sigue así.",
+        "reviewReset": "Se restableció el intervalo. Revisarás esta pregunta de nuevo mañana."
+      }
+    },
+    "reports": {
+      "aiUnavailable": "La IA no está disponible en este momento; inténtalo de nuevo o revisa la configuración de tu clave API.",
+      "errorGeneratingTextReport": "Hubo un error al generar tu informe técnico. Revisa la clave de API o tu conexión a internet.",
+      "errorGeneratingVoiceReport": "Hubo un error al generar tu informe. Revisa la clave de API o tu conexión a internet.",
+      "aiInterviewReport": "Informe de entrevista con IA",
+      "aiInterviewDescription": "Una evaluación verbal detallada de tu desempeño.",
+      "technicalEvaluation": "Evaluación técnica",
+      "technicalEvaluationDescription": "Revisa tu desempeño, ideas y áreas de mejora.",
+      "backToStudyMode": "Volver al modo de estudio"
+    },
+    "reviewQueue": {
+      "backToCompanies": "Volver a las empresas",
+      "title": "Cola de revisión por repetición espaciada",
+      "description": "Revisa las preguntas que practicaste antes usando el sistema Leitner.",
+      "instructions": "Responde estas preguntas hoy. Marca como Correcto para moverlas a un intervalo más largo, o como Incorrecto para revisarlas de nuevo mañana.",
+      "caughtUpTitle": "¡Ya estás al día!",
+      "caughtUpDescription": "No hay preguntas pendientes de revisión. ¡Practica más preguntas en Career Mode para construir tu cola de revisión!",
+      "exploreCompanies": "Explorar empresas"
+    },
+    "standardView": {
+      "studyQuestions": "Preguntas de estudio",
+      "mockInterview": "Entrevista simulada",
+      "questionBank": "Banco de preguntas",
+      "practiced": "{{practiced}} / {{total}} practicadas",
+      "chooseModeTitle": "Elige tu modo de entrevista",
+      "chooseModeDescription": "Practica con un banco de preguntas estructurado o simula una entrevista de voz en vivo con IA.",
+      "standardTechnical": "Técnica estándar",
+      "standardTechnicalDescription": "Realiza una entrevista técnica estructurada para {{companyName}}.",
+      "startTextInterview": "Iniciar entrevista por texto",
+      "aiVoiceInterview": "Entrevista de voz con IA",
+      "aiVoiceDescription": "Practica hablar en voz alta con una entrevistadora de voz realista.",
+      "startVoiceInterview": "Iniciar entrevista de voz",
+      "newBadge": "Nuevo"
+    },
+    "modal": {
+      "exitFullscreen": "Salir de pantalla completa",
+      "closeModal": "Cerrar",
+      "toggleFullscreen": "Cambiar pantalla completa",
+      "yourAnswer": "Tu respuesta",
+      "chooseInterviewer": "Elige a tu entrevistador",
+      "selectPersona": "Selecciona la persona de voz con la que te gustaría practicar.",
+      "maleVoice": "Entrevistador técnico clásico",
+      "femaleVoice": "Entrevistadora tranquila y colaborativa"
+    },
+    "editor": {
+      "languages": {
+        "javascript": "JavaScript",
+        "python": "Python",
+        "java": "Java",
+        "cpp": "C++",
+        "typescript": "TypeScript"
+      }
+    }
+  },
   "logout": {
     "title": "¿Cerrar Sesión?",
     "body": "¿Estás seguro de que deseas cerrar sesión?"

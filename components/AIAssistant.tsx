@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageCircle, X, Send, Sparkles, Bot, User, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Bot, User, Loader2, ChevronDown, ChevronUp, Bookmark, BookmarkCheck } from 'lucide-react';
 import { COURSES, COMPANIES, CATEGORIES } from '../constants';
+import { storageService } from '../services/storageService';
+import { useToast } from '../contexts/ToastContext';
 
 interface AIAssistantProps {
   courseContext: string;
@@ -15,6 +17,7 @@ interface Message {
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseTitle }) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [input, setInput] = useState('');
@@ -22,7 +25,20 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
     { role: 'model', text: t('aiAssistant.welcome', { courseTitle }) }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [savedIndices, setSavedIndices] = useState<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const handleBookmark = (idx: number, text: string) => {
+    if (savedIndices.has(idx)) return;
+    storageService.saveAINote({
+      id: `${Date.now()}-${idx}`,
+      text,
+      courseTitle,
+      savedAt: new Date().toISOString(),
+    });
+    setSavedIndices(prev => new Set(prev).add(idx));
+    showToast({ message: 'Saved to your AI Notes', type: 'success' });
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,17 +114,17 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
 
       const data = await res.json();
       const text = data.choices?.[0]?.message?.content || t('aiAssistant.fallbackResponse');
-      
+
       setMessages(prev => [...prev, { role: 'model', text }]);
     } catch (error: any) {
       console.error("AI Error:", error);
-      
+
       let errorMessage = t('aiAssistant.error.connection');
-      
+
       if (error?.message?.includes('401') || error?.message?.includes('429')) {
-         errorMessage = t('aiAssistant.error.api', { userMessage, courseTitle: courseTitle || t('aiAssistant.error.defaultCourse') });
+        errorMessage = t('aiAssistant.error.api', { userMessage, courseTitle: courseTitle || t('aiAssistant.error.defaultCourse') });
       }
-      
+
       setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsLoading(false);
@@ -153,73 +169,89 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
                 </div>
                 <div className={`
                     max-w-[85%] rounded-2xl p-3 text-sm leading-relaxed
-                    ${msg.role === 'user' 
-                      ? 'bg-primary text-white rounded-tr-none' 
-                      : 'bg-white dark:bg-[#2A303C] text-textMain border border-black/20 dark:border-white/5 rounded-tl-none'}
+                    ${msg.role === 'user'
+                    ? 'bg-primary text-white rounded-tr-none'
+                    : 'bg-white dark:bg-[#2A303C] text-textMain border border-black/20 dark:border-white/5 rounded-tl-none'}
                 `}>
                   {/* Better Plain Text Rendering */}
                   {msg.text.split('\n').map((line, i) => {
                     // Skip empty lines that are just whitespace
                     if (!line.trim() && i !== 0) return <div key={i} className="h-2" />;
-                    
+
                     // Basic bold handling for *word* or **word**
                     const parts = line.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, j) => {
-                        if (part.startsWith('**') && part.endsWith('**')) return <strong key={j}>{part.slice(2, -2)}</strong>;
-                        if (part.startsWith('*') && part.endsWith('*')) return <strong key={j}>{part.slice(1, -1)}</strong>;
-                        return part;
+                      if (part.startsWith('**') && part.endsWith('**')) return <strong key={j}>{part.slice(2, -2)}</strong>;
+                      if (part.startsWith('*') && part.endsWith('*')) return <strong key={j}>{part.slice(1, -1)}</strong>;
+                      return part;
                     });
 
                     return <p key={i} className="min-h-[1.2em]">{parts}</p>;
                   })}
+
+                  {msg.role === 'model' && (
+                    <div className="flex justify-end mt-2 pt-2 border-t border-black/10 dark:border-white/10">
+                      <button
+                        onClick={() => handleBookmark(idx, msg.text)}
+                        disabled={savedIndices.has(idx)}
+                        className={`flex items-center gap-1 text-xs font-medium transition-colors ${savedIndices.has(idx) ? 'text-primaryLight' : 'text-textMuted hover:text-primaryLight'
+                          }`}
+                        title={savedIndices.has(idx) ? 'Saved to AI Notes' : 'Save to AI Notes'}
+                        aria-label={savedIndices.has(idx) ? 'Saved to AI Notes' : 'Save to AI Notes'}
+                      >
+                        {savedIndices.has(idx) ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                        {savedIndices.has(idx) ? 'Saved' : 'Save'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
             {isLoading && (
-               <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center">
-                     <Sparkles size={14} />
-                  </div>
-                  <div className="bg-white dark:bg-[#2A303C] rounded-2xl rounded-tl-none p-3 border border-black/20 dark:border-white/5 flex items-center gap-2">
-                     <Loader2 size={16} className="animate-spin text-primaryLight" />
-                     <span className="text-xs text-textMuted">{t('aiAssistant.status.thinking')}</span>
-                  </div>
-               </div>
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center">
+                  <Sparkles size={14} />
+                </div>
+                <div className="bg-white dark:bg-[#2A303C] rounded-2xl rounded-tl-none p-3 border border-black/20 dark:border-white/5 flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-primaryLight" />
+                  <span className="text-xs text-textMuted">{t('aiAssistant.status.thinking')}</span>
+                </div>
+              </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
           <div className="p-4 bg-white dark:bg-[#1A1F2E] border-t border-black/20 dark:border-white/10 shrink-0">
-             <div className="flex gap-2 relative">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder={t('aiAssistant.input.placeholder')}
-                  className="flex-1 bg-black/5 dark:bg-black/20 border border-transparent focus:border-primaryLight rounded-xl px-4 py-3 text-textMain placeholder-textMuted focus:outline-none transition-all pr-10"
-                />
-                <button 
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
-                  title={t('aiAssistant.input.send')}
-                  aria-label={t('aiAssistant.input.send')}
+            <div className="flex gap-2 relative">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                placeholder={t('aiAssistant.input.placeholder')}
+                className="flex-1 bg-black/5 dark:bg-black/20 border border-transparent focus:border-primaryLight rounded-xl px-4 py-3 text-textMain placeholder-textMuted focus:outline-none transition-all pr-10"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                title={t('aiAssistant.input.send')}
+                aria-label={t('aiAssistant.input.send')}
+              >
+                <Send size={16} />
+              </button>
+            </div>
+            <div className="mt-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {[t('aiAssistant.suggestions.explain'), t('aiAssistant.suggestions.quiz'), t('aiAssistant.suggestions.example')].map(hint => (
+                <button
+                  key={hint}
+                  onClick={() => { setInput(hint); }}
+                  className="px-3 py-1 rounded-full bg-primary/10 text-primaryLight text-xs font-medium hover:bg-primary/20 transition-colors whitespace-nowrap"
                 >
-                  <Send size={16} />
+                  {hint}
                 </button>
-             </div>
-             <div className="mt-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                {[t('aiAssistant.suggestions.explain'), t('aiAssistant.suggestions.quiz'), t('aiAssistant.suggestions.example')].map(hint => (
-                   <button 
-                     key={hint}
-                     onClick={() => { setInput(hint); }}
-                     className="px-3 py-1 rounded-full bg-primary/10 text-primaryLight text-xs font-medium hover:bg-primary/20 transition-colors whitespace-nowrap"
-                   >
-                     {hint}
-                   </button>
-                ))}
-             </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -227,15 +259,15 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
       {/* Toggle Button */}
       {!isOpen && (
         <button
-            id="ai-assistant-toggle"
-            onClick={() => setIsOpen(true)}
-            className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-main text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-fade-in-up"
-            title={t('aiAssistant.toggle.open')}
-            aria-label={t('aiAssistant.toggle.open')}
+          id="ai-assistant-toggle"
+          onClick={() => setIsOpen(true)}
+          className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-main text-white shadow-2xl hover:scale-110 transition-all duration-300 animate-fade-in-up"
+          title={t('aiAssistant.toggle.open')}
+          aria-label={t('aiAssistant.toggle.open')}
         >
-            <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 animate-pulse"></div>
-            <Sparkles size={28} className="animate-pulse-slow" />
-            <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full border-2 border-[#0B1220]"></span>
+          <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 animate-pulse"></div>
+          <Sparkles size={28} className="animate-pulse-slow" />
+          <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full border-2 border-[#0B1220]"></span>
         </button>
       )}
     </div>

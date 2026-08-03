@@ -156,3 +156,10 @@ export interface CareerProgress {
   mockInterviewScores: { companyId: string; score: number; date: string }[];
   srsData?: Record<string, QuestionSRSData>; // Map of questionId to SRS progress
 }
+
+export interface SavedAINote {
+  id: string;
+  text: string;
+  courseTitle: string;
+  savedAt: string; // ISO timestamp
+}

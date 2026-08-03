@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, CalendarDays
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, CalendarDays, Bookmark
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -13,7 +13,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPStoreCursor } from '../constants';
-import { User as UserType, UserSettings } from '../types';
+import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -45,6 +45,17 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
+  const [savedNotes, setSavedNotes] = useState<SavedAINote[]>([]);
+
+  useEffect(() => {
+    if (activeTab === 'aiNotes') {
+      setSavedNotes(storageService.getSavedAINotes());
+    }
+  }, [activeTab]);
+
+  const handleDeleteNote = (id: string) => {
+    setSavedNotes(storageService.deleteAINote(id));
+  };
   const [formData, setFormData] = useState<UserType>(user);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | 'unsaved' | null }>({ type: null });
   const [pendingPath, setPendingPath] = useState<string | null>(null);
@@ -334,6 +345,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             <TabButton id="xpstore" icon={ShoppingBag} label={t('settings.tabs.xpStore')} />
             <TabButton id="learning" icon={BookOpen} label={t('settings.tabs.learning')} />
             <TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
+            <TabButton id="aiNotes" icon={Bookmark} label="Saved AI Notes" />
             <TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
             <TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
             <TabButton id="streak" icon={CalendarDays} label="Learning Streak" />
@@ -936,6 +948,46 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <Toggle checked={formData.settings.retryQuiz} onChange={(v) => handleChange('retryQuiz', v)} />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Saved AI Notes Section */}
+            {activeTab === 'aiNotes' && (
+              <div className="space-y-8 animate-fade-in">
+                <div>
+                  <h2 className="text-2xl font-bold text-textMain mb-2 flex items-center gap-2">
+                    <Bookmark className="text-primaryLight" /> Saved AI Notes
+                  </h2>
+                  <p className="text-textMuted">Technical explanations and tips you've bookmarked from the AI Tutor.</p>
+                </div>
+
+                {savedNotes.length === 0 ? (
+                  <div className="text-center py-16 text-textMuted">
+                    <Bookmark size={48} className="mx-auto mb-4 opacity-30" />
+                    <p>You haven't saved any AI notes yet.</p>
+                    <p className="text-sm mt-1">Look for the bookmark icon on AI Tutor responses.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {savedNotes.map(note => (
+                      <div key={note.id} className="p-5 rounded-2xl border border-black/20 dark:border-white/10 bg-white/50 dark:bg-white/5">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primaryLight">{note.courseTitle}</span>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="text-textMuted hover:text-red-500 transition-colors shrink-0"
+                            title="Delete note"
+                            aria-label="Delete note"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                        <p className="text-textMain leading-relaxed whitespace-pre-wrap">{note.text}</p>
+                        <p className="text-xs text-textMuted mt-3">{new Date(note.savedAt).toLocaleString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

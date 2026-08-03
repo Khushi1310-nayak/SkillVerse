@@ -34,6 +34,20 @@ const AVATARS: Record<string, string> = {
   '5': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha',
 };
 
+// Converts a "#rrggbb" (or shorthand "#rgb") hex color into the
+// space-separated "r g b" string format Tailwind expects for opacity support.
+const hexToRgbString = (hex?: string): string | null => {
+  if (!hex) return null;
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+  if (full.length !== 6) return null;
+  const r = parseInt(full.substring(0, 2), 16);
+  const g = parseInt(full.substring(2, 4), 16);
+  const b = parseInt(full.substring(4, 6), 16);
+  if ([r, g, b].some(Number.isNaN)) return null;
+  return `${r} ${g} ${b}`;
+};
+
 export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallback }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -58,11 +72,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
   useEffect(() => {
     const themePreference = user?.settings?.theme;
     const activeThemeId = user?.settings?.activeTheme || (themePreference === 'light' ? 'light' : 'dark');
+    const isCustomTheme = activeThemeId === 'custom';
     const matchedTheme = XP_STORE_THEMES.find(t => t.id === activeThemeId) || XP_STORE_THEMES[0];
 
-    const effectiveMode = (activeThemeId === 'light' || activeThemeId === 'dark')
-      ? (themePreference || matchedTheme.themeMode)
-      : matchedTheme.themeMode;
+    const effectiveMode = isCustomTheme
+      ? (themePreference || 'dark')
+      : (activeThemeId === 'light' || activeThemeId === 'dark')
+        ? (themePreference || matchedTheme.themeMode)
+        : matchedTheme.themeMode;
 
     if (effectiveMode === 'light') {
       document.documentElement.classList.remove('dark');
@@ -74,7 +91,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
     let primary = matchedTheme.primary;
     let primaryLight = matchedTheme.primaryLight;
 
-    if (user?.settings?.gradientIntensity === 'low') {
+    if (isCustomTheme) {
+      primary = hexToRgbString(user?.settings?.customPrimary) || matchedTheme.primary;
+      primaryLight = hexToRgbString(user?.settings?.customPrimaryLight) || matchedTheme.primaryLight;
+    } else if (user?.settings?.gradientIntensity === 'low') {
       if (activeThemeId === 'dark' || activeThemeId === 'light') {
         primary = '139 138 174'; // #8b8aae
         primaryLight = '220 189 187'; // #dcbdbb
@@ -88,7 +108,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
     document.documentElement.style.setProperty('--color-primary', primary);
     document.documentElement.style.setProperty('--color-primary-light', primaryLight);
-  }, [user?.settings?.theme, user?.settings?.gradientIntensity, user?.settings?.activeTheme]);
+  }, [user?.settings?.theme, user?.settings?.gradientIntensity, user?.settings?.activeTheme, user?.settings?.customPrimary, user?.settings?.customPrimaryLight]);
 
   const getOpacityClass = () => {
     if (user?.settings?.gradientIntensity === 'low') return 'opacity-30';

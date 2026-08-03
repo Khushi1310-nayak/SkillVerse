@@ -23,6 +23,8 @@ export interface UserSettings {
   unlockedCursors?: string[];
   activeTheme?: string;
   activeCursor?: string;
+  customPrimary?: string; // hex color, e.g. #6968A6
+  customPrimaryLight?: string; // hex color, e.g. #CF9893
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {

@@ -114,6 +114,186 @@
       }
     }
   },
+  "courseView": {
+    "notFound": "Course not found",
+    "loading": "Loading course material...",
+    "back": "Back",
+    "navigation": {
+      "notesResources": "Notes & Resources",
+      "finalQuiz": "Final Quiz"
+    },
+    "resources": {
+      "title": "External Resources",
+      "proceed": "Proceed to Quiz"
+    },
+    "quiz": {
+      "question": "Question {{current}}",
+      "questionCount": "{{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Submit Quiz",
+      "result": {
+        "congratulations": "Congratulations!",
+        "keepTrying": "Keep Trying!",
+        "scorePrefix": "You scored",
+        "earnedCertificate": "You have earned a certificate.",
+        "need70": "You need 70% to pass.",
+        "viewCertificate": "View Certificate",
+        "retryReminder": "Take a moment to review the course material before trying again!",
+        "retryCountdown": "⏳ You can retry in {{time}}",
+        "retry": "Retry Quiz",
+        "retryDisabled": "Retrying quizzes is disabled in your settings.",
+        "reviewAnswers": "Review Answers"
+      }
+    }
+  },
+  "aiAssistant": {
+    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
+    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "header": {
+      "title": "Learning Assistant",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "close": "Close AI Assistant"
+    },
+    "status": {
+      "thinking": "Thinking..."
+    },
+    "input": {
+      "placeholder": "Ask a question...",
+      "send": "Send message"
+    },
+    "suggestions": {
+      "explain": "Explain simply",
+      "quiz": "Give me a quiz",
+      "example": "Give an example"
+    },
+    "toggle": {
+      "open": "Open AI Assistant"
+    },
+    "error": {
+      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
+      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
+      "defaultCourse": "your dashboard"
+    }
+  },
+  "careerMode": {
+    "header": {
+      "badge": "Career Mode Beta",
+      "title": "Interview Prep",
+      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
+      "readiness": "Overall Readiness",
+      "ready": "Ready",
+      "questionsLabel": "Questions"
+    },
+    "companyCards": {
+      "recommendedTitle": "Recommended for You",
+      "progress": "Progress",
+      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
+      "emptyState": "No companies found matching your criteria."
+    },
+    "roleSearchFilters": {
+      "label": "Search companies by role",
+      "placeholder": "Search companies (e.g. Google, Amazon)..."
+    },
+    "timer": {
+      "connecting": "Connecting...",
+      "requestTime": "Ask {{interviewer}} for Time",
+      "analyzingCode": "Analyzing your code...",
+      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
+      "questionProgress": "Question {{current}} of {{total}}",
+      "nextQuestion": "Next Question",
+      "finishInterview": "Finish Interview",
+      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
+      "aiThinking": "AI is thinking...",
+      "listeningStatus": "Listening (speaking will auto-detect)...",
+      "waitingStatus": "Wait for AI to finish...",
+      "endInterviewEarly": "End Interview Early",
+      "sendNowOverride": "Send Now (Override Silence)",
+      "totalTime": "Total Time",
+      "questions": "Questions",
+      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
+      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
+      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
+      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
+      "fallbackSpeech": "I didn't quite catch that.",
+      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+    },
+    "question": {
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "saveQuestion": "Save question",
+      "removeSaved": "Remove from saved",
+      "srsStage": "SRS Stage",
+      "box": "Box {{number}}",
+      "nextReview": "Next review:",
+      "notScheduled": "Not scheduled yet",
+      "forgotWrong": "Forgot / Wrong",
+      "rememberedRight": "Remembered / Right",
+      "viewSolution": "View solution",
+      "xpAward": "+25 XP",
+      "toast": {
+        "reviewScheduled": "Question review scheduled further out! Keep it up.",
+        "reviewReset": "Interval reset. You will review this question again tomorrow."
+      }
+    },
+    "reports": {
+      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
+      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
+      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
+      "aiInterviewReport": "AI Interview Report",
+      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
+      "technicalEvaluation": "Technical Evaluation",
+      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
+      "backToStudyMode": "Back to Study Mode"
+    },
+    "reviewQueue": {
+      "backToCompanies": "Back to Companies",
+      "title": "Spaced Repetition Review Queue",
+      "description": "Review questions you previously practiced using the Leitner system.",
+      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
+      "caughtUpTitle": "You're all caught up!",
+      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
+      "exploreCompanies": "Explore Companies"
+    },
+    "standardView": {
+      "studyQuestions": "Study Questions",
+      "mockInterview": "Mock Interview",
+      "questionBank": "Question Bank",
+      "practiced": "{{practiced}} / {{total}} Practiced",
+      "chooseModeTitle": "Choose Your Interview Mode",
+      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
+      "standardTechnical": "Standard Technical",
+      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
+      "startTextInterview": "Start Text Interview",
+      "aiVoiceInterview": "AI Voice Interview",
+      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
+      "startVoiceInterview": "Start Voice Interview",
+      "newBadge": "New"
+    },
+    "modal": {
+      "exitFullscreen": "Exit Fullscreen",
+      "closeModal": "Close",
+      "toggleFullscreen": "Toggle Fullscreen",
+      "yourAnswer": "Your Answer",
+      "chooseInterviewer": "Choose your interviewer",
+      "selectPersona": "Select the voice persona you'd like to practice with.",
+      "maleVoice": "Classic technical interviewer",
+      "femaleVoice": "Calm and collaborative interviewer"
+    },
+    "editor": {
+      "languages": {
+        "javascript": "JavaScript",
+        "python": "Python",
+        "java": "Java",
+        "cpp": "C++",
+        "typescript": "TypeScript"
+      }
+    }
+  },
   "logout": {
     "title": "Log Out?",
     "body": "Are you sure you want to log out of your account?"

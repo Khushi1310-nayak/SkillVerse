@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, CalendarDays, Bookmark
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -13,11 +13,12 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPStoreCursor } from '../constants';
-import { User as UserType, UserSettings } from '../types';
+import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { LearningStreakTab } from './LearningStreakTab';
 
 
 interface SettingsProps {
@@ -44,6 +45,17 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
+  const [savedNotes, setSavedNotes] = useState<SavedAINote[]>([]);
+
+  useEffect(() => {
+    if (activeTab === 'aiNotes') {
+      setSavedNotes(storageService.getSavedAINotes());
+    }
+  }, [activeTab]);
+
+  const handleDeleteNote = (id: string) => {
+    setSavedNotes(storageService.deleteAINote(id));
+  };
   const [formData, setFormData] = useState<UserType>(user);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | 'unsaved' | null }>({ type: null });
   const [pendingPath, setPendingPath] = useState<string | null>(null);
@@ -89,7 +101,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
       if (target.href.includes('#/')) {
         const url = new URL(target.href);
-        
+
         if (url.origin === window.location.origin && url.hash !== window.location.hash && url.hash !== '#/settings') {
           e.preventDefault();
           e.stopPropagation();
@@ -110,9 +122,16 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   }, [isDirty]);
 
   const handleChange = (field: keyof UserSettings, value: any) => {
+    const updatedSettings = {
+      ...formData.settings,
+      [field]: value
+    };
+    if (field === 'theme') {
+      updatedSettings.activeTheme = value === 'light' ? 'light' : 'dark';
+    }
     const updatedUser = {
       ...formData,
-      settings: { ...formData.settings, [field]: value }
+      settings: updatedSettings
     };
     setFormData(updatedUser);
 
@@ -120,6 +139,28 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     if (field === 'theme' || field === 'gradientIntensity') {
       onPreviewUpdate(updatedUser);
     }
+  };
+
+  const handleCustomColorChange = (field: 'customPrimary' | 'customPrimaryLight', value: string) => {
+    const updatedSettings: UserSettings = {
+      ...formData.settings,
+      [field]: value,
+      activeTheme: 'custom',
+    };
+    const updatedUser = { ...formData, settings: updatedSettings };
+    setFormData(updatedUser);
+    onPreviewUpdate(updatedUser);
+  };
+
+  const handleResetCustomTheme = () => {
+    const updatedSettings: UserSettings = {
+      ...formData.settings,
+      activeTheme: 'dark',
+      theme: 'dark',
+    };
+    const updatedUser = { ...formData, settings: updatedSettings };
+    setFormData(updatedUser);
+    onPreviewUpdate(updatedUser);
   };
 
   const handleProfileChange = (field: keyof UserType, value: any) => {
@@ -292,21 +333,23 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   return (
     <div className="animate-fade-in relative">
       <h1 className="text-3xl font-display font-bold text-textMain mb-8">
-  {t('settings.title')}
-</h1>
+        {t('settings.title')}
+      </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
         <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
           <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
-<TabButton id="profile" icon={User} label={t('settings.tabs.profile')} />
-<TabButton id="appearance" icon={Palette} label={t('settings.tabs.appearance')} />
-<TabButton id="xpstore" icon={ShoppingBag} label={t('settings.tabs.xpStore')} />
-<TabButton id="learning" icon={BookOpen} label={t('settings.tabs.learning')} />
-<TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
-<TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
-<TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
-<TabButton id="account" icon={Shield} label={t('settings.tabs.account')} />
+            <TabButton id="profile" icon={User} label={t('settings.tabs.profile')} />
+            <TabButton id="appearance" icon={Palette} label={t('settings.tabs.appearance')} />
+            <TabButton id="xpstore" icon={ShoppingBag} label={t('settings.tabs.xpStore')} />
+            <TabButton id="learning" icon={BookOpen} label={t('settings.tabs.learning')} />
+            <TabButton id="quiz" icon={Brain} label={t('settings.tabs.quiz')} />
+            <TabButton id="aiNotes" icon={Bookmark} label="Saved AI Notes" />
+            <TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
+            <TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
+            <TabButton id="streak" icon={CalendarDays} label="Learning Streak" />
+            <TabButton id="account" icon={Shield} label={t('settings.tabs.account')} />
           </div>
         </div>
 
@@ -358,11 +401,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                         >
                           {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
                           <span>
-                             {uploading
-                                ? `${t('settings.profile.uploading')} (${uploadProgress}%)`
-                                : t('settings.profile.uploadAvatar')}
+                            {uploading
+                              ? `${t('settings.profile.uploading')} (${uploadProgress}%)`
+                              : t('settings.profile.uploadAvatar')}
                           </span>
-                          </button>
+                        </button>
 
                         {formData.photoURL && (
                           <button
@@ -507,6 +550,83 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <div className="h-24 rounded-xl bg-gradient-main flex items-center justify-center shadow-lg shadow-primary/20">
                     <span className="text-white font-bold text-lg mix-blend-overlay">SkillVerse Premium UI</span>
                   </div>
+                </div>
+                {/* Custom Theme Palette Builder */}
+                <div className="space-y-5 p-5 rounded-2xl border border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5">
+                  <div>
+                    <label className="text-sm font-semibold text-textMuted uppercase tracking-wider">Custom Theme Palette</label>
+                    <p className="text-xs text-textMuted mt-1">Pick your own primary and secondary accent colors.</p>
+                  </div>
+
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={formData.settings.customPrimary || '#6968A6'}
+                        onChange={(e) => handleCustomColorChange('customPrimary', e.target.value)}
+                        title="Primary Accent Color"
+                        aria-label="Primary Accent Color"
+                        className="w-12 h-12 rounded-lg border border-black/10 dark:border-white/10 cursor-pointer bg-transparent p-0"
+                      />
+                      <div>
+                        <div className="text-sm font-bold text-textMain">Primary Accent</div>
+                        <div className="text-xs text-textMuted">{(formData.settings.customPrimary || '#6968A6').toUpperCase()}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={formData.settings.customPrimaryLight || '#CF9893'}
+                        onChange={(e) => handleCustomColorChange('customPrimaryLight', e.target.value)}
+                        title="Secondary Accent Color"
+                        aria-label="Secondary Accent Color"
+                        className="w-12 h-12 rounded-lg border border-black/10 dark:border-white/10 cursor-pointer bg-transparent p-0"
+                      />
+                      <div>
+                        <div className="text-sm font-bold text-textMain">Secondary Accent</div>
+                        <div className="text-xs text-textMuted">{(formData.settings.customPrimaryLight || '#CF9893').toUpperCase()}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Glassmorphism Preview */}
+                  <div
+                    className="rounded-2xl p-6 border backdrop-blur-md transition-all duration-300 space-y-4"
+                    style={{
+                      background: `linear-gradient(135deg, ${formData.settings.customPrimary || '#6968A6'}22 0%, ${formData.settings.customPrimaryLight || '#CF9893'}22 100%)`,
+                      borderColor: `${formData.settings.customPrimary || '#6968A6'}55`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-textMain">Live Preview</span>
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
+                        style={{ backgroundColor: formData.settings.customPrimaryLight || '#CF9893' }}
+                      >
+                        New Badge
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="px-5 py-2.5 rounded-xl text-white font-medium shadow-lg transition-transform hover:scale-[1.02]"
+                      style={{
+                        backgroundImage: `linear-gradient(90deg, ${formData.settings.customPrimary || '#6968A6'} 0%, ${formData.settings.customPrimaryLight || '#CF9893'} 100%)`,
+                      }}
+                    >
+                      Sample Button
+                    </button>
+                  </div>
+
+                  {formData.settings.activeTheme === 'custom' && (
+                    <button
+                      type="button"
+                      onClick={handleResetCustomTheme}
+                      className="text-xs font-medium text-textMuted hover:text-textMain underline"
+                    >
+                      Reset to Default Dark
+                    </button>
+                  )}
                 </div>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                   <div>
@@ -831,6 +951,46 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
               </div>
             )}
 
+            {/* Saved AI Notes Section */}
+            {activeTab === 'aiNotes' && (
+              <div className="space-y-8 animate-fade-in">
+                <div>
+                  <h2 className="text-2xl font-bold text-textMain mb-2 flex items-center gap-2">
+                    <Bookmark className="text-primaryLight" /> Saved AI Notes
+                  </h2>
+                  <p className="text-textMuted">Technical explanations and tips you've bookmarked from the AI Tutor.</p>
+                </div>
+
+                {savedNotes.length === 0 ? (
+                  <div className="text-center py-16 text-textMuted">
+                    <Bookmark size={48} className="mx-auto mb-4 opacity-30" />
+                    <p>You haven't saved any AI notes yet.</p>
+                    <p className="text-sm mt-1">Look for the bookmark icon on AI Tutor responses.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {savedNotes.map(note => (
+                      <div key={note.id} className="p-5 rounded-2xl border border-black/20 dark:border-white/10 bg-white/50 dark:bg-white/5">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primaryLight">{note.courseTitle}</span>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="text-textMuted hover:text-red-500 transition-colors shrink-0"
+                            title="Delete note"
+                            aria-label="Delete note"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                        <p className="text-textMain leading-relaxed whitespace-pre-wrap">{note.text}</p>
+                        <p className="text-xs text-textMuted mt-3">{new Date(note.savedAt).toLocaleString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Certificate Section */}
             {activeTab === 'certificate' && (
               <div className="space-y-8 animate-fade-in">
@@ -894,6 +1054,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   })}
                 </div>
               </div>
+            )}
+
+            {/* Learning Streak Section */}
+            {activeTab === 'streak' && (
+              <LearningStreakTab user={user} />
             )}
 
             {/* Account Section */}
@@ -998,7 +1163,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   {modal.type === 'reset'
                     ? t('settings.modals.resetBody')
                     : t('settings.modals.clearBody')}
-                  
+
                 </p>
                 <div className="flex gap-4">
                   <button

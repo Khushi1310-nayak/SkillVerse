@@ -3,6 +3,7 @@ import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestor
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Medal, TrendingUp, Calendar, Clock, Award } from 'lucide-react';
 import { db } from '../firebase/firebase';
+import { XP_STORE_FRAMES } from '../constants';
 
 interface LeaderboardUser {
   id: string;
@@ -13,6 +14,7 @@ interface LeaderboardUser {
   monthlyXP: number;
   level: number;
   avatarId?: string;
+  activeFrame?: string;
 }
 
 const AVATARS: Record<string, string> = {
@@ -54,7 +56,8 @@ export const Leaderboard: React.FC = () => {
           weeklyXP: data.weeklyXP || 0,
           monthlyXP: data.monthlyXP || 0,
           level: data.level || 1,
-          avatarId: data.preferences?.settings?.avatarId
+          avatarId: data.preferences?.settings?.avatarId,
+          activeFrame: data.preferences?.settings?.activeFrame || 'none'
         });
       });
       setUsers(topUsers);
@@ -182,6 +185,11 @@ export const Leaderboard: React.FC = () => {
                     width={48}
                     height={48}
                   />
+                  {user.activeFrame && user.activeFrame !== 'none' && (
+                    <div className={`absolute inset-0 rounded-full pointer-events-none ${
+                      XP_STORE_FRAMES.find(f => f.id === user.activeFrame)?.frameClass || ''
+                    }`} />
+                  )}
                   {index < 3 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">
                       <div className={`w-3 h-3 rounded-full ${

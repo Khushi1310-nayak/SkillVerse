@@ -13,7 +13,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { soundManager } from '../utils/soundManager';
-import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPStoreCursor } from '../constants';
+import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
 import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
@@ -382,6 +382,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                         width={80}
                         height={80}
                       />
+                      {formData.settings.activeFrame && formData.settings.activeFrame !== 'none' && (
+                        <div className={`absolute inset-0 rounded-full pointer-events-none ${
+                          XP_STORE_FRAMES.find(f => f.id === formData.settings.activeFrame)?.frameClass || ''
+                        }`} />
+                      )}
                       {formData.photoURL && (
                         <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
                           {t('settings.profile.custom')}
@@ -858,6 +863,113 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                                     : 'bg-black/10 dark:bg-white/5 text-textMuted cursor-not-allowed'}`}
                               >
                                 Buy Cursor
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Avatar Frames Shelf */}
+                <div className="space-y-4 pt-4 border-t border-black/20 dark:border-white/10">
+                  <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+                    <User size={18} className="text-primaryLight" /> Avatar Frames
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {XP_STORE_FRAMES.map(frame => {
+                      const isUnlocked = formData.settings.unlockedFrames?.includes(frame.id) ?? (frame.id === 'none');
+                      const isActive = formData.settings.activeFrame === frame.id || (!formData.settings.activeFrame && frame.id === 'none');
+                      const canAfford = formData.xp >= frame.cost;
+
+                      const handleSelectFrame = () => {
+                        const updatedUser = {
+                          ...formData,
+                          settings: {
+                            ...formData.settings,
+                            activeFrame: frame.id
+                          }
+                        };
+                        setFormData(updatedUser);
+                        onPreviewUpdate(updatedUser);
+                      };
+
+                      const handleUnlockFrame = async () => {
+                        try {
+                          await purchaseItem(frame.id, frame.cost, 'frame');
+                          if (formData.settings.soundEffects !== false) soundManager.playCoin();
+                          showToast({ message: `Unlocked ${frame.name} Frame!`, type: 'success' });
+                          setFormData(prev => ({
+                            ...prev,
+                            xp: prev.xp - frame.cost,
+                            settings: {
+                              ...prev.settings,
+                              unlockedFrames: [...(prev.settings.unlockedFrames || ['none']), frame.id],
+                              activeFrame: frame.id
+                            }
+                          }));
+                        } catch (err: any) {
+                          showToast({ message: err.message || 'Failed to unlock frame', type: 'error' });
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={frame.id}
+                          className={`p-5 rounded-2xl border transition-all flex flex-col justify-between h-48 bg-white/30 dark:bg-white/5
+                            ${isActive ? 'border-primaryLight shadow-lg shadow-primary/10' : 'border-black/10 dark:border-white/10'}`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-bold text-textMain">{frame.name}</span>
+                              {isUnlocked ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Owned</span>
+                              ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">{frame.cost} XP</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-2 line-clamp-2">{frame.description}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-black/10 dark:border-white/5">
+                            {/* Frame Preview */}
+                            <div className="relative w-8 h-8 rounded-full overflow-visible flex items-center justify-center">
+                              <img
+                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+                                alt="Frame Preview Avatar"
+                                className="w-8 h-8 rounded-full object-cover bg-white/10"
+                                width={32}
+                                height={32}
+                              />
+                              {frame.id !== 'none' && (
+                                <div className={`absolute inset-0 rounded-full pointer-events-none ${frame.frameClass}`} />
+                              )}
+                            </div>
+
+                            {isUnlocked ? (
+                              isActive ? (
+                                <span className="text-xs font-bold text-primaryLight uppercase tracking-wider flex items-center gap-1"><CheckCircle size={14} /> Active</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={handleSelectFrame}
+                                  className="px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-black/20 dark:border-white/10 text-textMain rounded-lg text-xs font-bold transition-all"
+                                >
+                                  Select
+                                </button>
+                              )
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={handleUnlockFrame}
+                                disabled={!canAfford}
+                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all
+                                  ${canAfford
+                                    ? 'bg-gradient-main text-white hover:shadow-md active:scale-95'
+                                    : 'bg-black/10 dark:bg-white/5 text-textMuted cursor-not-allowed'}`}
+                              >
+                                Buy Frame
                               </button>
                             )}
                           </div>

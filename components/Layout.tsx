@@ -18,7 +18,7 @@ import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
 import { CommandPalette } from './CommandPalette';
-import { XP_STORE_THEMES } from '../constants';
+import { XP_STORE_THEMES, XP_STORE_FRAMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
@@ -202,13 +202,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
         <div className="pt-6 border-t border-black/20 dark:border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
-            <img
-              src={user.photoURL || AVATARS[user.settings.avatarId || '1']}
-              alt="Avatar"
-              className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
-              width={40}
-              height={40}
-            />
+            <div className="relative">
+              <img
+                src={user.photoURL || AVATARS[user.settings.avatarId || '1']}
+                alt="Avatar"
+                className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
+                width={40}
+                height={40}
+              />
+              {user.settings.activeFrame && user.settings.activeFrame !== 'none' && (
+                <div className={`absolute inset-0 rounded-full pointer-events-none ${
+                  XP_STORE_FRAMES.find(f => f.id === user.settings.activeFrame)?.frameClass || ''
+                }`} />
+              )}
+            </div>
             <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="font-bold text-textMain truncate">{user.username}</div>
               <div className="text-xs text-textMuted truncate">{user.email}</div>

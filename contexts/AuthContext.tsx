@@ -35,7 +35,7 @@ interface AuthContextType {
   updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
   updateLocalUser: (updatedUser: AppUser) => void; 
   completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
-  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor') => Promise<void>;
+  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -340,7 +340,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor') => {
+  const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => {
     if (!auth.currentUser || !appUser) return;
     if (appUser.xp < cost) {
       throw new Error("Insufficient XP");
@@ -368,6 +368,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       updatedSettings.unlockedCursors = unlocked;
       updatedSettings.activeCursor = itemId;
+    } else if (type === 'frame') {
+      const unlocked = updatedSettings.unlockedFrames || ['none'];
+      if (!unlocked.includes(itemId)) {
+        unlocked.push(itemId);
+      }
+      updatedSettings.unlockedFrames = unlocked;
+      updatedSettings.activeFrame = itemId;
     }
 
     const previousAppUser = appUser;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, Award, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, Calendar, Clock, Award } from 'lucide-react';
 import { db } from '../firebase/firebase';
 
 interface LeaderboardUser {
@@ -9,6 +9,8 @@ interface LeaderboardUser {
   username: string;
   photoURL?: string;
   xp: number;
+  weeklyXP: number;
+  monthlyXP: number;
   level: number;
   avatarId?: string;
 }
@@ -24,12 +26,22 @@ const AVATARS: Record<string, string> = {
 export const Leaderboard: React.FC = () => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(10));
+    setLoading(true);
     
-    // Subscribe to Firestore updates in real-time.
-    // We store the unsubscribe callback to properly clean up the listener.
+    // Determine which field to order by based on selected timeframe
+    let orderField = 'weeklyXP';
+    if (timeframe === 'month') orderField = 'monthlyXP';
+    if (timeframe === 'all') orderField = 'xp';
+
+    const q = query(
+      collection(db, 'users'), 
+      orderBy(orderField, 'desc'), 
+      limit(10)
+    );
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const topUsers: LeaderboardUser[] = [];
       snapshot.forEach((doc) => {
@@ -39,6 +51,8 @@ export const Leaderboard: React.FC = () => {
           username: data.username || 'Anonymous',
           photoURL: data.photoURL,
           xp: data.xp || 0,
+          weeklyXP: data.weeklyXP || 0,
+          monthlyXP: data.monthlyXP || 0,
           level: data.level || 1,
           avatarId: data.preferences?.settings?.avatarId
         });
@@ -47,13 +61,17 @@ export const Leaderboard: React.FC = () => {
       setLoading(false);
     }, (error) => {
       console.error("Error fetching leaderboard:", error);
-      // Let the developer know about the composite index via the console error
       setLoading(false);
     });
 
-    // Execute the unsubscribe function when the component unmounts.
     return () => unsubscribe();
-  }, []);
+  }, [timeframe]);
+
+  const getDisplayXP = (user: LeaderboardUser): number => {
+    if (timeframe === 'week') return user.weeklyXP;
+    if (timeframe === 'month') return user.monthlyXP;
+    return user.xp;
+  };
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -99,6 +117,43 @@ export const Leaderboard: React.FC = () => {
           <h2 className="text-2xl font-display font-bold text-textMain">Global Leaderboard</h2>
           <p className="text-sm text-textMuted">Top learners ranked by XP</p>
         </div>
+      </div>
+
+      {/* Time Frame Filter Buttons */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setTimeframe('week')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+            timeframe === 'week'
+              ? 'bg-gradient-main text-white shadow-lg scale-105'
+              : 'bg-white/10 text-textMain hover:bg-white/20'
+          }`}
+        >
+          <Clock size={16} />
+          <span>This Week</span>
+        </button>
+        <button
+          onClick={() => setTimeframe('month')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+            timeframe === 'month'
+              ? 'bg-gradient-main text-white shadow-lg scale-105'
+              : 'bg-white/10 text-textMain hover:bg-white/20'
+          }`}
+        >
+          <Calendar size={16} />
+          <span>This Month</span>
+        </button>
+        <button
+          onClick={() => setTimeframe('all')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+            timeframe === 'all'
+              ? 'bg-gradient-main text-white shadow-lg scale-105'
+              : 'bg-white/10 text-textMain hover:bg-white/20'
+          }`}
+        >
+          <Award size={16} />
+          <span>All Time</span>
+        </button>
       </div>
 
       <div className="space-y-3 relative z-10">
@@ -148,7 +203,7 @@ export const Leaderboard: React.FC = () => {
 
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-1.5 text-textMain font-bold text-xl">
-                  {user.xp.toLocaleString()} <span className="text-sm font-medium text-textMuted">XP</span>
+                  {getDisplayXP(user).toLocaleString()} <span className="text-sm font-medium text-textMuted">XP</span>
                 </div>
               </div>
             </motion.div>

@@ -52,6 +52,8 @@ export interface User {
   enrolledDate: string;
   settings: UserSettings;
   xp: number;
+  weeklyXP?: number;
+monthlyXP?: number;
   level: number;
   courses: string[];
   photoURL?: string;

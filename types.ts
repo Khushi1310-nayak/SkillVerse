@@ -23,6 +23,8 @@ export interface UserSettings {
   unlockedCursors?: string[];
   activeTheme?: string;
   activeCursor?: string;
+  customPrimary?: string; // hex color, e.g. #6968A6
+  customPrimaryLight?: string; // hex color, e.g. #CF9893
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -155,4 +157,11 @@ export interface CareerProgress {
   savedQuestions: string[];
   mockInterviewScores: { companyId: string; score: number; date: string }[];
   srsData?: Record<string, QuestionSRSData>; // Map of questionId to SRS progress
+}
+
+export interface SavedAINote {
+  id: string;
+  text: string;
+  courseTitle: string;
+  savedAt: string; // ISO timestamp
 }

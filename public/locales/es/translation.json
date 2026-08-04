@@ -9,7 +9,7 @@
     "logout": "Cerrar Sesión",
     "menu": "Menú",
     "openMenu": "Abrir Menú",
-"closeMenu": "Cerrar Menú"
+    "closeMenu": "Cerrar Menú"
   },
   "common": {
     "cancel": "Cancelar",
@@ -177,105 +177,276 @@
       "defaultCourse": "tu panel"
     }
   },
+  "careerMode": {
+    "header": {
+      "badge": "Modo de carrera beta",
+      "title": "Preparación para entrevistas",
+      "description": "Dirige tu atención a empresas específicas, practica preguntas reales y simula entornos de entrevista de alta presión.",
+      "readiness": "Preparación general",
+      "ready": "Listo",
+      "questionsLabel": "Preguntas"
+    },
+    "companyCards": {
+      "recommendedTitle": "Recomendado para ti",
+      "progress": "Progreso",
+      "searchPlaceholder": "Busca empresas (por ejemplo, Google, Amazon)...",
+      "emptyState": "No se encontraron empresas que coincidan con tus criterios."
+    },
+    "roleSearchFilters": {
+      "label": "Buscar empresas por rol",
+      "placeholder": "Busca empresas (por ejemplo, Google, Amazon)..."
+    },
+    "timer": {
+      "connecting": "Conectando...",
+      "requestTime": "Pedirle a {{interviewer}} más tiempo",
+      "analyzingCode": "Analizando tu código...",
+      "analysisDescription": "Nuestra IA está evaluando tu enfoque frente a complejidades temporales y espaciales óptimas.",
+      "questionProgress": "Pregunta {{current}} de {{total}}",
+      "nextQuestion": "Siguiente pregunta",
+      "finishInterview": "Finalizar entrevista",
+      "voiceTurnProgress": "Entrevista de voz en vivo - Turno {{current}} de {{total}}",
+      "aiThinking": "La IA está pensando...",
+      "listeningStatus": "Escuchando (hablar se detectará automáticamente)...",
+      "waitingStatus": "Espera a que la IA termine...",
+      "endInterviewEarly": "Finalizar entrevista antes de tiempo",
+      "sendNowOverride": "Enviar ahora (anular silencio)",
+      "totalTime": "Tiempo total",
+      "questions": "Preguntas",
+      "extraTimePrompt": "¿Cuántos minutos extra necesitas? (máx. 30)",
+      "extraTimeLimitReached": "Solo puedo conceder un máximo de {{max}} minutos adicionales. He agregado {{max}} minutos a tu reloj.",
+      "extraTimeGranted": "Te he concedido {{requested}} minutos extra. ¡Buena suerte!",
+      "extraTimeTotalLimitReached": "Solo puedes solicitar un máximo de 30 minutos en total. He agregado tus {{remaining}} minutos restantes a tu reloj.",
+      "fallbackSpeech": "No te entendí bien.",
+      "speechNotSupported": "El reconocimiento de voz no es compatible con este navegador. Usa Chrome."
+    },
+    "question": {
+      "difficulty": {
+        "easy": "Fácil",
+        "medium": "Intermedio",
+        "hard": "Difícil"
+      },
+      "saveQuestion": "Guardar pregunta",
+      "removeSaved": "Quitar de guardados",
+      "srsStage": "Etapa SRS",
+      "box": "Caja {{number}}",
+      "nextReview": "Próxima revisión:",
+      "notScheduled": "Aún no programado",
+      "forgotWrong": "Olvidé / Incorrecto",
+      "rememberedRight": "Recordé / Correcto",
+      "viewSolution": "Ver solución",
+      "xpAward": "+25 XP",
+      "toast": {
+        "reviewScheduled": "¡La revisión de esta pregunta se ha pospuesto! Sigue así.",
+        "reviewReset": "Se restableció el intervalo. Revisarás esta pregunta de nuevo mañana."
+      }
+    },
+    "reports": {
+      "aiUnavailable": "La IA no está disponible en este momento; inténtalo de nuevo o revisa la configuración de tu clave API.",
+      "errorGeneratingTextReport": "Hubo un error al generar tu informe técnico. Revisa la clave de API o tu conexión a internet.",
+      "errorGeneratingVoiceReport": "Hubo un error al generar tu informe. Revisa la clave de API o tu conexión a internet.",
+      "aiInterviewReport": "Informe de entrevista con IA",
+      "aiInterviewDescription": "Una evaluación verbal detallada de tu desempeño.",
+      "technicalEvaluation": "Evaluación técnica",
+      "technicalEvaluationDescription": "Revisa tu desempeño, ideas y áreas de mejora.",
+      "backToStudyMode": "Volver al modo de estudio"
+    },
+    "reviewQueue": {
+      "backToCompanies": "Volver a las empresas",
+      "title": "Cola de revisión por repetición espaciada",
+      "description": "Revisa las preguntas que practicaste antes usando el sistema Leitner.",
+      "instructions": "Responde estas preguntas hoy. Marca como Correcto para moverlas a un intervalo más largo, o como Incorrecto para revisarlas de nuevo mañana.",
+      "caughtUpTitle": "¡Ya estás al día!",
+      "caughtUpDescription": "No hay preguntas pendientes de revisión. ¡Practica más preguntas en Career Mode para construir tu cola de revisión!",
+      "exploreCompanies": "Explorar empresas"
+    },
+    "standardView": {
+      "studyQuestions": "Preguntas de estudio",
+      "mockInterview": "Entrevista simulada",
+      "questionBank": "Banco de preguntas",
+      "practiced": "{{practiced}} / {{total}} practicadas",
+      "chooseModeTitle": "Elige tu modo de entrevista",
+      "chooseModeDescription": "Practica con un banco de preguntas estructurado o simula una entrevista de voz en vivo con IA.",
+      "standardTechnical": "Técnica estándar",
+      "standardTechnicalDescription": "Realiza una entrevista técnica estructurada para {{companyName}}.",
+      "startTextInterview": "Iniciar entrevista por texto",
+      "aiVoiceInterview": "Entrevista de voz con IA",
+      "aiVoiceDescription": "Practica hablar en voz alta con una entrevistadora de voz realista.",
+      "startVoiceInterview": "Iniciar entrevista de voz",
+      "newBadge": "Nuevo"
+    },
+    "modal": {
+      "exitFullscreen": "Salir de pantalla completa",
+      "closeModal": "Cerrar",
+      "toggleFullscreen": "Cambiar pantalla completa",
+      "yourAnswer": "Tu respuesta",
+      "chooseInterviewer": "Elige a tu entrevistador",
+      "selectPersona": "Selecciona la persona de voz con la que te gustaría practicar.",
+      "maleVoice": "Entrevistador técnico clásico",
+      "femaleVoice": "Entrevistadora tranquila y colaborativa"
+    },
+    "editor": {
+      "languages": {
+        "javascript": "JavaScript",
+        "python": "Python",
+        "java": "Java",
+        "cpp": "C++",
+        "typescript": "TypeScript"
+      }
+    }
+  },
   "logout": {
     "title": "¿Cerrar Sesión?",
     "body": "¿Estás seguro de que deseas cerrar sesión?"
   },
   "settings": {
-  "title": "Configuración",
-  "tabs": {
-    "profile": "Perfil",
-    "appearance": "Apariencia",
-    "xpStore": "Tienda XP",
-    "learning": "Aprendizaje",
-    "quiz": "Cuestionarios",
-    "certificate": "Certificado",
-    "achievements": "Logros",
-    "account": "Cuenta"
+    "title": "Configuración",
+    "tabs": {
+      "profile": "Perfil",
+      "appearance": "Apariencia",
+      "xpStore": "Tienda XP",
+      "learning": "Aprendizaje",
+      "quiz": "Cuestionarios",
+      "certificate": "Certificado",
+      "achievements": "Logros",
+      "account": "Cuenta"
+    },
+    "actions": {
+      "save": "Guardar cambios",
+      "reset": "Restablecer valores predeterminados"
+    },
+    "profile": {
+      "title": "Configuración del perfil",
+      "displayName": "Nombre para mostrar",
+      "displayNamePlaceholder": "Ingresa el nombre para mostrar",
+      "email": "Dirección de correo electrónico",
+      "emailPlaceholder": "Ingresa la dirección de correo electrónico",
+      "memberSince": "Miembro desde",
+      "avatar": "Avatar",
+      "uploadAvatar": "Subir avatar personalizado",
+      "removeAvatar": "Eliminar avatar personalizado",
+      "custom": "Personalizado",
+      "currentAvatar": "Avatar actual",
+      "uploading": "Subiendo",
+      "presetAvatar": "O seleccionar un avatar predeterminado",
+      "uploadHint": "Sube una imagen PNG o JPEG (máx. 2MB), o selecciona un avatar predefinido a continuación."
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "themeMode": "Modo de tema",
+      "themeModeDesc": "Cambiar entre el modo claro y oscuro",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "gradientIntensity": "Intensidad del degradado",
+      "subtle": "Sutil",
+      "balanced": "Equilibrado",
+      "vibrant": "Vibrante",
+      "language": "Idioma",
+      "languageDesc": "Elige tu idioma preferido"
+    },
+    "learning": {
+      "title": "Preferencias de aprendizaje",
+      "dailyGoal": "Objetivo diario de estudio",
+      "reminders": "Recordatorios de progreso",
+      "remindersDesc": "Recibe notificaciones para mantener tu racha",
+      "autoSave": "Guardar notas automáticamente",
+      "autoSaveDesc": "Guarda automáticamente tu progreso"
+    },
+    "quiz": {
+      "title": "Preferencias de cuestionarios",
+      "instantFeedback": "Retroalimentación inmediata",
+      "instantFeedbackDesc": "Mostrar inmediatamente las respuestas correctas e incorrectas",
+      "showAnswers": "Mostrar respuestas correctas",
+      "showAnswersDesc": "Revelar las respuestas después de completar el cuestionario",
+      "allowRetry": "Permitir reintentos",
+      "allowRetryDesc": "Permitir volver a realizar los cuestionarios inmediatamente"
+    },
+    "certificate": {
+      "title": "Configuración del certificado",
+      "nameLabel": "Nombre en el certificado",
+      "namePlaceholder": "Nombre legal",
+      "nameHint": "Este nombre aparecerá en todos los certificados obtenidos.",
+      "format": "Formato predeterminado",
+      "pdf": "PDF (Estándar)",
+      "image": "Imagen (Pro)"
+    },
+    "achievements": {
+      "title": "Logros"
+    },
+    "account": {
+      "title": "Administración de la cuenta",
+      "resetProgress": "Restablecer progreso",
+      "resetProgressDesc": "Borrar todo el progreso de los cursos y las puntuaciones de los cuestionarios",
+      "reset": "Restablecer",
+      "clearData": "Borrar datos locales",
+      "clearDataDesc": "Eliminar todos los datos de la cuenta de este dispositivo",
+      "clear": "Borrar"
+    },
+    "xpStore": {
+      "title": "Tienda XP"
+    },
+    "modals": {
+      "resetTitle": "¿Restablecer el progreso?",
+      "resetBody": "Esto eliminará todo el progreso de sus cursos y las puntuaciones de los cuestionarios. Esta acción no se puede deshacer.",
+      "clearTitle": "¿Borrar todos los datos?",
+      "clearBody": "Esto eliminará su cuenta y todos los datos asociados de este navegador. Se cerrará su sesión.",
+      "unsavedTitle": "Cambios sin guardar",
+      "unsavedBody": "Tienes cambios sin guardar. ¿Estás seguro de que deseas salir sin guardar?",
+      "stay": "Permanecer",
+      "leave": "Salir"
+    }
   },
-  "actions": {
-    "save": "Guardar cambios",
-    "reset": "Restablecer valores predeterminados"
+  "certifications": {
+    "loading": "Cargando certificaciones...",
+    "title": "Mis Certificaciones",
+    "subtitle": "Prueba oficial de tus habilidades y logros.",
+    "emptyTitle": "Aún no hay certificados",
+    "emptyDescription": "Completa cursos y aprueba los exámenes finales para obtener certificaciones profesionales.",
+    "browseCourses": "Explorar cursos",
+    "cardTitle": "{{courseTitle}} Certificado",
+    "issued": "Emitido el {{date}}",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado",
+    "viewCertificate": "Certificado"
   },
-  "profile": {
-    "title": "Configuración del perfil",
-    "displayName": "Nombre para mostrar",
-    "displayNamePlaceholder": "Ingresa el nombre para mostrar",
-    "email": "Dirección de correo electrónico",
-    "emailPlaceholder": "Ingresa la dirección de correo electrónico",
-    "memberSince": "Miembro desde",
-    "avatar": "Avatar",
-    "uploadAvatar": "Subir avatar personalizado",
-    "removeAvatar": "Eliminar avatar personalizado",
-    "custom": "Personalizado",
-    "currentAvatar": "Avatar actual",
-    "uploading": "Subiendo",
-    "presetAvatar": "O seleccionar un avatar predeterminado",
-    "uploadHint": "Sube una imagen PNG o JPEG (máx. 2MB), o selecciona un avatar predefinido a continuación."
-  },
-  "appearance": {
-    "title": "Apariencia",
-    "themeMode": "Modo de tema",
-    "themeModeDesc": "Cambiar entre el modo claro y oscuro",
-    "light": "Claro",
-    "dark": "Oscuro",
-    "gradientIntensity": "Intensidad del degradado",
-    "subtle": "Sutil",
-    "balanced": "Equilibrado",
-    "vibrant": "Vibrante",
-    "language": "Idioma",
-"languageDesc": "Elige tu idioma preferido"
-  },
-  "learning": {
-    "title": "Preferencias de aprendizaje",
-    "dailyGoal": "Objetivo diario de estudio",
-    "reminders": "Recordatorios de progreso",
-    "remindersDesc": "Recibe notificaciones para mantener tu racha",
-    "autoSave": "Guardar notas automáticamente",
-    "autoSaveDesc": "Guarda automáticamente tu progreso"
-  },
-  "quiz": {
-    "title": "Preferencias de cuestionarios",
-    "instantFeedback": "Retroalimentación inmediata",
-    "instantFeedbackDesc": "Mostrar inmediatamente las respuestas correctas e incorrectas",
-    "showAnswers": "Mostrar respuestas correctas",
-    "showAnswersDesc": "Revelar las respuestas después de completar el cuestionario",
-    "allowRetry": "Permitir reintentos",
-    "allowRetryDesc": "Permitir volver a realizar los cuestionarios inmediatamente"
+  "certificateDisplay": {
+    "academyName": "SkillVerse Academy",
+    "title": "Certificado",
+    "subtitle": "de Finalización",
+    "certifyThat": "Esto certifica que",
+    "demonstratedMastery": "Ha demostrado con éxito su dominio en",
+    "assessmentPrefix": "Al aprobar la evaluación integral con una puntuación del",
+    "assessmentSuffix": "el {{date}}, afirmando la competencia en los conceptos fundamentales y avanzados de esta materia.",
+    "dateIssued": "Fecha de emisión",
+    "verified": "Verificado",
+    "credentialId": "ID: {{id}}",
+    "platformDirector": "Director de la Plataforma"
   },
   "certificate": {
-    "title": "Configuración del certificado",
-    "nameLabel": "Nombre en el certificado",
-    "namePlaceholder": "Nombre legal",
-    "nameHint": "Este nombre aparecerá en todos los certificados obtenidos.",
-    "format": "Formato predeterminado",
-    "pdf": "PDF (Estándar)",
-    "image": "Imagen (Pro)"
-  },
-  "achievements": {
-    "title": "Logros"
-  },
-  "account": {
-    "title": "Administración de la cuenta",
-    "resetProgress": "Restablecer progreso",
-    "resetProgressDesc": "Borrar todo el progreso de los cursos y las puntuaciones de los cuestionarios",
-    "reset": "Restablecer",
-    "clearData": "Borrar datos locales",
-    "clearDataDesc": "Eliminar todos los datos de la cuenta de este dispositivo",
-    "clear": "Borrar"
-  },
-  "xpStore": {
-    "title": "Tienda XP"
-  },
-  "modals": {
-    "resetTitle": "¿Restablecer el progreso?",
-    "resetBody": "Esto eliminará todo el progreso de sus cursos y las puntuaciones de los cuestionarios. Esta acción no se puede deshacer.",
-    "clearTitle": "¿Borrar todos los datos?",
-    "clearBody": "Esto eliminará su cuenta y todos los datos asociados de este navegador. Se cerrará su sesión.",
-    "unsavedTitle": "Cambios sin guardar",
-    "unsavedBody": "Tienes cambios sin guardar. ¿Estás seguro de que deseas salir sin guardar?",
-    "stay": "Permanecer",
-    "leave": "Salir"
+    "loading": "Cargando detalles del certificado...",
+    "unavailableTitle": "Certificado no disponible",
+    "unavailableDescription": "Aún no has completado este curso.",
+    "goToCourse": "Ir al curso",
+    "backToDashboard": "Volver al panel",
+    "linkCopied": "¡Enlace copiado!",
+    "copyLink": "Copiar enlace",
+    "shareTwitter": "Compartir en Twitter",
+    "sharing": "Compartiendo...",
+    "shareLinkedIn": "Compartir en LinkedIn",
+    "generatingPdf": "Generando PDF...",
+    "downloadPdf": "Descargar PDF",
+    "shareTextTwitter": "¡Acabo de obtener un Certificado de Finalización de \"{{title}}\" en SkillVerse Academy! 🎓🚀 Revisa mi credencial verificada:",
+    "shareTextLinkedIn": "¡Me entusiasma compartir que he completado \"{{title}}\" en SkillVerse! 🎓🌟 Verifica mi credencial aquí:",
+    "toast": {
+      "imageDownloaded": "¡Imagen del certificado descargada! Redirigiendo a LinkedIn para publicar...",
+      "redirectingLinkedIn": "Redirigiendo a LinkedIn para publicar..."
+    },
+    "shareCard": {
+      "credentialVerified": "CREDENCIAL VERIFICADA",
+      "issued": "Emitido: {{date}}",
+      "title": "Certificado de Finalización",
+      "description": "ha completado y dominado con éxito todos los requisitos de",
+      "passingScore": "Puntuación de aprobación: {{score}}%",
+      "verifiedAchievement": "Logro Verificado"
+    }
   }
-}
 }

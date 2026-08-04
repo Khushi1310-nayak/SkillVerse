@@ -18,6 +18,7 @@ import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useToast } from '../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -66,6 +67,7 @@ const Confetti: React.FC = () => {
 };
 
 const ReadinessScore: React.FC<{ percentage: number }> = ({ percentage }) => {
+  const { t } = useTranslation();
   // Color Transition Logic
   const colorClass = percentage < 30 ? 'text-red-500' : percentage < 70 ? 'text-orange-500' : 'text-emerald-500';
 
@@ -73,7 +75,7 @@ const ReadinessScore: React.FC<{ percentage: number }> = ({ percentage }) => {
     <div className="relative flex items-center justify-center w-32 h-32 md:w-32 md:h-32 group shrink-0">
       <div className="flex flex-col items-center justify-center text-center z-10">
         <span className={`text-4xl md:text-5xl font-bold leading-none ${colorClass}`}>{percentage}%</span>
-        <span className="text-xs text-textMuted uppercase tracking-wider mt-2 font-bold">Ready</span>
+        <span className="text-xs text-textMuted uppercase tracking-wider mt-2 font-bold">{t("careerMode.header.ready")}</span>
       </div>
     </div>
   );
@@ -82,6 +84,7 @@ const ReadinessScore: React.FC<{ percentage: number }> = ({ percentage }) => {
 // --- SUB-COMPONENTS ---
 
 const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgress; onClick: (company: Company) => void }> = ({ company, progress, onClick }) => {
+  const { t } = useTranslation();
   const practicedCount = company.questions.filter(q => progress.practicedQuestions.includes(q.id)).length;
   const progressPercent = Math.round((practicedCount / company.questions.length) * 100);
 
@@ -115,7 +118,7 @@ const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgres
 
       <div className="space-y-2">
         <div className="flex justify-between text-xs font-medium text-textMuted">
-          <span>Progress</span>
+          <span>{t('careerMode.companyCards.progress')}</span>
           <span className={progressPercent === 100 ? 'text-success' : ''}>{practicedCount}/{company.questions.length}</span>
         </div>
         <div className="h-2 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
@@ -149,6 +152,7 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
   srsData,
   onSrsUpdate
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showXp, setShowXp] = useState(false);
 
@@ -178,24 +182,28 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
            {/* XP Popup Animation */}
            {showXp && (
              <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-success font-bold text-sm animate-fade-in-up whitespace-nowrap">
-               +25 XP
+               {t('careerMode.question.xpAward')}
              </div>
            )}
          </button>
 
          <div className="flex-1 min-w-0">
             <div className="flex flex-wrap gap-2 mb-2">
-               <span className={`text-[10px] px-2 py-0.5 rounded border font-bold uppercase whitespace-nowrap
-                  ${question.difficulty === 'Easy' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 
-                    question.difficulty === 'Medium' ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 
-                    'text-red-500 bg-red-500/10 border-red-500/20'}
-               `}>{question.difficulty}</span>
+               {question.difficulty === 'Easy'
+  ? t('careerMode.question.difficulty.easy')
+  : question.difficulty === 'Medium'
+  ? t('careerMode.question.difficulty.medium')
+  : question.difficulty === 'Hard'
+  ? t('careerMode.question.difficulty.hard')
+  : question.difficulty}
                {question.tags.map(tag => (
                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
                ))}
                {srsData && (
                  <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 font-bold uppercase whitespace-nowrap">
-                   Box {srsData.srsInterval}
+                   {t('careerMode.question.box', {
+  number: srsData.srsInterval,
+})}
                  </span>
                )}
             </div>
@@ -206,8 +214,16 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
           <button
             onClick={(e) => { e.stopPropagation(); onToggleSave(question.id); }}
             className={`p-1 hover:scale-110 transition-transform ${isSaved ? 'text-primaryLight fill-primaryLight' : 'text-textMuted hover:text-textMain'}`}
-            title={isSaved ? "Remove from saved" : "Save question"}
-            aria-label={isSaved ? "Remove from saved" : "Save question"}
+            title={
+  isSaved
+    ? t('careerMode.question.removeSaved')
+    : t('careerMode.question.saveQuestion')
+}
+aria-label={
+  isSaved
+    ? t('careerMode.question.removeSaved')
+    : t('careerMode.question.saveQuestion')
+}
           >
             <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
           </button>
@@ -223,18 +239,18 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
             
             <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">
                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">SRS Stage:</span>
+                  <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">{t('careerMode.question.srsStage')}</span>
                   {srsData ? (
                      <div className="flex items-center gap-1.5">
                         <span className="text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded">
                            Box {srsData.srsInterval}
                         </span>
                         <span className="text-[10px] text-textMuted">
-                           Next review: {new Date(srsData.nextReviewDate).toLocaleDateString()}
+                           {t('careerMode.question.nextReview')} {new Date(srsData.nextReviewDate).toLocaleDateString()}
                         </span>
                      </div>
                   ) : (
-                     <span className="text-xs text-textMuted italic">Not scheduled yet</span>
+                     <span className="text-xs text-textMuted italic">{t('careerMode.question.notScheduled')}</span>
                   )}
                </div>
                
@@ -244,13 +260,13 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
                        onClick={() => onSrsUpdate(question.id, false)}
                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold text-xs transition-colors"
                      >
-                        Forgot / Wrong
+                        {t('careerMode.question.forgotWrong')}
                      </button>
                      <button
                        onClick={() => onSrsUpdate(question.id, true)}
                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 font-bold text-xs transition-colors"
                      >
-                        Remembered / Right
+                        {t('careerMode.question.rememberedRight')}
                      </button>
                   </div>
                )}
@@ -263,7 +279,7 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
                  rel="noopener noreferrer"
                  className="flex items-center gap-2 text-primaryLight text-xs font-bold hover:underline"
                >
-                 View Full Solution <ExternalLink size={12} />
+                 {t('careerMode.question.viewSolution')} <ExternalLink size={12} />
                </a>
             </div>
          </div>
@@ -351,9 +367,10 @@ interface VoiceChatProps {
 }
 
 const VoiceChatComponent: React.FC<VoiceChatProps> = ({ chatHistory }) => {
+  const { t } = useTranslation();
   const currentMessage = chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'assistant'
     ? chatHistory[chatHistory.length - 1].content
-    : chatHistory.length > 1 ? chatHistory[chatHistory.length - 2].content : "Connecting...";
+    : chatHistory.length > 1 ? chatHistory[chatHistory.length - 2].content : t('careerMode.timer.connecting');
 
   return (
     <>
@@ -379,6 +396,7 @@ interface CareerModeProps {
 }
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const showReviewQueue = searchParams.get('review') === 'true';
@@ -461,7 +479,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const handleRequestTime = useCallback(() => {
     if (extraTimeUsed >= 30) return;
 
-    const input = window.prompt("How many extra minutes do you need? (Max 30)");
+    const input = window.prompt(t('careerMode.timer.extraTimePrompt'));
     if (!input) return;
 
     let requested = parseInt(input);
@@ -470,14 +488,14 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     let responseText = "";
     if (requested > 30) {
       requested = 30;
-      responseText = "I can only grant a maximum of 30 additional minutes. I have added 30 minutes to your clock.";
+      responseText = t('careerMode.timer.extraTimeLimitReached', { max: 30 });
     } else {
-      responseText = `I have granted you ${requested} extra minutes. Good luck.`;
+      responseText = t('careerMode.timer.extraTimeGranted', { requested });
     }
 
     if (requested + extraTimeUsed > 30) {
       requested = 30 - extraTimeUsed;
-      responseText = `You can only request up to 30 minutes total. I have added your remaining ${requested} minutes to your clock.`;
+      responseText = t('careerMode.timer.extraTimeTotalLimitReached', { remaining: requested });
     }
 
     setExtraTimeUsed(prev => prev + requested);
@@ -516,9 +534,9 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     const newProgress = storageService.updateQuestionSRS(qId, gotRight);
     setProgress(newProgress);
     showToast({
-      message: gotRight 
-        ? "Question review scheduled further out! Keep it up." 
-        : "Interval reset. You will review this question again tomorrow.",
+      message: gotRight
+        ? t('careerMode.question.toast.reviewScheduled')
+        : t('careerMode.question.toast.reviewReset'),
       type: gotRight ? "success" : "info"
     });
   }, [showToast]);
@@ -612,8 +630,8 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
       setMockState('finished');
     } catch (err) {
       console.error(err);
-      showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
-      setTextReport("There was an error generating your technical report. Please check your API key or internet connection.");
+      showToast({ message: t('careerMode.reports.aiUnavailable'), type: "error" });
+      setTextReport(t('careerMode.reports.errorGeneratingTextReport'));
       setMockState('idle');
       setIsFullScreen(false);
     } finally {
@@ -678,7 +696,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
       if (!res.ok) throw new Error("API failed");
       const data = await res.json();
-      const aiText = data.choices?.[0]?.message?.content || "I didn't quite catch that.";
+      const aiText = data.choices?.[0]?.message?.content || t('careerMode.timer.fallbackSpeech');
 
       const updatedHistory = [...history, { role: 'assistant', content: aiText }];
       setChatHistory(updatedHistory);
@@ -731,7 +749,7 @@ At the very end of your report, provide a final score on a scale of 0 to 100 in 
 
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
-      setCurrentSpeech("Speech recognition is not supported in this browser. Please use Chrome.");
+      setCurrentSpeech(t('careerMode.timer.speechNotSupported'));
       return;
     }
 
@@ -854,7 +872,7 @@ ${transcriptText}`;
     } catch (err) {
       console.error(err);
       showToast({ message: "AI is currently unavailable, please try again or check your API key settings.", type: "error" });
-      setVoiceReport("There was an error generating your report. Please check your API key or internet connection.");
+      setVoiceReport(t('careerMode.reports.errorGeneratingVoiceReport'));
       setMockState('idle');
       setIsFullScreen(false);
       if (recognitionRef.current) {
@@ -940,13 +958,13 @@ ${transcriptText}`;
                  onClick={() => setSearchParams({})} 
                  className="flex items-center gap-2 text-primaryLight font-bold text-sm mb-2 hover:underline"
                >
-                  &larr; Back to Companies
+                  &larr; {t('careerMode.reviewQueue.backToCompanies')}
                </button>
                <h2 className="text-3xl font-display font-bold text-textMain flex items-center gap-2">
                   <Clock size={28} className="text-orange-500" />
-                  Spaced Repetition Review Queue
+                  {t('careerMode.reviewQueue.title')}
                </h2>
-               <p className="text-textMuted mt-1">Review questions you previously practiced using the Leitner system.</p>
+               <p className="text-textMuted mt-1">{t('careerMode.reviewQueue.description')}</p>
             </div>
          </div>
 
@@ -954,7 +972,7 @@ ${transcriptText}`;
             {dueQuestions.length > 0 ? (
                <div className="space-y-4 max-w-4xl">
                   <p className="text-sm text-textMuted mb-4">
-                     Answer these questions today. Mark them as **Right** to move them to a longer interval, or **Wrong** to review them again tomorrow.
+                     {t('careerMode.reviewQueue.instructions')}
                   </p>
                   {dueQuestions.map(({ question, company }) => (
                      <div key={question.id} className="relative">
@@ -978,15 +996,15 @@ ${transcriptText}`;
                   <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
                      <CheckCircle size={32} />
                   </div>
-                  <h3 className="text-xl font-bold text-textMain mb-2">You're all caught up!</h3>
+                  <h3 className="text-xl font-bold text-textMain mb-2">{t('careerMode.reviewQueue.caughtUpTitle')}</h3>
                   <p className="text-textMuted max-w-md mx-auto mb-6">
-                     No questions are currently due for review. Practice more questions in Career Mode to build your review queue!
+                     {t('careerMode.reviewQueue.caughtUpDescription')}
                   </p>
                   <button 
                     onClick={() => setSearchParams({})}
                     className="px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium transition-all"
                   >
-                     Explore Companies
+                     {t('careerMode.reviewQueue.exploreCompanies')}
                   </button>
                </div>
             )}
@@ -1006,18 +1024,18 @@ ${transcriptText}`;
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primaryLight text-xs font-bold uppercase tracking-wider mb-4 border border-primary/20">
-            <Briefcase size={14} /> Career Mode Beta
+            <Briefcase size={14} /> {t('careerMode.header.badge')}
           </div>
-          <h1 className="text-4xl font-display font-bold text-textMain mb-2">Interview Prep</h1>
+          <h1 className="text-4xl font-display font-bold text-textMain mb-2">{t('careerMode.header.title')}</h1>
           <p className="text-textMuted max-w-xl">
-            Target specific companies, practice real questions, and simulate high-pressure interview environments.
+            {t('careerMode.header.description')}
           </p>
         </div>
 
         <div className="flex items-center gap-6 bg-glass border border-black/20 dark:border-white/10 p-4 rounded-2xl w-full md:w-auto justify-between md:justify-start">
           <div className="text-right">
-            <div className="text-xs text-textMuted uppercase font-bold tracking-wider mb-1">Overall Readiness</div>
-            <div className="text-sm font-medium text-textMain">{totalPracticed} / {totalQuestions} Questions</div>
+            <div className="text-xs text-textMuted uppercase font-bold tracking-wider mb-1">{t('careerMode.header.readiness')}</div>
+            <div className="text-sm font-medium text-textMain">{totalPracticed} / {totalQuestions} {t('careerMode.header.questionsLabel')}</div>
           </div>
           <ReadinessScore percentage={readinessScore} />
         </div>
@@ -1031,7 +1049,8 @@ ${transcriptText}`;
   />
   <input
     type="text"
-    placeholder="Search companies (e.g. Google, Amazon)..."
+    placeholder={t('careerMode.roleSearchFilters.placeholder')}
+    aria-label={t('careerMode.roleSearchFilters.label')}
     value={search}
     onChange={(e) => setSearch(e.target.value)}
     className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
@@ -1043,7 +1062,7 @@ ${transcriptText}`;
   <div>
     <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
       <span className="w-2 h-5 rounded-full bg-primaryLight" />
-      Recommended for You
+      {t('careerMode.companyCards.recommendedTitle')}
     </h3>
 
     <div className="flex gap-4 overflow-x-auto pb-2">
@@ -1113,7 +1132,7 @@ ${transcriptText}`;
           ))
         ) : (
           <div className="col-span-full text-center py-20 text-textMuted">
-            No companies found matching your criteria.
+            {t('careerMode.companyCards.emptyState')}
           </div>
         )}
       </div>
@@ -1130,10 +1149,10 @@ ${transcriptText}`;
             {/* Floating Close Buttons in FullScreen */}
             {isFullScreen && (
               <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-                <button onClick={() => setIsFullScreen(false)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Exit Fullscreen" aria-label="Exit Fullscreen">
+                <button onClick={() => setIsFullScreen(false)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title={t('careerMode.modal.exitFullscreen')} aria-label={t('careerMode.modal.exitFullscreen')}>
                   <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                 </button>
-                <button onClick={handleExitInterview} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                <button onClick={handleExitInterview} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md transition-colors shrink-0" title={t('careerMode.modal.closeModal')} aria-label={t('careerMode.modal.closeModal')}>
                   <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                 </button>
               </div>
@@ -1156,10 +1175,10 @@ ${transcriptText}`;
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setIsFullScreen(!isFullScreen)} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"} aria-label="Toggle fullscreen">
+                  <button onClick={() => setIsFullScreen(!isFullScreen)} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title={isFullScreen ? t('careerMode.modal.exitFullscreen') : t('careerMode.modal.toggleFullscreen')} aria-label={t('careerMode.modal.toggleFullscreen')}>
                     {isFullScreen ? <Minimize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" /> : <Maximize2 size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />}
                   </button>
-                  <button onClick={handleExitInterview} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title="Close modal" aria-label="Close modal">
+                  <button onClick={handleExitInterview} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors shrink-0" title={t('careerMode.modal.closeModal')} aria-label={t('careerMode.modal.closeModal')}>
                     <X size={20} className="text-textMuted hover:text-textMain md:w-6 md:h-6" />
                   </button>
                 </div>
@@ -1188,7 +1207,7 @@ ${transcriptText}`;
                     disabled={extraTimeUsed >= 30}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${extraTimeUsed >= 30 ? 'bg-black/5 dark:bg-white/5 border-transparent text-textMuted cursor-not-allowed' : 'bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-textMain hover:bg-primary/20 hover:text-primaryLight hover:border-primary/30 backdrop-blur-sm'}`}
                   >
-                    Ask Robin for Time
+                    {t('careerMode.timer.requestTime', { interviewer: 'Robin' })}
                   </button>
                 </div>
 
@@ -1196,13 +1215,13 @@ ${transcriptText}`;
                   {isGeneratingText ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fade-in text-center">
                       <Loader2 size={64} className="text-primaryLight animate-spin" />
-                      <h3 className="text-2xl font-bold text-textMain">Analyzing your code...</h3>
-                      <p className="text-textMuted text-lg max-w-md">Our AI is running your approach against optimal Time and Space complexities.</p>
+                      <h3 className="text-2xl font-bold text-textMain">{t('careerMode.timer.analyzingCode')}</h3>
+                      <p className="text-textMuted text-lg max-w-md">{t('careerMode.timer.analysisDescription')}</p>
                     </div>
                   ) : (
                     <>
                       <div className="text-center mb-6 md:mb-8">
-                        <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Question {currentMockIndex + 1} of 5</span>
+                        <span className="text-textMuted uppercase tracking-widest text-xs font-bold">{t('careerMode.timer.questionProgress', { current: currentMockIndex + 1, total: 5 })}</span>
                         <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]">
                           <Typewriter text={mockQuestions[currentMockIndex]?.title || ''} speed={50} />
                         </h3>
@@ -1215,11 +1234,11 @@ ${transcriptText}`;
                             onChange={(e) => setEditorLanguage(e.target.value)}
                             className="bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-lg text-xs md:text-sm font-bold text-textMain px-4 py-2 focus:ring-2 focus:ring-primaryLight outline-none cursor-pointer backdrop-blur-sm shadow-sm appearance-none hover:bg-black/10 dark:hover:bg-white/20 transition-all"
                           >
-                            <option value="javascript" className="bg-background text-textMain">JavaScript</option>
-                            <option value="python" className="bg-background text-textMain">Python</option>
-                            <option value="java" className="bg-background text-textMain">Java</option>
-                            <option value="cpp" className="bg-background text-textMain">C++</option>
-                            <option value="typescript" className="bg-background text-textMain">TypeScript</option>
+                            <option value="javascript" className="bg-background text-textMain">{t('careerMode.editor.languages.javascript')}</option>
+                            <option value="python" className="bg-background text-textMain">{t('careerMode.editor.languages.python')}</option>
+                            <option value="java" className="bg-background text-textMain">{t('careerMode.editor.languages.java')}</option>
+                            <option value="cpp" className="bg-background text-textMain">{t('careerMode.editor.languages.cpp')}</option>
+                            <option value="typescript" className="bg-background text-textMain">{t('careerMode.editor.languages.typescript')}</option>
                           </select>
                         </div>
                         <div className="flex-1 w-full rounded-xl overflow-hidden border border-black/20 dark:border-white/5">
@@ -1244,14 +1263,14 @@ ${transcriptText}`;
                             onClick={() => setCurrentMockIndex(prev => prev + 1)}
                             className="px-6 py-3 md:px-8 bg-black/5 dark:bg-white text-textMain dark:text-[#0B1220] rounded-xl font-bold hover:scale-105 transition-transform flex items-center gap-2 text-sm md:text-base"
                           >
-                            Next Question <ArrowRight size={18} />
+                            {t('careerMode.timer.nextQuestion')} <ArrowRight size={18} />
                           </button>
                         ) : (
                           <button
                             onClick={finishMockInterview}
                             className="px-6 py-3 md:px-8 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-2 text-sm md:text-base"
                           >
-                            Finish Interview <CheckCircle size={18} />
+                            {t('careerMode.timer.finishInterview')} <CheckCircle size={18} />
                           </button>
                         )}
                       </div>
@@ -1280,20 +1299,20 @@ ${transcriptText}`;
                     disabled={extraTimeUsed >= 30}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${extraTimeUsed >= 30 ? 'bg-black/5 dark:bg-white/5 border-transparent text-textMuted cursor-not-allowed' : 'bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-textMain hover:bg-primary/20 hover:text-primaryLight hover:border-primary/30 backdrop-blur-sm'}`}
                   >
-                    Ask {voiceType === 'robin' ? 'Robin' : 'Elisa'} for Time
+                    {t('careerMode.timer.requestTime', { interviewer: voiceType === 'robin' ? 'Robin' : 'Elisa' })}
                   </button>
                 </div>
 
                 <div className="max-w-3xl w-full mt-16 md:mt-0 flex flex-col items-center">
                   <div className="text-center mb-10">
-                    <span className="text-textMuted uppercase tracking-widest text-xs font-bold">Live Voice Interview - Turn {turnCount} of 10</span>
+                    <span className="text-textMuted uppercase tracking-widest text-xs font-bold">{t('careerMode.timer.voiceTurnProgress', { current: turnCount, total: 10 })}</span>
                     <VoiceChat chatHistory={chatHistory} />
                   </div>
 
                   {voiceStatus === 'generating' ? (
                     <div className="flex flex-col items-center gap-4 animate-fade-in">
                       <Loader2 size={48} className="text-primaryLight animate-spin" />
-                      <p className="text-textMuted text-lg">AI is thinking...</p>
+                      <p className="text-textMuted text-lg">{t('careerMode.timer.aiThinking')}</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center w-full max-w-xl">
@@ -1311,9 +1330,9 @@ ${transcriptText}`;
                       </div>
 
                       <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
-                        <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> Your Answer:</div>
+                        <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> {t('careerMode.modal.yourAnswer')}</div>
                         <p className="text-textMain text-lg italic">
-                          {currentSpeech || (voiceStatus === 'listening' ? "Listening (speaking will auto-detect)..." : "Wait for AI to finish...")}
+                          {currentSpeech || (voiceStatus === 'listening' ? t('careerMode.timer.listeningStatus') : t('careerMode.timer.waitingStatus'))}
                         </p>
                       </div>
 
@@ -1322,14 +1341,14 @@ ${transcriptText}`;
                           onClick={handleEndInterviewEarly}
                           className="px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 hover:bg-red-500/10 hover:text-red-500 text-textMuted"
                         >
-                          End Interview Early
+                          {t('careerMode.timer.endInterviewEarly')}
                         </button>
                         <button
                           onClick={handleSendNowOverride}
                           disabled={voiceStatus !== 'listening'}
                           className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voiceStatus !== 'listening' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
                         >
-                          Send Now (Override Silence) <ArrowRight size={20} />
+                          {t('careerMode.timer.sendNowOverride')} <ArrowRight size={20} />
                         </button>
                       </div>
                     </div>
@@ -1342,8 +1361,8 @@ ${transcriptText}`;
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center mb-6 shadow-xl">
                     <Sparkles size={32} className="text-white" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center">AI Interview Report</h2>
-                  <p className="text-textMuted mb-8 text-center">Comprehensive analysis of your spoken responses.</p>
+                  <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center">{t('careerMode.reports.aiInterviewReport')}</h2>
+                  <p className="text-textMuted mb-8 text-center">{t('careerMode.reports.aiInterviewDescription')}</p>
 
                   <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert max-w-none mb-10 shadow-inner overflow-hidden">
                     <ReactMarkdown>{voiceReport}</ReactMarkdown>
@@ -1364,17 +1383,17 @@ ${transcriptText}`;
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center mb-6 shadow-2xl animate-fade-in-up">
                     <Award size={40} className="text-white md:w-12 md:h-12" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center animate-fade-in-up">Technical Evaluation</h2>
-                  <p className="text-textMuted mb-8 text-center animate-fade-in-up [animation-delay:200ms]">AI Assessment of your coding approach.</p>
+                  <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center animate-fade-in-up">{t('careerMode.reports.technicalEvaluation')}</h2>
+                  <p className="text-textMuted mb-8 text-center animate-fade-in-up [animation-delay:200ms]">{t('careerMode.reports.technicalEvaluationDescription')}</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8 w-full max-w-xl animate-fade-in-up [animation-delay:400ms]">
                     <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-4 rounded-xl text-center">
                       <div className="text-2xl font-bold text-textMain">{formatTime(timer)}</div>
-                      <div className="text-xs text-textMuted uppercase tracking-wider">Total Time</div>
+                      <div className="text-xs text-textMuted uppercase tracking-wider">{t('careerMode.timer.totalTime')}</div>
                     </div>
                     <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-4 rounded-xl text-center">
                       <div className="text-2xl font-bold text-primaryLight">5/5</div>
-                      <div className="text-xs text-textMuted uppercase tracking-wider">Questions</div>
+                      <div className="text-xs text-textMuted uppercase tracking-wider">{t('careerMode.timer.questions')}</div>
                     </div>
                   </div>
 
@@ -1398,13 +1417,13 @@ ${transcriptText}`;
                     onClick={() => setActiveTab('study')}
                     className={`py-3 md:py-4 px-4 md:px-6 font-bold border-b-2 transition-colors text-sm md:text-base ${activeTab === 'study' ? 'border-primaryLight text-primaryLight' : 'border-transparent text-textMuted hover:text-textMain'}`}
                   >
-                    Study Questions
+                    {t('careerMode.standardView.studyQuestions')}
                   </button>
                   <button
                     onClick={() => setActiveTab('mock')}
                     className={`py-3 md:py-4 px-4 md:px-6 font-bold border-b-2 transition-colors text-sm md:text-base ${activeTab === 'mock' ? 'border-primaryLight text-primaryLight' : 'border-transparent text-textMuted hover:text-textMain'}`}
                   >
-                    Mock Interview
+                    {t('careerMode.standardView.mockInterview')}
                   </button>
                 </div>
 
@@ -1412,9 +1431,9 @@ ${transcriptText}`;
                   {activeTab === 'study' ? (
                     <div className="max-w-4xl mx-auto space-y-4">
                       <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-lg md:text-xl text-textMain">Question Bank</h3>
+                        <h3 className="font-bold text-lg md:text-xl text-textMain">{t('careerMode.standardView.questionBank')}</h3>
                         <div className="text-sm text-textMuted">
-                          {selectedCompany.questions.filter(q => progress.practicedQuestions.includes(q.id)).length} / {selectedCompany.questions.length} Practiced
+                          {t('careerMode.standardView.practiced', { practiced: selectedCompany.questions.filter(q => progress.practicedQuestions.includes(q.id)).length, total: selectedCompany.questions.length })}
                         </div>
                       </div>
 
@@ -1434,9 +1453,9 @@ ${transcriptText}`;
                       <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 animate-pulse-slow shrink-0 mt-auto">
                         <Clock size={32} className="text-primaryLight md:w-10 md:h-10" />
                       </div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-textMain mb-4">Choose your interview mode</h3>
+                      <h3 className="text-2xl md:text-3xl font-bold text-textMain mb-4">{t('careerMode.standardView.chooseModeTitle')}</h3>
                       <p className="text-textMuted mb-8 leading-relaxed px-4 max-w-2xl">
-                        Select how you want to be assessed. Both modes simulate real interview pressure but test different skill sets.
+                        {t('careerMode.standardView.chooseModeDescription')}
                       </p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 mb-10">
@@ -1444,16 +1463,16 @@ ${transcriptText}`;
                         <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 p-6 rounded-2xl flex flex-col h-full hover:border-primaryLight/50 transition-colors">
                           <div className="flex items-center gap-3 mb-4">
                             <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl"><Briefcase size={24} /></div>
-                            <h4 className="text-xl font-bold text-textMain text-left">Standard Technical</h4>
+                            <h4 className="text-xl font-bold text-textMain text-left">{t('careerMode.standardView.standardTechnical')}</h4>
                           </div>
                           <p className="text-sm text-textMuted text-left mb-6 flex-1">
-                            5 random technical questions from {selectedCompany.name}'s pool. Type your approach and thoughts. Focuses on algorithms, system design, and coding logic.
+                            {t('careerMode.standardView.standardTechnicalDescription', { companyName: selectedCompany.name })}
                           </p>
                           <button
                             onClick={startMockInterview}
                             className="w-full py-3 bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 text-textMain rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
                           >
-                            <PlayCircle size={18} /> Start Text Interview
+                            <PlayCircle size={18} /> {t('careerMode.standardView.startTextInterview')}
                           </button>
                         </div>
 
@@ -1463,18 +1482,18 @@ ${transcriptText}`;
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-3">
                               <div className="p-3 bg-gradient-main text-white rounded-xl shadow-lg shadow-primary/20"><Mic size={24} /></div>
-                              <h4 className="text-xl font-bold text-textMain text-left">AI Voice Interview</h4>
+                              <h4 className="text-xl font-bold text-textMain text-left">{t('careerMode.standardView.aiVoiceInterview')}</h4>
                             </div>
-                            <span className="px-2 py-1 bg-gradient-main text-white text-[10px] font-bold uppercase rounded-full shadow-lg">New</span>
+                            <span className="px-2 py-1 bg-gradient-main text-white text-[10px] font-bold uppercase rounded-full shadow-lg">{t('careerMode.standardView.newBadge')}</span>
                           </div>
                           <p className="text-sm text-textMuted text-left mb-6 flex-1">
-                            Real-time spoken conversation with our AI recruiter. Answers 10 behavioral &amp; HR questions. Evaluates your English vocabulary, fluency, and content accuracy.
+                            {t('careerMode.standardView.aiVoiceDescription')}
                           </p>
                           <button
                             onClick={() => setShowVoiceSelectModal(true)}
                             className="w-full py-3 bg-gradient-main text-white rounded-xl font-bold shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                           >
-                            <Sparkles size={18} /> Start Voice Interview
+                            <Sparkles size={18} /> {t('careerMode.standardView.startVoiceInterview')}
                           </button>
                         </div>
                       </div>
@@ -1500,8 +1519,8 @@ ${transcriptText}`;
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                     <Mic size={32} className="text-primaryLight" />
                   </div>
-                  <h3 id="voice-select-title" className="text-2xl font-bold text-textMain mb-2">Choose your Interviewer</h3>
-                  <p className="text-textMuted mb-8">Select the AI persona for your live voice interview.</p>
+                  <h3 id="voice-select-title" className="text-2xl font-bold text-textMain mb-2">{t('careerMode.modal.chooseInterviewer')}</h3>
+                  <p className="text-textMuted mb-8">{t('careerMode.modal.selectPersona')}</p>
 
                   <div className="grid grid-cols-2 gap-4">
                     <button
@@ -1510,7 +1529,7 @@ ${transcriptText}`;
                     >
                       <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">👨</span>
                       <span className="font-bold text-textMain text-lg">Robin</span>
-                      <span className="text-xs text-textMuted mt-1">Male Voice</span>
+                      <span className="text-xs text-textMuted mt-1">{t('careerMode.modal.maleVoice')}</span>
                     </button>
 
                     <button
@@ -1519,7 +1538,7 @@ ${transcriptText}`;
                     >
                       <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">👩</span>
                       <span className="font-bold text-textMain text-lg">Elisa</span>
-                      <span className="text-xs text-textMuted mt-1">Female Voice</span>
+                      <span className="text-xs text-textMuted mt-1">{t('careerMode.modal.femaleVoice')}</span>
                     </button>
                   </div>
                 </div>

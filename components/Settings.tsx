@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, CalendarDays, Bookmark
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -18,7 +18,6 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { LearningStreakTab } from './LearningStreakTab';
 
 
 interface SettingsProps {
@@ -308,7 +307,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
         setActiveTab(id);
         localStorage.setItem('settings_active_tab', id);
       }}
+      role="tab"
+      aria-selected={activeTab === id}
+      aria-label={label}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left mb-1
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background
         ${activeTab === id
           ? 'bg-primary/10 text-primaryLight border border-primary/20 shadow-sm'
           : 'text-textMuted hover:bg-white/5 hover:text-textMain'
@@ -322,9 +325,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const Toggle = ({ checked, onChange, ariaLabel = 'Toggle setting' }: { checked: boolean, onChange: (v: boolean) => void, ariaLabel?: string }) => (
     <button
       onClick={() => onChange(!checked)}
+      role="switch"
+      aria-checked={checked}
       aria-label={ariaLabel}
       title={ariaLabel}
-      className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none ${checked ? 'bg-primaryLight shadow-[0_0_10px_rgba(207,152,147,0.4)]' : 'bg-black/10 dark:bg-white/10'}`}
+      className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${checked ? 'bg-primaryLight shadow-[0_0_10px_rgba(207,152,147,0.4)]' : 'bg-black/10 dark:bg-white/10'}`}
     >
       <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 shadow-sm ${checked ? 'left-7' : 'left-1'}`} />
     </button>
@@ -339,7 +344,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
         <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
-          <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4">
+          <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-4" role="tablist" aria-label="Settings sections">
             <TabButton id="profile" icon={User} label={t('settings.tabs.profile')} />
             <TabButton id="appearance" icon={Palette} label={t('settings.tabs.appearance')} />
             <TabButton id="xpstore" icon={ShoppingBag} label={t('settings.tabs.xpStore')} />
@@ -348,7 +353,6 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             <TabButton id="aiNotes" icon={Bookmark} label="Saved AI Notes" />
             <TabButton id="certificate" icon={Award} label={t('settings.tabs.certificate')} />
             <TabButton id="achievements" icon={Trophy} label={t('settings.tabs.achievements')} />
-            <TabButton id="streak" icon={CalendarDays} label="Learning Streak" />
             <TabButton id="account" icon={Shield} label={t('settings.tabs.account')} />
           </div>
         </div>
@@ -397,7 +401,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploading}
-                          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primaryLight border border-primary/20 rounded-xl font-medium transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primaryLight border border-primary/20 rounded-xl font-medium transition-all shadow-sm active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
                           <span>
@@ -412,7 +416,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                             type="button"
                             onClick={handleRemoveCustomAvatar}
                             disabled={uploading}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium transition-all"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           >
                             <Trash2 size={16} />
                             <span>{t('settings.profile.removeAvatar')}</span>
@@ -450,9 +454,12 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                           key={avatar.id}
                           type="button"
                           onClick={() => handleAvatarSelect(avatar.id)}
-                          className={`p-1 rounded-full border-2 transition-all ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-black/20 dark:border-white/20'}`}
+                          aria-label={`Select preset avatar ${avatar.id}`}
+                          aria-pressed={!formData.photoURL && formData.settings.avatarId === avatar.id}
+                          title={`Select preset avatar ${avatar.id}`}
+                          className={`p-1 rounded-full border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${!formData.photoURL && formData.settings.avatarId === avatar.id ? 'border-primaryLight scale-110 shadow-lg' : 'border-transparent hover:border-black/20 dark:border-white/20'}`}
                         >
-                          <img src={avatar.url} alt="Avatar" className="w-12 h-12 rounded-full bg-white/10" loading="lazy" width={48} height={48} />
+                          <img src={avatar.url} alt="" className="w-12 h-12 rounded-full bg-white/10" loading="lazy" width={48} height={48} />
                         </button>
                       ))}
                     </div>
@@ -510,13 +517,15 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <div className="flex self-start sm:self-auto bg-black/5 dark:bg-black/30 rounded-lg p-1 shrink-0">
                     <button
                       onClick={() => handleChange('theme', 'light')}
-                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${formData.settings.theme === 'light' ? 'bg-white text-black shadow-md' : 'text-textMuted hover:text-textMain'}`}
+                      aria-pressed={formData.settings.theme === 'light'}
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${formData.settings.theme === 'light' ? 'bg-white text-black shadow-md' : 'text-textMuted hover:text-textMain'}`}
                     >
                       {t('settings.appearance.light')}
                     </button>
                     <button
                       onClick={() => handleChange('theme', 'dark')}
-                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${formData.settings.theme === 'dark' ? 'bg-gray-700 text-white shadow-md' : 'text-textMuted hover:text-textMain'}`}
+                      aria-pressed={formData.settings.theme === 'dark'}
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${formData.settings.theme === 'dark' ? 'bg-gray-700 text-white shadow-md' : 'text-textMuted hover:text-textMain'}`}
                     >
                       {t('settings.appearance.dark')}
                     </button>
@@ -551,6 +560,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     <span className="text-white font-bold text-lg mix-blend-overlay">SkillVerse Premium UI</span>
                   </div>
                 </div>
+
                 {/* Custom Theme Palette Builder */}
                 <div className="space-y-5 p-5 rounded-2xl border border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5">
                   <div>
@@ -628,6 +638,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     </button>
                   )}
                 </div>
+
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                   <div>
                     <div className="font-bold text-textMain">{t('settings.appearance.language')}</div>
@@ -1056,11 +1067,6 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
               </div>
             )}
 
-            {/* Learning Streak Section */}
-            {activeTab === 'streak' && (
-              <LearningStreakTab user={user} />
-            )}
-
             {/* Account Section */}
             {activeTab === 'account' && (
               <div className="space-y-8 animate-fade-in">
@@ -1071,7 +1077,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <div className="space-y-4">
                   <button
                     onClick={() => setModal({ type: 'reset' })}
-                    className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl transition-all group"
+                    className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     <div className="flex items-center gap-3">
                       <RefreshCcw className="text-orange-500 dark:text-orange-400" />
@@ -1085,7 +1091,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
                   <button
                     onClick={() => setModal({ type: 'clear' })}
-                    className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-red-500/10 border border-black/20 dark:border-white/10 hover:border-red-500/50 rounded-xl transition-all group"
+                    className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-red-500/10 border border-black/20 dark:border-white/10 hover:border-red-500/50 rounded-xl transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     <div className="flex items-center gap-3">
                       <Trash2 className="text-red-500 dark:text-red-400" />
@@ -1104,7 +1110,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             <div className="mt-12 pt-6 border-t border-black/20 dark:border-white/10 flex justify-end">
               <button
                 onClick={saveSettings}
-                className="flex items-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all active:scale-95"
+                className="flex items-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <Save size={20} /> Save Changes
               </button>
@@ -1139,13 +1145,13 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <div className="flex gap-4">
                   <button
                     onClick={() => setModal({ type: null })}
-                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {t('settings.modals.stay')}
                   </button>
                   <button
                     onClick={handleLeave}
-                    className="flex-1 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {t('settings.modals.leave')}
                   </button>
@@ -1168,13 +1174,13 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <div className="flex gap-4">
                   <button
                     onClick={() => setModal({ type: null })}
-                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-textMain border border-black/20 dark:border-white/10 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {t('common.cancel')}
                   </button>
                   <button
                     onClick={modal.type === 'reset' ? handleResetProgress : handleClearData}
-                    className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {t('common.confirm')}
                   </button>

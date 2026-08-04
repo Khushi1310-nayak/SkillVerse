@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Award, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import { BadgeCard } from './ui/BadgeCard';
@@ -8,6 +9,7 @@ import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 
 export const CertificationsList: React.FC = () => {
+  const { t } = useTranslation();
   const { appUser: user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export const CertificationsList: React.FC = () => {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
         <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading certifications...</div>
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('certifications.loading')}</div>
       </div>
     );
   }
@@ -43,8 +45,8 @@ export const CertificationsList: React.FC = () => {
   return (
     <div className="animate-fade-in space-y-8">
        <div>
-         <h1 className="text-3xl font-display font-bold text-textMain mb-2">My Certifications</h1>
-         <p className="text-textMuted">Official proof of your skills and achievements.</p>
+         <h1 className="text-3xl font-display font-bold text-textMain mb-2">{t('certifications.title')}</h1>
+         <p className="text-textMuted">{t('certifications.subtitle')}</p>
        </div>
 
        {passedCourses.length > 0 ? (
@@ -61,12 +63,12 @@ export const CertificationsList: React.FC = () => {
             <div className="w-20 h-20 bg-white/50 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                <Award size={40} className="text-textMuted opacity-50" />
             </div>
-            <h3 className="text-xl font-bold text-textMain mb-2">No Certificates Yet</h3>
+            <h3 className="text-xl font-bold text-textMain mb-2">{t('certifications.emptyTitle')}</h3>
             <p className="text-textMuted max-w-md mb-8">
-               Complete courses and pass the final quizzes to earn professional certifications.
+               {t('certifications.emptyDescription')}
             </p>
             <Link to="/courses" className="px-8 py-3 bg-gradient-main text-white rounded-xl font-bold hover:shadow-lg hover:shadow-primary/20 transition-all">
-               Browse Courses
+               {t('certifications.browseCourses')}
             </Link>
          </div>
        )}

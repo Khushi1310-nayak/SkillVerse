@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Award, Download, CheckCircle, Link as LinkIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Course, Progress, User } from '../../types';
 
 export interface BadgeCardProps {
@@ -10,6 +11,7 @@ export interface BadgeCardProps {
 }
 
 export const BadgeCard: React.FC<BadgeCardProps> = ({ course, progress, user }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0, 3).toUpperCase()}-${progress.score}`;
 
@@ -51,9 +53,9 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ course, progress, user }) 
         </div>
       </div>
       
-      <h3 className="text-xl font-bold text-textMain mb-1">{course.title} Certified</h3>
+      <h3 className="text-xl font-bold text-textMain mb-1">{t('certifications.cardTitle', { courseTitle: course.title })}</h3>
       <div className="text-xs font-mono text-[#F5C97A] mb-2 tracking-wider">ID: {credentialId}</div>
-      <p className="text-sm text-textMuted mb-6">Issued {progress.completedDate}</p>
+      <p className="text-sm text-textMuted mb-6">{t('certifications.issued', { date: progress.completedDate })}</p>
       
       <div className="flex gap-3 w-full">
         <button 
@@ -61,13 +63,13 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ course, progress, user }) 
           className="flex-1 bg-white/5 dark:bg-white/5 hover:bg-white/10 border border-black/20 dark:border-white/10 text-textMain py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors text-xs sm:text-sm"
         >
           {copied ? <CheckCircle size={16} className="text-success" /> : <LinkIcon size={16} />}
-          {copied ? "Copied" : "Copy Link"}
+          {copied ? t('certifications.copied') : t('certifications.copyLink')}
         </button>
         <Link 
           to={`/certificate/${course.id}`}
           className="flex-1 bg-gradient-main text-white py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium hover:shadow-lg transition-all text-xs sm:text-sm"
         >
-          <Download size={16} /> Certificate
+          <Download size={16} /> {t('certifications.viewCertificate')}
         </Link>
       </div>
     </div>

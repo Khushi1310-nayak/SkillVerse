@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Printer, CheckCircle, Loader2, Link as LinkIcon, Award, Twitter, Linkedin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import html2canvas from 'html2canvas';
@@ -11,12 +12,16 @@ import { Course } from '../types';
 import { useToast } from '../contexts/ToastContext';
 
 export const Certificate: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { appUser: user } = useAuth();
-  const componentRef = useRef<HTMLDivElement>(null);
+  const { showToast } = useToast();
+
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -39,7 +44,7 @@ export const Certificate: React.FC = () => {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
         <Loader2 className="animate-spin text-primaryLight w-12 h-12" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">Loading certificate details...</div>
+        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('certificate.loading')}</div>
       </div>
     );
   }
@@ -50,20 +55,15 @@ export const Certificate: React.FC = () => {
         <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Award className="text-textMuted opacity-50" size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-textMain mb-4">Certificate Unavailable</h2>
-        <p className="text-textMuted mb-8">You haven't completed this course yet.</p>
+        <h2 className="text-2xl font-bold text-textMain mb-4">{t('certificate.unavailableTitle')}</h2>
+        <p className="text-textMuted mb-8">{t('certificate.unavailableDescription')}</p>
         <Link to={`/course/${id}`} className="px-6 py-2 bg-gradient-main text-white rounded-lg font-bold">
-            Go to Course
+            {t('certificate.goToCourse')}
         </Link>
       </div>
     );
   }
 
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-  const { showToast } = useToast();
-  
   const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0,3).toUpperCase()}-${progress.score}`;
 
   const certificateData: CertificateData = {
@@ -105,7 +105,7 @@ export const Certificate: React.FC = () => {
     };
     const token = btoa(JSON.stringify(tokenData));
     const shareUrl = `${window.location.origin}/#/credential/${token}`;
-    const text = `I just earned a Certificate of Completion for "${course.title}" on SkillVerse Academy! 🎓🚀 Check out my verified credential:`;
+    const text = t('certificate.shareTextTwitter', { title: course.title });
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterUrl, '_blank', 'noopener,noreferrer');
   };
@@ -122,7 +122,7 @@ export const Certificate: React.FC = () => {
       };
       const token = btoa(JSON.stringify(tokenData));
       const shareUrl = `${window.location.origin}/#/credential/${token}`;
-      const text = `I'm thrilled to share that I've completed "${course.title}" on SkillVerse! 🎓🌟 Verify my credential here: ${shareUrl}`;
+      const text = `${t('certificate.shareTextLinkedIn', { title: course.title })} ${shareUrl}`;
       
       const blob = await generateShareImageBlob('certificate-share-card');
       if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], 'certificate.png', { type: 'image/png' })] })) {
@@ -143,9 +143,9 @@ export const Certificate: React.FC = () => {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
           
-          showToast({ message: "Certificate image downloaded! Redirecting to LinkedIn to post...", type: "success" });
+          showToast({ message: t('certificate.toast.imageDownloaded'), type: "success" });
         } else {
-          showToast({ message: "Redirecting to LinkedIn to post...", type: "info" });
+          showToast({ message: t('certificate.toast.redirectingLinkedIn'), type: "info" });
         }
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
         window.open(linkedinUrl, '_blank', 'noopener,noreferrer');
@@ -203,7 +203,7 @@ export const Certificate: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center p-6 animate-fade-in">
       <div className="w-full max-w-5xl mb-8 flex justify-between items-center no-print">
         <Link to="/" className="flex items-center text-textMuted hover:text-textMain transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
+          <ArrowLeft size={20} className="mr-2" /> {t('certificate.backToDashboard')}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
            <button 
@@ -211,13 +211,13 @@ export const Certificate: React.FC = () => {
              className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10"
            >
              {copied ? <CheckCircle size={18} className="text-success" /> : <LinkIcon size={18} />}
-             {copied ? "Link Copied!" : "Copy Link"}
+             {copied ? t('certificate.linkCopied') : t('certificate.copyLink')}
            </button>
            <button 
              onClick={handleShareTwitter}
              className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 group"
            >
-             <Twitter size={18} className="text-[#1DA1F2] group-hover:scale-110 transition-transform" /> Share to Twitter
+             <Twitter size={18} className="text-[#1DA1F2] group-hover:scale-110 transition-transform" /> {t('certificate.shareTwitter')}
            </button>
            <button 
              onClick={handleShareLinkedIn}
@@ -225,7 +225,7 @@ export const Certificate: React.FC = () => {
              className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 disabled:opacity-50 group"
            >
              {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} className="text-[#0A66C2] fill-[#0A66C2] group-hover:scale-110 transition-transform" />}
-             {isSharing ? "Sharing..." : "Share to LinkedIn"}
+             {isSharing ? t('certificate.sharing') : t('certificate.shareLinkedIn')}
            </button>
            <button 
              onClick={handleDownloadPDF}
@@ -233,7 +233,7 @@ export const Certificate: React.FC = () => {
              className="flex items-center gap-2 bg-gradient-main text-white px-6 py-2 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-medium disabled:opacity-50"
            >
              {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Printer size={18} />} 
-             {isDownloading ? "Generating PDF..." : "Download PDF"}
+             {isDownloading ? t('certificate.generatingPdf') : t('certificate.downloadPdf')}
            </button>
         </div>
       </div>
@@ -278,31 +278,31 @@ export const Certificate: React.FC = () => {
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-[#6968A6] to-[#CF9893] flex items-center justify-center text-white font-bold shadow-lg text-2xl font-display">SV</div>
             <div>
-              <div className="text-lg font-bold tracking-[0.25em] text-[#B9B6E3] uppercase">SkillVerse Academy</div>
-              <div className="text-xs text-gray-500 font-mono tracking-wider">CREDENTIAL VERIFIED</div>
+              <div className="text-lg font-bold tracking-[0.25em] text-[#B9B6E3] uppercase">{t('certificateDisplay.academyName')}</div>
+              <div className="text-xs text-gray-500 font-mono tracking-wider">{t('certificate.shareCard.credentialVerified')}</div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm font-mono text-[#F5C97A] font-bold">ID: {credentialId}</div>
-            <div className="text-xs text-gray-400 font-mono mt-1">Issued: {progress.completedDate || new Date().toLocaleDateString()}</div>
+            <div className="text-sm font-mono text-[#F5C97A] font-bold">{t('certificateDisplay.credentialId', { id: credentialId })}</div>
+            <div className="text-xs text-gray-400 font-mono mt-1">{t('certificate.shareCard.issued', { date: progress.completedDate || new Date().toLocaleDateString() })}</div>
           </div>
         </div>
 
         {/* Card Main Body */}
         <div className="text-center z-10 my-auto flex flex-col items-center w-full">
-          <div className="text-sm uppercase tracking-[0.3em] text-gray-400 font-bold mb-3">Certificate of Completion</div>
+          <div className="text-sm uppercase tracking-[0.3em] text-gray-400 font-bold mb-3">{t('certificate.shareCard.title')}</div>
           <h2 className="text-5xl font-extrabold text-white tracking-wide mb-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.15)]">
             {user.username}
           </h2>
           <div className="w-32 h-1 bg-[#F5C97A] mb-5 opacity-70"></div>
           <div className="text-lg text-[#B9B6E3] max-w-2xl mx-auto leading-relaxed">
-            has successfully completed and mastered all requirements for
+            {t('certificate.shareCard.description')}
           </div>
           <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#6968A6] to-[#CF9893] mt-3 tracking-wide">
             {course.title}
           </h3>
           <div className="text-sm text-gray-400 mt-4 font-mono">
-            Passing Score: <span className="text-[#F5C97A] font-bold">{progress.score}%</span>
+            {t('certificate.shareCard.passingScore', { score: progress.score })}
           </div>
         </div>
 
@@ -310,7 +310,7 @@ export const Certificate: React.FC = () => {
         <div className="flex justify-between items-end z-10 w-full">
           <div className="flex items-center gap-3">
             <Award className="text-[#F5C97A]" size={36} />
-            <span className="text-sm font-bold text-[#B9B6E3] tracking-widest uppercase">Verified Achievement</span>
+            <span className="text-sm font-bold text-[#B9B6E3] tracking-widest uppercase">{t('certificate.shareCard.verifiedAchievement')}</span>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-400 font-mono">skillverse-academy.web.app</div>

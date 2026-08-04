@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download,
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
 import { aiService } from '../services/aiService';
+import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
@@ -134,6 +135,14 @@ export const CourseView: React.FC = () => {
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuestion] = optionIndex;
     setSelectedAnswers(newAnswers);
+
+    if (settings?.soundEffects !== false) {
+      if (optionIndex === course.quiz[currentQuestion].correctAnswer) {
+        soundManager.playCorrect();
+      } else {
+        soundManager.playIncorrect();
+      }
+    }
   };
 
   const submitQuiz = () => {
@@ -148,6 +157,10 @@ export const CourseView: React.FC = () => {
     setScore(finalScore);
     setPassed(isPassed);
     setQuizSubmitted(true);
+
+    if (isPassed && settings?.soundEffects !== false) {
+      soundManager.playFanfare();
+    }
 
     // Start cooldown on failure
     if (!isPassed) {

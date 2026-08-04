@@ -8,6 +8,7 @@ export interface UserSettings {
   instantFeedback: boolean;
   showAnswers: boolean;
   retryQuiz: boolean;
+  soundEffects?: boolean;
   certificateName: string;
   avatarId: string;
   // Onboarding Fields
@@ -36,6 +37,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   instantFeedback: true,
   showAnswers: false,
   retryQuiz: true,
+  soundEffects: true,
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,
@@ -53,7 +55,7 @@ export interface User {
   settings: UserSettings;
   xp: number;
   weeklyXP?: number;
-monthlyXP?: number;
+  monthlyXP?: number;
   level: number;
   courses: string[];
   photoURL?: string;

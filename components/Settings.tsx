@@ -5,13 +5,14 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
+import { soundManager } from '../utils/soundManager';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XPStoreTheme, XPStoreCursor } from '../constants';
 import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
@@ -695,6 +696,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       const handleUnlockTheme = async () => {
                         try {
                           await purchaseItem(theme.id, theme.cost, 'theme');
+                          if (formData.settings.soundEffects !== false) soundManager.playCoin();
                           showToast({ message: `Unlocked ${theme.name} Theme!`, type: 'success' });
                           setFormData(prev => ({
                             ...prev,
@@ -793,6 +795,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       const handleUnlockCursor = async () => {
                         try {
                           await purchaseItem(cursor.id, cursor.cost, 'cursor');
+                          if (formData.settings.soundEffects !== false) soundManager.playCoin();
                           showToast({ message: `Unlocked ${cursor.name} Cursor!`, type: 'success' });
                           setFormData(prev => ({
                             ...prev,
@@ -913,6 +916,24 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       </div>
                     </div>
                     <Toggle checked={formData.settings.autoSave} onChange={(v) => handleChange('autoSave', v)} />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-center gap-3">
+                      <Volume2 className="text-pink-500 dark:text-pink-400" />
+                      <div>
+                        <div className="font-bold text-textMain">Sound Effects</div>
+                        <div className="text-sm text-textMuted">Play audio feedback for quiz answers, level-ups, and purchases</div>
+                      </div>
+                    </div>
+                    <Toggle
+                      checked={formData.settings.soundEffects !== false}
+                      onChange={(v) => {
+                        handleChange('soundEffects', v);
+                        if (v) soundManager.playCorrect();
+                      }}
+                      ariaLabel="Toggle sound effects"
+                    />
                   </div>
                 </div>
               </div>

@@ -448,5 +448,17 @@
       "passingScore": "Passing Score: {{score}}%",
       "verifiedAchievement": "Verified Achievement"
     }
+  },
+  "lessonDiscussion": {
+    "title": "Lesson Discussion & Q&A",
+    "subtitle": "Ask questions, share insights, and discuss with fellow learners",
+    "placeholder": "Ask a question or share a thought about this lesson...",
+    "submit": "Post Comment",
+    "loginRequired": "Please log in to join the discussion and post questions.",
+    "emptyTitle": "No discussions yet",
+    "emptySubtitle": "Be the first to ask a question or leave a note on this lesson!",
+    "time": {
+      "justNow": "Just now"
+    }
   }
 }

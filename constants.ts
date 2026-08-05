@@ -167,7 +167,7 @@ const generateSectionHtml = (sec: { title: string; icon: string }, i: number, to
   '</div>';
 };
 
-const generateRichContent = (topic: string, categoryId: string): string => {
+export const generateRichContent = (topic: string, categoryId: string): string => {
   const sectionsHtml = MODULE_SECTIONS.map((sec, i) => generateSectionHtml(sec, i, topic)).join('');
 
   return `

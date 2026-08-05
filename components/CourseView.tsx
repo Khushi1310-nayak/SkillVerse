@@ -8,7 +8,8 @@ import { aiService } from '../services/aiService';
 import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
-import { COURSES } from '../constants';
+import { COURSES, generateRichContent } from '../constants';
+import { getDailyQuiz } from '../utils/dailyQuizGenerator';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
@@ -37,11 +38,12 @@ export const CourseView: React.FC = () => {
         if (activeCourse) {
           const q = await firestoreService.getQuiz(id);
           const dailyQuiz = getDailyQuiz(activeCourse.title);
+          const dynamicContent = generateRichContent(activeCourse.title, activeCourse.categoryId);
+
           setCourse({
             ...activeCourse,
-            // Always inject fresh dynamic daily content with working code snippets if available
-            content: localCourse ? localCourse.content : activeCourse.content,
-            quiz: q ? q.questions : (activeCourse.quiz || [])
+            content: dynamicContent,
+            quiz: dailyQuiz.length > 0 ? dailyQuiz : (q ? q.questions : (activeCourse.quiz || []))
           });
         } else {
           setCourse(null);

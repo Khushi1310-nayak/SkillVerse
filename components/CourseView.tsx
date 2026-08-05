@@ -10,6 +10,8 @@ import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
+import { createRoot } from 'react-dom/client';
+import { CodePlayground } from './CodePlayground';
 
 export const CourseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -59,6 +61,80 @@ export const CourseView: React.FC = () => {
   const [passed, setPassed] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const rootsRef = useRef<any[]>([]);
+
+  const cleanupRoots = () => {
+    rootsRef.current.forEach(root => {
+      try {
+        root.unmount();
+      } catch (e) {
+        // Safe to ignore if already unmounted
+      }
+    });
+    rootsRef.current = [];
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'learn' || loadingCourse || !course) {
+      cleanupRoots();
+      return;
+    }
+
+    // Small delay to ensure dangerouslySetInnerHTML has fully rendered
+    const timer = setTimeout(() => {
+      cleanupRoots();
+
+      const contentContainer = contentRef.current;
+      if (!contentContainer) return;
+
+      const codeElements = Array.from(contentContainer.querySelectorAll('code'));
+      const processedContainers = new Set<HTMLElement>();
+
+      codeElements.forEach((codeEl) => {
+        let container: HTMLElement | null = codeEl.parentElement;
+        
+        while (container && container !== contentContainer) {
+          if (container.classList.contains('bg-[#0f1623]') || 
+              container.className.includes('bg-[#0f1623]') || 
+              container.tagName === 'PRE') {
+            break;
+          }
+          container = container.parentElement;
+        }
+
+        if (!container || container === contentContainer) {
+          container = codeEl.parentElement;
+        }
+
+        if (container && !processedContainers.has(container) && container.parentNode) {
+          processedContainers.add(container);
+
+          const initialCode = codeEl.textContent || '';
+          const isInline = !initialCode.includes('\n') && initialCode.length < 50;
+          if (isInline) return;
+
+          const mountPoint = document.createElement('div');
+          mountPoint.className = 'w-full my-6';
+
+          container.parentNode.replaceChild(mountPoint, container);
+
+          try {
+            const root = createRoot(mountPoint);
+            root.render(<CodePlayground initialCode={initialCode.trim()} />);
+            rootsRef.current.push(root);
+          } catch (err) {
+            console.error('Failed to initialize CodePlayground root:', err);
+          }
+        }
+      });
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      cleanupRoots();
+    };
+  }, [course?.id, activeTab, loadingCourse]);
 
   useEffect(() => {
     // Load existing progress
@@ -297,7 +373,7 @@ export const CourseView: React.FC = () => {
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
-                <div dangerouslySetInnerHTML={{ __html: course.content }} />
+                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: course.content }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">

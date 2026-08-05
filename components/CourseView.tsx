@@ -13,6 +13,7 @@ import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
 import { useActiveTimer } from '../hooks/useActiveTimer';
+import { LessonDiscussion } from './LessonDiscussion';
 
 export const CourseView: React.FC = () => {
   useActiveTimer();
@@ -388,6 +389,9 @@ export const CourseView: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Lesson Discussion & Q&A Drawer */}
+              <LessonDiscussion courseId={course.id} lessonId="main-lesson" user={user} />
 
               <div className="flex justify-end pt-8">
                 <button

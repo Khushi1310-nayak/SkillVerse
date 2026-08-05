@@ -1,6 +1,7 @@
 import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-react';
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 import { getDailyCodeSnippet } from './utils/dailyCodeGenerator';
+import { getDailyQuiz } from './utils/dailyQuizGenerator';
 
 export const CATEGORIES: Category[] = [
   {
@@ -117,7 +118,10 @@ const getDocLink = (topic: string) => {
 };
 
 const generateQuiz = (subject: string): any[] => {
-  return getDailyQuiz(subject);
+  if (typeof getDailyQuiz === 'function') {
+    return getDailyQuiz(subject);
+  }
+  return [];
 };
 
 const MODULE_SECTIONS = [
@@ -132,41 +136,39 @@ const MODULE_SECTIONS = [
 ];
 
 const generateSectionHtml = (sec: { title: string; icon: string }, i: number, topic: string): string => {
-  const cleanTitle = (sec && sec.title && sec.title.includes('. ')) ? sec.title.split('. ')[1] : (sec?.title || '');
-  const slug = (topic || '').toLowerCase().replace(/\s+/g, '-');
-  const docsUrl = getDocLink(topic);
-  const playUrl = `/#/playground?course=${slug}&module=${i + 1}`;
+  const courseSlug = topic.toLowerCase().replace(/\s+/g, '-');
+  const playgroundLink = `/#/playground?course=${courseSlug}&module=${i + 1}`;
 
-  return `<div id="module-${i + 1}" class="bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8 transition-all duration-300 shadow-xl relative overflow-hidden group hover:border-primaryLight/40">
-    <div class="absolute -right-4 -bottom-4 text-9xl font-display font-bold text-white/5 pointer-events-none select-none">${i + 1}</div>
-    <div class="relative z-10">
-      <div class="flex items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-5">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">${sec.icon}</div>
-          <h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">${sec.title}</h2>
-        </div>
-        <a href="${playUrl}" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-main text-white font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Practice Problem ${i + 1} ⚡</a>
-      </div>
-      <div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">
-        <p>In this module, we dissect <strong>${cleanTitle}</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ${topic} code.</p>
-        <ul class="list-none pl-0 space-y-2 mt-4">
-          <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Theoretical foundations</li>
-          <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Practical implementation strategies</li>
-          <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Common industry use-cases</li>
-        </ul>
-      </div>
-      <div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">
-        <span class="text-xs font-bold text-textMuted uppercase tracking-widest">Module ${i + 1} of 8</span>
-        <div class="flex items-center gap-3">
-          <a href="${playUrl}" class="inline-flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-main text-white font-bold text-xs">Practice ⚡</a>
-          <a href="${docsUrl}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all">Official Docs ↗</a>
-        </div>
-      </div>
-    </div>
-  </div>`;
+  return '<div id="module-' + (i + 1) + '" class="bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8 transition-all duration-300 shadow-xl relative overflow-hidden group hover:border-primaryLight/40">' +
+    '<div class="absolute -right-4 -bottom-4 text-9xl font-display font-bold text-white/5 pointer-events-none select-none">' + (i + 1) + '</div>' +
+    '<div class="relative z-10">' +
+      '<div class="flex items-center justify-between gap-4 mb-6">' +
+        '<div class="flex items-center gap-5">' +
+          '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">' + sec.icon + '</div>' +
+          '<h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">' + sec.title + '</h2>' +
+        '</div>' +
+        '<a href="' + playgroundLink + '" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-main text-white font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Practice Problem ' + (i + 1) + ' ⚡</a>' +
+      '</div>' +
+      '<div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">' +
+        '<p>In this module, we dissect <strong>' + sectionTitleName + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
+        '<ul class="list-none pl-0 space-y-2 mt-4">' +
+          '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Theoretical foundations</li>' +
+          '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Practical implementation strategies</li>' +
+          '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Common industry use-cases</li>' +
+        '</ul>' +
+      '</div>' +
+      '<div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">' +
+        '<span class="text-xs font-bold text-textMuted uppercase tracking-widest">Module ' + (i + 1) + ' of 8</span>' +
+        '<div class="flex items-center gap-3">' +
+          '<a href="' + playgroundLink + '" class="inline-flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-main text-white font-bold text-xs">Practice ⚡</a>' +
+          '<a href="' + link + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all">Official Docs ↗</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 };
 
-const generateRichContent = (topic: string, categoryId: string): string => {
+export const generateRichContent = (topic: string, categoryId: string): string => {
   const sectionsHtml = MODULE_SECTIONS.map((sec, i) => generateSectionHtml(sec, i, topic)).join('');
 
   return `

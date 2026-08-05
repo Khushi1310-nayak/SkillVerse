@@ -8,7 +8,7 @@ import {
   deleteDoc 
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
-import { Course, Company, QuizQuestion, Chapter } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment } from '../types';
 import { COURSES, COMPANIES } from '../constants';
 
 // Helper to structure chapters for initial seed courses
@@ -209,5 +209,80 @@ export const firestoreService = {
 
   deleteCompany: async (id: string): Promise<void> => {
     await deleteDoc(doc(db, 'companies', id));
+  },
+
+  // --- LESSON DISCUSSIONS & Q&A ---
+  getLessonComments: async (courseId: string, lessonId: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    try {
+      const colRef = collection(db, 'courses', courseId, 'lessons', lessonId, 'comments');
+      const querySnapshot = await getDocs(colRef);
+      if (!querySnapshot.empty) {
+        const comments: LessonComment[] = [];
+        querySnapshot.forEach((docSnap) => {
+          comments.push({ id: docSnap.id, ...docSnap.data() } as LessonComment);
+        });
+        comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        localStorage.setItem(key, JSON.stringify(comments));
+        return comments;
+      }
+    } catch (err) {
+      console.warn('Firestore offline, falling back to local storage for comments:', err);
+    }
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : [];
+  },
+
+  postLessonComment: async (commentData: Omit<LessonComment, 'id' | 'createdAt' | 'upvotes' | 'upvotedBy'>): Promise<LessonComment> => {
+    const newComment: LessonComment = {
+      ...commentData,
+      id: `comment-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: new Date().toISOString(),
+      upvotes: 0,
+      upvotedBy: [],
+    };
+    const key = `lesson_comments_${commentData.courseId}_${commentData.lessonId}`;
+    try {
+      const docRef = doc(db, 'courses', commentData.courseId, 'lessons', commentData.lessonId, 'comments', newComment.id);
+      await setDoc(docRef, newComment);
+    } catch (err) {
+      console.warn('Firestore write failed, saving locally:', err);
+    }
+    const saved = localStorage.getItem(key);
+    const comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    comments.unshift(newComment);
+    localStorage.setItem(key, JSON.stringify(comments));
+    return newComment;
+  },
+
+  upvoteLessonComment: async (commentId: string, userId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    const saved = localStorage.getItem(key);
+    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+
+    comments = comments.map(comment => {
+      if (comment.id === commentId) {
+        const upvotedBy = comment.upvotedBy || [];
+        const hasUpvoted = upvotedBy.includes(userId);
+        const newUpvotedBy = hasUpvoted
+          ? upvotedBy.filter(id => id !== userId)
+          : [...upvotedBy, userId];
+        const newUpvotes = newUpvotedBy.length;
+        const updated = { ...comment, upvotes: newUpvotes, upvotedBy: newUpvotedBy };
+        
+        // Try updating firestore as well asynchronously
+        try {
+          const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
+          updateDoc(docRef, { upvotes: newUpvotes, upvotedBy: newUpvotedBy }).catch(() => {});
+        } catch (e) {}
+
+        return updated;
+      }
+      return comment;
+    });
+
+    localStorage.setItem(key, JSON.stringify(comments));
+    return comments;
   }
 };
+

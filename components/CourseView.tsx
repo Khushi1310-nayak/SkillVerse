@@ -12,8 +12,10 @@ import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
+import { useActiveTimer } from '../hooks/useActiveTimer';
 
 export const CourseView: React.FC = () => {
+  useActiveTimer();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();

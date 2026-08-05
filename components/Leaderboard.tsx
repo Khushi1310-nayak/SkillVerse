@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Medal, TrendingUp, Calendar, Clock, Award } from 'lucide-react';
 import { db } from '../firebase/firebase';
 import { XP_STORE_FRAMES } from '../constants';
+import { PublicProfileModal } from './PublicProfileModal';
 
 interface LeaderboardUser {
   id: string;
@@ -29,6 +30,9 @@ export const Leaderboard: React.FC = () => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedRankIndex, setSelectedRankIndex] = useState<number | undefined>(undefined);
+
 
   useEffect(() => {
     setLoading(true);
@@ -169,14 +173,19 @@ export const Leaderboard: React.FC = () => {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
               key={user.id}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-colors duration-300 ${getRowStyle(index)}`}
+              onClick={() => {
+                setSelectedUserId(user.id);
+                setSelectedRankIndex(index);
+              }}
+              className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 cursor-pointer group ${getRowStyle(index)}`}
+              title="Click to view public profile"
             >
               <div className="flex items-center gap-4">
                 <div className="flex justify-center items-center w-8">
                   {getRankIcon(index)}
                 </div>
                 
-                <div className="relative">
+                <div className="relative group-hover:scale-105 transition-transform">
                   <img
                     src={user.photoURL || AVATARS[user.avatarId || '1']}
                     alt={user.username}
@@ -200,7 +209,9 @@ export const Leaderboard: React.FC = () => {
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-textMain text-lg leading-tight">{user.username}</h3>
+                  <h3 className="font-bold text-textMain text-lg leading-tight group-hover:underline group-hover:text-primaryLight transition-colors">
+                    {user.username}
+                  </h3>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-primaryLight">
                       Lvl {user.level}
@@ -227,6 +238,16 @@ export const Leaderboard: React.FC = () => {
       
       {/* Background decoration */}
       <div className="absolute right-[-5%] top-[-5%] w-[30%] h-[50%] rounded-full bg-primaryLight/10 blur-[80px] pointer-events-none" />
+
+      {/* Public Profile Modal */}
+      <PublicProfileModal
+        userId={selectedUserId}
+        rankIndex={selectedRankIndex}
+        onClose={() => {
+          setSelectedUserId(null);
+          setSelectedRankIndex(undefined);
+        }}
+      />
     </div>
   );
 };

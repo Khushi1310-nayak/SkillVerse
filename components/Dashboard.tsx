@@ -32,6 +32,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
   const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
 
+  const [weeklyStats, setWeeklyStats] = useState(() => 
+    storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60)
+  );
+
+  useEffect(() => {
+    // Sync state if settings change
+    setWeeklyStats(storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60));
+  }, [user.settings?.dailyGoal]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const next = storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60);
+      setWeeklyStats(prev => {
+        if (
+          next.totalSeconds === prev.totalSeconds &&
+          next.goalHours === prev.goalHours &&
+          next.percentage === prev.percentage
+        ) {
+          return prev;
+        }
+        return next;
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [user.settings?.dailyGoal]);
+
+  const displayHours = useMemo(() => {
+    const seconds = weeklyStats.totalSeconds;
+    if (seconds <= 0) return '0';
+    const hours = seconds / 3600;
+    if (hours < 0.1) {
+      return Math.max(0.01, Math.round(hours * 100) / 100).toFixed(2);
+    }
+    return (Math.round(hours * 10) / 10).toFixed(1);
+  }, [weeklyStats.totalSeconds]);
+
     useEffect(() => {
     const loadCompanies = async () => {
       try {
@@ -399,6 +436,56 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Weekly Study Target Card */}
+        <div id="dash-weekly-target" className="lg:col-span-3 bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-5 sm:p-8 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex-1 space-y-2">
+            <h3 className="text-lg font-semibold text-textMain">Weekly Study Target</h3>
+            <p className="text-sm text-textMuted max-w-xl">
+              Track your active learning journey! Your study time accumulates dynamically when you actively focus on a course or career mode.
+            </p>
+            <div className="flex items-baseline gap-2 mt-4">
+              <span className="text-3xl font-bold text-textMain">{displayHours}</span>
+              <span className="text-textMuted">/</span>
+              <span className="text-lg text-textMuted font-medium">{weeklyStats.goalHours} Hours</span>
+            </div>
+          </div>
+          
+          <div className="relative flex items-center justify-center shrink-0">
+            <svg
+              height={120}
+              width={120}
+              className="transform -rotate-90"
+            >
+              {/* Background Circle */}
+              <circle
+                className="text-black/5 dark:text-white/5"
+                stroke="currentColor"
+                fill="transparent"
+                strokeWidth={8}
+                r={48}
+                cx={60}
+                cy={60}
+              />
+              {/* Progress Circle */}
+              <circle
+                className="text-primaryLight transition-all duration-1000 ease-out"
+                stroke="currentColor"
+                fill="transparent"
+                strokeWidth={8}
+                strokeDasharray={301.6}
+                strokeDashoffset={301.6 - (weeklyStats.percentage / 100) * 301.6}
+                strokeLinecap="round"
+                r={48}
+                cx={60}
+                cy={60}
+              />
+            </svg>
+            <div className="absolute text-xl font-bold text-textMain">
+              {weeklyStats.percentage}%
+            </div>
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ export interface UserSettings {
   instantFeedback: boolean;
   showAnswers: boolean;
   retryQuiz: boolean;
+  soundEffects?: boolean;
   certificateName: string;
   avatarId: string;
   // Onboarding Fields
@@ -21,8 +22,10 @@ export interface UserSettings {
   learningStyle?: string;
   unlockedThemes?: string[];
   unlockedCursors?: string[];
+  unlockedFrames?: string[];
   activeTheme?: string;
   activeCursor?: string;
+  activeFrame?: string;
   customPrimary?: string; // hex color, e.g. #6968A6
   customPrimaryLight?: string; // hex color, e.g. #CF9893
 }
@@ -36,14 +39,17 @@ export const DEFAULT_SETTINGS: UserSettings = {
   instantFeedback: true,
   showAnswers: false,
   retryQuiz: true,
+  soundEffects: true,
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,
   hasSeenTour: false,
   unlockedThemes: ['dark', 'light'],
   unlockedCursors: ['default'],
+  unlockedFrames: ['none'],
   activeTheme: 'dark',
-  activeCursor: 'default'
+  activeCursor: 'default',
+  activeFrame: 'none'
 };
 
 export interface User {
@@ -52,6 +58,8 @@ export interface User {
   enrolledDate: string;
   settings: UserSettings;
   xp: number;
+  weeklyXP?: number;
+  monthlyXP?: number;
   level: number;
   courses: string[];
   photoURL?: string;

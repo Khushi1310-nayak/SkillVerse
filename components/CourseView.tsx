@@ -5,12 +5,17 @@ import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download,
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
 import { aiService } from '../services/aiService';
+import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
+import { createRoot } from 'react-dom/client';
+import { CodePlayground } from './CodePlayground';
+import { useActiveTimer } from '../hooks/useActiveTimer';
 
 export const CourseView: React.FC = () => {
+  useActiveTimer();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -58,6 +63,80 @@ export const CourseView: React.FC = () => {
   const [passed, setPassed] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const rootsRef = useRef<any[]>([]);
+
+  const cleanupRoots = () => {
+    rootsRef.current.forEach(root => {
+      try {
+        root.unmount();
+      } catch (e) {
+        // Safe to ignore if already unmounted
+      }
+    });
+    rootsRef.current = [];
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'learn' || loadingCourse || !course) {
+      cleanupRoots();
+      return;
+    }
+
+    // Small delay to ensure dangerouslySetInnerHTML has fully rendered
+    const timer = setTimeout(() => {
+      cleanupRoots();
+
+      const contentContainer = contentRef.current;
+      if (!contentContainer) return;
+
+      const codeElements = Array.from(contentContainer.querySelectorAll('code'));
+      const processedContainers = new Set<HTMLElement>();
+
+      codeElements.forEach((codeEl) => {
+        let container: HTMLElement | null = codeEl.parentElement;
+        
+        while (container && container !== contentContainer) {
+          if (container.classList.contains('bg-[#0f1623]') || 
+              container.className.includes('bg-[#0f1623]') || 
+              container.tagName === 'PRE') {
+            break;
+          }
+          container = container.parentElement;
+        }
+
+        if (!container || container === contentContainer) {
+          container = codeEl.parentElement;
+        }
+
+        if (container && !processedContainers.has(container) && container.parentNode) {
+          processedContainers.add(container);
+
+          const initialCode = codeEl.textContent || '';
+          const isInline = !initialCode.includes('\n') && initialCode.length < 50;
+          if (isInline) return;
+
+          const mountPoint = document.createElement('div');
+          mountPoint.className = 'w-full my-6';
+
+          container.parentNode.replaceChild(mountPoint, container);
+
+          try {
+            const root = createRoot(mountPoint);
+            root.render(<CodePlayground initialCode={initialCode.trim()} />);
+            rootsRef.current.push(root);
+          } catch (err) {
+            console.error('Failed to initialize CodePlayground root:', err);
+          }
+        }
+      });
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      cleanupRoots();
+    };
+  }, [course?.id, activeTab, loadingCourse]);
 
   useEffect(() => {
     // Load existing progress
@@ -134,6 +213,14 @@ export const CourseView: React.FC = () => {
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuestion] = optionIndex;
     setSelectedAnswers(newAnswers);
+
+    if (settings?.soundEffects !== false) {
+      if (optionIndex === course.quiz[currentQuestion].correctAnswer) {
+        soundManager.playCorrect();
+      } else {
+        soundManager.playIncorrect();
+      }
+    }
   };
 
   const submitQuiz = () => {
@@ -148,6 +235,10 @@ export const CourseView: React.FC = () => {
     setScore(finalScore);
     setPassed(isPassed);
     setQuizSubmitted(true);
+
+    if (isPassed && settings?.soundEffects !== false) {
+      soundManager.playFanfare();
+    }
 
     // Start cooldown on failure
     if (!isPassed) {
@@ -244,7 +335,7 @@ export const CourseView: React.FC = () => {
 
       {/* Sidebar Navigation */}
       <div className="lg:col-span-1 space-y-6">
-        <Link to={`/category/${course.categoryId}`} className="inline-flex items-center text-textMuted hover:text-textMain transition-colors">
+        <Link to={`/category/${course.categoryId}`} className="inline-flex items-center text-textMuted hover:text-textMain transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background">
           <ArrowLeft size={20} className="mr-2" /> {t('courseView.back')}
         </Link>
 
@@ -253,17 +344,21 @@ export const CourseView: React.FC = () => {
             <BookOpen className="text-white" />
           </div>
           <h2 className="text-xl font-bold text-textMain mb-2">{course.title}</h2>
-          <div className="flex flex-col gap-2 mt-6">
+          <div className="flex flex-col gap-2 mt-6" role="tablist" aria-label="Course sections">
             <button
               onClick={() => setActiveTab('learn')}
-              className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+              role="tab"
+              aria-selected={activeTab === 'learn'}
+              className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
             >
               <span>{t('courseView.navigation.notesResources')}</span>
               {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
             </button>
             <button
               onClick={() => setActiveTab('quiz')}
-              className={`flex items-center justify-between p-3 rounded-xl transition-all ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+              role="tab"
+              aria-selected={activeTab === 'quiz'}
+              className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
             >
               <span>{t('courseView.navigation.finalQuiz')}</span>
               {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
@@ -280,14 +375,14 @@ export const CourseView: React.FC = () => {
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
-                <div dangerouslySetInnerHTML={{ __html: course.content }} />
+                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: course.content }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">
                 <h3 className="text-lg font-bold text-textMain mb-4">{t('courseView.resources.title')}</h3>
                 <div className="flex flex-wrap gap-4">
                   {course.resources.map((res, i) => (
-                    <a key={i} href={res.url} className="px-4 py-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-lg text-primaryLight text-sm transition-colors">
+                    <a key={i} href={res.url} className="px-4 py-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-lg text-primaryLight text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                       {res.title} ↗
                     </a>
                   ))}
@@ -297,7 +392,7 @@ export const CourseView: React.FC = () => {
               <div className="flex justify-end pt-8">
                 <button
                   onClick={() => setActiveTab('quiz')}
-                  className="bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
+                  className="bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {t('courseView.resources.proceed')}
                 </button>
@@ -323,7 +418,7 @@ export const CourseView: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="space-y-4 mb-10">
+                  <div className="space-y-4 mb-10" role="radiogroup" aria-label={course.quiz[currentQuestion].question}>
                     {course.quiz[currentQuestion].options.map((option, idx) => {
                       const isSelected = selectedAnswers[currentQuestion] === idx;
                       const isCorrect = idx === course.quiz[currentQuestion].correctAnswer;
@@ -349,9 +444,11 @@ export const CourseView: React.FC = () => {
                       return (
                         <button
                           key={idx}
+                          role="radio"
+                          aria-checked={isSelected}
                           onClick={() => handleOptionSelect(idx)}
                           disabled={showInstant}
-                          className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-4 ${btnClass}`}
+                          className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${btnClass}`}
                         >
                           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${iconBorder}`}>
                             {isSelected && <div className={`w-3 h-3 rounded-full ${showInstant ? (isCorrect ? 'bg-success' : 'bg-red-500') : 'bg-primaryLight'}`} />}
@@ -366,14 +463,14 @@ export const CourseView: React.FC = () => {
                     <button
                       onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
                       disabled={currentQuestion === 0}
-                      className="px-6 py-2 rounded-lg text-textMuted hover:text-textMain disabled:opacity-50"
+                      className="px-6 py-2 rounded-lg text-textMuted hover:text-textMain disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       {t('courseView.quiz.previous')}
                     </button>
                     {currentQuestion < course.quiz.length - 1 ? (
                       <button
                         onClick={() => setCurrentQuestion(currentQuestion + 1)}
-                        className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors"
+                        className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {t('courseView.quiz.next')}
                       </button>
@@ -381,7 +478,7 @@ export const CourseView: React.FC = () => {
                       <button
                         onClick={submitQuiz}
                         disabled={selectedAnswers.length < course.quiz.length}
-                        className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {t('courseView.quiz.submit')}
                       </button>
@@ -405,7 +502,7 @@ export const CourseView: React.FC = () => {
                     {passed ? (
                       <Link
                         to={`/certificate/${course.id}`}
-                        className="flex items-center justify-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
+                        className="flex items-center justify-center gap-2 bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         <Download size={20} /> {t('courseView.quiz.result.viewCertificate')}
                       </Link>
@@ -421,7 +518,7 @@ export const CourseView: React.FC = () => {
                           <button
                             onClick={resetQuiz}
                             disabled={timeLeft > 0}
-                            className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold transition-all
+                            className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background
                               ${timeLeft > 0
                                 ? 'bg-black/10 dark:bg-white/5 text-textMuted opacity-50 cursor-not-allowed border border-orange-500/30'
                                 : 'bg-black/5 dark:bg-white/10 text-textMain hover:bg-black/10 dark:hover:bg-white/20'
@@ -467,11 +564,12 @@ export const CourseView: React.FC = () => {
                               )
                             })}
                           </div>
+
                           {selectedAnswers[qIdx] !== undefined && selectedAnswers[qIdx] !== q.correctAnswer && (
                             <div className="mt-4">
                               <button
                                 onClick={() => handleAskAiWhy(qIdx)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primaryLight text-sm font-medium hover:bg-primary/20 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primaryLight text-sm font-medium hover:bg-primary/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                               >
                                 <Sparkles size={16} /> Ask AI Why
                               </button>

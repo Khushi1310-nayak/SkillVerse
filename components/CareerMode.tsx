@@ -5,7 +5,7 @@ import {
   ExternalLink, ChevronDown, ChevronRight, X,
   PlayCircle, Timer, Award, Zap, Heart, Sparkles,
   BarChart, ArrowRight, Maximize2, Minimize2,
-  Mic, MicOff, Volume2, User, Loader2
+  Mic, MicOff, Volume2, User, Loader2, Download
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useSearchParams } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { Company, InterviewQuestion, CareerProgress, User as AppUser } from '../
 import { getRecommendedCompanies } from '../utils/recommendations';
 import { firestoreService } from '../services/firestoreService';
 import { auth } from '../firebase/firebase';
+import { generateInterviewReportPDF } from '../utils/pdfGenerator';
 import { Typewriter } from './Typewriter';
 import Editor from '@monaco-editor/react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -390,12 +391,15 @@ const VoiceChat = React.memo(VoiceChatComponent, (prevProps, nextProps) => {
   return prevProps.chatHistory === nextProps.chatHistory;
 });
 
+import { useActiveTimer } from '../hooks/useActiveTimer';
+
 // --- MAIN COMPONENT ---
 interface CareerModeProps {
   user?: AppUser;
 }
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
+  useActiveTimer();
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -446,6 +450,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const [textReport, setTextReport] = useState("");
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const [editorLanguage, setEditorLanguage] = useState<string>('javascript');
 
   const editorOptions = useMemo(() => ({
@@ -559,6 +564,122 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     setMockState('idle');
     setActiveTab('study');
   }, []);
+
+  const handleDownloadPDF = useCallback(async () => {
+    const reportText = mockState === 'finished_voice' ? voiceReport : textReport;
+    if (!reportText) {
+      showToast({ message: "No report feedback available to download.", type: "error" });
+      return;
+    }
+
+    setIsDownloadingPDF(true);
+
+    try {
+      // 1. Extract score
+      const scoreMatch = reportText.match(/\[SCORE:\s*(\d+)\]/i);
+      let readiness = scoreMatch ? parseInt(scoreMatch[1], 10) : 80;
+
+      // Check localStorage scores for the company if no score in voiceReport
+      if (!scoreMatch && selectedCompany) {
+        const companyScores = progress.mockInterviewScores.filter(s => s.companyId === selectedCompany.id);
+        if (companyScores.length > 0) {
+          readiness = companyScores[companyScores.length - 1].score;
+        }
+      }
+
+      // 2. Parse lines into sections
+      const lines = reportText.split('\n').map(l => l.trim());
+      let currentSection: 'strengths' | 'improvements' | 'feedback' = 'feedback';
+      const strengths: string[] = [];
+      const improvements: string[] = [];
+      const feedbackLines: string[] = [];
+
+      lines.forEach(line => {
+        if (!line) return;
+        const lowerLine = line.toLowerCase();
+
+        // Section header identification
+        if (
+          lowerLine.includes('key strengths') || 
+          lowerLine.includes('strengths') || 
+          lowerLine.includes('what they did well')
+        ) {
+          currentSection = 'strengths';
+          return;
+        } else if (
+          lowerLine.includes('areas for improvement') || 
+          lowerLine.includes('improvement') || 
+          lowerLine.includes('need to work on') ||
+          lowerLine.includes('what they need to work on')
+        ) {
+          currentSection = 'improvements';
+          return;
+        } else if (
+          /^\d+\.\s+\*\*/.test(line) || 
+          line.startsWith('###') || 
+          line.startsWith('##') || 
+          line.startsWith('#')
+        ) {
+          currentSection = 'feedback';
+        }
+
+        // Clean lines of markdown list characters and asterisks
+        const cleanLine = line
+          .replace(/^[-*+\d.]\s*/, '') // Remove list bullets
+          .replace(/\*\*/g, '')         // Remove bold markers
+          .trim();
+        
+        if (!cleanLine) return;
+
+        if (currentSection === 'strengths') {
+          if (line.startsWith('-') || line.startsWith('*') || /^\d+\./.test(line)) {
+            strengths.push(cleanLine);
+          }
+        } else if (currentSection === 'improvements') {
+          if (line.startsWith('-') || line.startsWith('*') || /^\d+\./.test(line)) {
+            improvements.push(cleanLine);
+          }
+        } else {
+          // General feedback paragraphs (excluding the SCORE bracket)
+          if (!line.includes('[SCORE:')) {
+            feedbackLines.push(line);
+          }
+        }
+      });
+
+      // Standard robust fallbacks if lists are empty
+      if (strengths.length === 0) {
+        strengths.push("Engaged with all questions presented during the mock session.");
+        strengths.push("Formulated complete explanations and code structures.");
+      }
+      if (improvements.length === 0) {
+        improvements.push("Focus on space/time complexity considerations.");
+        improvements.push("Refine error validation and edge-case coverage.");
+      }
+
+      // 3. Compile remaining feedback paragraphs
+      const rawFeedback = feedbackLines.join('\n\n');
+      const cleanFeedback = (rawFeedback || reportText).replace(/\[SCORE:\s*\d+\]/gi, '').trim();
+
+      // 4. Generate report PDF
+      await generateInterviewReportPDF({
+        companyName: selectedCompany?.name || 'Technical Interview Loop',
+        candidateName: auth.currentUser?.displayName || 'Candidate',
+        date: new Date().toLocaleDateString(),
+        readinessScore: readiness,
+        strengths,
+        improvements,
+        aiFeedback: cleanFeedback
+      });
+
+      showToast({ message: "PDF Report downloaded successfully!", type: "success" });
+    } catch (err) {
+      console.error('PDF Generation failed:', err);
+      showToast({ message: "Failed to generate PDF report. Please try again.", type: "error" });
+    } finally {
+      setIsDownloadingPDF(false);
+    }
+  }, [mockState, voiceReport, textReport, selectedCompany, progress, showToast]);
 
   const startMockInterview = useCallback(() => {
     if (!selectedCompany) return;
@@ -1368,12 +1489,31 @@ ${transcriptText}`;
                     <ReactMarkdown>{voiceReport}</ReactMarkdown>
                   </div>
 
-                  <button
-                    onClick={handleBackToStudy}
-                    className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
-                  >
-                    Back to Study Mode
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-4 mb-10 w-full justify-center">
+                    <button
+                      onClick={handleDownloadPDF}
+                      disabled={isDownloadingPDF}
+                      className="px-8 py-4 bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      {isDownloadingPDF ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          Download PDF Report
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleBackToStudy}
+                      className="px-8 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md"
+                    >
+                      Back to Study Mode
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : mockState === 'finished' ? (
@@ -1401,12 +1541,31 @@ ${transcriptText}`;
                     <ReactMarkdown>{textReport}</ReactMarkdown>
                   </div>
 
-                  <button
-                    onClick={handleBackToStudy}
-                    className="px-10 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md mb-10"
-                  >
-                    Back to Study Mode
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-4 mb-10 w-full justify-center">
+                    <button
+                      onClick={handleDownloadPDF}
+                      disabled={isDownloadingPDF}
+                      className="px-8 py-4 bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      {isDownloadingPDF ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          Download PDF Report
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleBackToStudy}
+                      className="px-8 py-4 bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 text-textMain dark:text-white rounded-xl font-bold transition-all shadow-md"
+                    >
+                      Back to Study Mode
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

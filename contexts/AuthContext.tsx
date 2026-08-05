@@ -35,7 +35,7 @@ interface AuthContextType {
   updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
   updateLocalUser: (updatedUser: AppUser) => void; 
   completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
-  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor') => Promise<void>;
+  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -58,11 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
              const data = docSnap.data();
 
              // --- Streak calculation ---
-             // "Activity" = an authenticated session load for the calendar day.
              const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
              const storedStreak: number = data.streak || 0;
              const storedLastActiveDate: string | null = data.lastActiveDate || null;
-
              let computedStreak = storedStreak;
 
              if (storedLastActiveDate !== todayStr) {
@@ -72,20 +70,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   const dayDiff = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
                   computedStreak = dayDiff === 1 ? storedStreak + 1 : 1;
                 } else {
-                  // No lastActiveDate yet — first visit ever, or a
-                  // pre-existing account created before this feature shipped.
                   computedStreak = 1;
                 }
 
-                // Persist the update. This will cause onSnapshot to fire again,
-                // but on that second pass storedLastActiveDate will equal
-                // todayStr, so the block above will be skipped — no infinite loop.
                 setDoc(
                   doc(db, "users", currentUser.uid),
                   { streak: computedStreak, lastActiveDate: todayStr },
                   { merge: true }
                 ).catch(err => console.error("Error updating streak:", err));
              }
+
+             // --- Weekly & Monthly XP Reset Logic ---
+             const now = new Date();
+             const day = now.getDay();
+             const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+             const monday = new Date(now);
+             monday.setDate(diff);
+             monday.setHours(0, 0, 0, 0);
+             const currentWeekStr = monday.toISOString().split('T')[0];
+             
+             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+             let resetUpdates: any = {};
+             let needsReset = false;
+
+             if (data.lastWeeklyResetDate !== currentWeekStr) {
+               resetUpdates.weeklyXP = 0;
+               resetUpdates.lastWeeklyResetDate = currentWeekStr;
+               needsReset = true;
+             }
+
+             if (data.lastMonthlyResetDate !== currentMonthStr) {
+               resetUpdates.monthlyXP = 0;
+               resetUpdates.lastMonthlyResetDate = currentMonthStr;
+               needsReset = true;
+             }
+
+             if (needsReset) {
+               setDoc(
+                 doc(db, "users", currentUser.uid),
+                 resetUpdates,
+                 { merge: true }
+               ).catch(err => console.error("Error resetting weekly/monthly XP:", err));
+             }
+
+             const displayWeeklyXP = (data.lastWeeklyResetDate !== currentWeekStr) ? 0 : (data.weeklyXP || 0);
+             const displayMonthlyXP = (data.lastMonthlyResetDate !== currentMonthStr) ? 0 : (data.monthlyXP || 0);
+             // ------------------------------------------
 
              // --- Badge calculation ---
              const existingBadges: string[] = data.badges || [];
@@ -116,6 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
                 settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) },
                 xp: data.xp || 0,
+                weeklyXP: displayWeeklyXP,     // 👈 Added
+                monthlyXP: displayMonthlyXP,   // 👈 Added
                 level: data.level || 1,
                 courses: data.courses || [],
                 photoURL: data.photoURL || currentUser.photoURL || "",
@@ -127,13 +160,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
              setAppUser(mappedAppUser);
              setLoading(false);
            } else {
-             // In case the document takes a second to be created during signup
              setAppUser({
                 username: currentUser.displayName || "User",
                 email: currentUser.email || "",
                 enrolledDate: new Date().toISOString(),
                 settings: DEFAULT_SETTINGS,
                 xp: 0,
+                weeklyXP: 0,       // 👈 Added
+                monthlyXP: 0,      // 👈 Added
                 level: 1,
                 courses: [],
                 photoURL: currentUser.photoURL || "",
@@ -224,173 +258,178 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
-  if (!auth.currentUser) return;
+  const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
+    if (!auth.currentUser) return;
 
-  const previousAppUser = appUser;
-  const userRef = doc(db, "users", auth.currentUser.uid);
+    const previousAppUser = appUser;
+    const userRef = doc(db, "users", auth.currentUser.uid);
 
-  const mergedSettings: UserSettings = {
-    ...(appUser?.settings ?? DEFAULT_SETTINGS),
-    ...newSettings,
+    const mergedSettings: UserSettings = {
+      ...(appUser?.settings ?? DEFAULT_SETTINGS),
+      ...newSettings,
+    };
+
+    setAppUser(prev => prev ? { ...prev, settings: mergedSettings } : null);
+
+    try {
+      await setDoc(
+        userRef,
+        {
+          preferences: {
+            settings: mergedSettings,
+          },
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      setAppUser(previousAppUser);
+      console.error("Error updating user settings:", error);
+      throw error;
+    }
   };
 
-  // Optimistic UI update
-  setAppUser(prev => prev ? { ...prev, settings: mergedSettings } : null);
+  const updateUserAccount = async (updatedUser: AppUser) => {
+    if (!auth.currentUser) return;
 
-  try {
-    await setDoc(
-      userRef,
-      {
-        preferences: {
-          settings: mergedSettings,
-        },
-      },
-      { merge: true }
-    );
-  } catch (error) {
-    // Roll back optimistic state on failure
-    setAppUser(previousAppUser);
-    console.error("Error updating user settings:", error);
-    throw error;
-  }
-};
+    const previousAppUser = appUser;
+    const userRef = doc(db, "users", auth.currentUser.uid);
 
-const updateUserAccount = async (updatedUser: AppUser) => {
-  if (!auth.currentUser) return;
+    setAppUser(updatedUser);
 
-  const previousAppUser = appUser;
-  const userRef = doc(db, "users", auth.currentUser.uid);
-
-  // Optimistic UI update
-  setAppUser(updatedUser);
-
-  try {
-    await updateProfile(auth.currentUser, {
-      displayName: updatedUser.username,
-      photoURL: updatedUser.photoURL || "",
-    });
-
-    await setDoc(
-      userRef,
-      {
-        username: updatedUser.username,
+    try {
+      await updateProfile(auth.currentUser, {
+        displayName: updatedUser.username,
         photoURL: updatedUser.photoURL || "",
-        preferences: {
-          settings: updatedUser.settings,
+      });
+
+      await setDoc(
+        userRef,
+        {
+          username: updatedUser.username,
+          photoURL: updatedUser.photoURL || "",
+          preferences: {
+            settings: updatedUser.settings,
+          },
         },
-      },
-      { merge: true }
-    );
-  } catch (error) {
-    // Roll back optimistic state on failure
-    setAppUser(previousAppUser);
-    console.error("Error updating user account:", error);
-    throw error;
-  }
-};
-
-const updateLocalUser = (updatedUser: AppUser) => {
-  setAppUser(updatedUser);
-};
-
-const completeCourse = async (courseId: string, xpEarned: number) => {
-  if (!auth.currentUser) return;
-  const userRef = doc(db, "users", auth.currentUser.uid);
-  try {
-    await setDoc(userRef, {
-      xp: increment(xpEarned),
-      courses: arrayUnion(courseId)
-    }, { merge: true });
-    
-    // Level up logic could be added here later, but for now we'll just handle XP
-  } catch (error) {
-    console.error("Error completing course:", error);
-    throw error;
-  }
-};
-
-const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor') => {
-  if (!auth.currentUser || !appUser) return;
-  if (appUser.xp < cost) {
-    throw new Error("Insufficient XP");
-  }
-
-  const userRef = doc(db, "users", auth.currentUser.uid);
-  const updatedSettings = { ...appUser.settings };
-  
-  if (type === 'theme') {
-    const unlocked = updatedSettings.unlockedThemes || ['dark', 'light'];
-    if (!unlocked.includes(itemId)) {
-      unlocked.push(itemId);
+        { merge: true }
+      );
+    } catch (error) {
+      setAppUser(previousAppUser);
+      console.error("Error updating user account:", error);
+      throw error;
     }
-    updatedSettings.unlockedThemes = unlocked;
-    updatedSettings.activeTheme = itemId;
-    if (itemId === 'light') {
-      updatedSettings.theme = 'light';
-    } else {
-      updatedSettings.theme = 'dark';
-    }
-  } else if (type === 'cursor') {
-    const unlocked = updatedSettings.unlockedCursors || ['default'];
-    if (!unlocked.includes(itemId)) {
-      unlocked.push(itemId);
-    }
-    updatedSettings.unlockedCursors = unlocked;
-    updatedSettings.activeCursor = itemId;
-  }
-
-  const previousAppUser = appUser;
-  const updatedAppUser: AppUser = {
-    ...appUser,
-    xp: appUser.xp - cost,
-    settings: updatedSettings
   };
 
-  setAppUser(updatedAppUser);
+  const updateLocalUser = (updatedUser: AppUser) => {
+    setAppUser(updatedUser);
+  };
 
-  try {
-    await setDoc(
-      userRef,
-      {
-        xp: increment(-cost),
-        preferences: {
-          settings: updatedSettings
-        }
-      },
-      { merge: true }
-    );
-  } catch (error) {
-    setAppUser(previousAppUser);
-    console.error("Error purchasing item:", error);
-    throw error;
-  }
-};
+  const completeCourse = async (courseId: string, xpEarned: number) => {
+    if (!auth.currentUser) return;
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    try {
+      await setDoc(userRef, {
+        xp: increment(xpEarned),
+        weeklyXP: increment(xpEarned),    // 👈 Added
+        monthlyXP: increment(xpEarned),   // 👈 Added
+        courses: arrayUnion(courseId)
+      }, { merge: true });
+    } catch (error) {
+      console.error("Error completing course:", error);
+      throw error;
+    }
+  };
 
-const value: AuthContextType = {
-  user,
-  appUser,
-  loading,
-  login,
-  signup,
-  logout,
-  resetPassword,
-  loginWithGoogle,
-  loginWithGithub,
-  resendVerificationEmail,
-  updateUserProfile,
-  updateUserSettings,
-  updateUserAccount,
-  updateLocalUser,
-  completeCourse,
-  purchaseItem,
-};
+  const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => {
+    if (!auth.currentUser || !appUser) return;
+    if (appUser.xp < cost) {
+      throw new Error("Insufficient XP");
+    }
 
-return (
-  <AuthContext.Provider value={value}>
-    {!loading && children}
-  </AuthContext.Provider>
-);
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const updatedSettings = { ...appUser.settings };
+    
+    if (type === 'theme') {
+      const unlocked = updatedSettings.unlockedThemes || ['dark', 'light'];
+      if (!unlocked.includes(itemId)) {
+        unlocked.push(itemId);
+      }
+      updatedSettings.unlockedThemes = unlocked;
+      updatedSettings.activeTheme = itemId;
+      if (itemId === 'light') {
+        updatedSettings.theme = 'light';
+      } else {
+        updatedSettings.theme = 'dark';
+      }
+    } else if (type === 'cursor') {
+      const unlocked = updatedSettings.unlockedCursors || ['default'];
+      if (!unlocked.includes(itemId)) {
+        unlocked.push(itemId);
+      }
+      updatedSettings.unlockedCursors = unlocked;
+      updatedSettings.activeCursor = itemId;
+    } else if (type === 'frame') {
+      const unlocked = updatedSettings.unlockedFrames || ['none'];
+      if (!unlocked.includes(itemId)) {
+        unlocked.push(itemId);
+      }
+      updatedSettings.unlockedFrames = unlocked;
+      updatedSettings.activeFrame = itemId;
+    }
+
+    const previousAppUser = appUser;
+    const updatedAppUser: AppUser = {
+      ...appUser,
+      xp: appUser.xp - cost,
+      settings: updatedSettings
+    };
+
+    setAppUser(updatedAppUser);
+
+    try {
+      await setDoc(
+        userRef,
+        {
+          xp: increment(-cost),
+          weeklyXP: increment(-cost),      // 👈 Added
+          monthlyXP: increment(-cost),     // 👈 Added
+          preferences: {
+            settings: updatedSettings
+          }
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      setAppUser(previousAppUser);
+      console.error("Error purchasing item:", error);
+      throw error;
+    }
+  };
+
+  const value: AuthContextType = {
+    user,
+    appUser,
+    loading,
+    login,
+    signup,
+    logout,
+    resetPassword,
+    loginWithGoogle,
+    loginWithGithub,
+    resendVerificationEmail,
+    updateUserProfile,
+    updateUserSettings,
+    updateUserAccount,
+    updateLocalUser,
+    completeCourse,
+    purchaseItem,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuthContext = () => {
@@ -398,4 +437,3 @@ export const useAuthContext = () => {
   if (!context) throw new Error("useAuthContext must be used within an AuthProvider");
   return context;
 };
-

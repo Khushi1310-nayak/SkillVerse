@@ -468,6 +468,14 @@ export interface XPStoreCursor {
   ringClass: string;
 }
 
+export interface XPStoreFrame {
+  id: string;
+  name: string;
+  cost: number;
+  description: string;
+  frameClass: string;
+}
+
 export const XP_STORE_THEMES: XPStoreTheme[] = [
   {
     id: 'dark',
@@ -548,6 +556,44 @@ export const XP_STORE_CURSORS: XPStoreCursor[] = [
     description: 'Gleaming gold cursor for elite learners.',
     dotClass: 'bg-amber-400',
     ringClass: 'border-amber-400',
+  }
+];
+
+export const XP_STORE_FRAMES: XPStoreFrame[] = [
+  {
+    id: 'none',
+    name: 'No Frame',
+    cost: 0,
+    description: 'No avatar frame selected.',
+    frameClass: '',
+  },
+  {
+    id: 'neon-pulse',
+    name: 'Neon Pulse',
+    cost: 150,
+    description: 'A vibrant pulsing neon frame for a modern tech look.',
+    frameClass: 'ring-[3px] ring-purple-500 animate-pulse shadow-[0_0_12px_rgba(168,85,247,0.7)]',
+  },
+  {
+    id: 'gold-shimmer',
+    name: 'Gold Shimmer',
+    cost: 300,
+    description: 'A luxurious shining gold frame for outstanding achievements.',
+    frameClass: 'ring-[3px] ring-amber-400 animate-pulse shadow-[0_0_15px_rgba(250,204,21,0.8)]',
+  },
+  {
+    id: 'cyberpunk-grid',
+    name: 'Cyberpunk Grid',
+    cost: 450,
+    description: 'A futuristic digital grid with glowing cyber hues.',
+    frameClass: 'ring-[3px] ring-cyan-400 border-[2px] border-pink-500 shadow-[0_0_12px_rgba(6,182,212,0.7)]',
+  },
+  {
+    id: 'emerald-aura',
+    name: 'Emerald Aura',
+    cost: 200,
+    description: 'A soothing mystical green glow surrounding your avatar.',
+    frameClass: 'ring-[3px] ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.7)]',
   }
 ];
 

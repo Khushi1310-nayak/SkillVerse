@@ -9,7 +9,7 @@
     "logout": "Log Out",
     "menu": "Menu",
     "openMenu": "Open Menu",
-"closeMenu": "Close Menu"
+    "closeMenu": "Close Menu"
   },
   "common": {
     "cancel": "Cancel",
@@ -300,95 +300,153 @@
   },
   "settings": {
     "title": "Settings",
-  "tabs": {
-    "profile": "Profile",
-    "appearance": "Appearance",
-    "xpStore": "XP Store",
-    "learning": "Learning",
-    "quiz": "Quiz",
-    "certificate": "Certificate",
-    "achievements": "Achievements",
-    "account": "Account"
+    "tabs": {
+      "profile": "Profile",
+      "appearance": "Appearance",
+      "xpStore": "XP Store",
+      "learning": "Learning",
+      "quiz": "Quiz",
+      "certificate": "Certificate",
+      "achievements": "Achievements",
+      "account": "Account"
+    },
+    "actions": {
+      "save": "Save Changes",
+      "reset": "Reset to Defaults"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Enter display name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter email address",
+      "memberSince": "Member since",
+      "avatar": "Avatar",
+      "uploadAvatar": "Upload Custom Avatar",
+      "removeAvatar": "Remove Custom",
+      "custom": "Custom",
+      "currentAvatar": "Current Avatar",
+      "uploading": "Uploading",
+      "presetAvatar": "Or Select Preset Avatar",
+      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "themeMode": "Theme Mode",
+      "themeModeDesc": "Toggle between dark and light mode",
+      "light": "Light",
+      "dark": "Dark",
+      "gradientIntensity": "Gradient Intensity",
+      "subtle": "Subtle",
+      "balanced": "Balanced",
+      "vibrant": "Vibrant",
+      "language": "Language",
+      "languageDesc": "Choose your preferred language"
+    },
+    "learning": {
+      "title": "Learning Preferences",
+      "dailyGoal": "Daily Study Goal",
+      "reminders": "Progress Reminders",
+      "remindersDesc": "Get notified to keep your streak",
+      "autoSave": "Auto-save Notes",
+      "autoSaveDesc": "Automatically save your progress"
+    },
+    "quiz": {
+      "title": "Quiz Preferences",
+      "instantFeedback": "Instant Feedback",
+      "instantFeedbackDesc": "Show correct/incorrect immediately",
+      "showAnswers": "Show Correct Answers",
+      "showAnswersDesc": "Reveal answers after quiz completion",
+      "allowRetry": "Allow Retry",
+      "allowRetryDesc": "Permit retaking quizzes immediately"
+    },
+    "certificate": {
+      "title": "Certificate Settings",
+      "nameLabel": "Name on Certificate",
+      "namePlaceholder": "Legal Name",
+      "nameHint": "This name will appear on all your earned certificates.",
+      "format": "Default Format",
+      "pdf": "PDF (Standard)",
+      "image": "Image (Pro)"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "account": {
+      "title": "Account Management",
+      "resetProgress": "Reset Progress",
+      "resetProgressDesc": "Clear all course progress and quiz scores",
+      "reset": "Reset",
+      "clearData": "Clear Local Data",
+      "clearDataDesc": "Remove all account data from this device",
+      "clear": "Clear"
+    },
+    "xpStore": {
+      "title": "XP Store"
+    },
+    "modals": {
+      "resetTitle": "Reset Progress?",
+      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
+      "clearTitle": "Clear All Data?",
+      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
+      "unsavedTitle": "Unsaved Changes",
+      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
+      "stay": "Stay",
+      "leave": "Leave"
+    }
   },
-  "actions": {
-  "save": "Save Changes",
-  "reset": "Reset to Defaults"
-},
-"profile": {
-  "title": "Profile Settings",
-  "displayName": "Display Name",
-  "displayNamePlaceholder": "Enter display name",
-  "email": "Email Address",
-  "emailPlaceholder": "Enter email address",
-  "memberSince": "Member since",
-  "avatar": "Avatar",
-  "uploadAvatar": "Upload Custom Avatar",
-  "removeAvatar": "Remove Custom",
-  "custom": "Custom",
-  "currentAvatar": "Current Avatar",
-  "uploading": "Uploading",
-  "presetAvatar": "Or Select Preset Avatar",
-  "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
-},
-"appearance": {
-  "title": "Appearance",
-  "themeMode": "Theme Mode",
-  "themeModeDesc": "Toggle between dark and light mode",
-  "light": "Light",
-  "dark": "Dark",
-  "gradientIntensity": "Gradient Intensity",
-  "subtle": "Subtle",
-  "balanced": "Balanced",
-  "vibrant": "Vibrant",
-  "language": "Language",
-  "languageDesc": "Choose your preferred language"
-},
-"learning": {
-  "title": "Learning Preferences",
-  "dailyGoal": "Daily Study Goal",
-  "reminders": "Progress Reminders",
-  "remindersDesc": "Get notified to keep your streak",
-  "autoSave": "Auto-save Notes",
-  "autoSaveDesc": "Automatically save your progress"
-},
-"quiz": {
-  "title": "Quiz Preferences",
-  "instantFeedback": "Instant Feedback",
-  "instantFeedbackDesc": "Show correct/incorrect immediately",
-  "showAnswers": "Show Correct Answers",
-  "showAnswersDesc": "Reveal answers after quiz completion",
-  "allowRetry": "Allow Retry",
-  "allowRetryDesc": "Permit retaking quizzes immediately"
-},
-"certificate": {
-  "title": "Certificate Settings",
-  "nameLabel": "Name on Certificate",
-  "namePlaceholder": "Legal Name",
-  "nameHint": "This name will appear on all your earned certificates.",
-  "format": "Default Format",
-  "pdf": "PDF (Standard)",
-  "image": "Image (Pro)"
-},
-"achievements": { "title": "Achievements" },
-"account": {
-  "title": "Account Management",
-  "resetProgress": "Reset Progress",
-  "resetProgressDesc": "Clear all course progress and quiz scores",
-  "reset": "Reset",
-  "clearData": "Clear Local Data",
-  "clearDataDesc": "Remove all account data from this device",
-  "clear": "Clear"
-},
-"xpStore": { "title": "XP Store" },
-"modals": {
-  "resetTitle": "Reset Progress?",
-  "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-  "clearTitle": "Clear All Data?",
-  "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-  "unsavedTitle": "Unsaved Changes",
-"unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-"stay": "Stay",
-"leave": "Leave"
-}
-}
+  "certifications": {
+    "loading": "Loading certifications...",
+    "title": "My Certifications",
+    "subtitle": "Official proof of your skills and achievements.",
+    "emptyTitle": "No Certificates Yet",
+    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
+    "browseCourses": "Browse Courses",
+    "cardTitle": "{{courseTitle}} Certified",
+    "issued": "Issued {{date}}",
+    "copyLink": "Copy Link",
+    "copied": "Copied",
+    "viewCertificate": "Certificate"
+  },
+  "certificateDisplay": {
+    "academyName": "SkillVerse Academy",
+    "title": "Certificate",
+    "subtitle": "of Completion",
+    "certifyThat": "This is to certify that",
+    "demonstratedMastery": "Has successfully demonstrated mastery in",
+    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
+    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
+    "dateIssued": "Date Issued",
+    "verified": "Verified",
+    "credentialId": "ID: {{id}}",
+    "platformDirector": "Platform Director"
+  },
+  "certificate": {
+    "loading": "Loading certificate details...",
+    "unavailableTitle": "Certificate Unavailable",
+    "unavailableDescription": "You haven't completed this course yet.",
+    "goToCourse": "Go to Course",
+    "backToDashboard": "Back to Dashboard",
+    "linkCopied": "Link Copied!",
+    "copyLink": "Copy Link",
+    "shareTwitter": "Share to Twitter",
+    "sharing": "Sharing...",
+    "shareLinkedIn": "Share to LinkedIn",
+    "generatingPdf": "Generating PDF...",
+    "downloadPdf": "Download PDF",
+    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
+    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "toast": {
+      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
+      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+    },
+    "shareCard": {
+      "credentialVerified": "CREDENTIAL VERIFIED",
+      "issued": "Issued: {{date}}",
+      "title": "Certificate of Completion",
+      "description": "has successfully completed and mastered all requirements for",
+      "passingScore": "Passing Score: {{score}}%",
+      "verifiedAchievement": "Verified Achievement"
+    }
+  }
 }

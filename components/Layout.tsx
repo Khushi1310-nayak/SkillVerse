@@ -18,7 +18,7 @@ import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
 import { CommandPalette } from './CommandPalette';
-import { XP_STORE_THEMES } from '../constants';
+import { XP_STORE_THEMES, XP_STORE_FRAMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
@@ -179,7 +179,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-black/20 dark:border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
-        <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo">
+        <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background">
           <div className="relative w-12 h-12 min-w-[48px] rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 group-hover/logo:ring-primaryLight/50 group-hover/logo:scale-105 transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-main rounded-xl blur-md opacity-40 group-hover/logo:opacity-80 transition-opacity duration-500"></div>
             <img src="/skillverse-logo.png" alt="SkillVerse Logo" className="relative z-10 w-full h-full object-cover rounded-xl" width={48} height={48} />
@@ -202,13 +202,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
         <div className="pt-6 border-t border-black/20 dark:border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 px-2 py-3 mb-2 overflow-hidden" id="nav-user-profile">
-            <img
-              src={user.photoURL || AVATARS[user.settings.avatarId || '1']}
-              alt="Avatar"
-              className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
-              width={40}
-              height={40}
-            />
+            <div className="relative">
+              <img
+                src={user.photoURL || AVATARS[user.settings.avatarId || '1']}
+                alt="Avatar"
+                className="w-10 h-10 min-w-[40px] rounded-full bg-white/10 object-cover"
+                width={40}
+                height={40}
+              />
+              {user.settings.activeFrame && user.settings.activeFrame !== 'none' && (
+                <div className={`absolute inset-0 rounded-full pointer-events-none ${
+                  XP_STORE_FRAMES.find(f => f.id === user.settings.activeFrame)?.frameClass || ''
+                }`} />
+              )}
+            </div>
             <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="font-bold text-textMain truncate">{user.username}</div>
               <div className="text-xs text-textMuted truncate">{user.email}</div>
@@ -226,7 +233,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
-        <Link to="/" className="text-xl font-display font-bold text-textMain">SkillVerse</Link>
+        <Link to="/" className="text-xl font-display font-bold text-textMain rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight">SkillVerse</Link>
         <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
           <Menu />
         </button>

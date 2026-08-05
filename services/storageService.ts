@@ -7,6 +7,16 @@ const CAREER_KEY = 'skillverse_career';
 const LAST_VISITED_KEY = 'skillverse_last_visited';
 const AI_NOTES_KEY = 'skillverse_ai_notes';
 const STREAK_KEY = 'skillverse_streak_data';
+const STUDY_TIME_KEY = 'skillverse_study_time';
+
+const getLocalDateString = (): string => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 
 // --- STREAK DATA TYPES ---
 export interface DailyActivity {
@@ -230,5 +240,61 @@ export const storageService = {
       xp === 0 ? 0 : xp < 50 ? 1 : xp < 100 ? 2 : 3;
     data.activities[date] = { date, xp, courses, level };
     localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+  },
+
+  // --- STUDY TIME TRACKER ---
+  saveStudyTime: (secondsToAdd: number): Record<string, number> => {
+    const today = getLocalDateString();
+    const currentData = storageService.getStudyTimeRecords();
+    currentData[today] = (currentData[today] || 0) + secondsToAdd;
+    localStorage.setItem(STUDY_TIME_KEY, JSON.stringify(currentData));
+    return currentData;
+  },
+
+  getStudyTimeRecords: (): Record<string, number> => {
+    const data = localStorage.getItem(STUDY_TIME_KEY);
+    return data ? JSON.parse(data) : {};
+  },
+
+  getWeeklyStudyStats: (dailyGoalMinutes: number = 60): {
+    totalSeconds: number;
+    totalHours: number;
+    goalHours: number;
+    percentage: number;
+    dailyMinutes: Record<string, number>;
+  } => {
+    const records = storageService.getStudyTimeRecords();
+    
+    // Get last 7 days of dates in YYYY-MM-DD format
+    const last7Days: string[] = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      last7Days.push(`${year}-${month}-${day}`);
+    }
+
+    let totalSeconds = 0;
+    const dailyMinutes: Record<string, number> = {};
+
+    last7Days.forEach(date => {
+      const seconds = records[date] || 0;
+      totalSeconds += seconds;
+      dailyMinutes[date] = Math.round((seconds / 60) * 10) / 10; // 1 decimal place of minutes
+    });
+
+    const totalHours = Math.round((totalSeconds / 3600) * 10) / 10; // 1 decimal place of hours
+    const goalHours = Math.round(((dailyGoalMinutes * 7) / 60) * 10) / 10;
+    const percentage = goalHours > 0 ? Math.min(100, Math.round((totalSeconds / (goalHours * 3600)) * 100)) : 0;
+
+    return {
+      totalSeconds,
+      totalHours,
+      goalHours,
+      percentage,
+      dailyMinutes
+    };
   },
 };

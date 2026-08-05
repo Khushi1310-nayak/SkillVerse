@@ -9,7 +9,6 @@ import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { COURSES } from '../constants';
-import { getDailyQuiz } from '../utils/dailyQuizGenerator';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
@@ -30,22 +29,26 @@ export const CourseView: React.FC = () => {
       if (!id) return;
       setLoadingCourse(true);
       try {
-        const activeCourse = COURSES.find(c => c.id === id);
-        const localCourse = await firestoreService.getCourse(id);
+        const localCourse = COURSES.find(c => c.id === id);
+        const c = await firestoreService.getCourse(id);
+        const activeCourse = localCourse || c;
+
         if (activeCourse) {
           const q = await firestoreService.getQuiz(id);
           const dailyQuiz = getDailyQuiz(activeCourse.title);
           setCourse({
             ...activeCourse,
+            // Always inject fresh dynamic daily content with working code snippets if available
             content: localCourse ? localCourse.content : activeCourse.content,
-            quiz: dailyQuiz.length > 0 ? dailyQuiz : (q ? q.questions : (activeCourse.quiz || []))
+            quiz: q ? q.questions : (activeCourse.quiz || [])
           });
         } else {
           setCourse(null);
         }
       } catch (err) {
         console.error('Failed to load course details:', err);
-        setCourse(null);
+        const fallback = COURSES.find(c => c.id === id) || null;
+        setCourse(fallback);
       } finally {
         setLoadingCourse(false);
       }

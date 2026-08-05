@@ -23,6 +23,7 @@ const Settings = lazy(() => import('./components/Settings').then(m => ({ default
 const CoursesList = lazy(() => import('./components/CoursesList').then(m => ({ default: m.CoursesList })));
 const CertificationsList = lazy(() => import('./components/CertificationsList').then(m => ({ default: m.CertificationsList })));
 const CareerMode = lazy(() => import('./components/CareerMode').then(m => ({ default: m.CareerMode })));
+const CodingPracticePlayground = lazy(() => import('./components/CodingPracticePlayground').then(m => ({ default: m.CodingPracticePlayground })));
 const Onboarding = lazy(() => import('./components/Onboarding').then(m => ({ default: m.Onboarding })));
 const CredentialVerification = lazy(() => import('./components/CredentialVerification').then(m => ({ default: m.CredentialVerification })));
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
@@ -97,6 +98,7 @@ const AppRoutes = () => {
                     <Routes>
                       <Route path="/" element={<Dashboard user={appUser} />} />
                       <Route path="/courses" element={<CoursesList />} />
+                      <Route path="/playground" element={<CodingPracticePlayground />} />
                       <Route path="/career" element={<CareerMode user={appUser} />} />
                       <Route path="/certifications" element={<CertificationsList />} />
                       <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />

@@ -1,6 +1,7 @@
 import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-react';
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 import { getDailyCodeSnippet } from './utils/dailyCodeGenerator';
+import { getDailyQuiz } from './utils/dailyQuizGenerator';
 
 export const CATEGORIES: Category[] = [
   {
@@ -117,7 +118,10 @@ const getDocLink = (topic: string) => {
 };
 
 const generateQuiz = (subject: string): any[] => {
-  return getDailyQuiz(subject);
+  if (typeof getDailyQuiz === 'function') {
+    return getDailyQuiz(subject);
+  }
+  return [];
 };
 
 const MODULE_SECTIONS = [
@@ -132,11 +136,8 @@ const MODULE_SECTIONS = [
 ];
 
 const generateSectionHtml = (sec: { title: string; icon: string }, i: number, topic: string): string => {
-  const link = getDocLink(topic);
-  const dailySnippet = getDailyCodeSnippet(topic, i);
   const courseSlug = topic.toLowerCase().replace(/\s+/g, '-');
   const playgroundLink = `/#/playground?course=${courseSlug}&module=${i + 1}`;
-  const sectionTitleName = sec.title.includes('. ') ? sec.title.split('. ')[1] : sec.title;
 
   return '<div id="module-' + (i + 1) + '" class="bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8 transition-all duration-300 shadow-xl relative overflow-hidden group hover:border-primaryLight/40">' +
     '<div class="absolute -right-4 -bottom-4 text-9xl font-display font-bold text-white/5 pointer-events-none select-none">' + (i + 1) + '</div>' +
@@ -156,19 +157,18 @@ const generateSectionHtml = (sec: { title: string; icon: string }, i: number, to
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Common industry use-cases</li>' +
         '</ul>' +
       '</div>' +
-      '<div class="bg-[#0f1623] rounded-xl p-5 border border-white/10 font-mono text-sm text-blue-300 mb-6 overflow-x-auto shadow-inner group-hover:border-primary/20 transition-colors">' +
-        '<div class="flex gap-2 mb-3 opacity-50"><div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div></div>' +
-        '<code>' + dailySnippet + '</code>' +
-      '</div>' +
-      '<div class="flex items-center justify-between border-t border-white/10 pt-6">' +
+      '<div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">' +
         '<span class="text-xs font-bold text-textMuted uppercase tracking-widest">Module ' + (i + 1) + ' of 8</span>' +
-        '<a href="' + link + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all group-hover:translate-x-1">Official Docs ↗</a>' +
+        '<div class="flex items-center gap-3">' +
+          '<a href="' + playgroundLink + '" class="inline-flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-main text-white font-bold text-xs">Practice ⚡</a>' +
+          '<a href="' + link + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all">Official Docs ↗</a>' +
+        '</div>' +
       '</div>' +
     '</div>' +
   '</div>';
 };
 
-const generateRichContent = (topic: string, categoryId: string): string => {
+export const generateRichContent = (topic: string, categoryId: string): string => {
   const sectionsHtml = MODULE_SECTIONS.map((sec, i) => generateSectionHtml(sec, i, topic)).join('');
 
   return `

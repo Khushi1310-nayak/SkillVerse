@@ -1,6 +1,7 @@
 import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-react';
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 import { getDailyCodeSnippet } from './utils/dailyCodeGenerator';
+import { getDailyQuiz } from './utils/dailyQuizGenerator';
 
 export const CATEGORIES: Category[] = [
   {
@@ -117,7 +118,10 @@ const getDocLink = (topic: string) => {
 };
 
 const generateQuiz = (subject: string): any[] => {
-  return getDailyQuiz(subject);
+  if (typeof getDailyQuiz === 'function') {
+    return getDailyQuiz(subject);
+  }
+  return [];
 };
 
 const MODULE_SECTIONS = [

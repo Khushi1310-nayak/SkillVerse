@@ -35,6 +35,7 @@ export const CourseView: React.FC = () => {
 
         if (activeCourse) {
           const q = await firestoreService.getQuiz(id);
+          const dailyQuiz = getDailyQuiz(activeCourse.title);
           setCourse({
             ...activeCourse,
             // Always inject fresh dynamic daily content with working code snippets if available

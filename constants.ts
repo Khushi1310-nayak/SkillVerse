@@ -1,5 +1,7 @@
 import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-react';
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
+import { getDailyCodeSnippet } from './utils/dailyCodeGenerator';
+import { getDailyQuiz } from './utils/dailyQuizGenerator';
 
 export const CATEGORIES: Category[] = [
   {
@@ -116,87 +118,7 @@ const getDocLink = (topic: string) => {
 };
 
 const generateQuiz = (subject: string): any[] => {
-  // Define 12 robust questions with clear correct answers
-  const rawQuestions = [
-    {
-      q: `What is the primary role of ${subject} in development?`,
-      opts: ['Data Processing', 'Visual Styling', 'System Architecture', 'User Testing'],
-      correct: 'Data Processing'
-    },
-    {
-      q: `Which feature is most distinct in ${subject}?`,
-      opts: ['Strong Typing', 'Garbage Collection', 'Hot Reloading', 'Component Scope'],
-      correct: 'Strong Typing'
-    },
-    {
-      q: `How does ${subject} handle memory allocation?`,
-      opts: ['Manually', 'Automatic GC', 'Reference Counting', 'Stack Only'],
-      correct: 'Automatic GC'
-    },
-    {
-      q: `What is the standard file extension for ${subject}?`,
-      opts: [`.${subject.substring(0,2).toLowerCase()}`, '.txt', '.exe', '.bin'],
-      correct: `.${subject.substring(0,2).toLowerCase()}`
-    },
-    {
-      q: `Which paradigm does ${subject} primarily follow?`,
-      opts: ['Object-Oriented', 'Functional', 'Imperative', 'Logic-based'],
-      correct: 'Object-Oriented'
-    },
-    {
-      q: `What is the entry point in a standard ${subject} application?`,
-      opts: ['main()', 'index.html', 'app.js', 'start()'],
-      correct: 'main()'
-    },
-    {
-      q: `Which of these is a popular library/framework for ${subject}?`,
-      opts: ['Spring', 'React', 'Django', 'Laravel'],
-      correct: 'Spring' // Generic placeholder, shuffled anyway
-    },
-    {
-      q: `How do you declare a constant in ${subject}?`,
-      opts: ['const', 'final', 'static', 'let'],
-      correct: 'const'
-    },
-    {
-      q: `What complexity is a binary search in ${subject}?`,
-      opts: ['O(log n)', 'O(n)', 'O(1)', 'O(n^2)'],
-      correct: 'O(log n)'
-    },
-    {
-      q: `Which tool is used for dependency management in ${subject}?`,
-      opts: ['NPM/Yarn', 'Maven', 'Pip', 'Cargo'],
-      correct: 'NPM/Yarn'
-    },
-    {
-      q: `What does the 'this' keyword refer to in ${subject}?`,
-      opts: ['Current Object', 'Global Scope', 'Previous Function', 'None of these'],
-      correct: 'Current Object'
-    },
-    {
-      q: `How are exceptions handled in ${subject}?`,
-      opts: ['Try-Catch', 'If-Else', 'Switch', 'Do-While'],
-      correct: 'Try-Catch'
-    }
-  ];
-
-  // Map to format and ensure randomization while tracking correct answer
-  return rawQuestions.map((item, i) => {
-    // Shuffle options
-    const shuffledOptions = [...item.opts].sort(() => Math.random() - 0.5);
-    // Find where the correct answer moved to
-    // If the correct answer generic placeholder doesn't match exactly (due to generic logic above), pick index 0 as "correct" for mock purposes 
-    // BUT for better realism, we try to match. If not found, default to 0.
-    let correctIndex = shuffledOptions.indexOf(item.correct);
-    if (correctIndex === -1) correctIndex = 0; 
-
-    return {
-      id: i + 1,
-      question: item.q,
-      options: shuffledOptions,
-      correctAnswer: correctIndex,
-    };
-  });
+  return getDailyQuiz(subject);
 };
 
 const generateRichContent = (topic: string, categoryId: string) => {

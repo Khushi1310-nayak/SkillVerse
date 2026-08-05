@@ -391,12 +391,15 @@ const VoiceChat = React.memo(VoiceChatComponent, (prevProps, nextProps) => {
   return prevProps.chatHistory === nextProps.chatHistory;
 });
 
+import { useActiveTimer } from '../hooks/useActiveTimer';
+
 // --- MAIN COMPONENT ---
 interface CareerModeProps {
   user?: AppUser;
 }
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
+  useActiveTimer();
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();

@@ -28,82 +28,13 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalContainerRef = useRef<HTMLDivElement>(null);
 
-  // Monitor theme changes to adjust Monaco Editor theme
+  // Scroll to bottom of terminal inside container only without moving page viewport
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
-  // Update editor code when initialCode changes (e.g. user changes lesson)
-  useEffect(() => {
-    setCode(initialCode);
-    setLogs([]);
-    setError(null);
-    setIsExecuting(false);
-    setSrcDoc('');
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    if (terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
     }
-  }, [initialCode]);
-
-  // Handle postMessage communication from sandboxed iframe
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (!isExecuting) return;
-
-      if (iframeRef.current && event.source === iframeRef.current.contentWindow) {
-        const data = event.data;
-        if (data && typeof data === 'object') {
-          switch (data.type) {
-            case 'console-log':
-              setLogs(prev => [...prev, { type: 'log', message: data.message }]);
-              break;
-            case 'console-error':
-              setLogs(prev => [...prev, { type: 'error', message: data.message }]);
-              break;
-            case 'console-warn':
-              setLogs(prev => [...prev, { type: 'warn', message: data.message }]);
-              break;
-            case 'runtime-error':
-              setError({
-                message: data.message,
-                line: data.line,
-                col: data.col,
-                stack: data.stack
-              });
-              setIsExecuting(false);
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-              }
-              break;
-            case 'execution-success':
-              setIsExecuting(false);
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-              }
-              break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [isExecuting]);
-
-  // Scroll to bottom of terminal when logs change
-  useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs, error]);
 
   const handleExecute = () => {
@@ -213,6 +144,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
         
         <div className="flex items-center gap-3">
           <button 
+            type="button"
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 rounded-lg border border-black/10 dark:border-white/5 font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight"
             title="Reset to original code"
@@ -222,6 +154,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
           </button>
           
           <button 
+            type="button"
             onClick={handleExecute}
             disabled={isExecuting}
             className="flex items-center gap-1.5 px-4 py-1.5 text-xs bg-gradient-main hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 text-white font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primaryLight"
@@ -286,8 +219,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
           <span className="font-bold uppercase tracking-wider text-[10px]">Console Output</span>
         </div>
 
-        {/* Terminal logs list */}
-        <div className="space-y-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+        {/* Terminal logs list with ref */}
+        <div ref={terminalContainerRef} className="space-y-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
           {logs.length === 0 && !error && (
             <div className="text-textMuted/60 italic select-none">Click "Run Code" to view execution results.</div>
           )}

@@ -28,6 +28,7 @@ export const CourseView: React.FC = () => {
     const fetchCourseData = async () => {
       if (!id) return;
       setLoadingCourse(true);
+      window.scrollTo({ top: 0, behavior: 'instant' });
       try {
         const localCourse = COURSES.find(c => c.id === id);
         const c = await firestoreService.getCourse(id);

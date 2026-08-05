@@ -150,7 +150,7 @@ const generateSectionHtml = (sec: { title: string; icon: string }, i: number, to
         '<a href="' + playgroundLink + '" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-main text-white font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Practice Problem ' + (i + 1) + ' ⚡</a>' +
       '</div>' +
       '<div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">' +
-        '<p>In this module, we dissect <strong>' + titleClean + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
+        '<p>In this module, we dissect <strong>' + sectionTitleName + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
         '<ul class="list-none pl-0 space-y-2 mt-4">' +
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Theoretical foundations</li>' +
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Practical implementation strategies</li>' +

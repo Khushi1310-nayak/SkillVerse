@@ -11,7 +11,8 @@ import {
   X,
   AlertTriangle,
   Briefcase,
-  Shield
+  Shield,
+  Code2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
@@ -192,6 +193,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
         <nav className="flex-1 space-y-2">
           <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} id="nav-dashboard" />
           <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} id="nav-courses" />
+          <NavItem to="/playground" icon={Code2} label="Playground" id="nav-playground" />
           <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
           <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
           {showAdminLink && (
@@ -251,6 +253,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
             <nav className="space-y-2 flex-1">
               <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
               <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
+              <NavItem to="/playground" icon={Code2} label="Playground" />
               <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
               <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
               {showAdminLink && (

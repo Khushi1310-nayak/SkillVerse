@@ -132,16 +132,18 @@ const MODULE_SECTIONS = [
 ];
 
 const generateSectionHtml = (sec: { title: string; icon: string }, i: number, topic: string): string => {
-  const link = getDocLink(topic);
-  const dailySnippet = getDailyCodeSnippet(topic, i);
-  const titleClean = sec.title.includes('. ') ? sec.title.split('. ')[1] : sec.title;
+  const courseSlug = topic.toLowerCase().replace(/\s+/g, '-');
+  const playgroundLink = `/#/playground?course=${courseSlug}&module=${i + 1}`;
 
   return '<div id="module-' + (i + 1) + '" class="bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8 transition-all duration-300 shadow-xl relative overflow-hidden group hover:border-primaryLight/40">' +
     '<div class="absolute -right-4 -bottom-4 text-9xl font-display font-bold text-white/5 pointer-events-none select-none">' + (i + 1) + '</div>' +
     '<div class="relative z-10">' +
-      '<div class="flex items-center gap-5 mb-6">' +
-        '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">' + sec.icon + '</div>' +
-        '<h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">' + sec.title + '</h2>' +
+      '<div class="flex items-center justify-between gap-4 mb-6">' +
+        '<div class="flex items-center gap-5">' +
+          '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">' + sec.icon + '</div>' +
+          '<h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">' + sec.title + '</h2>' +
+        '</div>' +
+        '<a href="' + playgroundLink + '" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-main text-white font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Practice Problem ' + (i + 1) + ' ⚡</a>' +
       '</div>' +
       '<div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">' +
         '<p>In this module, we dissect <strong>' + titleClean + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
@@ -151,13 +153,12 @@ const generateSectionHtml = (sec: { title: string; icon: string }, i: number, to
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Common industry use-cases</li>' +
         '</ul>' +
       '</div>' +
-      '<div class="bg-[#0f1623] rounded-xl p-5 border border-white/10 font-mono text-sm text-blue-300 mb-6 overflow-x-auto shadow-inner group-hover:border-primary/20 transition-colors">' +
-        '<div class="flex gap-2 mb-3 opacity-50"><div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div></div>' +
-        '<code>' + dailySnippet + '</code>' +
-      '</div>' +
-      '<div class="flex items-center justify-between border-t border-white/10 pt-6">' +
+      '<div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">' +
         '<span class="text-xs font-bold text-textMuted uppercase tracking-widest">Module ' + (i + 1) + ' of 8</span>' +
-        '<a href="' + link + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all group-hover:translate-x-1">Official Docs ↗</a>' +
+        '<div class="flex items-center gap-3">' +
+          '<a href="' + playgroundLink + '" class="inline-flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-main text-white font-bold text-xs">Practice ⚡</a>' +
+          '<a href="' + link + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-primary/20 text-sm font-bold text-primaryLight hover:text-white transition-all">Official Docs ↗</a>' +
+        '</div>' +
       '</div>' +
     '</div>' +
   '</div>';

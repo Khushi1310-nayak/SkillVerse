@@ -171,3 +171,19 @@ export interface SavedAINote {
   courseTitle: string;
   savedAt: string; // ISO timestamp
 }
+
+export interface LessonComment {
+  id: string;
+  courseId: string;
+  lessonId: string;
+  userId: string;
+  username: string;
+  avatarId?: string;
+  photoURL?: string;
+  content: string;
+  createdAt: string;
+  upvotes: number;
+  upvotedBy: string[];
+  parentId?: string | null;
+}
+

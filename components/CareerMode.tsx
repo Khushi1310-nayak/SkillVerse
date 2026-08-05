@@ -374,16 +374,18 @@ const VoiceChatComponent: React.FC<VoiceChatProps> = ({ chatHistory }) => {
     : chatHistory.length > 1 ? chatHistory[chatHistory.length - 2].content : t('careerMode.timer.connecting');
 
   return (
-    <>
-      {/* Hidden live region for screen readers to announce the full response at once */}
+    <div className="w-full flex flex-col items-center">
+      {/* Hidden live region for screen readers */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {currentMessage}
       </div>
-      {/* Visual typewriter effect hidden from screen readers to prevent character-by-character spelling */}
-      <h3 className="text-lg md:text-2xl font-bold text-textMain mt-4 leading-relaxed min-h-[4rem]" aria-hidden="true">
-        <Typewriter text={currentMessage} speed={50} />
-      </h3>
-    </>
+      {/* Visual typewriter container with max-height and custom scrollbar to prevent text overlap */}
+      <div className="w-full max-w-2xl max-h-44 overflow-y-auto custom-scrollbar bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-4 md:p-6 text-center shadow-inner flex items-center justify-center">
+        <h3 className="text-base md:text-xl font-bold text-textMain leading-relaxed" aria-hidden="true">
+          <Typewriter text={currentMessage} speed={40} />
+        </h3>
+      </div>
+    </div>
   );
 };
 
@@ -1408,13 +1410,13 @@ ${transcriptText}`;
                 </div>
               </div>
             ) : mockState === 'active_voice' ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden overflow-y-auto">
+              <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-y-auto custom-scrollbar w-full">
                 {/* Progress Bar */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-black/5 dark:bg-white/10">
                   <div className={`h-full bg-gradient-main transition-all duration-1000 ${getPercentClass((turnCount / 10) * 100)}`} />
                 </div>
 
-                <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4">
+                <div className="absolute top-6 left-6 md:left-8 flex items-center gap-4 z-20">
                   <InterviewTimer
                     initialTime={2700}
                     extraTimeSeconds={extraTimeUsed * 60}
@@ -1432,8 +1434,8 @@ ${transcriptText}`;
                   </button>
                 </div>
 
-                <div className="max-w-3xl w-full mt-16 md:mt-0 flex flex-col items-center">
-                  <div className="text-center mb-10 w-full flex flex-col items-center">
+                <div className="max-w-3xl w-full mt-16 md:mt-6 flex flex-col items-center">
+                  <div className="text-center mb-6 w-full flex flex-col items-center">
                     <span className="text-textMuted uppercase tracking-widest text-xs font-bold mb-2">{t('careerMode.timer.voiceTurnProgress', { current: turnCount, total: 10 })}</span>
                     <VoiceChat chatHistory={chatHistory} />
                   </div>
@@ -1446,7 +1448,7 @@ ${transcriptText}`;
                   )}
 
                   {/* Live Waveform Visualizer */}
-                  <div className="w-full max-w-md h-16 mb-8 flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-2xl p-2 relative overflow-hidden">
+                  <div className="w-full max-w-md h-16 mb-6 flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-2xl p-2 relative overflow-hidden shrink-0">
                     <canvas
                       ref={visualizerCanvasRef}
                       width={500}
@@ -1465,43 +1467,44 @@ ${transcriptText}`;
                   </div>
 
                   {voiceStatus === 'generating' ? (
-                    <div className="flex flex-col items-center gap-4 animate-fade-in">
+                    <div className="flex flex-col items-center gap-4 animate-fade-in py-8">
                       <Loader2 size={48} className="text-primaryLight animate-spin" />
                       <p className="text-textMuted text-lg">{t('careerMode.timer.aiThinking')}</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center w-full max-w-xl">
                       {/* Visualizer / Mic indicator */}
-                      <div className="relative mb-8">
+                      <div className="relative mb-6">
                         {voiceStatus === 'listening' && (
                           <>
                             <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150"></div>
                             <div className="absolute inset-0 bg-primary/40 rounded-full animate-pulse scale-110"></div>
                           </>
                         )}
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center relative z-10 transition-colors duration-500 ${voiceStatus === 'listening' ? 'bg-gradient-main text-white shadow-lg shadow-primary/40' : 'bg-black/5 dark:bg-white/10 text-textMuted'}`}>
-                          {voiceStatus === 'listening' ? <Mic size={40} /> : <Volume2 size={40} className="animate-pulse" />}
+                        <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center relative z-10 transition-colors duration-500 ${voiceStatus === 'listening' ? 'bg-gradient-main text-white shadow-lg shadow-primary/40' : 'bg-black/5 dark:bg-white/10 text-textMuted'}`}>
+                          {voiceStatus === 'listening' ? <Mic size={36} /> : <Volume2 size={36} className="animate-pulse" />}
                         </div>
                       </div>
 
-                      <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-2xl p-6 w-full min-h-[150px] mb-8 relative">
-                        <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2"><User size={14} /> {t('careerMode.modal.yourAnswer')}</div>
-                        <p className="text-textMain text-lg italic">
+                      {/* User Answer Container with max-height & custom scrollbar */}
+                      <div className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-2xl p-5 w-full min-h-[100px] max-h-[180px] overflow-y-auto custom-scrollbar mb-6 relative shadow-inner">
+                        <div className="text-xs text-textMuted uppercase tracking-wider mb-2 font-bold flex items-center gap-2 sticky top-0 bg-transparent backdrop-blur-sm z-10"><User size={14} /> {t('careerMode.modal.yourAnswer')}</div>
+                        <p className="text-textMain text-base md:text-lg italic">
                           {currentSpeech || (voiceStatus === 'listening' ? t('careerMode.timer.listeningStatus') : t('careerMode.timer.waitingStatus'))}
                         </p>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                      <div className="flex flex-col sm:flex-row gap-4 w-full justify-center pb-6">
                         <button
                           onClick={handleEndInterviewEarly}
-                          className="px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 hover:bg-red-500/10 hover:text-red-500 text-textMuted"
+                          className="px-6 py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-black/5 dark:bg-white/10 hover:bg-red-500/10 hover:text-red-500 text-textMuted"
                         >
                           {t('careerMode.timer.endInterviewEarly')}
                         </button>
                         <button
                           onClick={handleSendNowOverride}
                           disabled={voiceStatus !== 'listening'}
-                          className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voiceStatus !== 'listening' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
+                          className={`px-6 py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voiceStatus !== 'listening' ? 'bg-black/10 text-textMuted cursor-not-allowed' : 'bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/30 hover:scale-105'}`}
                         >
                           {t('careerMode.timer.sendNowOverride')} <ArrowRight size={20} />
                         </button>
@@ -1511,15 +1514,15 @@ ${transcriptText}`;
                 </div>
               </div>
             ) : mockState === 'finished_voice' ? (
-              <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-hidden overflow-y-auto w-full custom-scrollbar">
-                <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in-up pt-10">
+              <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-y-auto w-full custom-scrollbar">
+                <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in-up pt-6">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center mb-6 shadow-xl">
                     <Sparkles size={32} className="text-white" />
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold text-textMain mb-2 text-center">{t('careerMode.reports.aiInterviewReport')}</h2>
                   <p className="text-textMuted mb-8 text-center">{t('careerMode.reports.aiInterviewDescription')}</p>
 
-                  <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert max-w-none mb-10 shadow-inner overflow-hidden">
+                  <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert max-w-none mb-10 shadow-inner overflow-visible">
                     <ReactMarkdown>{voiceReport}</ReactMarkdown>
                   </div>
 
@@ -1551,8 +1554,8 @@ ${transcriptText}`;
                 </div>
               </div>
             ) : mockState === 'finished' ? (
-              <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-hidden overflow-y-auto w-full custom-scrollbar">
-                <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in-up pt-10">
+              <div className="flex-1 flex flex-col items-center p-4 md:p-8 relative overflow-y-auto w-full custom-scrollbar">
+                <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in-up pt-6">
                   <Confetti />
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center mb-6 shadow-2xl animate-fade-in-up">
                     <Award size={40} className="text-white md:w-12 md:h-12" />
@@ -1571,7 +1574,7 @@ ${transcriptText}`;
                     </div>
                   </div>
 
-                  <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert prose-emerald max-w-none mb-10 shadow-inner overflow-hidden">
+                  <div className="w-full bg-black/5 dark:bg-[#0B1220]/50 border border-black/20 dark:border-white/10 p-6 md:p-10 rounded-3xl text-left prose prose-invert prose-emerald max-w-none mb-10 shadow-inner overflow-visible">
                     <ReactMarkdown>{textReport}</ReactMarkdown>
                   </div>
 

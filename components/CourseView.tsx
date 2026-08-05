@@ -8,6 +8,7 @@ import { aiService } from '../services/aiService';
 import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
+import { COURSES } from '../constants';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
@@ -29,19 +30,26 @@ export const CourseView: React.FC = () => {
       setLoadingCourse(true);
       window.scrollTo({ top: 0, behavior: 'instant' });
       try {
+        const localCourse = COURSES.find(c => c.id === id);
         const c = await firestoreService.getCourse(id);
-        if (c) {
+        const activeCourse = localCourse || c;
+
+        if (activeCourse) {
           const q = await firestoreService.getQuiz(id);
+          const dailyQuiz = getDailyQuiz(activeCourse.title);
           setCourse({
-            ...c,
-            quiz: q ? q.questions : []
+            ...activeCourse,
+            // Always inject fresh dynamic daily content with working code snippets if available
+            content: localCourse ? localCourse.content : activeCourse.content,
+            quiz: q ? q.questions : (activeCourse.quiz || [])
           });
         } else {
           setCourse(null);
         }
       } catch (err) {
         console.error('Failed to load course details:', err);
-        setCourse(null);
+        const fallback = COURSES.find(c => c.id === id) || null;
+        setCourse(fallback);
       } finally {
         setLoadingCourse(false);
       }

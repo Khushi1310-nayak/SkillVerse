@@ -392,6 +392,7 @@ const VoiceChat = React.memo(VoiceChatComponent, (prevProps, nextProps) => {
 });
 
 import { useActiveTimer } from '../hooks/useActiveTimer';
+import { useAudioVisualizer } from '../hooks/useAudioVisualizer';
 
 // --- MAIN COMPONENT ---
 interface CareerModeProps {
@@ -400,6 +401,7 @@ interface CareerModeProps {
 
 export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   useActiveTimer();
+  const visualizerCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -480,6 +482,12 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const voiceSelectModalRef = useRef<HTMLDivElement>(null);
   // Trap focus inside the Voice Select modal while it is open
   useFocusTrap(voiceSelectModalRef, showVoiceSelectModal, () => setShowVoiceSelectModal(false));
+
+  const { micPermissionDenied } = useAudioVisualizer({
+    isActive: mockState === 'active_voice',
+    voiceStatus,
+    canvasRef: visualizerCanvasRef
+  });
 
   const handleRequestTime = useCallback(() => {
     if (extraTimeUsed >= 30) return;
@@ -1425,9 +1433,35 @@ ${transcriptText}`;
                 </div>
 
                 <div className="max-w-3xl w-full mt-16 md:mt-0 flex flex-col items-center">
-                  <div className="text-center mb-10">
-                    <span className="text-textMuted uppercase tracking-widest text-xs font-bold">{t('careerMode.timer.voiceTurnProgress', { current: turnCount, total: 10 })}</span>
+                  <div className="text-center mb-10 w-full flex flex-col items-center">
+                    <span className="text-textMuted uppercase tracking-widest text-xs font-bold mb-2">{t('careerMode.timer.voiceTurnProgress', { current: turnCount, total: 10 })}</span>
                     <VoiceChat chatHistory={chatHistory} />
+                  </div>
+
+                  {/* Mic Permission Banner */}
+                  {micPermissionDenied && (
+                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold text-center w-full max-w-md animate-fade-in">
+                      ⚠️ Microphone permission was denied or is unavailable. Please allow access in browser settings. The interview will still proceed.
+                    </div>
+                  )}
+
+                  {/* Live Waveform Visualizer */}
+                  <div className="w-full max-w-md h-16 mb-8 flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-2xl p-2 relative overflow-hidden">
+                    <canvas
+                      ref={visualizerCanvasRef}
+                      width={500}
+                      height={100}
+                      className="w-full h-full opacity-80"
+                    />
+                    <div className="absolute bottom-1.5 right-3 text-[10px] text-textMuted font-bold uppercase tracking-wider">
+                      {voiceStatus === 'listening' ? (
+                        <span className="text-emerald-400 animate-pulse">Listening...</span>
+                      ) : voiceStatus === 'speaking' ? (
+                        <span className="text-primaryLight animate-pulse">AI Speaking...</span>
+                      ) : (
+                        <span className="text-orange-400 animate-pulse">AI thinking...</span>
+                      )}
+                    </div>
                   </div>
 
                   {voiceStatus === 'generating' ? (

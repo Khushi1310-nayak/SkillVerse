@@ -134,17 +134,22 @@ const MODULE_SECTIONS = [
 const generateSectionHtml = (sec: { title: string; icon: string }, i: number, topic: string): string => {
   const link = getDocLink(topic);
   const dailySnippet = getDailyCodeSnippet(topic, i);
-  const titleClean = sec.title.includes('. ') ? sec.title.split('. ')[1] : sec.title;
+  const courseSlug = topic.toLowerCase().replace(/\s+/g, '-');
+  const playgroundLink = `/#/playground?course=${courseSlug}&module=${i + 1}`;
+  const sectionTitleName = sec.title.includes('. ') ? sec.title.split('. ')[1] : sec.title;
 
   return '<div id="module-' + (i + 1) + '" class="bg-glass hover:bg-glass-hover border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8 transition-all duration-300 shadow-xl relative overflow-hidden group hover:border-primaryLight/40">' +
     '<div class="absolute -right-4 -bottom-4 text-9xl font-display font-bold text-white/5 pointer-events-none select-none">' + (i + 1) + '</div>' +
     '<div class="relative z-10">' +
-      '<div class="flex items-center gap-5 mb-6">' +
-        '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">' + sec.icon + '</div>' +
-        '<h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">' + sec.title + '</h2>' +
+      '<div class="flex items-center justify-between gap-4 mb-6">' +
+        '<div class="flex items-center gap-5">' +
+          '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-xl backdrop-blur-md">' + sec.icon + '</div>' +
+          '<h2 class="text-2xl md:text-3xl font-bold text-textMain group-hover:text-primaryLight transition-colors">' + sec.title + '</h2>' +
+        '</div>' +
+        '<a href="' + playgroundLink + '" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-main text-white font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Practice Problem ' + (i + 1) + ' ⚡</a>' +
       '</div>' +
       '<div class="prose dark:prose-invert max-w-none text-textMuted text-lg leading-relaxed mb-8">' +
-        '<p>In this module, we dissect <strong>' + titleClean + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
+        '<p>In this module, we dissect <strong>' + sectionTitleName + '</strong>. Understanding this concept is fundamental to writing clean, efficient, and scalable ' + topic + ' code.</p>' +
         '<ul class="list-none pl-0 space-y-2 mt-4">' +
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Theoretical foundations</li>' +
           '<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primaryLight"></span> Practical implementation strategies</li>' +

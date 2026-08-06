@@ -29,6 +29,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const terminalContainerRef = useRef<HTMLDivElement>(null);
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom of terminal inside container only without moving page viewport
   useEffect(() => {

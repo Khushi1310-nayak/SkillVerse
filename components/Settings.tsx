@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -13,6 +13,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { soundManager } from '../utils/soundManager';
+import { useInstallPrompt } from '../contexts/InstallPromptContext';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
 import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
@@ -46,6 +47,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     return localStorage.getItem('settings_active_tab') || 'profile';
   });
   const [savedNotes, setSavedNotes] = useState<SavedAINote[]>([]);
+  const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
 
   useEffect(() => {
     if (activeTab === 'aiNotes') {
@@ -383,9 +385,8 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                         height={80}
                       />
                       {formData.settings.activeFrame && formData.settings.activeFrame !== 'none' && (
-                        <div className={`absolute inset-0 rounded-full pointer-events-none ${
-                          XP_STORE_FRAMES.find(f => f.id === formData.settings.activeFrame)?.frameClass || ''
-                        }`} />
+                        <div className={`absolute inset-0 rounded-full pointer-events-none ${XP_STORE_FRAMES.find(f => f.id === formData.settings.activeFrame)?.frameClass || ''
+                          }`} />
                       )}
                       {formData.photoURL && (
                         <span className="absolute -bottom-1 -right-1 bg-primaryLight text-xs font-bold text-black px-2 py-0.5 rounded-full shadow">
@@ -1206,6 +1207,33 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
                   <Shield className="text-primaryLight" /> {t('settings.account.title')}
                 </h2>
+
+                {(isInstallable || isInstalled) && (
+                  <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <Download className="text-primaryLight" />
+                      <div className="text-left">
+                        <div className="font-bold text-textMain">Install SkillVerse App</div>
+                        <div className="text-sm text-textMuted">
+                          {isInstalled
+                            ? 'SkillVerse is installed and works offline for previously viewed courses.'
+                            : 'Add SkillVerse to your home screen for a full-screen, offline-ready experience.'}
+                        </div>
+                      </div>
+                    </div>
+                    {!isInstalled && (
+                      <button
+                        onClick={async () => {
+                          const accepted = await promptInstall();
+                          if (accepted) showToast({ message: 'SkillVerse installed!', type: 'success' });
+                        }}
+                        className="px-4 py-2 bg-gradient-main text-white rounded-lg text-sm font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background shrink-0"
+                      >
+                        Install
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   <button

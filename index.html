@@ -1,178 +1,203 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SkillVerse - Master the Future</title>
-    <link rel="icon" type="image/png" href="/skillverse-logo.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-              display: ['"Outfit"', 'sans-serif'],
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillVerse - Master the Future</title>
+  <link rel="icon" type="image/png" href="/skillverse-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#6968A6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SkillVerse" />
+  <meta name="description"
+    content="Learn programming, DSA, and design with AI-powered courses, quizzes, and career prep." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+          },
+          colors: {
+            background: 'var(--bg-background)',
+            primary: 'rgb(var(--color-primary) / <alpha-value>)',
+            primaryLight: 'rgb(var(--color-primary-light) / <alpha-value>)',
+            secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+            accent: 'rgb(var(--color-primary-light) / <alpha-value>)',
+            textMain: 'var(--text-main)',
+            textMuted: 'var(--text-muted)',
+            success: '#6EE7B7',
+          },
+          backgroundImage: {
+            'glass': 'var(--glass-bg)',
+            'glass-hover': 'var(--glass-hover)',
+            'gradient-main': 'linear-gradient(90deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 100%)',
+            'gradient-sec': 'linear-gradient(90deg, rgb(var(--color-secondary)) 0%, rgb(var(--color-primary)) 100%)',
+          },
+          borderColor: {
+            DEFAULT: 'var(--border-color)',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'fade-in-up': 'fadeInUp 0.8s ease-out',
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'slide-right': 'slideRight 0.3s ease-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
             },
-            colors: {
-              background: 'var(--bg-background)',
-              primary: 'rgb(var(--color-primary) / <alpha-value>)',
-              primaryLight: 'rgb(var(--color-primary-light) / <alpha-value>)',
-              secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-              accent: 'rgb(var(--color-primary-light) / <alpha-value>)',
-              textMain: 'var(--text-main)',
-              textMuted: 'var(--text-muted)',
-              success: '#6EE7B7',
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
             },
-            backgroundImage: {
-              'glass': 'var(--glass-bg)',
-              'glass-hover': 'var(--glass-hover)',
-              'gradient-main': 'linear-gradient(90deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 100%)',
-              'gradient-sec': 'linear-gradient(90deg, rgb(var(--color-secondary)) 0%, rgb(var(--color-primary)) 100%)',
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
             },
-            borderColor: {
-              DEFAULT: 'var(--border-color)',
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out',
-              'fade-in-up': 'fadeInUp 0.8s ease-out',
-              'float': 'float 6s ease-in-out infinite',
-              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'slide-right': 'slideRight 0.3s ease-out',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              float: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-20px)' },
-              },
-              slideRight: {
-                '0%': { transform: 'translateX(-100%)' },
-                '100%': { transform: 'translateX(0)' },
-              }
+            slideRight: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(0)' },
             }
           }
         }
       }
-    </script>
-    <style>
-      :root {
-        /* Light Mode Defaults */
-        --bg-background: #F8FAFC;
-        --text-main: #0F172A;
-        --text-muted: #64748B;
-        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
-        --glass-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-        --border-color: rgba(148, 163, 184, 0.2);
-        
-        /* Theme Colors in RGB format (r g b) for Tailwind opacity support */
-        --color-primary: 105 104 166;
-        --color-primary-light: 207 152 147;
-        --color-secondary: 8 80 120;
-      }
+    }
+  </script>
+  <style>
+    :root {
+      /* Light Mode Defaults */
+      --bg-background: #F8FAFC;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+      --glass-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+      --border-color: rgba(148, 163, 184, 0.2);
 
-      .dark {
-        /* Dark Mode Overrides */
-        --bg-background: #0B1220;
-        --text-main: #EDEBFF;
-        --text-muted: #B9B6E3;
-        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-        --glass-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
-        --border-color: rgba(255, 255, 255, 0.1);
-      }
+      /* Theme Colors in RGB format (r g b) for Tailwind opacity support */
+      --color-primary: 105 104 166;
+      --color-primary-light: 207 152 147;
+      --color-secondary: 8 80 120;
+    }
 
-      body {
-        background-color: var(--bg-background);
-        color: var(--text-main);
-        transition: background-color 0.5s ease, color 0.5s ease;
-      }
+    .dark {
+      /* Dark Mode Overrides */
+      --bg-background: #0B1220;
+      --text-main: #EDEBFF;
+      --text-muted: #B9B6E3;
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+      --glass-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
 
-      .bg-gradient-input {
-        background-image: linear-gradient(90deg, rgb(var(--color-primary) / 0.1) 0%, rgb(var(--color-primary-light) / 0.1) 100%);
-      }
+    body {
+      background-color: var(--bg-background);
+      color: var(--text-main);
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
 
-      .print-certificate {
-        width: 1000px !important;
-        height: 707px !important;
-        max-width: none !important;
-        transform: scale(1) !important;
-        transform-origin: top left !important;
-      }
+    .bg-gradient-input {
+      background-image: linear-gradient(90deg, rgb(var(--color-primary) / 0.1) 0%, rgb(var(--color-primary-light) / 0.1) 100%);
+    }
 
-      .badge-hexagon {
-        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      }
-      .badge-hexagon-inner {
-        border: 1px solid rgba(245, 201, 122, 0.3);
-      }
-      .certificate-pattern {
-        background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
-        background-size: 40px 40px;
-      }
-      .font-cursive {
-        font-family: cursive;
-      }
+    .print-certificate {
+      width: 1000px !important;
+      height: 707px !important;
+      max-width: none !important;
+      transform: scale(1) !important;
+      transform-origin: top left !important;
+    }
 
-/* Custom Cursor: native cursor is hidden only when JS has confirmed
+    .badge-hexagon {
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    .badge-hexagon-inner {
+      border: 1px solid rgba(245, 201, 122, 0.3);
+    }
+
+    .certificate-pattern {
+      background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+      background-size: 40px 40px;
+    }
+
+    .font-cursive {
+      font-family: cursive;
+    }
+
+    /* Custom Cursor: native cursor is hidden only when JS has confirmed
          a non-touch device and mounted the custom cursor component */
-      .custom-cursor-active,
-      .custom-cursor-active * {
-        cursor: none !important;
+    .custom-cursor-active,
+    .custom-cursor-active * {
+      cursor: none !important;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-background);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #6968A6;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #CF9893;
+    }
+
+    /* Certificate Print Styles */
+    @media print {
+      @page {
+        margin: 0;
+        size: landscape;
       }
 
-      /* Custom Scrollbar */      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+      body * {
+        visibility: hidden;
       }
-      ::-webkit-scrollbar-track {
-        background: var(--bg-background); 
+
+      #certificate-container,
+      #certificate-container * {
+        visibility: visible;
       }
-      ::-webkit-scrollbar-thumb {
-        background: #6968A6; 
-        border-radius: 4px;
+
+      #certificate-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #CF9893; 
+
+      .no-print {
+        display: none !important;
       }
-      
-      /* Certificate Print Styles */
-      @media print {
-        @page { margin: 0; size: landscape; }
-        body * {
-          visibility: hidden;
-        }
-        #certificate-container, #certificate-container * {
-          visibility: visible;
-        }
-        #certificate-container {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 0;
-          background: white !important;
-          color: black !important;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        .no-print {
-          display: none !important;
-        }
-      }
-    </style>
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -187,8 +212,10 @@
 }
 </script>
 </head>
-  <body>
-    <div id="root"></div>
+
+<body>
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>

@@ -2,6 +2,7 @@ import { LayoutDashboard, BookOpen, Briefcase, Award, Settings } from 'lucide-re
 import { Category, Course, Company, InterviewQuestion, FAQItem, BadgeDefinition } from './types';
 import { getDailyCodeSnippet } from './utils/dailyCodeGenerator';
 import { getDailyQuiz } from './utils/dailyQuizGenerator';
+import { getDailyCompanyQuestions } from './utils/dailyCompanyGenerator';
 
 export const CATEGORIES: Category[] = [
   {
@@ -331,17 +332,22 @@ const COMPANY_LIST = [
   { name: 'Palantir', focus: ['Data Processing', 'Algorithms'], domain: 'palantir.com' },
 ];
 
-export const COMPANIES: Company[] = COMPANY_LIST.map((c, index) => ({
-  id: c.name.toLowerCase().replace(/\s+/g, '-'),
-  name: c.name,
-  // Reliable mock logos using UI Avatars
-  logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&rounded=true&bold=true&size=128`, 
-  description: `Prepare for ${c.name} with curated questions focusing on ${c.focus.join(' and ')}.`,
-  roles: ['SDE I', 'SDE II', 'Frontend', 'Backend'],
-  difficulty: index % 3 === 0 ? 'Very Hard' : index % 3 === 1 ? 'Hard' : 'Moderate',
-  focus: c.focus,
-  questions: generateQuestionsForCompany(c.name.toLowerCase().replace(/\s+/g, '-'), c.focus),
-}));
+export const COMPANIES: Company[] = COMPANY_LIST.map((c, index) => {
+  const companyId = c.name.toLowerCase().replace(/\s+/g, '-');
+  return {
+    id: companyId,
+    name: c.name,
+    // Reliable mock logos using UI Avatars
+    logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&rounded=true&bold=true&size=128`, 
+    description: `Prepare for ${c.name} with curated questions focusing on ${c.focus.join(' and ')}.`,
+    roles: ['SDE I', 'SDE II', 'Frontend', 'Backend'],
+    difficulty: index % 3 === 0 ? 'Very Hard' : index % 3 === 1 ? 'Hard' : 'Moderate',
+    focus: c.focus,
+    questions: typeof getDailyCompanyQuestions === 'function' 
+      ? getDailyCompanyQuestions(companyId, c.focus) 
+      : generateQuestionsForCompany(companyId, c.focus),
+  };
+});
 
 export const VOICE_INTERVIEW_QUESTIONS = [
   "Tell me about a time you had to overcome a difficult technical challenge. How did you approach it?",

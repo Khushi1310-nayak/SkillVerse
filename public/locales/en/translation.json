@@ -369,6 +369,17 @@
       "pdf": "PDF (Standard)",
       "image": "Image (Pro)"
     },
+    "certificatePage": {
+      "backToDashboard": "Back to Dashboard",
+      "copyLink": "Copy Link",
+      "linkCopied": "Link Copied!",
+      "linkCopiedToast": "Verification link copied to clipboard!",
+      "shareTwitter": "Share to Twitter",
+      "shareLinkedIn": "Share to LinkedIn",
+      "sharing": "Sharing...",
+      "downloadPDF": "Download PDF",
+      "generatingPDF": "Generating PDF..."
+    },
     "achievements": {
       "title": "Achievements"
     },

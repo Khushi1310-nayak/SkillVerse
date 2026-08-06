@@ -53,6 +53,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
 };
 
 export interface User {
+  uid?: string;
   username: string;
   email: string;
   enrolledDate: string;
@@ -67,6 +68,7 @@ export interface User {
   lastActiveDate: string;
   badges: string[];
   role?: 'admin' | 'instructor' | 'user';
+  following?: string[];
 }
 
 export interface Lesson {

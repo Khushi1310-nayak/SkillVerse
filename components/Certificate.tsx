@@ -53,18 +53,18 @@ export const Certificate: React.FC = () => {
     return (
       <div className="text-center py-20 animate-fade-in">
         <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Award className="text-textMuted opacity-50" size={40} />
+          <Award className="text-textMuted opacity-50" size={40} />
         </div>
         <h2 className="text-2xl font-bold text-textMain mb-4">{t('certificate.unavailableTitle')}</h2>
         <p className="text-textMuted mb-8">{t('certificate.unavailableDescription')}</p>
         <Link to={`/course/${id}`} className="px-6 py-2 bg-gradient-main text-white rounded-lg font-bold">
-            {t('certificate.goToCourse')}
+          {t('certificate.goToCourse')}
         </Link>
       </div>
     );
   }
 
-  const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0,3).toUpperCase()}-${progress.score}`;
+  const credentialId = `${course.id.toUpperCase()}-${user.username.substring(0, 3).toUpperCase()}-${progress.score}`;
 
   const certificateData: CertificateData = {
     username: user.username,
@@ -97,11 +97,11 @@ export const Certificate: React.FC = () => {
 
   const handleShareTwitter = () => {
     const tokenData = {
-       u: user.username,
-       c: course.title,
-       s: progress.score,
-       d: progress.completedDate,
-       i: credentialId
+      u: user.username,
+      c: course.title,
+      s: progress.score,
+      d: progress.completedDate,
+      i: credentialId
     };
     const token = btoa(JSON.stringify(tokenData));
     const shareUrl = `${window.location.origin}/#/credential/${token}`;
@@ -114,16 +114,16 @@ export const Certificate: React.FC = () => {
     setIsSharing(true);
     try {
       const tokenData = {
-         u: user.username,
-         c: course.title,
-         s: progress.score,
-         d: progress.completedDate,
-         i: credentialId
+        u: user.username,
+        c: course.title,
+        s: progress.score,
+        d: progress.completedDate,
+        i: credentialId
       };
       const token = btoa(JSON.stringify(tokenData));
       const shareUrl = `${window.location.origin}/#/credential/${token}`;
       const text = `${t('certificate.shareTextLinkedIn', { title: course.title })} ${shareUrl}`;
-      
+
       const blob = await generateShareImageBlob('certificate-share-card');
       if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], 'certificate.png', { type: 'image/png' })] })) {
         const file = new File([blob], 'certificate.png', { type: 'image/png' });
@@ -142,7 +142,7 @@ export const Certificate: React.FC = () => {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          
+
           showToast({ message: t('certificate.toast.imageDownloaded'), type: "success" });
         } else {
           showToast({ message: t('certificate.toast.redirectingLinkedIn'), type: "info" });
@@ -160,19 +160,19 @@ export const Certificate: React.FC = () => {
   const handleDownloadPDF = async () => {
     const element = document.getElementById('certificate-container');
     if (!element) return;
-    
+
     setIsDownloading(true);
     try {
-      const canvas = await html2canvas(element, { 
-         scale: 2, // Scale 2 is usually enough for A4 print
-         useCORS: true,
-         backgroundColor: '#0B1220',
-         logging: false
+      const canvas = await html2canvas(element, {
+        scale: 2, // Scale 2 is usually enough for A4 print
+        useCORS: true,
+        backgroundColor: '#0B1220',
+        logging: false
       });
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('landscape', 'px', [canvas.width, canvas.height]);
-      
+
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       pdf.save(`${course.title.replace(/\s+/g, '_')}_Certificate.pdf`);
     } catch (err) {
@@ -185,17 +185,18 @@ export const Certificate: React.FC = () => {
   const handleCopyLink = () => {
     // Generate Base64 token
     const tokenData = {
-       u: user.username,
-       c: course.title,
-       s: progress.score,
-       d: progress.completedDate,
-       i: credentialId
+      u: user.username,
+      c: course.title,
+      s: progress.score,
+      d: progress.completedDate,
+      i: credentialId
     };
     const token = btoa(JSON.stringify(tokenData));
     const url = `${window.location.origin}/#/credential/${token}`;
-    
+
     navigator.clipboard.writeText(url);
     setCopied(true);
+    showToast({ message: t('certificatePage.linkCopiedToast'), type: 'success' });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -206,55 +207,55 @@ export const Certificate: React.FC = () => {
           <ArrowLeft size={20} className="mr-2" /> {t('certificate.backToDashboard')}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-           <button 
-             onClick={handleCopyLink}
-             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10"
-           >
-             {copied ? <CheckCircle size={18} className="text-success" /> : <LinkIcon size={18} />}
-             {copied ? t('certificate.linkCopied') : t('certificate.copyLink')}
-           </button>
-           <button 
-             onClick={handleShareTwitter}
-             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 group"
-           >
-             <Twitter size={18} className="text-[#1DA1F2] group-hover:scale-110 transition-transform" /> {t('certificate.shareTwitter')}
-           </button>
-           <button 
-             onClick={handleShareLinkedIn}
-             disabled={isSharing}
-             className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 disabled:opacity-50 group"
-           >
-             {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} className="text-[#0A66C2] fill-[#0A66C2] group-hover:scale-110 transition-transform" />}
-             {isSharing ? t('certificate.sharing') : t('certificate.shareLinkedIn')}
-           </button>
-           <button 
-             onClick={handleDownloadPDF}
-             disabled={isDownloading}
-             className="flex items-center gap-2 bg-gradient-main text-white px-6 py-2 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-medium disabled:opacity-50"
-           >
-             {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Printer size={18} />} 
-             {isDownloading ? t('certificate.generatingPdf') : t('certificate.downloadPdf')}
-           </button>
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10"
+          >
+            {copied ? <CheckCircle size={18} className="text-success" /> : <LinkIcon size={18} />}
+            {copied ? t('certificatePage.linkCopied') : t('certificatePage.copyLink')}
+          </button>
+          <button
+            onClick={handleShareTwitter}
+            className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 group"
+          >
+            <Twitter size={18} className="text-[#1DA1F2] group-hover:scale-110 transition-transform" /> {t('certificatePage.shareTwitter')}
+          </button>
+          <button
+            onClick={handleShareLinkedIn}
+            disabled={isSharing}
+            className="flex items-center gap-2 bg-white/5 dark:bg-white/10 text-textMain px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/20 transition-all font-medium border border-black/20 dark:border-white/10 disabled:opacity-50 group"
+          >
+            {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} className="text-[#0A66C2] fill-[#0A66C2] group-hover:scale-110 transition-transform" />}
+            {isSharing ? t('certificatePage.sharing') : t('certificatePage.shareLinkedIn')}
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="flex items-center gap-2 bg-gradient-main text-white px-6 py-2 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-medium disabled:opacity-50"
+          >
+            {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Printer size={18} />}
+            {isDownloading ? t('certificatePage.generatingPDF') : t('certificatePage.downloadPDF')}
+          </button>
         </div>
       </div>
 
       <div className="w-full max-w-5xl overflow-x-auto pb-8 flex justify-center no-scrollbar">
-         {/* We wrap it in a container so that it can scale or scroll horizontally on mobile */}
-         <div className="min-w-[800px] w-full">
-            {/* The CertificateDisplay component renders the actual UI */}
-            {/* During download, we can use a CSS class to toggle the printing styles if needed, or rely on html2canvas parsing */}
-            <CertificateDisplay data={certificateData} isPrinting={isDownloading} />
-         </div>
+        {/* We wrap it in a container so that it can scale or scroll horizontally on mobile */}
+        <div className="min-w-[800px] w-full">
+          {/* The CertificateDisplay component renders the actual UI */}
+          {/* During download, we can use a CSS class to toggle the printing styles if needed, or rely on html2canvas parsing */}
+          <CertificateDisplay data={certificateData} isPrinting={isDownloading} />
+        </div>
       </div>
-      
+
       {/* ----------------- HIDDEN SOCIAL SHARE CARD ----------------- */}
-      <div 
-        id="certificate-share-card" 
-        style={{ 
-          position: 'absolute', 
-          left: '-9999px', 
-          top: '-9999px', 
-          width: '1200px', 
+      <div
+        id="certificate-share-card"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: '-9999px',
+          width: '1200px',
           height: '630px',
           display: 'flex',
           flexDirection: 'column',

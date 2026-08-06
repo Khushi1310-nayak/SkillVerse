@@ -32,7 +32,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
   const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
 
-  const [weeklyStats, setWeeklyStats] = useState(() => 
+  const [weeklyStats, setWeeklyStats] = useState(() =>
     storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60)
   );
 
@@ -69,7 +69,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     return (Math.round(hours * 10) / 10).toFixed(1);
   }, [weeklyStats.totalSeconds]);
 
-    useEffect(() => {
+  useEffect(() => {
     const loadCompanies = async () => {
       try {
         const companyList = await firestoreService.getCompanies();
@@ -159,9 +159,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const savedQuestionsList = useMemo(() => {
     const list: { question: any; companyName: string }[] = [];
     const savedIds = careerProgress.savedQuestions || [];
-    
+
     if (savedIds.length === 0 || companies.length === 0) return [];
-    
+
     companies.forEach(company => {
       company.questions.forEach((q: any) => {
         if (savedIds.includes(q.id)) {
@@ -175,9 +175,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const mockHistoryList = useMemo(() => {
     const scores = careerProgress.mockInterviewScores || [];
     if (scores.length === 0) return [];
-    
+
     const sorted = [...scores].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
+
     return sorted.map((attempt: any) => {
       const company = companies.find(c => c.id === attempt.companyId);
       return {
@@ -452,7 +452,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               <span className="text-lg text-textMuted font-medium">{weeklyStats.goalHours} Hours</span>
             </div>
           </div>
-          
+
           <div className="relative flex items-center justify-center shrink-0">
             <svg
               height={120}
@@ -569,7 +569,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             {savedQuestionsList.length > 0 ? (
               <div className="space-y-3">
                 {savedQuestionsList.slice(0, 3).map(({ question, companyName }) => (
-                  <div 
+                  <div
                     key={question.id}
                     className="p-3.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-xl flex items-center justify-between hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                   >
@@ -577,7 +577,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                       <h4 className="text-sm font-bold text-textMain truncate">{question.title}</h4>
                       <span className="text-[10px] text-textMuted uppercase font-semibold">{companyName}</span>
                     </div>
-                    <Link 
+                    <Link
                       to={`/career`}
                       className="text-xs font-bold text-primaryLight shrink-0 hover:underline"
                     >
@@ -620,13 +620,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             {mockHistoryList.length > 0 ? (
               <div className="space-y-3">
                 {mockHistoryList.slice(0, 3).map((attempt, index) => {
-                  const dateStr = new Date(attempt.date).toLocaleDateString(undefined, { 
-                    month: 'short', 
+                  const dateStr = new Date(attempt.date).toLocaleDateString(undefined, {
+                    month: 'short',
                     day: 'numeric',
-                    year: 'numeric' 
+                    year: 'numeric'
                   });
                   return (
-                    <div 
+                    <div
                       key={index}
                       className="p-3.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/5 rounded-xl flex items-center justify-between"
                     >
@@ -639,7 +639,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                       <div className={`px-2.5 py-1 rounded-lg text-xs font-bold 
                         ${attempt.score >= 70 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
                           attempt.score >= 50 ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
-                          'bg-red-500/10 text-red-500 border border-red-500/20'}
+                            'bg-red-500/10 text-red-500 border border-red-500/20'}
                       `}>
                         {attempt.score}%
                       </div>

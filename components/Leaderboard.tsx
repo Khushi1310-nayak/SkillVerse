@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, TrendingUp, Calendar, Clock, Award } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, Calendar, Clock, Award, UserPlus, UserCheck } from 'lucide-react';
 import { db } from '../firebase/firebase';
 import { XP_STORE_FRAMES } from '../constants';
 import { PublicProfileModal } from './PublicProfileModal';
+import { firestoreService } from '../services/firestoreService';
 
 interface LeaderboardUser {
   id: string;
@@ -18,6 +19,12 @@ interface LeaderboardUser {
   activeFrame?: string;
 }
 
+interface LeaderboardProps {
+  currentUserId?: string;
+  followingIds?: string[];
+  onFollowChange?: (targetUserId: string, isNowFollowing: boolean) => void;
+}
+
 const AVATARS: Record<string, string> = {
   '1': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
   '2': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
@@ -26,13 +33,22 @@ const AVATARS: Record<string, string> = {
   '5': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha',
 };
 
-export const Leaderboard: React.FC = () => {
+export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followingIds = [], onFollowChange }) => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedRankIndex, setSelectedRankIndex] = useState<number | undefined>(undefined);
+  const [followingMap, setFollowingMap] = useState<Record<string, boolean>>({});
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const map: Record<string, boolean> = {};
+    followingIds.forEach(id => {
+      map[id] = true;
+    });
+    setFollowingMap(map);
+  }, [followingIds]);
 
   useEffect(() => {
     setLoading(true);
@@ -73,6 +89,29 @@ export const Leaderboard: React.FC = () => {
 
     return () => unsubscribe();
   }, [timeframe]);
+
+  const handleFollowToggle = async (e: React.MouseEvent, targetUserId: string) => {
+    e.stopPropagation(); // Prevent opening public profile modal
+    if (!currentUserId || currentUserId === targetUserId || actionLoadingId) return;
+
+    const isCurrentlyFollowing = !!followingMap[targetUserId];
+    setActionLoadingId(targetUserId);
+
+    try {
+      await firestoreService.toggleFollowUser(currentUserId, targetUserId, isCurrentlyFollowing);
+      setFollowingMap(prev => ({
+        ...prev,
+        [targetUserId]: !isCurrentlyFollowing
+      }));
+      if (onFollowChange) {
+        onFollowChange(targetUserId, !isCurrentlyFollowing);
+      }
+    } catch (error) {
+      console.error("Error toggling follow state:", error);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   const getDisplayXP = (user: LeaderboardUser): number => {
     if (timeframe === 'week') return user.weeklyXP;
@@ -165,68 +204,102 @@ export const Leaderboard: React.FC = () => {
 
       <div className="space-y-3 relative z-10">
         <AnimatePresence>
-          {users.map((user, index) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
-              key={user.id}
-              onClick={() => {
-                setSelectedUserId(user.id);
-                setSelectedRankIndex(index);
-              }}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 cursor-pointer group ${getRowStyle(index)}`}
-              title="Click to view public profile"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex justify-center items-center w-8">
-                  {getRankIcon(index)}
-                </div>
-                
-                <div className="relative group-hover:scale-105 transition-transform">
-                  <img
-                    src={user.photoURL || AVATARS[user.avatarId || '1']}
-                    alt={user.username}
-                    className="w-12 h-12 rounded-full object-cover border border-black/20 dark:border-white/10 bg-black/20"
-                    loading="lazy"
-                    width={48}
-                    height={48}
-                  />
-                  {user.activeFrame && user.activeFrame !== 'none' && (
-                    <div className={`absolute inset-0 rounded-full pointer-events-none ${
-                      XP_STORE_FRAMES.find(f => f.id === user.activeFrame)?.frameClass || ''
-                    }`} />
-                  )}
-                  {index < 3 && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">
-                      <div className={`w-3 h-3 rounded-full ${
-                        index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : 'bg-amber-600'
+          {users.map((user, index) => {
+            const isSelf = currentUserId === user.id;
+            const isFollowing = !!followingMap[user.id];
+            const isLoadingThis = actionLoadingId === user.id;
+
+            return (
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
+                key={user.id}
+                onClick={() => {
+                  setSelectedUserId(user.id);
+                  setSelectedRankIndex(index);
+                }}
+                className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 cursor-pointer group ${getRowStyle(index)}`}
+                title="Click to view public profile"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex justify-center items-center w-8">
+                    {getRankIcon(index)}
+                  </div>
+                  
+                  <div className="relative group-hover:scale-105 transition-transform">
+                    <img
+                      src={user.photoURL || AVATARS[user.avatarId || '1']}
+                      alt={user.username}
+                      className="w-12 h-12 rounded-full object-cover border border-black/20 dark:border-white/10 bg-black/20"
+                      loading="lazy"
+                      width={48}
+                      height={48}
+                    />
+                    {user.activeFrame && user.activeFrame !== 'none' && (
+                      <div className={`absolute inset-0 rounded-full pointer-events-none ${
+                        XP_STORE_FRAMES.find(f => f.id === user.activeFrame)?.frameClass || ''
                       }`} />
+                    )}
+                    {index < 3 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">
+                        <div className={`w-3 h-3 rounded-full ${
+                          index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : 'bg-amber-600'
+                        }`} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-bold text-textMain text-lg leading-tight group-hover:underline group-hover:text-primaryLight transition-colors">
+                      {user.username}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-primaryLight">
+                        Lvl {user.level}
+                      </span>
                     </div>
-                  )}
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-textMain text-lg leading-tight group-hover:underline group-hover:text-primaryLight transition-colors">
-                    {user.username}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-primaryLight">
-                      Lvl {user.level}
-                    </span>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col items-end">
-                <div className="flex items-center gap-1.5 text-textMain font-bold text-xl">
-                  {getDisplayXP(user).toLocaleString()} <span className="text-sm font-medium text-textMuted">XP</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1.5 text-textMain font-bold text-xl">
+                      {getDisplayXP(user).toLocaleString()} <span className="text-sm font-medium text-textMuted">XP</span>
+                    </div>
+                  </div>
+
+                  {!isSelf && currentUserId && (
+                    <button
+                      onClick={(e) => handleFollowToggle(e, user.id)}
+                      disabled={isLoadingThis}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                        isFollowing
+                          ? 'bg-white/10 text-textMain hover:bg-red-500/20 hover:text-red-400 border border-white/10'
+                          : 'bg-gradient-main text-white hover:opacity-90 shadow-primary/20'
+                      }`}
+                    >
+                      {isLoadingThis ? (
+                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : isFollowing ? (
+                        <>
+                          <UserCheck size={14} />
+                          <span>Following</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus size={14} />
+                          <span>Follow</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {users.length === 0 && (

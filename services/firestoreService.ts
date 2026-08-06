@@ -5,7 +5,16 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
-  deleteDoc 
+  deleteDoc,
+  addDoc,
+  arrayUnion,
+  arrayRemove,
+  query,
+  where,
+  orderBy,
+  limit,
+  serverTimestamp,
+  increment
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { Course, Company, QuizQuestion, Chapter, LessonComment } from '../types';
@@ -283,6 +292,50 @@ export const firestoreService = {
 
     localStorage.setItem(key, JSON.stringify(comments));
     return comments;
+  },
+
+  // --- SOCIAL & ACTIVITY FEED ---
+  toggleFollowUser: async (currentUserId: string, targetUserId: string, isFollowing: boolean): Promise<void> => {
+    const userRef = doc(db, 'users', currentUserId);
+    await updateDoc(userRef, {
+      following: isFollowing ? arrayRemove(targetUserId) : arrayUnion(targetUserId)
+    });
+  },
+
+  publishActivityEvent: async (userId: string, userName: string, userAvatar: string, type: 'badge' | 'course' | 'streak', details: string): Promise<void> => {
+    const activitiesRef = collection(db, 'activities');
+    await addDoc(activitiesRef, {
+      userId,
+      userName,
+      userAvatar,
+      type,
+      details,
+      kudosCount: 0,
+      kudosUsers: [],
+      createdAt: serverTimestamp()
+    });
+  },
+
+  getFriendActivityFeed: async (followingIds: string[]): Promise<any[]> => {
+    if (!followingIds || followingIds.length === 0) return [];
+    
+    const activitiesRef = collection(db, 'activities');
+    const q = query(
+      activitiesRef, 
+      where('userId', 'in', followingIds.slice(0, 10)), 
+      orderBy('createdAt', 'desc'), 
+      limit(20)
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+  },
+
+  sendKudos: async (activityId: string, currentUserId: string): Promise<void> => {
+    const activityRef = doc(db, 'activities', activityId);
+    await updateDoc(activityRef, {
+      kudosCount: increment(1),
+      kudosUsers: arrayUnion(currentUserId)
+    });
   }
 };
-

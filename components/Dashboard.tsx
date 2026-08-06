@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,6 +9,7 @@ import { storageService } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
+import { ActivityFeedWidget } from './ActivityFeedWidget'; // 🛠️ Added ActivityFeedWidget import
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
@@ -663,6 +663,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Study Activity Feed */}
+      <div id="dash-activity-feed" className="mt-8">
+        <ActivityFeedWidget currentUserId={user.uid} followingIds={user.following || []} />
       </div>
 
       {/* Global Leaderboard */}

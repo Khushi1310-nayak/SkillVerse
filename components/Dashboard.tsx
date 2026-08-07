@@ -25,7 +25,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [showTour, setShowTour] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<Course[]>(COURSES);
   const [loading, setLoading] = useState(true);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [companies, setCompanies] = useState<any[]>([]);
@@ -116,9 +116,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     const loadCourses = async () => {
       try {
         const data = await firestoreService.getCourses();
-        setCourses(data);
+        if (data && data.length > 0) {
+          setCourses(data);
+        } else {
+          setCourses(COURSES);
+        }
       } catch (error) {
         console.error('Error fetching courses in Dashboard:', error);
+        setCourses(COURSES);
       } finally {
         setLoading(false);
       }

@@ -1009,44 +1009,50 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <Smartphone className="text-blue-500 dark:text-blue-400" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Smartphone className="text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">{t('settings.learning.reminders')}</div>
                         <div className="text-sm text-textMuted">{t('settings.learning.remindersDesc')}</div>
                       </div>
                     </div>
-                    <Toggle checked={formData.settings.reminders} onChange={(v) => handleChange('reminders', v)} />
+                    <div className="shrink-0 mt-1">
+                      <Toggle checked={formData.settings.reminders} onChange={(v) => handleChange('reminders', v)} />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <Save className="text-emerald-500 dark:text-emerald-400" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Save className="text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">{t('settings.learning.autoSave')}</div>
                         <div className="text-sm text-textMuted">{t('settings.learning.autoSaveDesc')}</div>
                       </div>
                     </div>
-                    <Toggle checked={formData.settings.autoSave} onChange={(v) => handleChange('autoSave', v)} />
+                    <div className="shrink-0 mt-1">
+                      <Toggle checked={formData.settings.autoSave} onChange={(v) => handleChange('autoSave', v)} />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <Volume2 className="text-pink-500 dark:text-pink-400" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Volume2 className="text-pink-500 dark:text-pink-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">Sound Effects</div>
                         <div className="text-sm text-textMuted">Play audio feedback for quiz answers, level-ups, and purchases</div>
                       </div>
                     </div>
-                    <Toggle
-                      checked={formData.settings.soundEffects !== false}
-                      onChange={(v) => {
-                        handleChange('soundEffects', v);
-                        if (v) soundManager.playCorrect();
-                      }}
-                      ariaLabel="Toggle sound effects"
-                    />
+                    <div className="shrink-0 mt-1">
+                      <Toggle
+                        checked={formData.settings.soundEffects !== false}
+                        onChange={(v) => {
+                          handleChange('soundEffects', v);
+                          if (v) soundManager.playCorrect();
+                        }}
+                        ariaLabel="Toggle sound effects"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1060,37 +1066,43 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </h2>
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <Zap className="text-yellow-500 dark:text-yellow-400" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Zap className="text-yellow-500 dark:text-yellow-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">{t('settings.quiz.instantFeedback')}</div>
                         <div className="text-sm text-textMuted">{t('settings.quiz.instantFeedbackDesc')}</div>
                       </div>
                     </div>
-                    <Toggle checked={formData.settings.instantFeedback} onChange={(v) => handleChange('instantFeedback', v)} />
+                    <div className="shrink-0 mt-1">
+                      <Toggle checked={formData.settings.instantFeedback} onChange={(v) => handleChange('instantFeedback', v)} />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="text-success" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <CheckCircle className="text-success mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">{t('settings.quiz.showAnswers')}</div>
                         <div className="text-sm text-textMuted">{t('settings.quiz.showAnswersDesc')}</div>
                       </div>
                     </div>
-                    <Toggle checked={formData.settings.showAnswers} onChange={(v) => handleChange('showAnswers', v)} />
+                    <div className="shrink-0 mt-1">
+                      <Toggle checked={formData.settings.showAnswers} onChange={(v) => handleChange('showAnswers', v)} />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <RefreshCcw className="text-purple-500 dark:text-purple-400" />
-                      <div>
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <RefreshCcw className="text-purple-500 dark:text-purple-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
                         <div className="font-bold text-textMain">{t('settings.quiz.allowRetry')}</div>
                         <div className="text-sm text-textMuted">{t('settings.quiz.allowRetryDesc')}</div>
                       </div>
                     </div>
-                    <Toggle checked={formData.settings.retryQuiz} onChange={(v) => handleChange('retryQuiz', v)} />
+                    <div className="shrink-0 mt-1">
+                      <Toggle checked={formData.settings.retryQuiz} onChange={(v) => handleChange('retryQuiz', v)} />
+                    </div>
                   </div>
                 </div>
               </div>

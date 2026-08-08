@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "لوحة التحكم",
+    "courses": "الدورات التدريبية",
+    "career": "وضع المسار المهني",
+    "certifications": "الشهادات",
+    "admin": "المسؤول",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "menu": "القائمة",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط",
+      "advanced": "متقدم"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "جاري تحميل لوحة التحكم...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "لوحة التحكم",
+      "tourButton": "بدء الجولة",
+      "subtitle": "نظرة عامة على رحلتك التعليمية"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "البحث عن دورة تدريبية...",
+      "viewAll": "عرض جميع النتائج",
+      "empty": "لم يتم العثور على دورات تطابق معايير المحددة."
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "المتابعة من حيث توقفت",
+      "button": "استئناف"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "المراجعة المتباعدة",
+      "messageOne": "لديك {{count}} سؤال لمراجعته اليوم!",
+      "messageOther": "لديك {{count}} سؤالاً لمراجعتها اليوم!",
+      "button": "راجع الآن"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "عمل رائع، {{username}}!",
+      "streakTooltip": "انقر لعرض احتفال سلسلة الإنجاز",
+      "streakOne": "سلسلة لمدة {{count}} يوم",
+      "streakOther": "سلسلة {{count}} أيام",
+      "summary": "أكملت {{completedCount}} من إجمالي {{totalCourses}} دورات.",
+      "continueLearning": "متابعة التعلم",
+      "viewCertificates": "عرض الشهادات",
+      "progressTitle": "التقدم حسب الفئة"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "موصى به لك"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "وصول سريع",
+      "programming": "البرمجة",
+      "dsa": "خوارزميات وهياكل البيانات",
+      "design": "التصميم",
+      "default": "الفئة"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "تذكير: حقق هدفك اليومي البالغ {{dailyGoal}} دقيقة للحفاظ على سلسلة إنجازك!"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "الأسئلة المحفوظة",
+      "practiceLink": "تدرب →",
+      "viewAll": "عرض جميع الأسئلة المحفوظة ({{count}}) →",
+      "emptyMessage": "لم تقم بحفظ أي أسئلة بعد! انتقل إلى وضع المسار المهني لبدء التدريب.",
+      "button": "استكشاف الأسئلة"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "سجل المقابلات التجريبية",
+      "emptyMessage": "ابدأ مقابلة تجريبية في وضع المسار المهني لاختبار مهاراتك في بيئة واقعية.",
+      "button": "بدء مقابلة تجريبية"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "استكشاف الدورات",
+    "subtitle": "وسع آفاق معرفتك من خلال مناهجنا المتميزة.",
+    "searchPlaceholder": "البحث عن دورة تدريبية...",
+    "filterTitle": "تصفية حسب الفئة",
+    "allCategories": "جميع الفئات",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "البرمجة",
+      "dsa": "خوارزميات وهياكل البيانات",
+      "design": "التصميم",
+      "default": "الفئة"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "مراجعة",
+    "startLearning": "بدء التعلم",
+    "empty": "لم يتم العثور على دورات تطابق المعايير المحددة."
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "جاري تحميل دورات الفئة...",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "review": "مراجعة",
+    "start": "بدء",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "البرمجة",
+        "description": "اكتسب مهارات تقنية عملية من خلال دروس البرمجة والمشاريع التطبيقية."
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "خوارزميات وهياكل البيانات",
+        "description": "عزز تفكيرك الخوارزمي من خلال هيكلة البيانات وحل المشكلات."
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "التصميم",
+        "description": "نمّ حسك في التصميم البصري وتصميم المنتجات من خلال دروس إبداعية وعملية."
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "الدورة التدريبية غير موجودة",
+    "loading": "جاري تحميل مواد الدورة...",
+    "back": "رجوع",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "الملاحظات والموارد",
+      "finalQuiz": "الاختبار النهائي"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "الموارد الخارجية",
+      "proceed": "الانتقال إلى الاختبار"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "السؤال {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "السابق",
+      "next": "التالي",
+      "submit": "تقديم الاختبار",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "تهانينا!",
+        "keepTrying": "واصل المحاولة!",
+        "scorePrefix": "درجتك هي",
+        "earnedCertificate": "لقد حصلت على شهادة إتمام.",
+        "need70": "تحتاج إلى 70% أو أكثر لاجتياز الاختبار.",
+        "viewCertificate": "عرض الشهادة",
+        "retryReminder": "خذ بعض الوقت لمراجعة مواد الدورة قبل المحاولة مرة أخرى!",
+        "retryCountdown": "⏳ يمكنك إعادة المحاولة خلال {{time}}",
+        "retry": "إعادة الاختبار",
+        "retryDisabled": "إعادة الاختبار معطلة في إعداداتك.",
+        "reviewAnswers": "مراجعة الإجابات"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "مرحباً! أنا المعلم الذكي الخاص بدورة **{{courseTitle}}**.\n\nيمكنني شرح المفاهيم، تقديم أمثلة، أو اختبار معرفتك بما تعلمته. كيف يمكنني مساعدتك اليوم؟",
+    "fallbackResponse": "تعذر إنشاء استجابة. يرجى المحاولة مرة أخرى.",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "مساعد الدراسة",
+      "collapse": "طَي",
+      "expand": "توسيع",
+      "close": "إغلاق المساعد الذكي"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "جاري التفكير..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "اطرح سؤالاً...",
+      "send": "إرسال الرسالة"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "اشرح بأسلوب بسيط",
+      "quiz": "اختبرني",
+      "example": "أعطني مثالاً"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "فتح المساعد الذكي"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "عذراً، أواجه مشكلة في الاتصال حالياً. يرجى التحقق من اتصالك بالإنترنت أو مفتاح API.",
+      "api": "عذراً! حدثت مشكلة مع مفتاح OpenRouter API الخاص بك (مشكلة في الفوترة أو المصادقة).\n\n*إجابة بديلة*:\nلقد سألت عن: \"{{userMessage}}\". نظرًا لعدم توفر مفتاح API، أرى أنك تدرس دورة \"{{courseTitle}}\". واصل التدريب!",
+      "defaultCourse": "لوحة التحكم الخاصة بك"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "وضع المسار المهني (تجريبي)",
+      "title": "التحضير للمقابلات",
+      "description": "ركز على شركات معينة، وتدرب على أسئلة حقيقية، وعش تجربة المقابلات تحت الضغط.",
+      "readiness": "الاستعداد العام",
+      "ready": "جاهز",
+      "questionsLabel": "أسئلة"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "موصى به لك",
+      "progress": "التقدم",
+      "searchPlaceholder": "ابحث عن الشركات (مثال: Google, Amazon)...",
+      "emptyState": "لم يتم العثور على شركات تطابق معايير البحث."
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "البحث عن الشركات حسب الدور الوظيفي",
+      "placeholder": "ابحث عن الشركات (مثال: Google, Amazon)..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "جاري الاتصال...",
+      "requestTime": "طلب وقت إضافي من {{interviewer}}",
+      "analyzingCode": "جاري تحليل الكود الخاص بك...",
+      "analysisDescription": "يقوم الذكاء الاصطناعي بتقييم نهجك مقارنة بأفضل تعقيد زمني ومكاني.",
+      "questionProgress": "السؤال {{current}} من {{total}}",
+      "nextQuestion": "السؤال التالي",
+      "finishInterview": "إنهاء المقابلة",
+      "voiceTurnProgress": "مقابلة صوتية مباشرة - الجولة {{current}} من {{total}}",
+      "aiThinking": "الذكاء الاصطناعي يفكر...",
+      "listeningStatus": "جاري الاستماع (التعرف على الصوت تلقائي)...",
+      "waitingStatus": "انتظر حتى ينتهي الذكاء الاصطناعي من الحديث...",
+      "endInterviewEarly": "إنهاء المقابلة مبكراً",
+      "sendNowOverride": "إرسال الآن (تجاوز)",
+      "totalTime": "الوقت الإجمالي",
+      "questions": "الأسئلة",
+      "extraTimePrompt": "كم دقيقة إضافية تحتاج؟ (الحد الأقصى 30)",
+      "extraTimeLimitReached": "يمكنني منحك {{max}} دقيقة إضافية كحد أقصى. لقد أضفت {{max}} دقيقة إلى المؤقت.",
+      "extraTimeGranted": "لقد منحتك {{requested}} دقائق إضافية. بالتوفيق!",
+      "extraTimeTotalLimitReached": "الحد الأقصى للوقت الإضافي المطلوب هو 30 دقيقة. تم إضافة الـ {{remaining}} دقائق المتبقية إلى المؤقت.",
+      "fallbackSpeech": "لم أستطع فهم ذلك جيداً.",
+      "speechNotSupported": "التعرف على الصوت غير مدعوم في هذا المتصفح. يرجى استخدام متصفح Chrome."
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "سهل",
+        "medium": "متوسط",
+        "hard": "صعب"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
-      "xpAward": "+25 XP",
+      "saveQuestion": "حفظ السؤال",
+      "removeSaved": "إزالة من المحفوظات",
+      "srsStage": "مرحلة التكرار المتباعد",
+      "box": "الصندوق {{number}}",
+      "nextReview": "المراجعة القادمة:",
+      "notScheduled": "غير مجدول",
+      "forgotWrong": "نسيت / إجابة خاطئة",
+      "rememberedRight": "تذكرت / إجابة صحيحة",
+      "viewSolution": "عرض الحل",
+      "xpAward": "+25 نقطة خبرة",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "تم جدولة مراجعة السؤال لوقت لاحق! واصل العمل الرائع.",
+        "reviewReset": "تم إعادة ضبط الفاصل الزمني. ستراجع هذا السؤال مرة أخرى غداً."
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "الذكاء الاصطناعي غير متاح حالياً، يرجى المحاولة لاحقاً أو التحقق من إعدادات مفتاح API.",
+      "errorGeneratingTextReport": "حدث خطأ أثناء إنشاء التقرير التقني. يرجى التحقق من مفتاح API أو الاتصال بالإنترنت.",
+      "errorGeneratingVoiceReport": "حدث خطأ أثناء إنشاء التقرير. يرجى التحقق من مفتاح API أو الاتصال بالإنترنت.",
+      "aiInterviewReport": "تقرير مقابلة الذكاء الاصطناعي",
+      "aiInterviewDescription": "تقييم شفهي مفصل لأدائك.",
+      "technicalEvaluation": "التقييم التقني",
+      "technicalEvaluationDescription": "راجع أدائك والملاحظات ومجالات التحسين.",
+      "backToStudyMode": "العودة إلى وضع الدراسة"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "العودة إلى الشركات",
+      "title": "قائمة المراجعة (التكرار المتباعد)",
+      "description": "راجع الأسئلة التي تدربت عليها سابقاً باستخدام نظام لايتنر.",
+      "instructions": "أجب على أسئلة اليوم. علمها بـ 'صحيح' لزيادة الفاصل الزمني للمراجعة، أو 'خاطئ' لمراجعتها غداً.",
+      "caughtUpTitle": "لقد أنجزت كل شيء!",
+      "caughtUpDescription": "لا توجد أسئلة مستحقة للمراجعة حالياً. تدرب على المزيد من الأسئلة في وضع المسار المهني لتغذية قائمة المراجعة!",
+      "exploreCompanies": "استكشاف الشركات"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "أسئلة الدراسة",
+      "mockInterview": "مقابلة تجريبية",
+      "questionBank": "بنك الأسئلة",
+      "practiced": "تم تدريب {{practiced}} من أصل {{total}}",
+      "chooseModeTitle": "اختر وضع المقابلة",
+      "chooseModeDescription": "تدرب مع مجموعة أسئلة منظمة أو أجرِ مقابلة صوتية مباشرة مع الذكاء الاصطناعي.",
+      "standardTechnical": "مقابلة تقنية قياسية",
+      "standardTechnicalDescription": "أجرِ مقابلة تقنية منظمة مخصصة لشركة {{companyName}}.",
+      "startTextInterview": "بدء مقابلة نصية",
+      "aiVoiceInterview": "مقابلة صوتية بالذكاء الاصطناعي",
+      "aiVoiceDescription": "تدرب على التفكير بصوت عالٍ مع محاور صوتي واقعي.",
+      "startVoiceInterview": "بدء مقابلة صوتية",
+      "newBadge": "جديد"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "الخروج من وضع ملء الشاشة",
+      "closeModal": "إغلاق",
+      "toggleFullscreen": "تبديل وضع ملء الشاشة",
+      "yourAnswer": "إجابتك",
+      "chooseInterviewer": "اختر المحاور",
+      "selectPersona": "حدد شخصية الصوت التي ترغب في التدرب معها.",
+      "maleVoice": "محاور تقني تقليدي",
+      "femaleVoice": "محاور هادئ ومتعاون"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "تسجيل الخروج؟",
+    "body": "هل أنت ألكيد من أنك تريد تسجيل الخروج من حسابك؟"
   },
   "settings": {
-    "title": "Settings",
+    "title": "الإعدادات",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "الملف الشخصي",
+      "appearance": "المظهر",
+      "xpStore": "متجر نقاط الخبرة",
+      "learning": "إعدادات التعلم",
+      "quiz": "الاختبارات",
+      "certificate": "الشهادات",
+      "achievements": "الإنجازات",
+      "account": "الحساب"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "حفظ التغييرات",
+      "reset": "إعادة الضبط الافتراضي"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "إعدادات الملف الشخصي",
+      "displayName": "الاسم المعروض",
+      "displayNamePlaceholder": "أدخل اسمك المعروض",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "memberSince": "عضو منذ",
+      "avatar": "الصورة الشخصية",
+      "uploadAvatar": "تحميل صورة مخصصة",
+      "removeAvatar": "إزالة الصورة المخصصة",
+      "custom": "مخصص",
+      "currentAvatar": "الصورة الحالية",
+      "uploading": "جاري التحميل",
+      "presetAvatar": "أو اختر صورة جاهزة",
+      "uploadHint": "قم بتحميل صورة بصيغة PNG أو JPEG (الحد الأقصى 2 ميجابايت) أو اختر من الصور الجاهزة أدناه."
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "المظهر",
+      "themeMode": "وضع المظهر",
+      "themeModeDesc": "التبديل بين الوضع الفاتح والداكن",
+      "light": "فاتح",
+      "dark": "داكن",
+      "gradientIntensity": "كثافة التدرج اللونية",
+      "subtle": "خفيف",
+      "balanced": "متوازن",
+      "vibrant": "حيوية",
+      "language": "اللغة",
+      "languageDesc": "اختر لغتك المفضلة"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "تفضيلات التعلم",
+      "dailyGoal": "هدف الدراسة اليومي",
+      "reminders": "تذكيرات التقدم",
+      "remindersDesc": "تلقي إشعارات للحفاظ على سلسلة إنجازك",
+      "autoSave": "الحفظ التلقائي للملاحظات",
+      "autoSaveDesc": "حفظ تقدمك تلقائياً"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "تفضيلات الاختبار",
+      "instantFeedback": "ملاحظات فورية",
+      "instantFeedbackDesc": "إظهار ما إذا كانت الإجابة صحيحة أو خاطئة فوراً",
+      "showAnswers": "إظهار الإجابات الصحيحة",
+      "showAnswersDesc": "كشف الإجابات الصحيحة عند الإنتهاء",
+      "allowRetry": "السماح بإعادة المحاولة",
+      "allowRetryDesc": "السماح بإعادة الاختبار فوراً"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "إعدادات الشهادة",
+      "nameLabel": "الاسم على الشهادة",
+      "namePlaceholder": "الاسم القانوني الكامل",
+      "nameHint": "سيظهر هذا الاسم على جميع الشهادات التي تحصل عليها.",
+      "format": "التنسيق الافتراضي",
+      "pdf": "PDF (قياسي)",
+      "image": "صورة (احترافي)"
+    },
+    "certificatePage": {
+      "backToDashboard": "العودة إلى لوحة التحكم",
+      "copyLink": "نسخ الرابط",
+      "linkCopied": "تم نسخ الرابط!",
+      "linkCopiedToast": "تم نسخ رابط التحقق إلى الحافظة!",
+      "shareTwitter": "مشاركة على منصة X",
+      "shareLinkedIn": "مشاركة على LinkedIn",
+      "sharing": "جاري المشاركة...",
+      "downloadPDF": "تحميل ملف PDF",
+      "generatingPDF": "جاري إنشاء ملف PDF..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "الإنجازات"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "إدارة الحساب",
+      "resetProgress": "إعادة ضبط التقدم",
+      "resetProgressDesc": "مسح جميع نتائج الاختبارات وتقدم الدورات",
+      "reset": "إعادة ضبط",
+      "clearData": "مسح البيانات المحلية",
+      "clearDataDesc": "حذف جميع بيانات الحساب من هذا الجهاز",
+      "clear": "مسح"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "متجر نقاط الخبرة"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "إعادة ضبط التقدم؟",
+      "resetBody": "سيؤدي هذا إلى مسح كل تقدمك في الدورات ودرجات الاختبارات. لا يمكن التراجع عن هذا الإجراء.",
+      "clearTitle": "مسح جميع البيانات؟",
+      "clearBody": "سيؤدي هذا إلى إزالة حسابك وكافة البيانات المرتبطة به من هذا المتصفح وتمريرك لتسجيل الخروج.",
+      "unsavedTitle": "تغييرات غير محفوظة",
+      "unsavedBody": "لديك بعض التغييرات غير المحفوظة. هل أنت تأكيد من أنك تريد المغادرة دون حفظ؟",
+      "stay": "البقاء",
+      "leave": "المغادرة"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "جاري تحميل الشهادات...",
+    "title": "شهاداتي",
+    "subtitle": "إثبات رسمي لمهاراتك وإنجازاتك.",
+    "emptyTitle": "لا توجد شهادات بعد",
+    "emptyDescription": "أكمل الدورات واجتاز الاختبارات النهائية للحصول على شهادات احترافية.",
+    "browseCourses": "تصفح الدورات",
+    "cardTitle": "شهادة في {{courseTitle}}",
+    "issued": "تم الإصدار في {{date}}",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ",
+    "viewCertificate": "عرض الشهادة"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
-    "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "title": "شهادة إتمام",
+    "subtitle": "Certificate of Completion",
+    "certifyThat": "تشهد هذه الشهادة بأن",
+    "demonstratedMastery": "قد أثبت إتقانه بنجاح لـ",
+    "assessmentPrefix": "من خلال تحقيق نتيجة قدرها",
+    "assessmentSuffix": "في التقييم الشامل بتاريخ {{date}}، مما يثبت الكفاءة الكاملة في المفاهيم الأساسية والمتقدمة للمادة.",
+    "dateIssued": "تاريخ الإصدار",
+    "verified": "مُوثق",
+    "credentialId": "المعرف: {{id}}",
+    "platformDirector": "مدير المنصة"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "جاري تحميل تفاصيل الشهادة...",
+    "unavailableTitle": "الشهادة غير متاحة",
+    "unavailableDescription": "لم تقم بإكمال هذه الدورة بعد.",
+    "goToCourse": "الانتقال إلى الدورة",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "linkCopied": "تم نسخ الرابط إلى الحافظة!",
+    "copyLink": "نسخ الرابط",
+    "shareTwitter": "مشاركة على منصة X",
+    "sharing": "جاري المشاركة...",
+    "shareLinkedIn": "مشاركة على LinkedIn",
+    "generatingPdf": "جاري إنشاء ملف PDF...",
+    "downloadPdf": "تحميل ملف PDF",
+    "shareTextTwitter": "لقد حصلت للتو على شهادة إتمام في \"{{title}}\" من أكاديمية SkillVerse! 🎓🚀 تحقق من وثيقتي الموثقة:",
+    "shareTextLinkedIn": "يسعدني أن أشارككم إتمامي لدورة \"{{title}}\" على SkillVerse! 🎓🌟 يمكنك الاطلاع على شهادتي من هنا:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "تم تنزيل صورة الشهادة! جاري التوجيه إلى LinkedIn للنشر...",
+      "redirectingLinkedIn": "جاري التوجيه إلى LinkedIn..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "وثيقة إتمام معتمدة",
+      "issued": "تاريخ الإصدار: {{date}}",
+      "title": "شهادة إتمام",
+      "description": "قد أتم بنجاح وامتياز جميع متطلبات الدورة التدريبية",
+      "passingScore": "درجة النجاح: {{score}}%",
+      "verifiedAchievement": "إنجاز معتمد"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "مناقشة الدرس والأسئلة والأجوبة",
+    "subtitle": "اطرح الأسئلة، وشارك الأفكار، وناقش مع زملائك المتعلمين",
+    "placeholder": "اطرح سؤالاً أو شارك فكرة حول هذا الدرس...",
+    "submit": "نشر التعليق",
+    "loginRequired": "يرجى تسجيل الدخول للانضمام إلى المناقشة وطرح الأسئلة.",
+    "emptyTitle": "لا توجد مناقشات بعد",
+    "emptySubtitle": "كن أول من يطرح سؤالاً أو يترك ملاحظة حول هذا الدرس!",
+    "time": {
+      "justNow": "الآن"
     }
   }
 }

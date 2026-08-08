@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "仪表板",
+    "courses": "课程",
+    "career": "职业模式",
+    "certifications": "证书",
+    "admin": "管理员",
+    "settings": "设置",
+    "logout": "退出登录",
+    "menu": "菜单",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "取消",
+    "confirm": "确认",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "初级",
+      "intermediate": "中级",
+      "advanced": "高级"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "正在加载仪表板...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "仪表板",
+      "tourButton": "功能导览",
+      "subtitle": "您的学习之旅概览"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "搜索课程...",
+      "viewAll": "查看所有结果",
+      "empty": "未找到符合条件的课程。"
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "继续上次的学习",
+      "button": "继续学习"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "间隔重复复习",
+      "messageOne": "今天有 {{count}} 个问题需要复习！",
+      "messageOther": "今天有 {{count}} 个问题需要复习！",
+      "button": "立即复习"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "干得漂亮，{{username}}！",
+      "streakTooltip": "点击查看连续学习庆祝",
+      "streakOne": "连续学习 {{count}} 天",
+      "streakOther": "连续学习 {{count}} 天",
+      "summary": "在 {{totalCourses}} 门课程中，您已完成 {{completedCount}} 门。",
+      "continueLearning": "继续学习",
+      "viewCertificates": "查看证书",
+      "progressTitle": "各分类学习进度"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "为您推荐"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "快捷入口",
+      "programming": "编程开发",
+      "dsa": "数据结构与算法",
+      "design": "视觉与产品设计",
+      "default": "分类"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "提醒：达成每日 {{dailyGoal}} 分钟的目标，保持您的连续学习纪录！"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "已保存的问题",
+      "practiceLink": "开始练习 →",
+      "viewAll": "查看全部 {{count}} 个已保存的问题 →",
+      "emptyMessage": "您还没有保存任何问题！前往职业模式开始练习吧。",
+      "button": "浏览问题"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "模拟面试历史",
+      "emptyMessage": "前往职业模式发起一次模拟面试，在实战环境中检验您的技能。",
+      "button": "开始模拟面试"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "探索课程",
+    "subtitle": "通过我们的优质课程体系拓展您的知识领域。",
+    "searchPlaceholder": "搜索课程...",
+    "filterTitle": "按分类筛选",
+    "allCategories": "所有分类",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "编程开发",
+      "dsa": "数据结构与算法",
+      "design": "视觉与产品设计",
+      "default": "分类"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "复习",
+    "startLearning": "开始学习",
+    "empty": "未找到符合条件的课程。"
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "正在加载分类课程...",
+    "backToDashboard": "返回仪表板",
+    "review": "复习",
+    "start": "开始",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "编程开发",
+        "description": "通过代码实战与项目实践，掌握扎实的开发技术。"
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "数据结构与算法",
+        "description": "通过数据结构与解题练习，提升您的算法思维能力。"
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "视觉与产品设计",
+        "description": "通过富有创意和实用性的课程，培养您的视觉与产品设计能力。"
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "未找到相关课程",
+    "loading": "正在加载课程资料...",
+    "back": "返回",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "笔记与资源",
+      "finalQuiz": "结业测试"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "拓展资源",
+      "proceed": "前往测试"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "问题 {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "上一题",
+      "next": "下一题",
+      "submit": "提交测试",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "恭喜您！",
+        "keepTrying": "再接再厉！",
+        "scorePrefix": "您的得分是",
+        "earnedCertificate": "您已获得结业证书。",
+        "need70": "通过测试需要达到至少 70% 的正确率。",
+        "viewCertificate": "查看证书",
+        "retryReminder": "在重新尝试之前，花点时间复习一下课程资料吧！",
+        "retryCountdown": "⏳ 您可以在 {{time}} 后重新尝试",
+        "retry": "重新测试",
+        "retryDisabled": "您的设置中已禁用重新测试功能。",
+        "reviewAnswers": "查看答案解析"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "您好！我是 **{{courseTitle}}** 的 AI 学习导师。\n\n我可以为您解答概念、提供示例，或者针对您所学的知识点进行测验。今天有什么我可以帮您的吗？",
+    "fallbackResponse": "无法生成回答，请重试。",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "学习助手",
+      "collapse": "折叠",
+      "expand": "展开",
+      "close": "关闭 AI 助手"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "正在思考..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "请输入您的问题...",
+      "send": "发送消息"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "用通俗易懂的话解释一下",
+      "quiz": "考考我",
+      "example": "举个例子"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "打开 AI 助手"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "抱歉，网络连接出现问题。请检查您的网络连接或 API 密钥配置。",
+      "api": "提示：您的 OpenRouter API 密钥存在异常（账单或身份验证问题）。\n\n*备用响应*：\n您询问了：“{{userMessage}}”。虽然目前 API 暂不可用，但我看到您正在学习“{{courseTitle}}”。继续保持练习吧！",
+      "defaultCourse": "仪表板"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "职业模式 Beta",
+      "title": "面试准备",
+      "description": "针对特定名企进行精准训练，练习真题，体验真实的高压面试环境。",
+      "readiness": "综合准备度",
+      "ready": "准备就绪",
+      "questionsLabel": "题目数"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "为您推荐",
+      "progress": "进度",
+      "searchPlaceholder": "搜索企业（如 Google, Amazon）...",
+      "emptyState": "未找到符合条件的企业。"
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "按岗位搜索企业",
+      "placeholder": "搜索企业（如 Google, Amazon）..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "正在连接...",
+      "requestTime": "向 {{interviewer}} 申请延长时间",
+      "analyzingCode": "正在分析您的代码...",
+      "analysisDescription": "AI 正在对比最佳时间与空间复杂度，评估您的解题思路。",
+      "questionProgress": "问题 {{current}} / {{total}}",
+      "nextQuestion": "下一题",
+      "finishInterview": "结束面试",
+      "voiceTurnProgress": "实时语音面试 - 第 {{current}} / {{total}} 轮",
+      "aiThinking": "AI 正在思考...",
+      "listeningStatus": "正在倾听（自动语音识别）...",
+      "waitingStatus": "请等待 AI 发言结束...",
+      "endInterviewEarly": "提前结束面试",
+      "sendNowOverride": "立即发送（强制发送）",
+      "totalTime": "总用时",
+      "questions": "问题",
+      "extraTimePrompt": "您需要延长多少分钟？（最多 30 分钟）",
+      "extraTimeLimitReached": "单次最多只能延长 {{max}} 分钟。已为您的计时器增加 {{max}} 分钟。",
+      "extraTimeGranted": "已为您延长 {{requested}} 分钟。祝您好运！",
+      "extraTimeTotalLimitReached": "累计延长时长不能超过 30 分钟。已将剩余的 {{remaining}} 分钟添加到计时器中。",
+      "fallbackSpeech": "抱歉，我没有听清。",
+      "speechNotSupported": "您的浏览器不支持语音识别功能，请使用 Chrome 浏览器。"
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "简单",
+        "medium": "中等",
+        "hard": "困难"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "saveQuestion": "保存问题",
+      "removeSaved": "取消保存",
+      "srsStage": "SRS 阶段",
+      "box": "卡片盒 {{number}}",
+      "nextReview": "下次复习：",
+      "notScheduled": "暂无计划",
+      "forgotWrong": "忘记 / 答错",
+      "rememberedRight": "记住 / 答对",
+      "viewSolution": "查看答案解析",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "已安排该问题的复习计划！继续保持。",
+        "reviewReset": "间隔已重置。您将在明天重新复习此问题。"
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "AI 服务当前不可用，请稍后重试或检查 API 密钥设置。",
+      "errorGeneratingTextReport": "生成技术评估报告时出错，请检查 API 密钥或网络连接。",
+      "errorGeneratingVoiceReport": "生成面试报告时出错，请检查 API 密钥或网络连接。",
+      "aiInterviewReport": "AI 面试评估报告",
+      "aiInterviewDescription": "关于您面试表现的详细评价。",
+      "technicalEvaluation": "技术评估",
+      "technicalEvaluationDescription": "查看您的技术表现、亮点以及改进建议。",
+      "backToStudyMode": "返回学习模式"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "返回企业列表",
+      "title": "复习队列（间隔重复）",
+      "description": "基于莱特纳（Leitner）卡片盒系统，复习您之前练习过的题目。",
+      "instructions": "回答今日问题。标记为“正确”将拉长复习间隔，标记为“错误”将在明天重新复习。",
+      "caughtUpTitle": "您已完成所有复习！",
+      "caughtUpDescription": "目前没有需要复习的问题。前往职业模式练习更多题目，丰富您的复习队列吧！",
+      "exploreCompanies": "探索企业"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "练习题库",
+      "mockInterview": "模拟面试",
+      "questionBank": "题库",
+      "practiced": "已练习 {{practiced}} / {{total}}",
+      "chooseModeTitle": "选择面试模式",
+      "chooseModeDescription": "使用结构化题库进行练习，或与 AI 展开实时语音面试。",
+      "standardTechnical": "标准技术面试",
+      "standardTechnicalDescription": "体验针对 {{companyName}} 定制的结构化技术面试。",
+      "startTextInterview": "开始文字面试",
+      "aiVoiceInterview": "AI 语音面试",
+      "aiVoiceDescription": "与逼真的语音考官互动，练习口头表达解题思路。",
+      "startVoiceInterview": "开始语音面试",
+      "newBadge": "新功能"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "退出全屏",
+      "closeModal": "关闭",
+      "toggleFullscreen": "切换全屏",
+      "yourAnswer": "您的回答",
+      "chooseInterviewer": "选择面试官",
+      "selectPersona": "选择您想合作练习的面试官声音风格。",
+      "maleVoice": "严谨的主考官",
+      "femaleVoice": "温和随和的考官"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "确认退出登录？",
+    "body": "您确定要退出当前账号吗？"
   },
   "settings": {
-    "title": "Settings",
+    "title": "设置",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "个人资料",
+      "appearance": "外观风格",
+      "xpStore": "XP 商店",
+      "learning": "学习偏好",
+      "quiz": "测试设置",
+      "certificate": "证书设置",
+      "achievements": "我的成就",
+      "account": "账号管理"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "保存修改",
+      "reset": "恢复默认值"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "个人资料设置",
+      "displayName": "显示名称",
+      "displayNamePlaceholder": "请输入您的显示名称",
+      "email": "电子邮箱",
+      "emailPlaceholder": "请输入您的电子邮箱",
+      "memberSince": "注册时间",
+      "avatar": "个人头像",
+      "uploadAvatar": "上传自定义头像",
+      "removeAvatar": "移除自定义头像",
+      "custom": "自定义",
+      "currentAvatar": "当前头像",
+      "uploading": "正在上传",
+      "presetAvatar": "或选择预设头像",
+      "uploadHint": "支持上传 PNG 或 JPEG 格式图片（最大 2MB），或从下方选择预设头像。"
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "外观风格",
+      "themeMode": "主题模式",
+      "themeModeDesc": "在浅色与深色模式之间切换",
+      "light": "浅色",
+      "dark": "深色",
+      "gradientIntensity": "渐变色彩强度",
+      "subtle": "柔和",
+      "balanced": "适中",
+      "vibrant": "鲜艳",
+      "language": "界面语言",
+      "languageDesc": "选择您偏好的语言"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "学习偏好",
+      "dailyGoal": "每日学习时长目标",
+      "reminders": "学习进度提醒",
+      "remindersDesc": "接收提醒以保持您的连续学习纪录",
+      "autoSave": "笔记自动保存",
+      "autoSaveDesc": "自动保存您的学习进度"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "测试偏好",
+      "instantFeedback": "实时答案反馈",
+      "instantFeedbackDesc": "答题后立即显示对错",
+      "showAnswers": "显示正确答案",
+      "showAnswersDesc": "完成测试后公布正确答案",
+      "allowRetry": "允许重新测试",
+      "allowRetryDesc": "允许在完成后立即重新测试"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "证书设置",
+      "nameLabel": "证书展示姓名",
+      "namePlaceholder": "您的真实姓名",
+      "nameHint": "该姓名将打印在您获得的所有证书上。",
+      "format": "默认导出格式",
+      "pdf": "PDF（标准）",
+      "image": "图片（Pro）"
+    },
+    "certificatePage": {
+      "backToDashboard": "返回仪表板",
+      "copyLink": "复制链接",
+      "linkCopied": "链接已复制！",
+      "linkCopiedToast": "验证链接已复制到剪贴板！",
+      "shareTwitter": "分享至 X（原 Twitter）",
+      "shareLinkedIn": "分享至 LinkedIn",
+      "sharing": "正在分享...",
+      "downloadPDF": "下载 PDF",
+      "generatingPDF": "正在生成 PDF..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "我的成就"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "账号管理",
+      "resetProgress": "重置学习进度",
+      "resetProgressDesc": "清除所有课程进度和测试成绩",
+      "reset": "重置",
+      "clearData": "清除本地数据",
+      "clearDataDesc": "从当前设备上删除所有账号数据",
+      "clear": "清除"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "XP 商店"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "确认重置学习进度？",
+      "resetBody": "这将清空您所有的课程进度和测试成绩。此操作无法撤销。",
+      "clearTitle": "确认清除所有数据？",
+      "clearBody": "这将从当前浏览器中删除您的账号及所有相关数据，您将被退出登录。",
+      "unsavedTitle": "有未保存的修改",
+      "unsavedBody": "您有尚未保存的更改。确定要在不保存的情况下离开吗？",
+      "stay": "留在此页",
+      "leave": "确认离开"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "正在加载证书...",
+    "title": "我的资格证书",
+    "subtitle": "证明您专业技能与学习成果的官方凭证。",
+    "emptyTitle": "暂无证书",
+    "emptyDescription": "完成课程并通过结业测试，即可获得专业资格证书。",
+    "browseCourses": "浏览课程",
+    "cardTitle": "{{courseTitle}} 结业证书",
+    "issued": "颁发日期：{{date}}",
+    "copyLink": "复制链接",
+    "copied": "已复制",
+    "viewCertificate": "查看证书"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
-    "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "title": "结业证书",
+    "subtitle": "Certificate of Completion",
+    "certifyThat": "特此证明",
+    "demonstratedMastery": "已顺利修完以下课程并展现出卓越的专业能力：",
+    "assessmentPrefix": "在综合评估测试中取得了",
+    "assessmentSuffix": "的分数（颁发日期：{{date}}），证明其已完全掌握该领域的核心概念与进阶知识。",
+    "dateIssued": "颁发日期",
+    "verified": "已验证",
+    "credentialId": "凭证编号：{{id}}",
+    "platformDirector": "平台主管"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "正在加载证书详情...",
+    "unavailableTitle": "证书暂不可用",
+    "unavailableDescription": "您尚未完成本门课程。",
+    "goToCourse": "前往课程",
+    "backToDashboard": "返回仪表板",
+    "linkCopied": "链接已复制到剪贴板！",
+    "copyLink": "复制链接",
+    "shareTwitter": "分享至 X（原 Twitter）",
+    "sharing": "正在分享...",
+    "shareLinkedIn": "分享至 LinkedIn",
+    "generatingPdf": "正在生成 PDF...",
+    "downloadPdf": "下载 PDF 证书",
+    "shareTextTwitter": "我已经在 SkillVerse Academy 获得了“{{title}}”的结业证书！🎓🚀 查看我的认证凭证：",
+    "shareTextLinkedIn": "很高兴与大家分享，我已经在 SkillVerse 完成了“{{title}}”的学习！🎓🌟 欢迎查看我的证书：",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "证书图片已下载！即将跳转至 LinkedIn 发布页面...",
+      "redirectingLinkedIn": "正在跳转至 LinkedIn..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "官方认证凭证",
+      "issued": "颁发日期：{{date}}",
+      "title": "结业证书",
+      "description": "已顺利满足本课程的所有要求并圆满结业",
+      "passingScore": "合格分数：{{score}}%",
+      "verifiedAchievement": "认证成就"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "课程讨论与问答",
+    "subtitle": "提问、分享见解，并与同行学员展开讨论",
+    "placeholder": "针对本课提出问题或分享您的想法...",
+    "submit": "发布评论",
+    "loginRequired": "请先登录以参与讨论和发布问题。",
+    "emptyTitle": "暂无讨论",
+    "emptySubtitle": "成为第一个在本课提问或留下的心得的人吧！",
+    "time": {
+      "justNow": "刚刚"
     }
   }
 }

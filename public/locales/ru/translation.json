@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "Панель управления",
+    "courses": "Курсы",
+    "career": "Карьерный режим",
+    "certifications": "Сертификаты",
+    "admin": "Админ",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "menu": "Меню",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "Начальный",
+      "intermediate": "Средний",
+      "advanced": "Продвинутый"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "Загрузка панели управления...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "Панель управления",
+      "tourButton": "Пройти обзор",
+      "subtitle": "Обзор вашего прогресса в обучении"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "Поиск курсов...",
+      "viewAll": "Посмотреть все результаты",
+      "empty": "По выбранным критериям курсов не найдено."
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "Продолжить с места остановки",
+      "button": "Возобновить"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "Интервальное повторение",
+      "messageOne": "У вас {{count}} вопрос для повторения сегодня!",
+      "messageOther": "У вас {{count}} вопросов для повторения сегодня!",
+      "button": "Повторить сейчас"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "Так держать, {{username}}!",
+      "streakTooltip": "Нажмите, чтобы посмотреть празднование серии",
+      "streakOne": "Серия {{count}} день",
+      "streakOther": "Серия {{count}} дней",
+      "summary": "Вы завершили {{completedCount}} из {{totalCourses}} доступных курсов.",
+      "continueLearning": "Продолжить обучение",
+      "viewCertificates": "Посмотреть сертификаты",
+      "progressTitle": "Прогресс по категориям"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "Рекомендовано вам"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "Быстрый доступ",
+      "programming": "Программирование",
+      "dsa": "Алгоритмы и структуры данных",
+      "design": "Дизайн",
+      "default": "Категория"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "Напоминание: Достигните дневной цели в {{dailyGoal}} минут, чтобы сохранить серию!"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "Сохраненные вопросы",
+      "practiceLink": "Практиковаться →",
+      "viewAll": "Посмотреть все {{count}} сохраненных вопросов →",
+      "emptyMessage": "Вы еще не сохранили ни одного вопроса! Перейдите в Карьерный режим, чтобы начать практику.",
+      "button": "Исследовать вопросы"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "История пробных собеседований",
+      "emptyMessage": "Запустите пробное собеседование в Карьерном режиме, чтобы проверить свои навыки в реальных условиях.",
+      "button": "Начать пробное собеседование"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "Каталог курсов",
+    "subtitle": "Расширяйте свои знания с помощью нашей профессиональной программы.",
+    "searchPlaceholder": "Поиск курсов...",
+    "filterTitle": "Фильтр по категориям",
+    "allCategories": "Все категории",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "Программирование",
+      "dsa": "Алгоритмы и структуры данных",
+      "design": "Дизайн",
+      "default": "Категория"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "Повторить",
+    "startLearning": "Начать обучение",
+    "empty": "По выбранным критериям курсов не найдено."
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "Загрузка курсов категории...",
+    "backToDashboard": "Назад в панель управления",
+    "review": "Повторить",
+    "start": "Начать",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "Программирование",
+        "description": "Развивайте практические технические навыки с помощью уроков кодинга и реальных проектов."
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "Алгоритмы и структуры данных",
+        "description": "Укрепите алгоритмическое мышление с помощью изучения структур данных и решения задач."
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "Дизайн",
+        "description": "Развивайте понимание визуального и продуктового дизайна через практические творческие уроки."
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "Курс не найден",
+    "loading": "Загрузка материалов курса...",
+    "back": "Назад",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "Заметки и ресурсы",
+      "finalQuiz": "Итоговый тест"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "Внешние ресурсы",
+      "proceed": "Перейти к тесту"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "Вопрос {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "Назад",
+      "next": "Далее",
+      "submit": "Отправить тест",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "Поздравляем!",
+        "keepTrying": "Продолжайте пытаться!",
+        "scorePrefix": "Ваш результат",
+        "earnedCertificate": "Вы получили сертификат.",
+        "need70": "Вам нужно набрать минимум 70% для успешного прохождения.",
+        "viewCertificate": "Посмотреть сертификат",
+        "retryReminder": "Уделите немного времени повторению материалов курса перед следующей попыткой!",
+        "retryCountdown": "⏳ Вы сможете повторить попытку через {{time}}",
+        "retry": "Пройти тест заново",
+        "retryDisabled": "Повторное прохождение тестов отключено в ваших настройках.",
+        "reviewAnswers": "Просмотреть ответы"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "Привет! Я твой ИИ-репетитор по курсу **{{courseTitle}}**.\n\nЯ могу объяснить концепции, привести примеры или протестировать твои знания. Чем я могу помочь сегодня?",
+    "fallbackResponse": "Не удалось сгенерировать ответ. Пожалуйста, попробуйте еще раз.",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "Ассистент по обучению",
+      "collapse": "Свернуть",
+      "expand": "Развернуть",
+      "close": "Закрыть ИИ-ассистента"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "Думает..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "Задайте вопрос...",
+      "send": "Отправить сообщение"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "Объясни простыми словами",
+      "quiz": "Проведи тест для меня",
+      "example": "Приведи пример"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "Открыть ИИ-ассистента"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "Извините, сейчас возникли проблемы с подключением. Проверьте интернет-соединение или ваш API-ключ.",
+      "api": "Ой! Возникла проблема с вашим API-ключом OpenRouter (биллинг или аутентификация).\n\n*Резервный ответ*:\nВы спросили о: \"{{userMessage}}\". Поскольку API недоступен, я вижу, что вы изучаете \"{{courseTitle}}\". Продолжайте практиковаться!",
+      "defaultCourse": "ваша панель управления"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "Карьерный режим Бета",
+      "title": "Подготовка к собеседованиям",
+      "description": "Готовьтесь к собеседованиям в конкретные компании, практикуйтесь на реальных вопросах и симулируйте реальные условия.",
+      "readiness": "Общая готовность",
+      "ready": "Готов",
+      "questionsLabel": "Вопросы"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "Рекомендовано вам",
+      "progress": "Прогресс",
+      "searchPlaceholder": "Поиск компаний (например, Google, Amazon)...",
+      "emptyState": "По выбранным критериям компаний не найдено."
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "Поиск компаний по вакансиям",
+      "placeholder": "Поиск компаний (например, Google, Amazon)..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "Подключение...",
+      "requestTime": "Запросить дополнительное время у {{interviewer}}",
+      "analyzingCode": "Анализ вашего кода...",
+      "analysisDescription": "Наш ИИ оценивает ваш подход и сравнивает его с оптимальной временной и пространственной сложностью.",
+      "questionProgress": "Вопрос {{current}} из {{total}}",
+      "nextQuestion": "Следующий вопрос",
+      "finishInterview": "Завершить собеседование",
+      "voiceTurnProgress": "Голосовое собеседование в реальном времени — Ход {{current}} из {{total}}",
+      "aiThinking": "ИИ думает...",
+      "listeningStatus": "Слушаю (распознавание речи автоматическое)...",
+      "waitingStatus": "Подождите, пока ИИ закончит говорить...",
+      "endInterviewEarly": "Завершить собеседование досрочно",
+      "sendNowOverride": "Отправить сейчас (принудительно)",
+      "totalTime": "Общее время",
+      "questions": "Вопросы",
+      "extraTimePrompt": "Сколько дополнительных минут вам нужно? (Макс. 30)",
+      "extraTimeLimitReached": "Я могу предоставить не более {{max}} дополнительных минут. К вашему таймеру добавлено {{max}} минут.",
+      "extraTimeGranted": "Вам добавлено {{requested}} дополнительных минут. Удачи!",
+      "extraTimeTotalLimitReached": "Вы можете запросить не более 30 минут в сумме. К вашему таймеру добавлены оставшиеся {{remaining}} минут.",
+      "fallbackSpeech": "Я не совсем вас понял.",
+      "speechNotSupported": "Распознавание речи не поддерживается этим браузером. Пожалуйста, используйте Chrome."
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "Легкий",
+        "medium": "Средний",
+        "hard": "Сложный"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "saveQuestion": "Сохранить вопрос",
+      "removeSaved": "Удалить из сохраненных",
+      "srsStage": "Этап SRS",
+      "box": "Карточка {{number}}",
+      "nextReview": "Следующее повторение:",
+      "notScheduled": "Еще не запланировано",
+      "forgotWrong": "Забыл / Неверно",
+      "rememberedRight": "Вспомнил / Верно",
+      "viewSolution": "Посмотреть решение",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "Повторение вопроса запланировано на позже! Так держать.",
+        "reviewReset": "Интервал сброшен. Вы повторите этот вопрос завтра."
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "ИИ сейчас недоступен, попробуйте позже или проверьте настройки API-ключа.",
+      "errorGeneratingTextReport": "Произошла ошибка при создании технического отчета. Проверьте API-ключ или интернет-соединение.",
+      "errorGeneratingVoiceReport": "Произошла ошибка при создании отчета. Проверьте API-ключ или интернет-соединение.",
+      "aiInterviewReport": "Отчет об ИИ-собеседовании",
+      "aiInterviewDescription": "Подробная устная оценка вашего выступления.",
+      "technicalEvaluation": "Техническая оценка",
+      "technicalEvaluationDescription": "Разбор ваших результатов, замечаний и областей для улучшения.",
+      "backToStudyMode": "Вернуться в режим обучения"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "Назад к компаниям",
+      "title": "Очередь интервального повторения",
+      "description": "Повторяйте пройденные ранее вопросы с помощью системы Лейтнера.",
+      "instructions": "Ответьте на эти вопросы сегодня. Отметьте их как «Верно», чтобы увеличить интервал, или «Неверно», чтобы повторить завтра.",
+      "caughtUpTitle": "Вы всё повторили!",
+      "caughtUpDescription": "На данный момент нет вопросов для повторения. Практикуйтесь в Карьерном режиме, чтобы пополнить очередь!",
+      "exploreCompanies": "Смотреть компании"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "Вопросы для изучения",
+      "mockInterview": "Пробное собеседование",
+      "questionBank": "Банк вопросов",
+      "practiced": "Пройдено {{practiced}} из {{total}}",
+      "chooseModeTitle": "Выберите режим собеседования",
+      "chooseModeDescription": "Практикуйтесь на структурированном наборе вопросов или пройдите голосовое собеседование с ИИ в реальном времени.",
+      "standardTechnical": "Стандартное техническое",
+      "standardTechnicalDescription": "Пройдите структурированное техническое собеседование для {{companyName}}.",
+      "startTextInterview": "Начать текстовое собеседование",
+      "aiVoiceInterview": "Голосовое ИИ-собеседование",
+      "aiVoiceDescription": "Учитесь рассуждать вслух с реалистичным голосовым интервьюером.",
+      "startVoiceInterview": "Начать голосовое собеседование",
+      "newBadge": "Новое"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "Выйти из полноэкранного режима",
+      "closeModal": "Закрыть",
+      "toggleFullscreen": "Полноэкранный режим",
+      "yourAnswer": "Ваш ответ",
+      "chooseInterviewer": "Выберите интервьюера",
+      "selectPersona": "Выберите голос и тип личности для практики.",
+      "maleVoice": "Классический технический интервьюер",
+      "femaleVoice": "Спокойная и поддерживающая интервьюер"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "Выйти из системы?",
+    "body": "Вы уверены, что хотите выйти из своего аккаунта?"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Настройки",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "Профиль",
+      "appearance": "Внешний вид",
+      "xpStore": "Магазин XP",
+      "learning": "Обучение",
+      "quiz": "Тесты",
+      "certificate": "Сертификаты",
+      "achievements": "Достижения",
+      "account": "Аккаунт"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "Сохранить изменения",
+      "reset": "Сбросить по умолчанию"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "Настройки профиля",
+      "displayName": "Отображаемое имя",
+      "displayNamePlaceholder": "Введите отображаемое имя",
+      "email": "Электронная почта",
+      "emailPlaceholder": "Введите адрес электронной почты",
+      "memberSince": "На платформе с",
+      "avatar": "Аватар",
+      "uploadAvatar": "Загрузить свой аватар",
+      "removeAvatar": "Удалить свой аватар",
+      "custom": "Пользовательский",
+      "currentAvatar": "Текущий аватар",
+      "uploading": "Загрузка",
+      "presetAvatar": "Или выберите готовый аватар",
+      "uploadHint": "Загрузите изображение в формате PNG или JPEG (макс. 2 МБ) или выберите готовый аватар ниже."
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "Внешний вид",
+      "themeMode": "Тема оформления",
+      "themeModeDesc": "Переключение между темной и светлой темой",
+      "light": "Светлая",
+      "dark": "Темная",
+      "gradientIntensity": "Интенсивность градиента",
+      "subtle": "Мягкая",
+      "balanced": "Сбалансированная",
+      "vibrant": "Яркая",
+      "language": "Язык",
+      "languageDesc": "Выберите предпочитаемый язык"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "Настройки обучения",
+      "dailyGoal": "Дневная цель обучения",
+      "reminders": "Напоминания о прогрессе",
+      "remindersDesc": "Получайте уведомления для поддержания серии",
+      "autoSave": "Автосохранение заметок",
+      "autoSaveDesc": "Автоматически сохранять ваш прогресс"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "Настройки тестов",
+      "instantFeedback": "Мгновенная обратная связь",
+      "instantFeedbackDesc": "Сразу показывать правильность ответа",
+      "showAnswers": "Показывать правильные ответы",
+      "showAnswersDesc": "Показывать верные ответы после завершения теста",
+      "allowRetry": "Разрешить повторные попытки",
+      "allowRetryDesc": "Разрешить повторно проходить тесты сразу"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "Настройки сертификатов",
+      "nameLabel": "Имя в сертификате",
+      "namePlaceholder": "Официальные имя и фамилия",
+      "nameHint": "Это имя будет отображаться на всех полученных сертификатах.",
+      "format": "Формат по умолчанию",
+      "pdf": "PDF (Стандартный)",
+      "image": "Изображение (Pro)"
+    },
+    "certificatePage": {
+      "backToDashboard": "Вернуться на панель управления",
+      "copyLink": "Копировать ссылку",
+      "linkCopied": "Ссылка скопирована!",
+      "linkCopiedToast": "Ссылка для проверки скопирована в буфер обмена!",
+      "shareTwitter": "Поделиться в X (Twitter)",
+      "shareLinkedIn": "Поделиться в LinkedIn",
+      "sharing": "Публикация...",
+      "downloadPDF": "Скачать PDF",
+      "generatingPDF": "Создание PDF..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "Достижения"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "Управление аккаунтом",
+      "resetProgress": "Сбросить прогресс",
+      "resetProgressDesc": "Удаляет весь прогресс по курсам и результаты тестов",
+      "reset": "Сбросить",
+      "clearData": "Очистить локальные данные",
+      "clearDataDesc": "Удаляет все данные аккаунта с этого устройства",
+      "clear": "Очистить"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "Магазин XP"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "Сбросить прогресс?",
+      "resetBody": "Это удалит весь ваш прогресс в курсах и результаты тестов. Это действие нельзя отменить.",
+      "clearTitle": "Очистить все данные?",
+      "clearBody": "Это удалит ваш аккаунт и все связанные данные из этого браузера. Вы будете выведены из системы.",
+      "unsavedTitle": "Несохраненные изменения",
+      "unsavedBody": "У вас есть несохраненные изменения. Вы уверены, что хотите уйти без сохранения?",
+      "stay": "Остаться",
+      "leave": "Уйти"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "Загрузка сертификатов...",
+    "title": "Мои сертификаты",
+    "subtitle": "Официальное подтверждение ваших навыков и достижений.",
+    "emptyTitle": "Сертификатов пока нет",
+    "emptyDescription": "Проходите курсы и успешно сдавайте итоговые тесты, чтобы получать профессиональные сертификаты.",
+    "browseCourses": "Просмотреть курсы",
+    "cardTitle": "Сертификат по курсу \"{{courseTitle}}\"",
+    "issued": "Выдан {{date}}",
+    "copyLink": "Копировать ссылку",
+    "copied": "Скопировано",
+    "viewCertificate": "Сертификат"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
+    "title": "Сертификат",
+    "subtitle": "об успешном окончании",
+    "certifyThat": "Настоящим подтверждается, что",
+    "demonstratedMastery": "Успешно продемонстрировал(а) владение материалом по теме",
+    "assessmentPrefix": "Успешно сдав итоговую оценку с результатом",
+    "assessmentSuffix": "от {{date}}, что подтверждает полную компетентность в базовых и продвинутых концепциях предмета.",
+    "dateIssued": "Дата выдачи",
+    "verified": "Подтверждено",
     "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "platformDirector": "Директор платформы"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "Загрузка деталей сертификата...",
+    "unavailableTitle": "Сертификат недоступен",
+    "unavailableDescription": "Вы еще не завершили этот курс.",
+    "goToCourse": "Перейти к курсу",
+    "backToDashboard": "Назад в панель управления",
+    "linkCopied": "Ссылка скопирована!",
+    "copyLink": "Копировать ссылку",
+    "shareTwitter": "Поделиться в Twitter",
+    "sharing": "Публикация...",
+    "shareLinkedIn": "Поделиться в LinkedIn",
+    "generatingPdf": "Генерация PDF...",
+    "downloadPdf": "Скачать PDF",
+    "shareTextTwitter": "Я только что получил(а) Сертификат об окончании курса \"{{title}}\" в SkillVerse Academy! 🎓🚀 Посмотрите мой подтвержденный сертификат:",
+    "shareTextLinkedIn": "Рад(а) поделиться, что я успешно завершил(а) курс \"{{title}}\" на SkillVerse! 🎓🌟 Проверьте мой сертификат здесь:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "Изображение сертификата скачано! Перенаправление в LinkedIn для публикации...",
+      "redirectingLinkedIn": "Перенаправление в LinkedIn для публикации..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "СЕРТИФИКАТ ПОДТВЕРЖДЕН",
+      "issued": "Выдан: {{date}}",
+      "title": "Сертификат об окончании",
+      "description": "успешно выполнил(а) и освоил(а) все требования по курсу",
+      "passingScore": "Проходной балл: {{score}}%",
+      "verifiedAchievement": "Подтвержденное достижение"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "Обсуждение урока и вопросы",
+    "subtitle": "Задавайте вопросы, делитесь мыслями и обсуждайте с другими учащимися",
+    "placeholder": "Задайте вопрос или поделитесь мнением об этом уроке...",
+    "submit": "Опубликовать комментарий",
+    "loginRequired": "Пожалуйста, войдите в систему, чтобы присоединиться к обсуждению и задавать вопросы.",
+    "emptyTitle": "Обсуждений пока нет",
+    "emptySubtitle": "Станьте первым, кто задаст вопрос или оставит заметку к этому уроку!",
+    "time": {
+      "justNow": "Только что"
     }
   }
 }

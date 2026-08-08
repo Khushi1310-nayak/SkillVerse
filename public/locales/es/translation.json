@@ -369,6 +369,17 @@
       "pdf": "PDF (Estándar)",
       "image": "Imagen (Pro)"
     },
+    "certificatePage": {
+      "backToDashboard": "Volver al panel",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "¡Enlace copiado!",
+      "linkCopiedToast": "¡Enlace de verificación copiado al portapapeles!",
+      "shareTwitter": "Compartir en Twitter",
+      "shareLinkedIn": "Compartir en LinkedIn",
+      "sharing": "Compartiendo...",
+      "downloadPDF": "Descargar PDF",
+      "generatingPDF": "Generando PDF..."
+    },
     "achievements": {
       "title": "Logros"
     },
@@ -447,6 +458,18 @@
       "description": "ha completado y dominado con éxito todos los requisitos de",
       "passingScore": "Puntuación de aprobación: {{score}}%",
       "verifiedAchievement": "Logro Verificado"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "Discusión y preguntas de la lección",
+    "subtitle": "Haz preguntas, comparte ideas e interactúa con otros estudiantes",
+    "placeholder": "Haz una pregunta o comparte una reflexión sobre esta lección...",
+    "submit": "Publicar comentario",
+    "loginRequired": "Inicia sesión para participar en la discusión y hacer preguntas.",
+    "emptyTitle": "Aún no hay discusiones",
+    "emptySubtitle": "¡Sé el primero en hacer una pregunta o dejar una nota sobre esta lección!",
+    "time": {
+      "justNow": "Justo ahora"
     }
   }
 }

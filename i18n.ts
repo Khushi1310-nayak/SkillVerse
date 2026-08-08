@@ -60,4 +60,13 @@ i18n.on('languageChanged', (lng) => {
   document.documentElement.lang = lng;
 });
 
+// On initial load/refresh, i18next's LanguageDetector sets the language
+// synchronously during .init(), firing 'languageChanged' before the .on()
+// listener above is registered. We therefore apply dir/lang imperatively
+// here so that Arabic (and any future RTL language) is correctly reflected
+// on the very first render — not just after a runtime language switch.
+const initialLang = i18n.language || 'en';
+document.documentElement.dir = RTL_LANGUAGES.includes(initialLang) ? 'rtl' : 'ltr';
+document.documentElement.lang = initialLang;
+
 export default i18n;

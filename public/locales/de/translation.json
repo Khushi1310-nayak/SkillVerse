@@ -1,288 +1,288 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
+    "courses": "Kurse",
+    "career": "Karrieremodus",
+    "certifications": "Zertifikate",
     "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "menu": "Menü",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "Anfänger",
+      "intermediate": "Fortgeschritten",
+      "advanced": "Experte"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "Dashboard wird geladen...",
     "header": {
       "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "tourButton": "Tour starten",
+      "subtitle": "Übersicht über Ihre Lernreise"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "Kurse suchen...",
+      "viewAll": "Alle Ergebnisse anzeigen",
+      "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen."
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "Da weitermachen, wo Sie aufgehört haben",
+      "button": "Fortsetzen"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "Wiederholung nach Zeitabständen",
+      "messageOne": "Sie haben heute {{count}} Frage zur Wiederholung ausstehend!",
+      "messageOther": "Sie haben heute {{count}} Fragen zur Wiederholung ausstehend!",
+      "button": "Jetzt wiederholen"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "Weiter so, {{username}}!",
+      "streakTooltip": "Klicken, um die Serien-Feier anzuzeigen",
+      "streakOne": "{{count}} Tag Serie",
+      "streakOther": "{{count}} Tage Serie",
+      "summary": "Sie haben {{completedCount}} von {{totalCourses}} verfügbaren Kursen abgeschlossen.",
+      "continueLearning": "Weiterlernen",
+      "viewCertificates": "Zertifikate anzeigen",
+      "progressTitle": "Fortschritt nach Kategorie"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "Für Sie empfohlen"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
+      "title": "Schnellzugriff",
+      "programming": "Programmierung",
       "dsa": "DSA",
       "design": "Design",
-      "default": "Category"
+      "default": "Kategorie"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "Erinnerung: Erreichen Sie Ihr Tagesziel von {{dailyGoal}} Minuten, um Ihre Serie aufrechtzuerhalten!"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "Gespeicherte Fragen",
+      "practiceLink": "Üben →",
+      "viewAll": "Alle {{count}} gespeicherten Fragen anzeigen →",
+      "emptyMessage": "Sie haben noch keine Fragen gespeichert! Wechseln Sie in den Karrieremodus, um mit dem Üben zu beginnen.",
+      "button": "Fragen erkunden"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "Verlauf der Test-Interviews",
+      "emptyMessage": "Starten Sie ein Test-Interview im Karrieremodus, um Ihre Fähigkeiten unter realen Bedingungen zu testen.",
+      "button": "Test-Interview starten"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "Kurse erkunden",
+    "subtitle": "Erweitern Sie Ihr Wissen mit unserem erstklassigen Lehrplan.",
+    "searchPlaceholder": "Kurse suchen...",
+    "filterTitle": "Nach Kategorie filtern",
+    "allCategories": "Alle Kategorien",
     "categories": {
-      "programming": "Programming",
+      "programming": "Programmierung",
       "dsa": "DSA",
       "design": "Design",
-      "default": "Category"
+      "default": "Kategorie"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "Wiederholen",
+    "startLearning": "Lernen starten",
+    "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen."
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "Kategoriekurse werden geladen...",
+    "backToDashboard": "Zurück zum Dashboard",
+    "review": "Wiederholen",
+    "start": "Starten",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "Programmierung",
+        "description": "Bauen Sie praxisnahe technische Fähigkeiten durch praktische Programmierlektionen und Projekte auf."
       },
       "dsa": {
         "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "description": "Stärken Sie Ihr algorithmisches Denken mit Datenstrukturen und Übungen zur Problemlösung."
       },
       "design": {
         "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "description": "Entwickeln Sie Ihr visuelles und Produkt-Design-Gefühl mit praktischen kreativen Lektionen."
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "Kurs nicht gefunden",
+    "loading": "Kursmaterialien werden geladen...",
+    "back": "Zurück",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "Notizen & Ressourcen",
+      "finalQuiz": "Abschlusstest"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "Externe Ressourcen",
+      "proceed": "Weiter zum Test"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "Frage {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "submit": "Test einreichen",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "Herzlichen Glückwunsch!",
+        "keepTrying": "Bleiben Sie dran!",
+        "scorePrefix": "Sie haben",
+        "earnedCertificate": "Sie haben ein Zertifikat erworben.",
+        "need70": "Sie benötigen mindestens 70 %, um zu bestehen.",
+        "viewCertificate": "Zertifikat anzeigen",
+        "retryReminder": "Nehmen Sie sich einen Moment Zeit, um das Kursmaterial zu wiederholen, bevor Sie es erneut versuchen!",
+        "retryCountdown": "⏳ Sie können es in {{time}} erneut versuchen",
+        "retry": "Test wiederholen",
+        "retryDisabled": "Das Wiederholen von Tests ist in Ihren Einstellungen deaktiviert.",
+        "reviewAnswers": "Antworten überprüfen"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "Hallo! Ich bin Ihr KI-Tutor für **{{courseTitle}}**.\n\nIch kann Ihnen Konzepte erklären, Beispiele geben oder Sie über das Gelernte abfragen. Wie kann ich Ihnen heute helfen?",
+    "fallbackResponse": "Konnte keine Antwort generieren. Bitte versuchen Sie es erneut.",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "Lernassistent",
+      "collapse": "Einklappen",
+      "expand": "Ausklappen",
+      "close": "KI-Assistenten schließen"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "Denkt nach..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "Eine Frage stellen...",
+      "send": "Nachricht senden"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "Einfach erklären",
+      "quiz": "Testen Sie mich",
+      "example": "Ein Beispiel geben"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "KI-Assistenten öffnen"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "Entschuldigung, ich habe derzeit Verbindungsprobleme. Bitte überprüfen Sie Ihre Internetverbindung oder Ihren API-Schlüssel.",
+      "api": "Hoppla! Es gab ein Problem mit Ihrem OpenRouter API-Schlüssel (Abrechnung oder Authentifizierung).\n\n*Ersatzantwort*:\nSie haben gefragt nach: \"{{userMessage}}\". Da die API nicht erreichbar ist, sehe ich, dass Sie sich derzeit im Kontext von \"{{courseTitle}}\" befinden. Üben Sie fleißig weiter!",
+      "defaultCourse": "Ihrem Dashboard"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "Karrieremodus Beta",
+      "title": "Interview-Vorbereitung",
+      "description": "Zielen Sie auf bestimmte Unternehmen ab, üben Sie reale Fragen und simulieren Sie anspruchsvolle Interview-Situationen.",
+      "readiness": "Gesamtbereitschaft",
+      "ready": "Bereit",
+      "questionsLabel": "Fragen"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "Für Sie empfohlen",
+      "progress": "Fortschritt",
+      "searchPlaceholder": "Unternehmen suchen (z. B. Google, Amazon)...",
+      "emptyState": "Keine Unternehmen gefunden, die Ihren Kriterien entsprechen."
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "Unternehmen nach Rolle suchen",
+      "placeholder": "Unternehmen suchen (z. B. Google, Amazon)..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "Verbindung wird hergestellt...",
+      "requestTime": "{{interviewer}} um Zeit bitten",
+      "analyzingCode": "Ihr Code wird analysiert...",
+      "analysisDescription": "Unsere KI prüft Ihren Ansatz im Vergleich zu optimalen Zeit- und Speicherkomplexitäten.",
+      "questionProgress": "Frage {{current}} von {{total}}",
+      "nextQuestion": "Nächste Frage",
+      "finishInterview": "Interview beenden",
+      "voiceTurnProgress": "Live-Sprachinterview – Runde {{current}} von {{total}}",
+      "aiThinking": "KI denkt nach...",
+      "listeningStatus": "Zuhören (Sprechen wird automatisch erkannt)...",
+      "waitingStatus": "Warten Sie, bis die KI fertig ist...",
+      "endInterviewEarly": "Interview vorzeitig beenden",
+      "sendNowOverride": "Jetzt senden (Stille überschreiben)",
+      "totalTime": "Gesamtzeit",
+      "questions": "Fragen",
+      "extraTimePrompt": "Wie viele zusätzliche Minuten benötigen Sie? (Maximal 30)",
+      "extraTimeLimitReached": "Ich kann maximal {{max}} zusätzliche Minuten gewähren. Ich habe Ihre Uhr um {{max}} Minuten verlängert.",
+      "extraTimeGranted": "Ich habe Ihnen {{requested}} zusätzliche Minuten gewährt. Viel Erfolg.",
+      "extraTimeTotalLimitReached": "Sie können insgesamt nur bis zu 30 Minuten anfordern. Ich habe die verbleibenden {{remaining}} Minuten zu Ihrer Uhr hinzugefügt.",
+      "fallbackSpeech": "Das habe ich leider nicht verstanden.",
+      "speechNotSupported": "Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwenden Sie Chrome."
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "Einfach",
+        "medium": "Mittel",
+        "hard": "Schwer"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
+      "saveQuestion": "Frage speichern",
+      "removeSaved": "Aus Gespeicherten entfernen",
+      "srsStage": "SRS-Stufe",
       "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "nextReview": "Nächste Wiederholung:",
+      "notScheduled": "Noch nicht geplant",
+      "forgotWrong": "Vergessen / Falsch",
+      "rememberedRight": "Gewusst / Richtig",
+      "viewSolution": "Lösung anzeigen",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "Wiederholung der Frage weiter nach hinten verschoben! Weiter so.",
+        "reviewReset": "Intervall zurückgesetzt. Sie werden diese Frage morgen erneut wiederholen."
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "Die KI ist derzeit nicht verfügbar. Bitte versuchen Sie es erneut oder überprüfen Sie Ihre API-Schlüsseleinstellungen.",
+      "errorGeneratingTextReport": "Beim Erstellen Ihres technischen Berichts ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihren API-Schlüssel oder Ihre Internetverbindung.",
+      "errorGeneratingVoiceReport": "Beim Erstellen Ihres Berichts ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihren API-Schlüssel oder Ihre Internetverbindung.",
+      "aiInterviewReport": "KI-Interview-Bericht",
+      "aiInterviewDescription": "Eine detaillierte mündliche Bewertung Ihrer Leistung.",
+      "technicalEvaluation": "Technische Auswertung",
+      "technicalEvaluationDescription": "Überprüfen Sie Ihre Leistung, Erkenntnisse und Verbesserungspotenziale.",
+      "backToStudyMode": "Zurück zum Lernmodus"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "Zurück zu Unternehmen",
+      "title": "Wiederholungsliste (Spaced Repetition)",
+      "description": "Wiederholen Sie Fragen, die Sie zuvor mit dem Leitner-System geübt haben.",
+      "instructions": "Beantworten Sie diese Fragen heute. Markieren Sie sie als 'Richtig', um das Intervall zu verlängern, oder als 'Falsch', um sie morgen erneut zu wiederholen.",
+      "caughtUpTitle": "Sie sind auf dem neuesten Stand!",
+      "caughtUpDescription": "Derzeit stehen keine Fragen zur Wiederholung an. Üben Sie mehr Fragen im Karrieremodus, um Ihre Wiederholungsliste aufzubauen!",
+      "exploreCompanies": "Unternehmen erkunden"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "Lernfragen",
+      "mockInterview": "Test-Interview",
+      "questionBank": "Fragenkatalog",
+      "practiced": "{{practiced}} / {{total}} geübt",
+      "chooseModeTitle": "Wählen Sie Ihren Interview-Modus",
+      "chooseModeDescription": "Üben Sie mit einem strukturierten Fragenkatalog oder simulieren Sie ein Live-Sprachinterview mit KI.",
+      "standardTechnical": "Standard-Technisch",
+      "standardTechnicalDescription": "Absolvieren Sie ein strukturiertes technisches Interview für {{companyName}}.",
+      "startTextInterview": "Text-Interview starten",
+      "aiVoiceInterview": "KI-Sprachinterview",
+      "aiVoiceDescription": "Üben Sie das laute Aussprechen Ihrer Gedanken mit einem realistischen Sprach-Interviewer.",
+      "startVoiceInterview": "Sprachinterview starten",
+      "newBadge": "Neu"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "Vollbild beenden",
+      "closeModal": "Schließen",
+      "toggleFullscreen": "Vollbild umschalten",
+      "yourAnswer": "Ihre Antwort",
+      "chooseInterviewer": "Wählen Sie Ihren Interviewer",
+      "selectPersona": "Wählen Sie die Sprach-Persona aus, mit der Sie üben möchten.",
+      "maleVoice": "Klassischer technischer Interviewer",
+      "femaleVoice": "Ruhige und kollaborative Interviewerin"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "Abmelden?",
+    "body": "Sind Sie sicher, dass Sie sich von Ihrem Konto abmelden möchten?"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Einstellungen",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "Profil",
+      "appearance": "Erscheinungsbild",
+      "xpStore": "XP-Shop",
+      "learning": "Lernen",
+      "quiz": "Test",
+      "certificate": "Zertifikat",
+      "achievements": "Erfolge",
+      "account": "Konto"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "Änderungen speichern",
+      "reset": "Auf Standard zurücksetzen"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
+      "title": "Profileinstellungen",
+      "displayName": "Anzeigename",
+      "displayNamePlaceholder": "Anzeigenamen eingeben",
+      "email": "E-Mail-Adresse",
+      "emailPlaceholder": "E-Mail-Adresse eingeben",
+      "memberSince": "Mitglied seit",
       "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "uploadAvatar": "Eigenen Avatar hochladen",
+      "removeAvatar": "Eigenen entfernen",
+      "custom": "Benutzerdefiniert",
+      "currentAvatar": "Aktueller Avatar",
+      "uploading": "Wird hochgeladen",
+      "presetAvatar": "Oder vordefinierten Avatar auswählen",
+      "uploadHint": "Laden Sie ein PNG- oder JPEG-Bild hoch (max. 2 MB) oder wählen Sie unten einen vordefinierten Avatar aus."
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "Erscheinungsbild",
+      "themeMode": "Design-Modus",
+      "themeModeDesc": "Zwischen dunklem und hellem Modus wechseln",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "gradientIntensity": "Farbverlauf-Intensität",
+      "subtle": "Dezent",
+      "balanced": "Ausgewogen",
+      "vibrant": "Lebendig",
+      "language": "Sprache",
+      "languageDesc": "Wählen Sie Ihre bevorzugte Sprache"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "Lerneinstellungen",
+      "dailyGoal": "Tägliches Lernziel",
+      "reminders": "Fortschrittserinnerungen",
+      "remindersDesc": "Lassen Sie sich benachrichtigen, um Ihre Serie aufrechtzuerhalten",
+      "autoSave": "Notizen automatisch speichern",
+      "autoSaveDesc": "Speichert Ihren Fortschritt automatisch"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "Test-Einstellungen",
+      "instantFeedback": "Sofortiges Feedback",
+      "instantFeedbackDesc": "Richtig/Falsch sofort anzeigen",
+      "showAnswers": "Richtige Antworten anzeigen",
+      "showAnswersDesc": "Lösungen nach Abschluss des Tests anzeigen",
+      "allowRetry": "Wiederholung erlauben",
+      "allowRetryDesc": "Sofortiges Wiederholen von Tests gestatten"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
+      "title": "Zertifikatseinstellungen",
+      "nameLabel": "Name auf dem Zertifikat",
+      "namePlaceholder": "Offizieller Name",
+      "nameHint": "Dieser Name wird auf allen Ihren erworbenen Zertifikaten erscheinen.",
+      "format": "Standardformat",
       "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "image": "Bild (Pro)"
+    },
+    "certificatePage": {
+      "backToDashboard": "Zurück zum Dashboard",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Link kopiert!",
+      "linkCopiedToast": "Bestätigungslink in die Zwischenablage kopiert!",
+      "shareTwitter": "Auf X (Twitter) teilen",
+      "shareLinkedIn": "Auf LinkedIn teilen",
+      "sharing": "Wird geteilt...",
+      "downloadPDF": "PDF herunterladen",
+      "generatingPDF": "PDF wird erstellt..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "Erfolge"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "Kontoverwaltung",
+      "resetProgress": "Fortschritt zurücksetzen",
+      "resetProgressDesc": "Gesamten Kursfortschritt und Test-Ergebnisse löschen",
+      "reset": "Zurücksetzen",
+      "clearData": "Lokale Daten löschen",
+      "clearDataDesc": "Alle Kontodaten von diesem Gerät entfernen",
+      "clear": "Löschen"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "XP-Shop"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "Fortschritt zurücksetzen?",
+      "resetBody": "Dadurch werden all Ihre Kursfortschritte und Test-Ergebnisse gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "clearTitle": "Alle Daten löschen?",
+      "clearBody": "Dadurch werden Ihr Konto und alle zugehörigen Daten aus diesem Browser entfernt. Sie werden abgemeldet.",
+      "unsavedTitle": "Ungespeicherte Änderungen",
+      "unsavedBody": "Sie haben ungespeicherte Änderungen. Sind Sie sicher, dass Sie die Seite verlassen möchten, ohne zu speichern?",
+      "stay": "Bleiben",
+      "leave": "Verlassen"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "Zertifikate werden geladen...",
+    "title": "Meine Zertifikate",
+    "subtitle": "Offizieller Nachweis Ihrer Fähigkeiten und Erfolge.",
+    "emptyTitle": "Noch keine Zertifikate",
+    "emptyDescription": "Absolvieren Sie Kurse und bestehen Sie die Abschlusstests, um professionelle Zertifikate zu erwerben.",
+    "browseCourses": "Kurse durchsuchen",
+    "cardTitle": "{{courseTitle}} Zertifiziert",
+    "issued": "Ausgestellt am {{date}}",
+    "copyLink": "Link kopieren",
+    "copied": "Kopiert",
+    "viewCertificate": "Zertifikat"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
+    "title": "Zertifikat",
+    "subtitle": "über den erfolgreichen Abschluss",
+    "certifyThat": "Hiermit wird bescheinigt, dass",
+    "demonstratedMastery": "Erfolgreich fundierte Kenntnisse nachgewiesen hat in",
+    "assessmentPrefix": "Durch das Bestehen der umfassenden Prüfung mit einer Punktzahl von",
+    "assessmentSuffix": "am {{date}}, wodurch die Kompetenz in den grundlegenden und fortgeschrittenen Konzepten dieses Fachgebiets bestätigt wird.",
+    "dateIssued": "Ausstellungsdatum",
+    "verified": "Verifiziert",
     "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "platformDirector": "Plattformdirektor"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "Zertifikatsdetails werden geladen...",
+    "unavailableTitle": "Zertifikat nicht verfügbar",
+    "unavailableDescription": "Sie haben diesen Kurs noch nicht abgeschlossen.",
+    "goToCourse": "Zum Kurs gehen",
+    "backToDashboard": "Zurück zum Dashboard",
+    "linkCopied": "Link kopiert!",
+    "copyLink": "Link kopieren",
+    "shareTwitter": "Auf Twitter teilen",
+    "sharing": "Wird geteilt...",
+    "shareLinkedIn": "Auf LinkedIn teilen",
+    "generatingPdf": "PDF wird erstellt...",
+    "downloadPdf": "PDF herunterladen",
+    "shareTextTwitter": "Ich habe gerade ein Abschlusszertifikat für „{{title}}“ an der SkillVerse Academy erworben! 🎓🚀 Schauen Sie sich meinen verifizierten Nachweis an:",
+    "shareTextLinkedIn": "Ich freue mich sehr, mitteilen zu können, dass ich „{{title}}“ auf SkillVerse abgeschlossen habe! 🎓🌟 Verifizieren Sie mein Zertifikat hier:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "Zertifikatsbild heruntergeladen! Weiterleitung zu LinkedIn zum Posten...",
+      "redirectingLinkedIn": "Weiterleitung zu LinkedIn zum Posten..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "ZERTIFIKAT VERIFIZIERT",
+      "issued": "Ausgestellt: {{date}}",
+      "title": "Abschlusszertifikat",
+      "description": "hat alle Anforderungen erfolgreich erfüllt und gemeistert für",
+      "passingScore": "Bestehensquote: {{score}}%",
+      "verifiedAchievement": "Verifizierte Leistung"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "Lektionsdiskussion & Fragen",
+    "subtitle": "Stelle Fragen, teile Erkenntnisse und diskutiere mit anderen Lernenden",
+    "placeholder": "Stelle eine Frage oder teile deine Gedanken zu dieser Lektion...",
+    "submit": "Kommentar veröffentlichen",
+    "loginRequired": "Bitte melde dich an, um an der Diskussion teilzunehmen und Fragen zu stellen.",
+    "emptyTitle": "Noch keine Diskussionen",
+    "emptySubtitle": "Sei der Erste, der eine Frage stellt oder eine Anmerkung zu dieser Lektion hinterlässt!",
+    "time": {
+      "justNow": "Gerade eben"
     }
   }
 }

@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "डैशबोर्ड",
+    "courses": "कोर्स",
+    "career": "करियर मोड",
+    "certifications": "प्रमाणपत्र",
+    "admin": "एडमिन",
+    "settings": "सेटिंग्स",
+    "logout": "लॉग आउट",
+    "menu": "मेनू",
+    "openMenu": "मेनू खोलें",
+    "closeMenu": "मेनू बंद करें"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "शुरुआती",
+      "intermediate": "मध्यम",
+      "advanced": "उन्नत"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "डैशबोर्ड लोड हो रहा है...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "डैशबोर्ड",
+      "tourButton": "टूर लें",
+      "subtitle": "आपकी सीखने की यात्रा का अवलोकन"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "कोर्स खोजें...",
+      "viewAll": "सभी परिणाम देखें",
+      "empty": "चयनित मानदंडों से मेल खाने वाला कोई कोर्स नहीं मिला।"
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "जहाँ छोड़ा था वहाँ से शुरू करें",
+      "button": "दोबारा शुरू करें"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "अंतराल पुनरावृत्ति (Spaced Repetition)",
+      "messageOne": "आज दोहराने के लिए आपके पास {{count}} प्रश्न है!",
+      "messageOther": "आज दोहराने के लिए आपके पास {{count}} प्रश्न हैं!",
+      "button": "अभी दोहराएं"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "ऐसे ही आगे बढ़ते रहें, {{username}}!",
+      "streakTooltip": "लगातार सीखने के उत्सव को देखने के लिए क्लिक करें",
+      "streakOne": "{{count}} दिन का स्ट्रिक",
+      "streakOther": "{{count}} दिनों का स्ट्रिक",
+      "summary": "आपने कुल {{totalCourses}} में से {{completedCount}} कोर्स पूरे कर लिए हैं।",
+      "continueLearning": "सीखना जारी रखें",
+      "viewCertificates": "प्रमाणपत्र देखें",
+      "progressTitle": "श्रेणी के अनुसार प्रगति"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "आपके लिए अनुशंसित"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "त्वरित पहुँच",
+      "programming": "प्रोग्रामिंग",
+      "dsa": "एल्गोरिदम और डेटा स्ट्रक्चर्स",
+      "design": "डिजाइन",
+      "default": "श्रेणी"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "रिमाइंडर: अपना स्ट्रिक बनाए रखने के लिए {{dailyGoal}} मिनट का दैनिक लक्ष्य हासिल करें!"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "सहेजे गए प्रश्न",
+      "practiceLink": "अभ्यास करें →",
+      "viewAll": "सहेजे गए सभी {{count}} प्रश्न देखें →",
+      "emptyMessage": "आपने अभी तक कोई प्रश्न सहेजा नहीं है! अभ्यास शुरू करने के लिए करियर मोड पर जाएं।",
+      "button": "प्रश्न खोजें"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "मॉक इंटरव्यू का इतिहास",
+      "emptyMessage": "वास्तविक परिस्थितियों में अपने कौशल का परीक्षण करने के लिए करियर मोड में मॉक इंटरव्यू शुरू करें।",
+      "button": "मॉक इंटरव्यू शुरू करें"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "कोर्स खोजें",
+    "subtitle": "हमारे प्रीमियम पाठ्यक्रम के साथ अपने ज्ञान का विस्तार करें।",
+    "searchPlaceholder": "कोर्स खोजें...",
+    "filterTitle": "श्रेणी के अनुसार फ़िल्टर करें",
+    "allCategories": "सभी श्रेणियां",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "प्रोग्रामिंग",
+      "dsa": "एल्गोरिदम और डेटा स्ट्रक्चर्स",
+      "design": "डिजाइन",
+      "default": "श्रेणी"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "दोहराएं",
+    "startLearning": "सीखना शुरू करें",
+    "empty": "चयनित मानदंडों से मेल खाने वाला कोई कोर्स नहीं मिला।"
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "श्रेणी के कोर्स लोड हो रहे हैं...",
+    "backToDashboard": "डैशबोर्ड पर वापस जाएं",
+    "review": "दोहराएं",
+    "start": "शुरू करें",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "प्रोग्रामिंग",
+        "description": "कोडिंग पाठों और वास्तविक प्रोजेक्ट्स के माध्यम से व्यावहारिक तकनीकी कौशल विकसित करें।"
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "एल्गोरिदम और डेटा स्ट्रक्चर्स",
+        "description": "डेटा स्ट्रक्चर्स और समस्या निवारण (Problem Solving) के साथ अपनी एल्गोरिथम सोच को मजबूत करें।"
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "डिजाइन",
+        "description": "रचनात्मक और व्यावहारिक पाठों के साथ अपनी विजुअल और प्रोडक्ट डिजाइन की समझ विकसित करें।"
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "कोर्स नहीं मिला",
+    "loading": "कोर्स सामग्री लोड हो रही है...",
+    "back": "पीछे जाएं",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "नोट्स और संसाधन",
+      "finalQuiz": "अंतिम क्विज़"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "बाहरी संसाधन",
+      "proceed": "क्विज़ पर जाएं"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "प्रश्न {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "पिछला",
+      "next": "अगला",
+      "submit": "क्विज़ सबमिट करें",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "बधाई हो!",
+        "keepTrying": "प्रयास करते रहें!",
+        "scorePrefix": "आपका स्कोर है",
+        "earnedCertificate": "आपने एक प्रमाणपत्र अर्जित किया है।",
+        "need70": "पास होने के लिए आपको कम से कम 70% अंक चाहिए।",
+        "viewCertificate": "प्रमाणपत्र देखें",
+        "retryReminder": "पुनः प्रयास करने से पहले कोर्स सामग्री को दोहराने के लिए कुछ समय निकालें!",
+        "retryCountdown": "⏳ आप {{time}} में पुनः प्रयास कर सकते हैं",
+        "retry": "क्विज़ दोबारा दें",
+        "retryDisabled": "आपकी सेटिंग्स में क्विज़ दोहराने का विकल्प अक्षम (Disabled) है।",
+        "reviewAnswers": "उत्तरों की समीक्षा करें"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "नमस्ते! मैं **{{courseTitle}}** के लिए आपका AI ट्यूटर हूँ।\n\nमैं अवधारणाओं को समझा सकता हूँ, उदाहरण दे सकता हूँ या आपके द्वारा सीखे गए विषय पर क्विज़ ले सकता हूँ। आज मैं आपकी क्या सहायता कर सकता हूँ?",
+    "fallbackResponse": "उत्तर जनरेट करने में असमर्थ। कृपया पुनः प्रयास करें।",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "अध्ययन सहायक",
+      "collapse": "समेटें",
+      "expand": "विस्तार करें",
+      "close": "AI सहायक बंद करें"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "सोच रहा है..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "कोई प्रश्न पूछें...",
+      "send": "संदेश भेजें"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "आसान शब्दों में समझाएं",
+      "quiz": "मेरा क्विज़ लें",
+      "example": "एक उदाहरण दें"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "AI सहायक खोलें"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "क्षमा करें, मुझे इस समय कनेक्शन की समस्या आ रही है। कृपया अपना इंटरनेट कनेक्शन या API कुंजी जांचें।",
+      "api": "अरे! आपकी OpenRouter API कुंजी (बिलिंग या प्रमाणीकरण) के साथ कोई समस्या आ गई है।\n\n*वैकल्पिक उत्तर*:\nआपने पूछा: \"{{userMessage}}\"। चूंकि API उपलब्ध नहीं है, मैं देख रहा हूँ कि आप अभी \"{{courseTitle}}\" पढ़ रहे हैं। अभ्यास जारी रखें!",
+      "defaultCourse": "आपका डैशबोर्ड"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "करियर मोड बीटा",
+      "title": "इंटरव्यू की तैयारी",
+      "description": "विशिष्ट कंपनियों पर ध्यान केंद्रित करें, वास्तविक प्रश्नों का अभ्यास करें और दबाव में साक्षात्कार का अनुभव लें।",
+      "readiness": "समग्र तैयारी",
+      "ready": "तैयार",
+      "questionsLabel": "प्रश्न"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "आपके लिए अनुशंसित",
+      "progress": "प्रगति",
+      "searchPlaceholder": "कंपनियां खोजें (उदा. Google, Amazon)...",
+      "emptyState": "चयनित मानदंडों से मेल खाने वाली कोई कंपनी नहीं मिली।"
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "भूमिका (Role) के अनुसार कंपनियां खोजें",
+      "placeholder": "कंपनियां खोजें (उदा. Google, Amazon)..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "कनेक्ट हो रहा है...",
+      "requestTime": "{{interviewer}} से और समय मांगें",
+      "analyzingCode": "आपके कोड का विश्लेषण किया जा रहा है...",
+      "analysisDescription": "हमारा AI सर्वश्रेष्ठ टाइम और स्पेस कॉम्प्लेक्सिटी के साथ आपके दृष्टिकोण का मूल्यांकन कर रहा है।",
+      "questionProgress": "प्रश्न {{current}} / {{total}}",
+      "nextQuestion": "अगला प्रश्न",
+      "finishInterview": "इंटरव्यू समाप्त करें",
+      "voiceTurnProgress": "लाइव वॉयस इंटरव्यू - टर्न {{current}} / {{total}}",
+      "aiThinking": "AI सोच रहा है...",
+      "listeningStatus": "सुन रहा है (आवाज पहचान स्वचालित है)...",
+      "waitingStatus": "AI के बोलना बंद करने का इंतज़ार करें...",
+      "endInterviewEarly": "समय से पहले इंटरव्यू समाप्त करें",
+      "sendNowOverride": "अभी भेजें (Send Now)",
+      "totalTime": "कुल समय",
+      "questions": "प्रश्न",
+      "extraTimePrompt": "आपको कितने अतिरिक्त मिनट चाहिए? (अधिकतम 30)",
+      "extraTimeLimitReached": "मैं केवल अधिकतम {{max}} अतिरिक्त मिनट ही दे सकता हूँ। मैंने आपके टाइमर में {{max}} मिनट जोड़ दिए हैं।",
+      "extraTimeGranted": "मैंने आपको {{requested}} अतिरिक्त मिनट दे दिए हैं। शुभकामनाएँ!",
+      "extraTimeTotalLimitReached": "आप कुल मिलाकर अधिकतम 30 मिनट का अनुरोध कर सकते हैं। मैंने आपके टाइमर में शेष {{remaining}} मिनट जोड़ दिए हैं।",
+      "fallbackSpeech": "मुझे ठीक से समझ नहीं आया।",
+      "speechNotSupported": "इस ब्राउज़र द्वारा वॉयस रिकॉग्निशन समर्थित नहीं है। कृपया Chrome का उपयोग करें।"
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "आसान",
+        "medium": "मध्यम",
+        "hard": "कठिन"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "saveQuestion": "प्रश्न सहेजें",
+      "removeSaved": "सहेजे गए से हटाएं",
+      "srsStage": "SRS चरण",
+      "box": "बॉक्स {{number}}",
+      "nextReview": "अगला दोहराव:",
+      "notScheduled": "अभी निर्धारित नहीं",
+      "forgotWrong": "भूल गए / गलत",
+      "rememberedRight": "याद रहा / सही",
+      "viewSolution": "समाधान देखें",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "प्रश्न का पुनरावलोकन बाद के लिए निर्धारित किया गया! ऐसे ही लगे रहें।",
+        "reviewReset": "अंतराल रीसेट कर दिया गया। आप कल इस प्रश्न को फिर से दोहराएंगे।"
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "AI वर्तमान में उपलब्ध नहीं है, कृपया पुन: प्रयास करें या अपनी API कुंजी सेटिंग्स जांचें।",
+      "errorGeneratingTextReport": "आपकी तकनीकी रिपोर्ट जनरेट करते समय एक त्रुटि हुई। कृपया अपनी API कुंजी या इंटरनेट कनेक्शन जांचें।",
+      "errorGeneratingVoiceReport": "आपकी रिपोर्ट जनरेट करते समय एक त्रुटि हुई। कृपया अपनी API कुंजी या इंटरनेट कनेक्शन जांचें।",
+      "aiInterviewReport": "AI इंटरव्यू रिपोर्ट",
+      "aiInterviewDescription": "आपके प्रदर्शन का एक विस्तृत मौखिक मूल्यांकन।",
+      "technicalEvaluation": "तकनीकी मूल्यांकन",
+      "technicalEvaluationDescription": "अपने प्रदर्शन, टिप्पणियों और सुधार के क्षेत्रों की समीक्षा करें।",
+      "backToStudyMode": "अध्ययन मोड पर वापस जाएं"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "कंपनियों पर वापस जाएं",
+      "title": "पुनरावृत्ति कतार (Spaced Repetition)",
+      "description": "लाइटनर सिस्टम का उपयोग करके पहले अभ्यास किए गए प्रश्नों को दोहराएं।",
+      "instructions": "आज इन प्रश्नों के उत्तर दें। लंबा अंतराल देने के लिए उन्हें 'सही' के रूप में या कल दोहराने के लिए 'गलत' के रूप में चिह्नित करें।",
+      "caughtUpTitle": "आपने सब कुछ पूरा कर लिया है!",
+      "caughtUpDescription": "फिलहाल दोहराने के लिए कोई प्रश्न नहीं बचा है। अपनी पुनरावृत्ति कतार बढ़ाने के लिए करियर मोड में अधिक प्रश्नों का अभ्यास करें!",
+      "exploreCompanies": "कंपनियां देखें"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "अध्ययन प्रश्न",
+      "mockInterview": "मॉक इंटरव्यू",
+      "questionBank": "प्रश्न बैंक",
+      "practiced": "{{practiced}} / {{total}} अभ्यास किया गया",
+      "chooseModeTitle": "अपना इंटरव्यू मोड चुनें",
+      "chooseModeDescription": "प्रश्नों के एक संरचित सेट के साथ अभ्यास करें या AI के साथ लाइव वॉयस इंटरव्यू दें।",
+      "standardTechnical": "मानक तकनीकी (Standard Technical)",
+      "standardTechnicalDescription": "{{companyName}} के लिए एक संरचित तकनीकी साक्षात्कार दें।",
+      "startTextInterview": "टेक्स्ट इंटरव्यू शुरू करें",
+      "aiVoiceInterview": "AI वॉयस इंटरव्यू",
+      "aiVoiceDescription": "एक यथार्थवादी वॉयस इंटरव्यूअर के साथ बोलकर अपनी सोच व्यक्त करने का अभ्यास करें।",
+      "startVoiceInterview": "वॉयस इंटरव्यू शुरू करें",
+      "newBadge": "नया"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "फुलस्क्रीन से बाहर निकलें",
+      "closeModal": "बंद करें",
+      "toggleFullscreen": "फुलस्क्रीन टॉगल करें",
+      "yourAnswer": "आपका उत्तर",
+      "chooseInterviewer": "अपना इंटरव्यूअर चुनें",
+      "selectPersona": "वह वॉयस पर्सनालिटी चुनें जिसके साथ आप अभ्यास करना चाहते हैं।",
+      "maleVoice": "क्लासिक तकनीकी इंटरव्यूअर",
+      "femaleVoice": "शांत और सहयोगात्मक इंटरव्यूअर"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "लॉग आउट करें?",
+    "body": "क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?"
   },
   "settings": {
-    "title": "Settings",
+    "title": "सेटिंग्स",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "प्रोफ़ाइल",
+      "appearance": "दिखावट (Appearance)",
+      "xpStore": "XP स्टोर",
+      "learning": "सीखना (Learning)",
+      "quiz": "क्विज़",
+      "certificate": "प्रमाणपत्र",
+      "achievements": "उपलब्धियां",
+      "account": "खाता"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "परिवर्तन सहेजें",
+      "reset": "डिफ़ॉल्ट पर रीसेट करें"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "प्रोफ़ाइल सेटिंग्स",
+      "displayName": "प्रदर्शित नाम (Display Name)",
+      "displayNamePlaceholder": "अपना प्रदर्शित नाम दर्ज करें",
+      "email": "ईमेल पता",
+      "emailPlaceholder": "अपना ईमेल पता दर्ज करें",
+      "memberSince": "सदस्यता की तिथि",
+      "avatar": "अवतार",
+      "uploadAvatar": "कस्टम अवतार अपलोड करें",
+      "removeAvatar": "कस्टम अवतार हटाएं",
+      "custom": "कस्टम",
+      "currentAvatar": "वर्तमान अवतार",
+      "uploading": "अपलोड हो रहा है",
+      "presetAvatar": "या पहले से मौजूद अवतार चुनें",
+      "uploadHint": "PNG या JPEG छवि (अधिकतम 2MB) अपलोड करें या नीचे दिए गए अवतारों में से चुनें।"
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "दिखावट (Appearance)",
+      "themeMode": "थीम मोड",
+      "themeModeDesc": "लाइट और डार्क मोड के बीच स्विच करें",
+      "light": "लाइट",
+      "dark": "डार्क",
+      "gradientIntensity": "ग्रेडिएंट की तीव्रता",
+      "subtle": "हल्का (Subtle)",
+      "balanced": "संतुलित (Balanced)",
+      "vibrant": "चमकदार (Vibrant)",
+      "language": "भाषा",
+      "languageDesc": "अपनी पसंदीदा भाषा चुनें"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "सीखने की प्राथमिकताएं",
+      "dailyGoal": "दैनिक अध्ययन लक्ष्य",
+      "reminders": "प्रगति अनुस्मारक (Reminders)",
+      "remindersDesc": "अपनी स्ट्रिक बनाए रखने के लिए सूचनाएं प्राप्त करें",
+      "autoSave": "ऑटो-सेव नोट्स",
+      "autoSaveDesc": "अपनी प्रगति को स्वतः सहेजें"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "क्विज़ प्राथमिकताएं",
+      "instantFeedback": "तत्काल प्रतिक्रिया",
+      "instantFeedbackDesc": "तुरंत दिखाएं कि उत्तर सही है या गलत",
+      "showAnswers": "सही उत्तर दिखाएं",
+      "showAnswersDesc": "क्विज़ पूरा होने पर सही उत्तर प्रकट करें",
+      "allowRetry": "पुनः प्रयास की अनुमति दें",
+      "allowRetryDesc": "तुरंत क्विज़ दोहराने की अनुमति दें"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "प्रमाणपत्र सेटिंग्स",
+      "nameLabel": "प्रमाणपत्र पर नाम",
+      "namePlaceholder": "कानूनी पूरा नाम",
+      "nameHint": "यह नाम अर्जित सभी प्रमाणपत्रों पर दिखाई देगा।",
+      "format": "डिफ़ॉल्ट प्रारूप",
+      "pdf": "PDF (मानक)",
+      "image": "छवि (प्रो)"
+    },
+    "certificatePage": {
+      "backToDashboard": "डैशबोर्ड पर वापस जाएं",
+      "copyLink": "लिंक कॉपी करें",
+      "linkCopied": "लिंक कॉपी हो गया!",
+      "linkCopiedToast": "सत्यापन लिंक क्लिपबोर्ड पर कॉपी कर दिया गया है!",
+      "shareTwitter": "Twitter पर शेयर करें",
+      "shareLinkedIn": "LinkedIn पर शेयर करें",
+      "sharing": "शेयर हो रहा है...",
+      "downloadPDF": "PDF डाउनलोड करें",
+      "generatingPDF": "PDF जनरेट हो रहा है..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "उपलब्धियां"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "खाता प्रबंधन",
+      "resetProgress": "प्रगति रीसेट करें",
+      "resetProgressDesc": "सभी कोर्स प्रगति और क्विज़ स्कोर हटा देता है",
+      "reset": "रीसेट करें",
+      "clearData": "लोकल डेटा साफ़ करें",
+      "clearDataDesc": "इस डिवाइस से सभी खाता डेटा हटा देता है",
+      "clear": "साफ़ करें"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "XP स्टोर"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "प्रगति रीसेट करें?",
+      "resetBody": "यह आपकी सभी कोर्स प्रगति और क्विज़ स्कोर को साफ़ कर देगा। इस कार्रवाई को वापस नहीं लिया जा सकता है।",
+      "clearTitle": "सभी डेटा साफ़ करें?",
+      "clearBody": "यह इस ब्राउज़र से आपका खाता और उससे जुड़ा सभी डेटा हटा देगा। आप लॉग आउट हो जाएंगे।",
+      "unsavedTitle": "अनसहेजे गए परिवर्तन",
+      "unsavedBody": "आपके पास कुछ अनसहेजे गए परिवर्तन हैं। क्या आप निश्चित रूप से बिना सहेजे बाहर निकलना चाहते हैं?",
+      "stay": "रहें",
+      "leave": "बाहर निकलें"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "प्रमाणपत्र लोड हो रहे हैं...",
+    "title": "मेरे प्रमाणपत्र",
+    "subtitle": "आपके कौशल और उपलब्धियों का आधिकारिक प्रमाण।",
+    "emptyTitle": "अभी तक कोई प्रमाणपत्र नहीं है",
+    "emptyDescription": "व्यावसायिक प्रमाणपत्र अर्जित करने के लिए पाठ्यक्रम पूरा करें और अंतिम क्विज़ पास करें।",
+    "browseCourses": "कोर्स ब्राउज़ करें",
+    "cardTitle": "{{courseTitle}} में प्रमाणपत्र",
+    "issued": "{{date}} को जारी किया गया",
+    "copyLink": "लिंक कॉपी करें",
+    "copied": "कॉपी हो गया",
+    "viewCertificate": "प्रमाणपत्र"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
+    "title": "प्रमाणपत्र",
+    "subtitle": "पूर्णता का",
+    "certifyThat": "प्रमाणित किया जाता है कि",
+    "demonstratedMastery": "ने सफलतापूर्वक निम्नलिखित में महारत हासिल की है",
+    "assessmentPrefix": "व्यापक मूल्यांकन में स्कोर प्राप्त करके",
+    "assessmentSuffix": "दिनांक {{date}} को, जो विषय की मूलभूत और उन्नत अवधारणाओं में पूर्ण क्षमता की पुष्टि करता है।",
+    "dateIssued": "जारी करने की तिथि",
+    "verified": "सत्यापित",
     "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "platformDirector": "प्लेटफ़ॉर्म निदेशक"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "प्रमाणपत्र विवरण लोड हो रहे हैं...",
+    "unavailableTitle": "प्रमाणपत्र उपलब्ध नहीं है",
+    "unavailableDescription": "आपने अभी तक यह कोर्स पूरा नहीं किया है।",
+    "goToCourse": "कोर्स पर जाएं",
+    "backToDashboard": "डैशबोर्ड पर वापस जाएं",
+    "linkCopied": "लिंक कॉपी हो गया!",
+    "copyLink": "लिंक कॉपी करें",
+    "shareTwitter": "Twitter पर शेयर करें",
+    "sharing": "शेयर हो रहा है...",
+    "shareLinkedIn": "LinkedIn पर शेयर करें",
+    "generatingPdf": "PDF जनरेट हो रहा है...",
+    "downloadPdf": "PDF डाउनलोड करें",
+    "shareTextTwitter": "मैंने SkillVerse Academy पर \"{{title}}\" के लिए पूर्णता प्रमाणपत्र अर्जित किया है! 🎓🚀 मेरा सत्यापित क्रेडेंशियल देखें:",
+    "shareTextLinkedIn": "मुझे यह साझा करते हुए बेहद खुशी हो रही है कि मैंने SkillVerse पर \"{{title}}\" पूरा कर लिया है! 🎓🌟 मेरा क्रेडेंशियल यहाँ देखें:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "प्रमाणपत्र की छवि डाउनलोड हो गई! पोस्ट करने के लिए LinkedIn पर रीडायरेक्ट किया जा रहा है...",
+      "redirectingLinkedIn": "पोस्ट करने के लिए LinkedIn पर रीडायरेक्ट किया जा रहा है..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "सत्यापित क्रेडेंशियल",
+      "issued": "जारी किया गया: {{date}}",
+      "title": "पूर्णता प्रमाणपत्र",
+      "description": "ने निम्नलिखित के लिए सभी आवश्यकताओं को सफलतापूर्वक पूरा और मास्टर कर लिया है",
+      "passingScore": "उत्तीर्ण अंक: {{score}}%",
+      "verifiedAchievement": "सत्यापित उपलब्धि"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "पाठ चर्चा और प्रश्नोत्तर",
+    "subtitle": "प्रश्न पूछें, अपने विचार साझा करें और सहपाठियों के साथ चर्चा करें",
+    "placeholder": "इस पाठ के बारे में कोई प्रश्न पूछें या अपने विचार साझा करें...",
+    "submit": "टिप्पणी पोस्ट करें",
+    "loginRequired": "चर्चा में शामिल होने और प्रश्न पूछने के लिए कृपया लॉग इन करें।",
+    "emptyTitle": "अभी तक कोई चर्चा नहीं हुई है",
+    "emptySubtitle": "इस पाठ पर प्रश्न पूछने या टिप्पणी छोड़ने वाले पहले व्यक्ति बनें!",
+    "time": {
+      "justNow": "अभी-अभी"
     }
   }
 }

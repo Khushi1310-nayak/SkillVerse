@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "ダッシュボード",
+    "courses": "コース",
+    "career": "キャリアモード",
+    "certifications": "認定資格",
+    "admin": "管理者",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "menu": "メニュー",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "キャンセル",
+    "confirm": "確認",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "初級",
+      "intermediate": "中級",
+      "advanced": "上級"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "ダッシュボードを読み込み中...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "ダッシュボード",
+      "tourButton": "ツアーを見る",
+      "subtitle": "あなたの学習状況の概要"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "コースを検索...",
+      "viewAll": "すべての結果を表示",
+      "empty": "選択した条件に一致するコースは見つかりませんでした。"
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "前回の続きから再開",
+      "button": "再開する"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "分散学習（復習）",
+      "messageOne": "本日復習する質問が {{count}} 件あります！",
+      "messageOther": "本日復習する質問が {{count}} 件あります！",
+      "button": "今すぐ復習"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "その調子です、{{username}}さん！",
+      "streakTooltip": "クリックして連続記録のお祝いを表示",
+      "streakOne": "{{count}} 日連続学習",
+      "streakOther": "{{count}} 日連続学習",
+      "summary": "全 {{totalCourses}} コース中、{{completedCount}} コースを修了しました。",
+      "continueLearning": "学習を続ける",
+      "viewCertificates": "証明書を表示",
+      "progressTitle": "カテゴリー別進捗"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "あなたへのおすすめ"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "クイックアクセス",
+      "programming": "プログラミング",
+      "dsa": "アルゴリズムとデータ構造",
+      "design": "デザイン",
+      "default": "カテゴリー"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "リマインダー: 連続記録を維持するために、1日の目標である {{dailyGoal}} 分を達成しましょう！"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "保存した質問",
+      "practiceLink": "練習する →",
+      "viewAll": "保存した {{count}} 件の質問をすべて見る →",
+      "emptyMessage": "まだ質問が保存されていません！キャリアモードに移動して練習を始めましょう。",
+      "button": "質問を探す"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "模擬面接の履歴",
+      "emptyMessage": "キャリアモードで模擬面接を開始し、実践的な環境でスキルを試してみましょう。",
+      "button": "模擬面接を開始"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "コースを探す",
+    "subtitle": "専門的なカリキュラムで知識を深めましょう。",
+    "searchPlaceholder": "コースを検索...",
+    "filterTitle": "カテゴリーで絞り込む",
+    "allCategories": "すべてのカテゴリー",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "プログラミング",
+      "dsa": "アルゴリズムとデータ構造",
+      "design": "デザイン",
+      "default": "カテゴリー"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "復習する",
+    "startLearning": "学習を開始",
+    "empty": "選択した条件に一致するコースは見つかりませんでした。"
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "カテゴリーのコースを読み込み中...",
+    "backToDashboard": "ダッシュボードに戻る",
+    "review": "復習する",
+    "start": "開始",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "プログラミング",
+        "description": "コーディングのレッスンと実践的なプロジェクトを通じて技術スキルを習得します。"
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "アルゴリズムとデータ構造",
+        "description": "データ構造と問題解決を通じて、アルゴリズム思考力を強化します。"
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "デザイン",
+        "description": "クリエイティブで実践的なレッスンを通じて、ビジュアルデザインやプロダクトデザインの感覚を養います。"
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "コースが見つかりません",
+    "loading": "コース教材を読み込み中...",
+    "back": "戻る",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "ノートとリソース",
+      "finalQuiz": "小テスト"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "外部リソース",
+      "proceed": "小テストに進む"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "質問 {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "前へ",
+      "next": "次へ",
+      "submit": "提出する",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "おめでとうございます！",
+        "keepTrying": "次回も頑張りましょう！",
+        "scorePrefix": "あなたのスコアは",
+        "earnedCertificate": "修了証を獲得しました。",
+        "need70": "合格には70%以上が必要です。",
+        "viewCertificate": "修了証を見る",
+        "retryReminder": "再挑戦する前に、コース教材を復習してみましょう！",
+        "retryCountdown": "⏳ {{time}} 後に再挑戦できます",
+        "retry": "もう一度挑戦する",
+        "retryDisabled": "設定で小テストの再挑戦が無効になっています。",
+        "reviewAnswers": "回答を確認する"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "こんにちは！**{{courseTitle}}** のAIチューターです。\n\n概念の解説や例題の提示、学習内容に関するクイズを出題できます。今日はどのようなお手伝いをしましょうか？",
+    "fallbackResponse": "応答を生成できませんでした。もう一度お試しください。",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "学習アシスタント",
+      "collapse": "折りたたむ",
+      "expand": "展開する",
+      "close": "AIアシスタントを閉じる"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "考え中..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "質問を入力...",
+      "send": "メッセージを送信"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "分かりやすく説明して",
+      "quiz": "クイズを出して",
+      "example": "例をあげて"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "AIアシスタントを開く"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "申し訳ありません。現在接続に問題が発生しています。インターネット接続またはAPIキーを確認してください。",
+      "api": "OpenRouter APIキーに問題が発生しました（請求または認証の問題）。\n\n*代替応答*:\n「{{userMessage}}」について質問されました。APIが利用できないため、現在「{{courseTitle}}」の学習中であることが確認できます。練習を続けましょう！",
+      "defaultCourse": "ダッシュボード"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "キャリアモード Beta",
+      "title": "面接対策",
+      "description": "特定の企業に絞り込み、実際の質問で練習し、本番さながらの面接環境を体験できます。",
+      "readiness": "全体的な準備度",
+      "ready": "準備完了",
+      "questionsLabel": "質問数"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "あなたへのおすすめ",
+      "progress": "進捗",
+      "searchPlaceholder": "企業を検索（例: Google, Amazon）...",
+      "emptyState": "選択した条件に一致する企業は見つかりませんでした。"
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "職種で企業を検索",
+      "placeholder": "企業を検索（例: Google, Amazon）..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "接続中...",
+      "requestTime": "{{interviewer}} に追加時間をリクエスト",
+      "analyzingCode": "コードを分析中...",
+      "analysisDescription": "AIがあなたのアプローチを最適な時間・空間複雑度と比較・評価しています。",
+      "questionProgress": "質問 {{current}} / {{total}}",
+      "nextQuestion": "次の質問",
+      "finishInterview": "面接を終了",
+      "voiceTurnProgress": "リアルタイム音声面接 - ターン {{current}} / {{total}}",
+      "aiThinking": "AIが考え中...",
+      "listeningStatus": "音声を聞き取り中（自動で認識されます）...",
+      "waitingStatus": "AIが話し終えるのをお待ちください...",
+      "endInterviewEarly": "途中で面接を終了",
+      "sendNowOverride": "今すぐ送信（強制送信）",
+      "totalTime": "合計時間",
+      "questions": "質問",
+      "extraTimePrompt": "追加時間は何分必要ですか？（最大30分）",
+      "extraTimeLimitReached": "追加できるのは最大 {{max}} 分までです。タイマーに {{max}} 分を追加しました。",
+      "extraTimeGranted": "追加で {{requested}} 分を付与しました。頑張ってください。",
+      "extraTimeTotalLimitReached": "リクエストできる合計時間は最大30分です。残りの {{remaining}} 分をタイマーに追加しました。",
+      "fallbackSpeech": "よく聞き取れませんでした。",
+      "speechNotSupported": "お使いのブラウザは音声認識をサポートしていません。Chromeをご利用ください。"
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "初級",
+        "medium": "中級",
+        "hard": "上級"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "saveQuestion": "質問を保存",
+      "removeSaved": "保存から削除",
+      "srsStage": "SRSステージ",
+      "box": "ボックス {{number}}",
+      "nextReview": "次回の復習:",
+      "notScheduled": "未定",
+      "forgotWrong": "忘れた / 不正解",
+      "rememberedRight": "覚えている / 正解",
+      "viewSolution": "解答を見る",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "質問の復習がスケジュールされました！その調子です。",
+        "reviewReset": "間隔がリセットされました。明日この質問を再復習します。"
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "現在AIが利用できません。時間をおいて再試行するか、APIキーの設定を確認してください。",
+      "errorGeneratingTextReport": "技術レポートの生成中にエラーが発生しました。APIキーまたはインターネット接続を確認してください。",
+      "errorGeneratingVoiceReport": "レポートの生成中にエラーが発生しました。APIキーまたはインターネット接続を確認してください。",
+      "aiInterviewReport": "AI面接レポート",
+      "aiInterviewDescription": "あなたのパフォーマンスに関する詳細な評価内容。",
+      "technicalEvaluation": "技術的評価",
+      "technicalEvaluationDescription": "パフォーマンス、気づき、改善点を確認しましょう。",
+      "backToStudyMode": "学習モードに戻る"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "企業一覧に戻る",
+      "title": "復習キュー（分散学習）",
+      "description": "ライトナーシステムを使用して、以前練習した質問を復習します。",
+      "instructions": "本日の質問に答えましょう。「正解」にすると復習間隔が伸び、「不正解」にすると明日再復習します。",
+      "caughtUpTitle": "すべて完了しました！",
+      "caughtUpDescription": "現在、復習が必要な質問はありません。キャリアモードで新しい質問に挑戦し、復習キューを追加しましょう！",
+      "exploreCompanies": "企業を探す"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "学習用質問",
+      "mockInterview": "模擬面接",
+      "questionBank": "質問バンク",
+      "practiced": "{{practiced}} / {{total}} 完了",
+      "chooseModeTitle": "面接モードを選択",
+      "chooseModeDescription": "体系的な質問集で練習するか、AIとのリアルタイム音声面接を体験できます。",
+      "standardTechnical": "標準技術面接",
+      "standardTechnicalDescription": "{{companyName}} 向けの体系的な技術面接を受けます。",
+      "startTextInterview": "テキスト面接を開始",
+      "aiVoiceInterview": "AI音声面接",
+      "aiVoiceDescription": "リアルな音声面接官と一緒に、思考を声に出して伝える練習をします。",
+      "startVoiceInterview": "音声面接を開始",
+      "newBadge": "新機能"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "全画面表示を解除",
+      "closeModal": "閉じる",
+      "toggleFullscreen": "全画面表示を切り替え",
+      "yourAnswer": "あなたの回答",
+      "chooseInterviewer": "面接官を選択",
+      "selectPersona": "練習したい面接官のペルソナ（声・雰囲気）を選択してください。",
+      "maleVoice": "オーソドックスな技術面接官",
+      "femaleVoice": "穏やかで協力的な面接官"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "ログアウトしますか？",
+    "body": "アカウントからログアウトしてもよろしいですか？"
   },
   "settings": {
-    "title": "Settings",
+    "title": "設定",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "プロフィール",
+      "appearance": "外観",
+      "xpStore": "XPショップ",
+      "learning": "学習設定",
+      "quiz": "小テスト",
+      "certificate": "修了証",
+      "achievements": "実績",
+      "account": "アカウント"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "変更を保存",
+      "reset": "初期値に戻す"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "プロフィール設定",
+      "displayName": "表示名",
+      "displayNamePlaceholder": "表示名を入力",
+      "email": "メールアドレス",
+      "emailPlaceholder": "メールアドレスを入力",
+      "memberSince": "登録日",
+      "avatar": "アバター",
+      "uploadAvatar": "カスタムアバターをアップロード",
+      "removeAvatar": "カスタムを削除",
+      "custom": "カスタム",
+      "currentAvatar": "現在のアバター",
+      "uploading": "アップロード中",
+      "presetAvatar": "またはプリセットアバターを選択",
+      "uploadHint": "PNGまたはJPEG形式の画像（最大2MB）をアップロードするか、以下のプリセットを選択してください。"
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "外観",
+      "themeMode": "テーマモード",
+      "themeModeDesc": "ライトモードとダークモードの切り替え",
+      "light": "ライト",
+      "dark": "ダーク",
+      "gradientIntensity": "グラデーションの強さ",
+      "subtle": "ひかえめ",
+      "balanced": "標準",
+      "vibrant": "鮮やか",
+      "language": "言語",
+      "languageDesc": "希望の言語を選択してください"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "学習設定",
+      "dailyGoal": "1日の目標時間",
+      "reminders": "進捗リマインダー",
+      "remindersDesc": "連続記録を維持するための通知を受け取る",
+      "autoSave": "ノートの自動保存",
+      "autoSaveDesc": "進捗状況を自動的に保存する"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "小テスト設定",
+      "instantFeedback": "即時フィードバック",
+      "instantFeedbackDesc": "正解/不正解をすぐに表示する",
+      "showAnswers": "正解を表示",
+      "showAnswersDesc": "完了後に正解を表示する",
+      "allowRetry": "再挑戦を許可",
+      "allowRetryDesc": "すぐに再挑戦できるようにする"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "修了証の設定",
+      "nameLabel": "修了証の氏名",
+      "namePlaceholder": "本名（氏名）",
+      "nameHint": "この名前が取得するすべての修了証に印刷されます。",
+      "format": "デフォルト形式",
+      "pdf": "PDF（標準）",
+      "image": "画像（Pro）"
+    },
+    "certificatePage": {
+      "backToDashboard": "ダッシュボードに戻る",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "リンクをコピーしました！",
+      "linkCopiedToast": "検証リンクをクリップボードにコピーしました！",
+      "shareTwitter": "X（旧Twitter）で共有",
+      "shareLinkedIn": "LinkedInで共有",
+      "sharing": "共有中...",
+      "downloadPDF": "PDFをダウンロード",
+      "generatingPDF": "PDFを生成中..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "実績"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "アカウント管理",
+      "resetProgress": "進捗をリセット",
+      "resetProgressDesc": "すべてのコース進捗とテストのスコアを消去します",
+      "reset": "リセット",
+      "clearData": "ローカルデータを削除",
+      "clearDataDesc": "このデバイスからすべてのアカウントデータを削除します",
+      "clear": "削除"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "XPショップ"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "進捗をリセットしますか？",
+      "resetBody": "これにより、すべてのコース進捗とテストスコアが削除されます。この操作は取り消せません。",
+      "clearTitle": "すべてのデータを削除しますか？",
+      "clearBody": "これにより、このブラウザからアカウントと関連するすべてのデータが削除され、ログアウトされます。",
+      "unsavedTitle": "未保存の変更があります",
+      "unsavedBody": "保存されていない変更があります。保存せずに移動してもよろしいですか？",
+      "stay": "とどまる",
+      "leave": "移動する"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "認定資格を読み込み中...",
+    "title": "取得した認定資格",
+    "subtitle": "あなたのスキルと成果の公式証明書。",
+    "emptyTitle": "修了証はまだありません",
+    "emptyDescription": "コースを修了し、小テストに合格してプロフェッショナル認定資格を取得しましょう。",
+    "browseCourses": "コースを見る",
+    "cardTitle": "{{courseTitle}} 修了証",
+    "issued": "発行日: {{date}}",
+    "copyLink": "リンクをコピー",
+    "copied": "コピー完了",
+    "viewCertificate": "修了証を見る"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
+    "title": "修了証",
+    "subtitle": "Certificate of Completion",
+    "certifyThat": "以下に示す人物が",
+    "demonstratedMastery": "において優秀な成績を収めたことを証明します",
+    "assessmentPrefix": "評価テストにおいてスコア",
+    "assessmentSuffix": "（取得日: {{date}}）を達成し、本分野の基本概念および応用知識を十分に習得したことを証明します。",
+    "dateIssued": "発行日",
+    "verified": "認証済み",
     "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "platformDirector": "プラットフォームディレクター"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "修了証の詳細を読み込み中...",
+    "unavailableTitle": "修了証が利用できません",
+    "unavailableDescription": "このコースはまだ修了していません。",
+    "goToCourse": "コースへ行く",
+    "backToDashboard": "ダッシュボードに戻る",
+    "linkCopied": "リンクをコピーしました！",
+    "copyLink": "リンクをコピー",
+    "shareTwitter": "X（旧Twitter）で共有",
+    "sharing": "共有中...",
+    "shareLinkedIn": "LinkedInで共有",
+    "generatingPdf": "PDFを生成中...",
+    "downloadPdf": "PDFをダウンロード",
+    "shareTextTwitter": "SkillVerse Academyで「{{title}}」の修了証を取得しました！ 🎓🚀 認証された証明書はこちら:",
+    "shareTextLinkedIn": "SkillVerseで「{{title}}」を修了したことをお知らせします！ 🎓🌟 証明書はこちらから確認できます:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "修了証の画像をダウンロードしました！LinkedInの投稿画面へ移動します...",
+      "redirectingLinkedIn": "LinkedInの投稿画面へ移動中..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "認証済み証明書",
+      "issued": "発行日: {{date}}",
+      "title": "修了証",
+      "description": "は、本コースの全要件を完了し、優秀な成果を収めました",
+      "passingScore": "合格スコア: {{score}}%",
+      "verifiedAchievement": "認証された実績"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "レッスンディスカッション & Q&A",
+    "subtitle": "質問、気付きの共有、他の受講生とのディスカッションができます",
+    "placeholder": "このレッスンについて質問や意見を入力...",
+    "submit": "コメントを投稿",
+    "loginRequired": "ディスカッションに参加して質問を投稿するにはログインしてください。",
+    "emptyTitle": "ディスカッションはまだありません",
+    "emptySubtitle": "最初の質問やメモを投稿してみましょう！",
+    "time": {
+      "justNow": "たった今"
     }
   }
 }

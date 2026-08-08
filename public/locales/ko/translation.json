@@ -1,288 +1,288 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "courses": "Courses",
-    "career": "Career Mode",
-    "certifications": "Certifications",
-    "admin": "Admin",
-    "settings": "Settings",
-    "logout": "Log Out",
-    "menu": "Menu",
-    "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "dashboard": "대시보드",
+    "courses": "코스",
+    "career": "커리어 모드",
+    "certifications": "자격증",
+    "admin": "관리자",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "menu": "메뉴",
+    "openMenu": "메뉴 열기",
+    "closeMenu": "메뉴 닫기"
   },
   "common": {
-    "cancel": "Cancel",
-    "confirm": "Confirm",
+    "cancel": "취소",
+    "confirm": "확인",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "beginner": "초급",
+      "intermediate": "중급",
+      "advanced": "고급"
     }
   },
   "dashboard": {
-    "loading": "Loading dashboard...",
+    "loading": "대시보드를 불러오는 중...",
     "header": {
-      "title": "Dashboard",
-      "tourButton": "Take a Tour",
-      "subtitle": "Overview of your learning journey"
+      "title": "대시보드",
+      "tourButton": "둘러보기",
+      "subtitle": "학습 여정 개요"
     },
     "search": {
-      "placeholder": "Search courses...",
-      "viewAll": "View All Results",
-      "empty": "No courses found matching your criteria."
+      "placeholder": "코스 검색...",
+      "viewAll": "전체 결과 보기",
+      "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다."
     },
     "continue": {
-      "title": "Continue where you left off",
-      "button": "Resume"
+      "title": "이어서 학습하기",
+      "button": "재개"
     },
     "reviewQueue": {
-      "title": "Spaced Repetition Review",
-      "messageOne": "You have {{count}} question due for review today!",
-      "messageOther": "You have {{count}} questions due for review today!",
-      "button": "Review Now"
+      "title": "간격 반복 학습",
+      "messageOne": "오늘 복습할 질문이 {{count}}개 있습니다!",
+      "messageOther": "오늘 복습할 질문이 {{count}}개 있습니다!",
+      "button": "지금 복습하기"
     },
     "stats": {
-      "greeting": "Keep it up, {{username}}!",
-      "streakTooltip": "Click to view streak celebration",
-      "streakOne": "{{count}} day streak",
-      "streakOther": "{{count}} days streak",
-      "summary": "You've completed {{completedCount}} out of {{totalCourses}} available courses.",
-      "continueLearning": "Continue Learning",
-      "viewCertificates": "View Certificates",
-      "progressTitle": "Progress by Category"
+      "greeting": "지금처럼 계속해 보세요, {{username}}님!",
+      "streakTooltip": "연속 학습 축하를 보려면 클릭하세요",
+      "streakOne": "{{count}}일 연속 학습",
+      "streakOther": "{{count}}일 연속 학습",
+      "summary": "전체 {{totalCourses}}개 코스 중 {{completedCount}}개를 완료했습니다.",
+      "continueLearning": "학습 계속하기",
+      "viewCertificates": "인증서 보기",
+      "progressTitle": "카테고리별 진행률"
     },
     "recommended": {
-      "title": "Recommended for You"
+      "title": "추천 코스"
     },
     "categories": {
-      "title": "Quick Access",
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "title": "빠른 접근",
+      "programming": "프로그래밍",
+      "dsa": "알고리즘 및 자료구조",
+      "design": "디자인",
+      "default": "카테고리"
     },
     "reminder": {
-      "message": "Reminder: Hit your daily goal of {{dailyGoal}} minutes to keep your streak!"
+      "message": "알림: 연속 학습 기록을 유지하려면 일일 목표인 {{dailyGoal}}분을 달성하세요!"
     },
     "savedQuestions": {
-      "title": "Saved Questions",
-      "practiceLink": "Practice →",
-      "viewAll": "View all {{count}} saved questions →",
-      "emptyMessage": "You haven't saved any questions yet! Head to Career Mode to start practicing.",
-      "button": "Explore Questions"
+      "title": "저장된 질문",
+      "practiceLink": "연습하기 →",
+      "viewAll": "저장된 {{count}}개 질문 모두 보기 →",
+      "emptyMessage": "아직 저장된 질문이 없습니다! 커리어 모드로 이동하여 연습을 시작하세요.",
+      "button": "질문 둘러보기"
     },
     "mockHistory": {
-      "title": "Mock Interview History",
-      "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
-      "button": "Start Mock Interview"
+      "title": "모의 면접 기록",
+      "emptyMessage": "실제 환경에서 실력을 테스트하려면 커리어 모드에서 모의 면접을 시작하세요.",
+      "button": "모의 면접 시작"
     }
   },
   "courses": {
-    "title": "Explore Courses",
-    "subtitle": "Expand your knowledge with our premium curriculum.",
-    "searchPlaceholder": "Search courses...",
-    "filterTitle": "Filter by category",
-    "allCategories": "All Categories",
+    "title": "코스 탐색",
+    "subtitle": "프리미엄 커리큘럼으로 지식을 넓혀보세요.",
+    "searchPlaceholder": "코스 검색...",
+    "filterTitle": "카테고리별 필터",
+    "allCategories": "전체 카테고리",
     "categories": {
-      "programming": "Programming",
-      "dsa": "DSA",
-      "design": "Design",
-      "default": "Category"
+      "programming": "프로그래밍",
+      "dsa": "알고리즘 및 자료구조",
+      "design": "디자인",
+      "default": "카테고리"
     },
-    "review": "Review",
-    "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "review": "복습하기",
+    "startLearning": "학습 시작",
+    "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다."
   },
   "categoryView": {
-    "loading": "Loading category courses...",
-    "backToDashboard": "Back to Dashboard",
-    "review": "Review",
-    "start": "Start",
+    "loading": "카테고리 코스를 불러오는 중...",
+    "backToDashboard": "대시보드로 돌아가기",
+    "review": "복습하기",
+    "start": "시작",
     "categories": {
       "programming": {
-        "title": "Programming",
-        "description": "Build real-world technical skills through practical programming lessons and projects."
+        "title": "프로그래밍",
+        "description": "코딩 강의와 실전 프로젝트를 통해 실용적인 기술 역량을 기릅니다."
       },
       "dsa": {
-        "title": "DSA",
-        "description": "Strengthen your algorithmic thinking with data structures and problem-solving practice."
+        "title": "알고리즘 및 자료구조",
+        "description": "자료구조와 문제 해결 연습으로 알고리즘적 사고를 강화합니다."
       },
       "design": {
-        "title": "Design",
-        "description": "Develop your visual and product design intuition with hands-on creative lessons."
+        "title": "디자인",
+        "description": "창의적이고 실용적인 강의로 비주얼 및 제품 디자인 감각을 키웁니다."
       }
     }
   },
   "courseView": {
-    "notFound": "Course not found",
-    "loading": "Loading course material...",
-    "back": "Back",
+    "notFound": "코스를 찾을 수 없습니다",
+    "loading": "코스 자료를 불러오는 중...",
+    "back": "뒤로 가기",
     "navigation": {
-      "notesResources": "Notes & Resources",
-      "finalQuiz": "Final Quiz"
+      "notesResources": "노트 및 자료",
+      "finalQuiz": "최종 퀴즈"
     },
     "resources": {
-      "title": "External Resources",
-      "proceed": "Proceed to Quiz"
+      "title": "외부 자료",
+      "proceed": "퀴즈로 이동"
     },
     "quiz": {
-      "question": "Question {{current}}",
+      "question": "질문 {{current}}",
       "questionCount": "{{total}}",
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit Quiz",
+      "previous": "이전",
+      "next": "다음",
+      "submit": "퀴즈 제출",
       "result": {
-        "congratulations": "Congratulations!",
-        "keepTrying": "Keep Trying!",
-        "scorePrefix": "You scored",
-        "earnedCertificate": "You have earned a certificate.",
-        "need70": "You need 70% to pass.",
-        "viewCertificate": "View Certificate",
-        "retryReminder": "Take a moment to review the course material before trying again!",
-        "retryCountdown": "⏳ You can retry in {{time}}",
-        "retry": "Retry Quiz",
-        "retryDisabled": "Retrying quizzes is disabled in your settings.",
-        "reviewAnswers": "Review Answers"
+        "congratulations": "축하합니다!",
+        "keepTrying": "계속 도전해보세요!",
+        "scorePrefix": "취득 점수:",
+        "earnedCertificate": "수료증을 획득했습니다.",
+        "need70": "통과하려면 최소 70% 이상의 점수가 필요합니다.",
+        "viewCertificate": "수료증 보기",
+        "retryReminder": "다시 시도하기 전에 코스 자료를 잠시 복습해보세요!",
+        "retryCountdown": "⏳ {{time}} 후에 다시 시도할 수 있습니다",
+        "retry": "퀴즈 다시 풀기",
+        "retryDisabled": "설정에서 퀴즈 재시도가 비활성화되어 있습니다.",
+        "reviewAnswers": "답안 검토"
       }
     }
   },
   "aiAssistant": {
-    "welcome": "Hi there! I'm your AI tutor for **{{courseTitle}}**.\n\nI can explain concepts, give you examples, or quiz you on what you've learned. How can I help you today?",
-    "fallbackResponse": "I couldn't generate a response. Please try again.",
+    "welcome": "안녕하세요! **{{courseTitle}}** 코스의 AI 튜터입니다.\n\n개념 설명, 예시 제공, 학습 내용에 대한 퀴즈 출제를 도와드릴 수 있습니다. 오늘 어떤 것을 도와드릴까요?",
+    "fallbackResponse": "답변을 생성할 수 없습니다. 다시 시도해 주세요.",
     "header": {
-      "title": "Learning Assistant",
-      "collapse": "Collapse",
-      "expand": "Expand",
-      "close": "Close AI Assistant"
+      "title": "학습 도우미",
+      "collapse": "접기",
+      "expand": "펼치기",
+      "close": "AI 도우미 닫기"
     },
     "status": {
-      "thinking": "Thinking..."
+      "thinking": "생각 중..."
     },
     "input": {
-      "placeholder": "Ask a question...",
-      "send": "Send message"
+      "placeholder": "질문을 입력하세요...",
+      "send": "메시지 전송"
     },
     "suggestions": {
-      "explain": "Explain simply",
-      "quiz": "Give me a quiz",
-      "example": "Give an example"
+      "explain": "쉽게 설명해 줘",
+      "quiz": "퀴즈 내 줘",
+      "example": "예시를 들어 줘"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "AI 도우미 열기"
     },
     "error": {
-      "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",
-      "api": "Whoops! There was an issue with your OpenRouter API key (billing or authentication).\n\n*Mock Response Fallback*:\nYou asked about: \"{{userMessage}}\". Since the API is down, I can see you're currently in the context of \"{{courseTitle}}\". Keep practicing!",
-      "defaultCourse": "your dashboard"
+      "connection": "죄송합니다. 현재 연결에 문제가 발생했습니다. 인터넷 연결이나 API 키를 확인해 주세요.",
+      "api": "이런! OpenRouter API 키(결제 또는 인증)에 문제가 발생했습니다.\n\n*대체 응답*:\n질문하신 내용: \"{{userMessage}}\". API를 사용할 수 없지만 현재 \"{{courseTitle}}\" 학습 중인 것을 확인했습니다. 계속 연습해 보세요!",
+      "defaultCourse": "대시보드"
     }
   },
   "careerMode": {
     "header": {
-      "badge": "Career Mode Beta",
-      "title": "Interview Prep",
-      "description": "Target specific companies, practice real questions, and simulate high-pressure interview environments.",
-      "readiness": "Overall Readiness",
-      "ready": "Ready",
-      "questionsLabel": "Questions"
+      "badge": "커리어 모드 베타",
+      "title": "면접 준비",
+      "description": "특정 기업에 집중하고, 실전 질문을 연습하며, 실제 면접과 같은 압박감을 경험해보세요.",
+      "readiness": "전반적인 준비도",
+      "ready": "준비 완료",
+      "questionsLabel": "질문 수"
     },
     "companyCards": {
-      "recommendedTitle": "Recommended for You",
-      "progress": "Progress",
-      "searchPlaceholder": "Search companies (e.g. Google, Amazon)...",
-      "emptyState": "No companies found matching your criteria."
+      "recommendedTitle": "추천 기업",
+      "progress": "진행률",
+      "searchPlaceholder": "기업 검색 (예: Google, Amazon)...",
+      "emptyState": "선택한 조건에 맞는 기업을 찾을 수 없습니다."
     },
     "roleSearchFilters": {
-      "label": "Search companies by role",
-      "placeholder": "Search companies (e.g. Google, Amazon)..."
+      "label": "직무별 기업 검색",
+      "placeholder": "기업 검색 (예: Google, Amazon)..."
     },
     "timer": {
-      "connecting": "Connecting...",
-      "requestTime": "Ask {{interviewer}} for Time",
-      "analyzingCode": "Analyzing your code...",
-      "analysisDescription": "Our AI is running your approach against optimal Time and Space complexities.",
-      "questionProgress": "Question {{current}} of {{total}}",
-      "nextQuestion": "Next Question",
-      "finishInterview": "Finish Interview",
-      "voiceTurnProgress": "Live Voice Interview - Turn {{current}} of {{total}}",
-      "aiThinking": "AI is thinking...",
-      "listeningStatus": "Listening (speaking will auto-detect)...",
-      "waitingStatus": "Wait for AI to finish...",
-      "endInterviewEarly": "End Interview Early",
-      "sendNowOverride": "Send Now (Override Silence)",
-      "totalTime": "Total Time",
-      "questions": "Questions",
-      "extraTimePrompt": "How many extra minutes do you need? (Max 30)",
-      "extraTimeLimitReached": "I can only grant a maximum of {{max}} additional minutes. I have added {{max}} minutes to your clock.",
-      "extraTimeGranted": "I have granted you {{requested}} extra minutes. Good luck.",
-      "extraTimeTotalLimitReached": "You can only request up to 30 minutes total. I have added your remaining {{remaining}} minutes to your clock.",
-      "fallbackSpeech": "I didn't quite catch that.",
-      "speechNotSupported": "Speech recognition is not supported in this browser. Please use Chrome."
+      "connecting": "연결 중...",
+      "requestTime": "{{interviewer}}면접관에게 시간 연장 요청",
+      "analyzingCode": "작성한 코드 분석 중...",
+      "analysisDescription": "AI가 최적의 시간 및 공간 복잡도와 비교하여 풀이를 평가하고 있습니다.",
+      "questionProgress": "질문 {{current}} / {{total}}",
+      "nextQuestion": "다음 질문",
+      "finishInterview": "면접 종료",
+      "voiceTurnProgress": "실시간 음성 면접 - 턴 {{current}} / {{total}}",
+      "aiThinking": "AI 생각 중...",
+      "listeningStatus": "음성 듣는 중 (자동으로 인식됩니다)...",
+      "waitingStatus": "AI가 말을 마칠 때까지 기다려 주세요...",
+      "endInterviewEarly": "면접 조기 종료",
+      "sendNowOverride": "지금 전송 (무시하고 전송)",
+      "totalTime": "총 소요 시간",
+      "questions": "질문",
+      "extraTimePrompt": "추가 시간이 몇 분 필요하신가요? (최대 30분)",
+      "extraTimeLimitReached": "최대 {{max}}분까지만 추가할 수 있습니다. 타이머에 {{max}}분을 추가했습니다.",
+      "extraTimeGranted": "{{requested}}분의 추가 시간을 부여했습니다. 행운을 빕니다!",
+      "extraTimeTotalLimitReached": "총 연장 시간은 최대 30분까지 가능합니다. 타이머에 남은 {{remaining}}분을 추가했습니다.",
+      "fallbackSpeech": "잘 이해하지 못했습니다.",
+      "speechNotSupported": "이 브라우저에서는 음성 인식을 지원하지 않습니다. Chrome을 사용해 주세요."
     },
     "question": {
       "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard"
+        "easy": "쉬움",
+        "medium": "보통",
+        "hard": "어려움"
       },
-      "saveQuestion": "Save question",
-      "removeSaved": "Remove from saved",
-      "srsStage": "SRS Stage",
-      "box": "Box {{number}}",
-      "nextReview": "Next review:",
-      "notScheduled": "Not scheduled yet",
-      "forgotWrong": "Forgot / Wrong",
-      "rememberedRight": "Remembered / Right",
-      "viewSolution": "View solution",
+      "saveQuestion": "질문 저장",
+      "removeSaved": "저장 취소",
+      "srsStage": "SRS 단계",
+      "box": "상자 {{number}}",
+      "nextReview": "다음 복습:",
+      "notScheduled": "일정 없음",
+      "forgotWrong": "잊음 / 오답",
+      "rememberedRight": "기억함 / 정답",
+      "viewSolution": "해설 보기",
       "xpAward": "+25 XP",
       "toast": {
-        "reviewScheduled": "Question review scheduled further out! Keep it up.",
-        "reviewReset": "Interval reset. You will review this question again tomorrow."
+        "reviewScheduled": "질문 복습 일정이 나중으로 설정되었습니다! 잘하고 계십니다.",
+        "reviewReset": "복습 주기가 초기화되었습니다. 내일 이 질문을 다시 복습하게 됩니다."
       }
     },
     "reports": {
-      "aiUnavailable": "AI is currently unavailable, please try again or check your API key settings.",
-      "errorGeneratingTextReport": "There was an error generating your technical report. Please check your API key or internet connection.",
-      "errorGeneratingVoiceReport": "There was an error generating your report. Please check your API key or internet connection.",
-      "aiInterviewReport": "AI Interview Report",
-      "aiInterviewDescription": "A detailed verbal assessment of your performance.",
-      "technicalEvaluation": "Technical Evaluation",
-      "technicalEvaluationDescription": "Review your performance, insights, and areas to improve.",
-      "backToStudyMode": "Back to Study Mode"
+      "aiUnavailable": "현재 AI를 사용할 수 없습니다. 잠시 후 다시 시도하거나 API 키 설정을 확인하세요.",
+      "errorGeneratingTextReport": "기술 평가 리포트를 생성하는 중 오류가 발생했습니다. API 키 또는 인터넷 연결을 확인하세요.",
+      "errorGeneratingVoiceReport": "리포트를 생성하는 중 오류가 발생했습니다. API 키 또는 인터넷 연결을 확인하세요.",
+      "aiInterviewReport": "AI 면접 리포트",
+      "aiInterviewDescription": "면접 수행에 대한 상세한 구두 평가입니다.",
+      "technicalEvaluation": "기술적 평가",
+      "technicalEvaluationDescription": "수행 결과, 피드백 및 개선할 점을 검토하세요.",
+      "backToStudyMode": "학습 모드로 돌아가기"
     },
     "reviewQueue": {
-      "backToCompanies": "Back to Companies",
-      "title": "Spaced Repetition Review Queue",
-      "description": "Review questions you previously practiced using the Leitner system.",
-      "instructions": "Answer these questions today. Mark them as Right to move them to a longer interval, or Wrong to review them again tomorrow.",
-      "caughtUpTitle": "You're all caught up!",
-      "caughtUpDescription": "No questions are currently due for review. Practice more questions in Career Mode to build your review queue!",
-      "exploreCompanies": "Explore Companies"
+      "backToCompanies": "기업 목록으로 돌아가기",
+      "title": "복습 큐 (간격 반복 학습)",
+      "description": "라이트너 시스템을 사용하여 이전에 연습한 질문을 복습하세요.",
+      "instructions": "오늘의 질문에 답해 보세요. 복습 간격을 늘리려면 '정답', 내일 다시 복습하려면 '오답'으로 표시하세요.",
+      "caughtUpTitle": "모든 복습을 완료했습니다!",
+      "caughtUpDescription": "현재 복습할 질문이 없습니다. 커리어 모드에서 더 많은 질문을 연습하여 복습 대기열을 채워보세요!",
+      "exploreCompanies": "기업 탐색"
     },
     "standardView": {
-      "studyQuestions": "Study Questions",
-      "mockInterview": "Mock Interview",
-      "questionBank": "Question Bank",
-      "practiced": "{{practiced}} / {{total}} Practiced",
-      "chooseModeTitle": "Choose Your Interview Mode",
-      "chooseModeDescription": "Practice with a structured question bank or simulate a live voice interview with AI.",
-      "standardTechnical": "Standard Technical",
-      "standardTechnicalDescription": "Take a structured technical interview for {{companyName}}.",
-      "startTextInterview": "Start Text Interview",
-      "aiVoiceInterview": "AI Voice Interview",
-      "aiVoiceDescription": "Practice speaking your thoughts out loud with a realistic voice interviewer.",
-      "startVoiceInterview": "Start Voice Interview",
-      "newBadge": "New"
+      "studyQuestions": "학습 질문",
+      "mockInterview": "모의 면접",
+      "questionBank": "문제 은행",
+      "practiced": "{{practiced}} / {{total}} 완료",
+      "chooseModeTitle": "면접 모드 선택",
+      "chooseModeDescription": "구조화된 질문 모음으로 연습하거나 AI와 실시간 음성 면접을 진행해 보세요.",
+      "standardTechnical": "표준 기술 면접",
+      "standardTechnicalDescription": "{{companyName}} 맞춤형 구조화된 기술 면접을 진행합니다.",
+      "startTextInterview": "텍스트 면접 시작",
+      "aiVoiceInterview": "AI 음성 면접",
+      "aiVoiceDescription": "생생한 음성 면접관과 함께 생각을 말로 표현하는 연습을 합니다.",
+      "startVoiceInterview": "음성 면접 시작",
+      "newBadge": "신규"
     },
     "modal": {
-      "exitFullscreen": "Exit Fullscreen",
-      "closeModal": "Close",
-      "toggleFullscreen": "Toggle Fullscreen",
-      "yourAnswer": "Your Answer",
-      "chooseInterviewer": "Choose your interviewer",
-      "selectPersona": "Select the voice persona you'd like to practice with.",
-      "maleVoice": "Classic technical interviewer",
-      "femaleVoice": "Calm and collaborative interviewer"
+      "exitFullscreen": "전체 화면 종료",
+      "closeModal": "닫기",
+      "toggleFullscreen": "전체 화면 전환",
+      "yourAnswer": "작성한 답안",
+      "chooseInterviewer": "면접관 선택",
+      "selectPersona": "함께 연습하고 싶은 음성 페르소나를 선택하세요.",
+      "maleVoice": "전통적인 기술 면접관",
+      "femaleVoice": "차분하고 협력적인 면접관"
     },
     "editor": {
       "languages": {
@@ -295,158 +295,181 @@
     }
   },
   "logout": {
-    "title": "Log Out?",
-    "body": "Are you sure you want to log out of your account?"
+    "title": "로그아웃하시겠습니까?",
+    "body": "정말로 계정에서 로그아웃하시겠습니까?"
   },
   "settings": {
-    "title": "Settings",
+    "title": "설정",
     "tabs": {
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "xpStore": "XP Store",
-      "learning": "Learning",
-      "quiz": "Quiz",
-      "certificate": "Certificate",
-      "achievements": "Achievements",
-      "account": "Account"
+      "profile": "프로필",
+      "appearance": "화면 설정",
+      "xpStore": "XP 상점",
+      "learning": "학습 설정",
+      "quiz": "퀴즈",
+      "certificate": "수료증",
+      "achievements": "업적",
+      "account": "계정"
     },
     "actions": {
-      "save": "Save Changes",
-      "reset": "Reset to Defaults"
+      "save": "변경 사항 저장",
+      "reset": "기본값으로 초기화"
     },
     "profile": {
-      "title": "Profile Settings",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter email address",
-      "memberSince": "Member since",
-      "avatar": "Avatar",
-      "uploadAvatar": "Upload Custom Avatar",
-      "removeAvatar": "Remove Custom",
-      "custom": "Custom",
-      "currentAvatar": "Current Avatar",
-      "uploading": "Uploading",
-      "presetAvatar": "Or Select Preset Avatar",
-      "uploadHint": "Upload a PNG or JPEG image (max 2MB), or select a preset avatar below."
+      "title": "프로필 설정",
+      "displayName": "표시 이름",
+      "displayNamePlaceholder": "표시할 이름을 입력하세요",
+      "email": "이메일 주소",
+      "emailPlaceholder": "이메일 주소를 입력하세요",
+      "memberSince": "가입일",
+      "avatar": "아바타",
+      "uploadAvatar": "커스텀 아바타 업로드",
+      "removeAvatar": "커스텀 아바타 삭제",
+      "custom": "커스텀",
+      "currentAvatar": "현재 아바타",
+      "uploading": "업로드 중",
+      "presetAvatar": "또는 프리셋 아바타 선택",
+      "uploadHint": "PNG 또는 JPEG 이미지(최대 2MB)를 업로드하거나 아래에서 프리셋 아바타를 선택하세요."
     },
     "appearance": {
-      "title": "Appearance",
-      "themeMode": "Theme Mode",
-      "themeModeDesc": "Toggle between dark and light mode",
-      "light": "Light",
-      "dark": "Dark",
-      "gradientIntensity": "Gradient Intensity",
-      "subtle": "Subtle",
-      "balanced": "Balanced",
-      "vibrant": "Vibrant",
-      "language": "Language",
-      "languageDesc": "Choose your preferred language"
+      "title": "화면 설정",
+      "themeMode": "테마 모드",
+      "themeModeDesc": "라이트 모드와 다크 모드 전환",
+      "light": "라이트",
+      "dark": "다크",
+      "gradientIntensity": "그라데이션 강도",
+      "subtle": "은은하게",
+      "balanced": "균형 있게",
+      "vibrant": "선명하게",
+      "language": "언어",
+      "languageDesc": "선호하는 언어를 선택하세요"
     },
     "learning": {
-      "title": "Learning Preferences",
-      "dailyGoal": "Daily Study Goal",
-      "reminders": "Progress Reminders",
-      "remindersDesc": "Get notified to keep your streak",
-      "autoSave": "Auto-save Notes",
-      "autoSaveDesc": "Automatically save your progress"
+      "title": "학습 환경 설정",
+      "dailyGoal": "일일 학습 목표",
+      "reminders": "진행 상황 알림",
+      "remindersDesc": "연속 학습 기록을 유지하기 위한 알림 받기",
+      "autoSave": "노트 자동 저장",
+      "autoSaveDesc": "진행 상황을 자동으로 저장합니다"
     },
     "quiz": {
-      "title": "Quiz Preferences",
-      "instantFeedback": "Instant Feedback",
-      "instantFeedbackDesc": "Show correct/incorrect immediately",
-      "showAnswers": "Show Correct Answers",
-      "showAnswersDesc": "Reveal answers after quiz completion",
-      "allowRetry": "Allow Retry",
-      "allowRetryDesc": "Permit retaking quizzes immediately"
+      "title": "퀴즈 설정",
+      "instantFeedback": "즉시 피드백",
+      "instantFeedbackDesc": "정답/오답 여부를 즉시 표시",
+      "showAnswers": "정답 보기",
+      "showAnswersDesc": "퀴즈 완료 후 정답 공개",
+      "allowRetry": "재시도 허용",
+      "allowRetryDesc": "퀴즈를 즉시 다시 풀 수 있도록 허용"
     },
     "certificate": {
-      "title": "Certificate Settings",
-      "nameLabel": "Name on Certificate",
-      "namePlaceholder": "Legal Name",
-      "nameHint": "This name will appear on all your earned certificates.",
-      "format": "Default Format",
-      "pdf": "PDF (Standard)",
-      "image": "Image (Pro)"
+      "title": "수료증 설정",
+      "nameLabel": "수료증 표기 이름",
+      "namePlaceholder": "공식 실명",
+      "nameHint": "이 이름은 발급되는 모든 수료증에 표기됩니다.",
+      "format": "기본 형식",
+      "pdf": "PDF (표준)",
+      "image": "이미지 (Pro)"
+    },
+    "certificatePage": {
+      "backToDashboard": "대시보드로 돌아가기",
+      "copyLink": "링크 복사",
+      "linkCopied": "링크가 복사되었습니다!",
+      "linkCopiedToast": "인증 링크가 클립보드에 복사되었습니다!",
+      "shareTwitter": "Twitter에 공유",
+      "shareLinkedIn": "LinkedIn에 공유",
+      "sharing": "공유 중...",
+      "downloadPDF": "PDF 다운로드",
+      "generatingPDF": "PDF 생성 중..."
     },
     "achievements": {
-      "title": "Achievements"
+      "title": "업적"
     },
     "account": {
-      "title": "Account Management",
-      "resetProgress": "Reset Progress",
-      "resetProgressDesc": "Clear all course progress and quiz scores",
-      "reset": "Reset",
-      "clearData": "Clear Local Data",
-      "clearDataDesc": "Remove all account data from this device",
-      "clear": "Clear"
+      "title": "계정 관리",
+      "resetProgress": "진행 상황 초기화",
+      "resetProgressDesc": "모든 코스 진행 상황 및 퀴즈 점수를 삭제합니다",
+      "reset": "초기화",
+      "clearData": "로컬 데이터 삭제",
+      "clearDataDesc": "이 기기에서 모든 계정 데이터를 삭제합니다",
+      "clear": "삭제"
     },
     "xpStore": {
-      "title": "XP Store"
+      "title": "XP 상점"
     },
     "modals": {
-      "resetTitle": "Reset Progress?",
-      "resetBody": "This will delete all your course progress and quiz scores. This action cannot be undone.",
-      "clearTitle": "Clear All Data?",
-      "clearBody": "This will remove your account and all associated data from this browser. You will be logged out.",
-      "unsavedTitle": "Unsaved Changes",
-      "unsavedBody": "You have unsaved changes. Are you sure you want to leave without saving?",
-      "stay": "Stay",
-      "leave": "Leave"
+      "resetTitle": "진행 상황을 초기화하시겠습니까?",
+      "resetBody": "모든 코스 진행 상황과 퀴즈 점수가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+      "clearTitle": "모든 데이터를 삭제하시겠습니까?",
+      "clearBody": "이 브라우저에서 계정과 관련된 모든 데이터가 삭제되며 로그아웃됩니다.",
+      "unsavedTitle": "저장되지 않은 변경 사항",
+      "unsavedBody": "저장되지 않은 변경 사항이 있습니다. 저장하지 않고 나가시겠습니까?",
+      "stay": "머무르기",
+      "leave": "나가기"
     }
   },
   "certifications": {
-    "loading": "Loading certifications...",
-    "title": "My Certifications",
-    "subtitle": "Official proof of your skills and achievements.",
-    "emptyTitle": "No Certificates Yet",
-    "emptyDescription": "Complete courses and pass the final quizzes to earn professional certifications.",
-    "browseCourses": "Browse Courses",
-    "cardTitle": "{{courseTitle}} Certified",
-    "issued": "Issued {{date}}",
-    "copyLink": "Copy Link",
-    "copied": "Copied",
-    "viewCertificate": "Certificate"
+    "loading": "자격증을 불러오는 중...",
+    "title": "내 자격증",
+    "subtitle": "역량과 성취에 대한 공식 증명서입니다.",
+    "emptyTitle": "아직 수료증이 없습니다",
+    "emptyDescription": "코스를 완료하고 최종 퀴즈를 통과하여 전문 자격증을 획득하세요.",
+    "browseCourses": "코스 둘러보기",
+    "cardTitle": "{{courseTitle}} 수료증",
+    "issued": "발급일: {{date}}",
+    "copyLink": "링크 복사",
+    "copied": "복사됨",
+    "viewCertificate": "수료증 보기"
   },
   "certificateDisplay": {
     "academyName": "SkillVerse Academy",
-    "title": "Certificate",
-    "subtitle": "of Completion",
-    "certifyThat": "This is to certify that",
-    "demonstratedMastery": "Has successfully demonstrated mastery in",
-    "assessmentPrefix": "By passing the comprehensive assessment with a score of",
-    "assessmentSuffix": "on {{date}}, affirming competence in the fundamental and advanced concepts of this subject.",
-    "dateIssued": "Date Issued",
-    "verified": "Verified",
+    "title": "수 료 증",
+    "subtitle": "Certificate of Completion",
+    "certifyThat": "위 사람은",
+    "demonstratedMastery": "과정을 성공적으로 이수하고 우수한 역량을 증명하였음을 인정합니다.",
+    "assessmentPrefix": "종합 평가에서 점수",
+    "assessmentSuffix": "점을 기록하고(발급일: {{date}}), 해당 분야의 핵심 및 고급 개념에 대한 충분한 역량을 입증하였습니다.",
+    "dateIssued": "발급일",
+    "verified": "인증됨",
     "credentialId": "ID: {{id}}",
-    "platformDirector": "Platform Director"
+    "platformDirector": "플랫폼 디렉터"
   },
   "certificate": {
-    "loading": "Loading certificate details...",
-    "unavailableTitle": "Certificate Unavailable",
-    "unavailableDescription": "You haven't completed this course yet.",
-    "goToCourse": "Go to Course",
-    "backToDashboard": "Back to Dashboard",
-    "linkCopied": "Link Copied!",
-    "copyLink": "Copy Link",
-    "shareTwitter": "Share to Twitter",
-    "sharing": "Sharing...",
-    "shareLinkedIn": "Share to LinkedIn",
-    "generatingPdf": "Generating PDF...",
-    "downloadPdf": "Download PDF",
-    "shareTextTwitter": "I just earned a Certificate of Completion for \"{{title}}\" on SkillVerse Academy! 🎓🚀 Check out my verified credential:",
-    "shareTextLinkedIn": "I'm thrilled to share that I've completed \"{{title}}\" on SkillVerse! 🎓🌟 Verify my credential here:",
+    "loading": "수료증 상세 정보를 불러오는 중...",
+    "unavailableTitle": "수료증을 이용할 수 없습니다",
+    "unavailableDescription": "아직 이 코스를 완료하지 않았습니다.",
+    "goToCourse": "코스로 이동",
+    "backToDashboard": "대시보드로 돌아가기",
+    "linkCopied": "링크가 복사되었습니다!",
+    "copyLink": "링크 복사",
+    "shareTwitter": "Twitter에 공유",
+    "sharing": "공유 중...",
+    "shareLinkedIn": "LinkedIn에 공유",
+    "generatingPdf": "PDF 생성 중...",
+    "downloadPdf": "PDF 다운로드",
+    "shareTextTwitter": "SkillVerse Academy에서 \"{{title}}\" 수료증을 획득했습니다! 🎓🚀 인증된 수료증을 확인해 보세요:",
+    "shareTextLinkedIn": "SkillVerse에서 \"{{title}}\" 과정을 성공적으로 마쳤음을 공유하게 되어 기쁩니다! 🎓🌟 수료증 확인하기:",
     "toast": {
-      "imageDownloaded": "Certificate image downloaded! Redirecting to LinkedIn to post...",
-      "redirectingLinkedIn": "Redirecting to LinkedIn to post..."
+      "imageDownloaded": "수료증 이미지가 다운로드되었습니다! 게시를 위해 LinkedIn으로 이동합니다...",
+      "redirectingLinkedIn": "게시를 위해 LinkedIn으로 이동 중..."
     },
     "shareCard": {
-      "credentialVerified": "CREDENTIAL VERIFIED",
-      "issued": "Issued: {{date}}",
-      "title": "Certificate of Completion",
-      "description": "has successfully completed and mastered all requirements for",
-      "passingScore": "Passing Score: {{score}}%",
-      "verifiedAchievement": "Verified Achievement"
+      "credentialVerified": "인증된 수료증",
+      "issued": "발급일: {{date}}",
+      "title": "수료증",
+      "description": "은(는) 다음 과정을 성공적으로 이수하고 모든 요구 사항을 충족했습니다:",
+      "passingScore": "합격 점수: {{score}}%",
+      "verifiedAchievement": "인증된 성과"
+    }
+  },
+  "lessonDiscussion": {
+    "title": "강의 토론 및 Q&A",
+    "subtitle": "질문하고 인사이트를 나누며 다른 수강생들과 토론해 보세요",
+    "placeholder": "이 강의에 대해 질문하거나 의견을 남겨보세요...",
+    "submit": "댓글 작성",
+    "loginRequired": "토론에 참여하고 질문을 작성하려면 로그인해 주세요.",
+    "emptyTitle": "아직 토론이 없습니다",
+    "emptySubtitle": "이 강의에 첫 번째 질문이나 메모를 남겨보세요!",
+    "time": {
+      "justNow": "방금 전"
     }
   }
 }

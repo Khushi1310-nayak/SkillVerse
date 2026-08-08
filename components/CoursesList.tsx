@@ -9,7 +9,7 @@ import { Course } from '../types';
 
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<Course[]>(COURSES);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -18,9 +18,14 @@ export const CoursesList: React.FC = () => {
     const loadCourses = async () => {
       try {
         const data = await firestoreService.getCourses();
-        setCourses(data);
+        if (data && data.length > 0) {
+          setCourses(data);
+        } else {
+          setCourses(COURSES);
+        }
       } catch (error) {
         console.error('Error fetching courses from Firestore:', error);
+        setCourses(COURSES);
       } finally {
         setIsLoading(false);
       }

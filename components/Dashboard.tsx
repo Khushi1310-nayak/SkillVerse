@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase } from 'lucide-react';
-import { CATEGORIES } from '../constants';
+import { CATEGORIES, COURSES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 import { storageService } from '../services/storageService';

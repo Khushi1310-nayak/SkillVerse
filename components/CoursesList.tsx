@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Search, Filter, PlayCircle, CheckCircle, ChevronDown } from 'lucide-react';
-import { CATEGORIES } from '../constants';
+import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';

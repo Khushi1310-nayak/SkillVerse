@@ -11,6 +11,7 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 import { AdminRoute } from './guards/AdminRoute';
 import { AdminDashboard } from './components/AdminDashboard';
 import { storageService } from './services/storageService'; // Will clean up storageService next
+import { ErrorBoundary } from './components/ErrorBoundary';
 import NotFound from './components/NotFound';
 import { Loader2 } from 'lucide-react';
 
@@ -72,54 +73,60 @@ const AppRoutes = () => {
   };
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/docs" element={<DocumentationPage />} />
-        <Route path="/credential/:token" element={<CredentialVerification />} />
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/docs" element={<DocumentationPage />} />
+          <Route path="/credential/:token" element={<CredentialVerification />} />
 
-        {/* Verification Wall */}
-        <Route path="/verify-email" element={
-          user && (!user.emailVerified && user.providerData[0]?.providerId === "password") ?
-            <Auth /> : <Navigate to="/" replace />
-        } />
+          {/* Verification Wall */}
+          <Route path="/verify-email" element={
+            user && (!user.emailVerified && user.providerData[0]?.providerId === "password") ?
+              <Auth /> : <Navigate to="/" replace />
+          } />
 
-        <Route path="/*" element={
-          !user && !showAuth ? (
-            <LandingPage onGetStarted={() => setShowAuth(true)} />
-          ) : !user && showAuth ? (
-            <Auth />
-          ) : showOnboarding && appUser ? (
-            <ProtectedRoute requireVerification={false}>
-              <Onboarding user={appUser} onComplete={handleOnboardingComplete} />
-            </ProtectedRoute>
-          ) : (
-            <ProtectedRoute>
-              {appUser && (
-                <Layout user={appUser} onLogout={handleLogout} fallback={<PageLoader fullscreen={false} />}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard user={appUser} />} />
-                    <Route path="/courses" element={<CoursesList />} />
-                    <Route path="/playground" element={<CodingPracticePlayground />} />
-                    <Route path="/career" element={<CareerMode user={appUser} />} />
-                    <Route path="/certifications" element={<CertificationsList />} />
-                    <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
-                    <Route path="/category/:id" element={<CategoryView />} />
-                    <Route path="/course/:id" element={<CourseView />} />
-                    <Route path="/certificate/:id" element={<Certificate />} />
-                    <Route path="/admin" element={
-                      <AdminRoute>
-                        <AdminDashboard />
-                      </AdminRoute>
-                    } />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              )}
-            </ProtectedRoute>
-          )
-        } />
-      </Routes>
-    </Suspense>
+          <Route path="/*" element={
+            !user && !showAuth ? (
+              <LandingPage onGetStarted={() => setShowAuth(true)} />
+            ) : !user && showAuth ? (
+              <Auth />
+            ) : showOnboarding && appUser ? (
+              <ProtectedRoute requireVerification={false}>
+                <Onboarding user={appUser} onComplete={handleOnboardingComplete} />
+              </ProtectedRoute>
+            ) : (
+              <ProtectedRoute>
+                {appUser && (
+                  <Layout user={appUser} onLogout={handleLogout} fallback={<PageLoader fullscreen={false} />}>
+                    <ErrorBoundary>
+                      <Suspense fallback={<PageLoader fullscreen={false} />}>
+                        <Routes>
+                          <Route path="/" element={<Dashboard user={appUser} />} />
+                          <Route path="/courses" element={<CoursesList />} />
+                          <Route path="/playground" element={<CodingPracticePlayground />} />
+                          <Route path="/career" element={<CareerMode user={appUser} />} />
+                          <Route path="/certifications" element={<CertificationsList />} />
+                          <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
+                          <Route path="/category/:id" element={<CategoryView />} />
+                          <Route path="/course/:id" element={<CourseView />} />
+                          <Route path="/certificate/:id" element={<Certificate />} />
+                          <Route path="/admin" element={
+                            <AdminRoute>
+                              <AdminDashboard />
+                            </AdminRoute>
+                          } />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </Suspense>
+                    </ErrorBoundary>
+                  </Layout>
+                )}
+              </ProtectedRoute>
+            )
+          } />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 

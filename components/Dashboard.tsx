@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase } from 'lucide-react';
-import { CATEGORIES, COURSES } from '../constants';
+import { CATEGORIES, COURSES, COMPANIES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 import { storageService } from '../services/storageService';
@@ -73,7 +73,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     const loadCompanies = async () => {
       try {
         const companyList = await firestoreService.getCompanies();
-        setCompanies(companyList);
+        const targetCompanies = companyList && companyList.length > 0 ? companyList : COMPANIES;
+        setCompanies(targetCompanies);
 
         // Calculate SRS Due Questions
         const careerProgress = storageService.getCareerProgress();
@@ -82,8 +83,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         let count = 0;
         const now = new Date();
 
-        companyList.forEach(company => {
-          company.questions.forEach(q => {
+        targetCompanies.forEach(company => {
+          (company.questions || []).forEach(q => {
             const srs = srsMap[q.id];
             if (srs) {
               const nextReview = new Date(srs.nextReviewDate);
@@ -96,6 +97,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         setDueQuestionsCount(count);
       } catch (error) {
         console.error('Error fetching companies in Dashboard:', error);
+        setCompanies(COMPANIES);
       }
     };
     loadCompanies();
@@ -168,7 +170,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     if (savedIds.length === 0 || companies.length === 0) return [];
 
     companies.forEach(company => {
-      company.questions.forEach((q: any) => {
+      (company.questions || []).forEach((q: any) => {
         if (savedIds.includes(q.id)) {
           list.push({ question: q, companyName: company.name });
         }

@@ -86,8 +86,9 @@ const ReadinessScore: React.FC<{ percentage: number }> = ({ percentage }) => {
 
 const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgress; onClick: (company: Company) => void }> = ({ company, progress, onClick }) => {
   const { t } = useTranslation();
-  const practicedCount = company.questions.filter(q => progress.practicedQuestions.includes(q.id)).length;
-  const progressPercent = Math.round((practicedCount / company.questions.length) * 100);
+  const questions = company.questions || [];
+  const practicedCount = questions.filter(q => progress.practicedQuestions.includes(q.id)).length;
+  const progressPercent = questions.length > 0 ? Math.round((practicedCount / questions.length) * 100) : 0;
 
   return (
     <div

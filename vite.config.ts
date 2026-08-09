@@ -39,6 +39,9 @@ export default defineConfig(({ mode }) => {
           // HashRouter SPA: always fall back to the shell so offline
           // navigation to any #/route still loads the app.
           navigateFallback: '/index.html',
+          cleanupOutdatedCaches: true,
+          skipWaiting: true,
+          clientsClaim: true,
           globPatterns: [
             '**/*.{js,css,html,json,svg,png,jpg,jpeg,woff2}'
           ],

@@ -1,10 +1,10 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
   deleteDoc,
   addDoc,
   arrayUnion,
@@ -17,7 +17,7 @@ import {
   increment
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
-import { Course, Company, QuizQuestion, Chapter, LessonComment } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview } from '../types';
 import { COURSES, COMPANIES } from '../constants';
 
 // Helper to structure chapters for initial seed courses
@@ -56,10 +56,10 @@ export const firestoreService = {
         console.log('Seeding courses to Firestore...');
         for (const course of COURSES) {
           const initialChapters = generateInitialChapters(course.title);
-          
+
           // Separate quiz from course metadata for /courses collection
           const { quiz, ...courseData } = course;
-          
+
           // Seed course metadata
           await setDoc(doc(db, 'courses', course.id), {
             ...courseData,
@@ -97,7 +97,7 @@ export const firestoreService = {
       for (const course of COURSES) {
         const initialChapters = generateInitialChapters(course.title);
         const { quiz, ...courseData } = course;
-        
+
         await setDoc(doc(db, 'courses', course.id), {
           ...courseData,
           chapters: initialChapters,
@@ -278,12 +278,12 @@ export const firestoreService = {
           : [...upvotedBy, userId];
         const newUpvotes = newUpvotedBy.length;
         const updated = { ...comment, upvotes: newUpvotes, upvotedBy: newUpvotedBy };
-        
+
         // Try updating firestore as well asynchronously
         try {
           const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
-          updateDoc(docRef, { upvotes: newUpvotes, upvotedBy: newUpvotedBy }).catch(() => {});
-        } catch (e) {}
+          updateDoc(docRef, { upvotes: newUpvotes, upvotedBy: newUpvotedBy }).catch(() => { });
+        } catch (e) { }
 
         return updated;
       }
@@ -292,6 +292,64 @@ export const firestoreService = {
 
     localStorage.setItem(key, JSON.stringify(comments));
     return comments;
+  },
+
+  // --- COURSE RATINGS & REVIEWS ---
+  getCourseReviews: async (courseId: string): Promise<CourseReview[]> => {
+    const key = `course_reviews_${courseId}`;
+    try {
+      const colRef = collection(db, 'courses', courseId, 'reviews');
+      const querySnapshot = await getDocs(colRef);
+      if (!querySnapshot.empty) {
+        const reviews: CourseReview[] = [];
+        querySnapshot.forEach((docSnap) => {
+          reviews.push({ id: docSnap.id, ...docSnap.data() } as CourseReview);
+        });
+        reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        localStorage.setItem(key, JSON.stringify(reviews));
+        return reviews;
+      }
+    } catch (err) {
+      console.warn('Firestore offline, falling back to local storage for reviews:', err);
+    }
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : [];
+  },
+
+  submitCourseReview: async (
+    courseId: string,
+    reviewData: Omit<CourseReview, 'id' | 'createdAt'>
+  ): Promise<CourseReview[]> => {
+    const key = `course_reviews_${courseId}`;
+    const newReview: CourseReview = {
+      ...reviewData,
+      id: reviewData.userId, // one review per user per course; re-submitting overwrites it
+      createdAt: new Date().toISOString(),
+    };
+
+    // Upsert into local cache by userId first (offline-friendly, matches comment pattern)
+    const saved = localStorage.getItem(key);
+    let reviews: CourseReview[] = saved ? JSON.parse(saved) : [];
+    reviews = reviews.filter(r => r.userId !== newReview.userId);
+    reviews.unshift(newReview);
+    localStorage.setItem(key, JSON.stringify(reviews));
+
+    try {
+      const docRef = doc(db, 'courses', courseId, 'reviews', newReview.id);
+      await setDoc(docRef, newReview);
+
+      // Recompute and persist the denormalized average rating on the course doc
+      const ratingSum = reviews.reduce((sum, r) => sum + r.rating, 0);
+      const reviewCount = reviews.length;
+      const avgRating = reviewCount > 0 ? Math.round((ratingSum / reviewCount) * 10) / 10 : 0;
+
+      const courseRef = doc(db, 'courses', courseId);
+      await updateDoc(courseRef, { rating: avgRating, reviewCount }).catch(() => { });
+    } catch (err) {
+      console.warn('Firestore write failed, review saved locally only:', err);
+    }
+
+    return reviews;
   },
 
   // --- SOCIAL & ACTIVITY FEED ---
@@ -318,15 +376,15 @@ export const firestoreService = {
 
   getFriendActivityFeed: async (followingIds: string[]): Promise<any[]> => {
     if (!followingIds || followingIds.length === 0) return [];
-    
+
     const activitiesRef = collection(db, 'activities');
     const q = query(
-      activitiesRef, 
-      where('userId', 'in', followingIds.slice(0, 10)), 
-      orderBy('createdAt', 'desc'), 
+      activitiesRef,
+      where('userId', 'in', followingIds.slice(0, 10)),
+      orderBy('createdAt', 'desc'),
       limit(20)
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
   },

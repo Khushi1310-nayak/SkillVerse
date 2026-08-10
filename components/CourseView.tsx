@@ -16,6 +16,7 @@ import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
 import { useActiveTimer } from '../hooks/useActiveTimer';
 import { LessonDiscussion } from './LessonDiscussion';
+import { CourseReview } from './CourseReview';
 
 export const CourseView: React.FC = () => {
   useActiveTimer();
@@ -107,11 +108,11 @@ export const CourseView: React.FC = () => {
 
       codeElements.forEach((codeEl) => {
         let container: HTMLElement | null = codeEl.parentElement;
-        
+
         while (container && container !== contentContainer) {
-          if (container.classList.contains('bg-[#0f1623]') || 
-              container.className.includes('bg-[#0f1623]') || 
-              container.tagName === 'PRE') {
+          if (container.classList.contains('bg-[#0f1623]') ||
+            container.className.includes('bg-[#0f1623]') ||
+            container.tagName === 'PRE') {
             break;
           }
           container = container.parentElement;
@@ -400,6 +401,9 @@ export const CourseView: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Course Ratings & Reviews */}
+              <CourseReview courseId={course.id} user={user} />
 
               {/* Lesson Discussion & Q&A Drawer */}
               <LessonDiscussion courseId={course.id} lessonId="main-lesson" user={user} />

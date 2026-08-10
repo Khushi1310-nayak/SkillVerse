@@ -122,6 +122,8 @@ export interface Course {
   resources: { title: string; url: string }[];
   quiz: QuizQuestion[];
   chapters?: Chapter[];
+  rating?: number; // denormalized average rating (0-5), recomputed on each review
+  reviewCount?: number; // denormalized total number of reviews
 }
 
 export interface Progress {
@@ -187,5 +189,17 @@ export interface LessonComment {
   upvotes: number;
   upvotedBy: string[];
   parentId?: string | null;
+}
+
+export interface CourseReview {
+  id: string;
+  courseId: string;
+  userId: string;
+  username: string;
+  avatarId?: string;
+  photoURL?: string;
+  rating: number; // 1-5
+  comment?: string;
+  createdAt: string;
 }
 

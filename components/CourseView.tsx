@@ -16,6 +16,7 @@ import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
 import { useActiveTimer } from '../hooks/useActiveTimer';
 import { LessonDiscussion } from './LessonDiscussion';
+import { LessonNotes } from './LessonNotes';
 import { CourseReview } from './CourseReview';
 
 export const CourseView: React.FC = () => {
@@ -404,6 +405,9 @@ export const CourseView: React.FC = () => {
 
               {/* Course Ratings & Reviews */}
               <CourseReview courseId={course.id} user={user} />
+
+              {/* Personal Lesson Notes */}
+              <LessonNotes courseId={course.id} lessonId="main-lesson" />
 
               {/* Lesson Discussion & Q&A Drawer */}
               <LessonDiscussion courseId={course.id} lessonId="main-lesson" user={user} />

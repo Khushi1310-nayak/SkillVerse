@@ -176,6 +176,15 @@ export interface SavedAINote {
   savedAt: string; // ISO timestamp
 }
 
+export interface LessonNote {
+  id: string;
+  courseId: string;
+  lessonId: string;
+  text: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+}
+
 export interface LessonComment {
   id: string;
   courseId: string;

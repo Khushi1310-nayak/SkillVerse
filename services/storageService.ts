@@ -1,11 +1,12 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { Progress, CareerProgress, SavedAINote } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote } from '../types';
 
 const PROGRESS_KEY = 'skillverse_progress';
 const CAREER_KEY = 'skillverse_career';
 const LAST_VISITED_KEY = 'skillverse_last_visited';
 const AI_NOTES_KEY = 'skillverse_ai_notes';
+const LESSON_NOTES_KEY = 'skillverse_lesson_notes';
 const STREAK_KEY = 'skillverse_streak_data';
 const STUDY_TIME_KEY = 'skillverse_study_time';
 
@@ -219,6 +220,49 @@ export const storageService = {
     localStorage.setItem(AI_NOTES_KEY, JSON.stringify(notes));
     return notes;
   },
+
+  // --- PERSONAL LESSON NOTES ---
+
+  getAllLessonNotes: (): LessonNote[] => {
+    const data = localStorage.getItem(LESSON_NOTES_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+
+  getLessonNotes: (courseId: string, lessonId: string): LessonNote[] => {
+    return storageService.getAllLessonNotes()
+      .filter(n => n.courseId === courseId && n.lessonId === lessonId)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  },
+
+  saveLessonNote: (courseId: string, lessonId: string, text: string): LessonNote => {
+    const notes = storageService.getAllLessonNotes();
+    const now = new Date().toISOString();
+    const note: LessonNote = {
+      id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+      courseId,
+      lessonId,
+      text,
+      createdAt: now,
+      updatedAt: now,
+    };
+    notes.unshift(note);
+    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    return note;
+  },
+
+  updateLessonNote: (id: string, text: string): LessonNote[] => {
+    const notes = storageService.getAllLessonNotes().map(n =>
+      n.id === id ? { ...n, text, updatedAt: new Date().toISOString() } : n
+    );
+    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    return notes;
+  },
+
+  deleteLessonNote: (id: string): LessonNote[] => {
+    const notes = storageService.getAllLessonNotes().filter(n => n.id !== id);
+    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    return notes;
+  },
   // --- STREAK CALENDAR ---
 
   getStreakData: (): StreakData => {
@@ -264,7 +308,7 @@ export const storageService = {
     dailyMinutes: Record<string, number>;
   } => {
     const records = storageService.getStudyTimeRecords();
-    
+
     // Get last 7 days of dates in YYYY-MM-DD format
     const last7Days: string[] = [];
     const now = new Date();

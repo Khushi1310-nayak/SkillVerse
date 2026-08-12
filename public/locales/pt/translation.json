@@ -148,7 +148,7 @@
     },
     "loadError": {
       "title": "Não foi possível carregar este curso",
-      "body": "Algo deu errado ao buscar o curso. Verifique sua conexão e tente novamente.",
+      "body": "Ocorreu um erro ao carregar o curso. Verifique a sua ligação e tente novamente.",
       "retry": "Tentar novamente",
       "backToCourses": "Voltar aos cursos"
     }

@@ -20,11 +20,14 @@
 const detectStorage = (): Storage | null => {
   try {
     if (typeof window === 'undefined' || !window.localStorage) return null;
-    // Availability is not enough — Safari's "Block All Cookies" allows the
-    // property access but throws on write, so probe with a real round trip.
-    const probeKey = '__skillverse_probe__';
-    window.localStorage.setItem(probeKey, '1');
-    window.localStorage.removeItem(probeKey);
+
+    // Deliberately a *read* probe. Blocked storage (Safari's "Block All
+    // Cookies") throws on the property access above, which is the case we need
+    // to catch. A write probe would also throw when the origin is merely full,
+    // and dropping to memory then would hide all of the user's existing data —
+    // far worse than the failing write itself. Quota is handled per-write in
+    // setRaw, which reports failure without losing read access.
+    window.localStorage.getItem('__skillverse_probe__');
     return window.localStorage;
   } catch (err) {
     console.warn('LocalStorage is unavailable; falling back to in-memory storage for this session.', err);
@@ -34,7 +37,13 @@ const detectStorage = (): Storage | null => {
 
 const backing = detectStorage();
 
-/** Session-only fallback used when the browser denies persistent storage. */
+/**
+ * Session-only fallback, used *only* when the browser denies storage entirely.
+ *
+ * It deliberately does not double as a cache for writes that failed against a
+ * working LocalStorage: mirroring those would leave the two disagreeing about
+ * the same key, and a later read would have to guess which one wins.
+ */
 const memoryStore = new Map<string, string>();
 
 export const isPersistent = backing !== null;
@@ -45,12 +54,14 @@ const getRaw = (key: string): string | null => {
     return backing.getItem(key);
   } catch (err) {
     console.warn(`Could not read "${key}" from storage:`, err);
-    return memoryStore.get(key) ?? null;
+    return null;
   }
 };
 
 const setRaw = (key: string, value: string): boolean => {
   if (!backing) {
+    // No persistent storage at all — memory keeps the session usable, but the
+    // caller is still told the value will not survive a reload.
     memoryStore.set(key, value);
     return false;
   }
@@ -58,11 +69,10 @@ const setRaw = (key: string, value: string): boolean => {
     backing.setItem(key, value);
     return true;
   } catch (err) {
-    // Quota exceeded, or storage revoked mid-session. Keep the value in memory
-    // so the current screen stays consistent, but tell the caller it is not
-    // durable rather than throwing into a React render.
+    // Quota exceeded, or storage revoked mid-session. Report the failure
+    // instead of throwing into a React render. The previously stored value is
+    // left untouched, so reads stay consistent with what is actually on disk.
     console.error(`Could not write "${key}" to storage:`, err);
-    memoryStore.set(key, value);
     return false;
   }
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Bookmark, BookOpen, Trash2, CheckCircle } from 'lucide-react';
@@ -6,6 +6,7 @@ import { COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { Course } from '../types';
 import { CourseCard, CourseCardSkeleton } from './CourseCard';
 
@@ -20,6 +21,11 @@ export const SavedCourses: React.FC = () => {
   const [confirmingClear, setConfirmingClear] = useState(false);
 
   const { bookmarks, isBookmarked, toggleBookmark, clearBookmarks } = useCourseBookmarks();
+
+  // Moves focus into the dialog, keeps Tab inside it, restores focus on close
+  // and closes on Escape — `aria-modal` alone does none of that.
+  const confirmDialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(confirmDialogRef, confirmingClear, () => setConfirmingClear(false));
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -143,9 +149,11 @@ export const SavedCourses: React.FC = () => {
             onClick={() => setConfirmingClear(false)}
           />
           <div
+            ref={confirmDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="clear-bookmarks-title"
+            tabIndex={-1}
             className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-fade-in-up"
           >
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4 mx-auto">

@@ -147,6 +147,7 @@ export const CoursesList: React.FC = () => {
           />
           <input
             type="text"
+            aria-label={t('courses.searchPlaceholder')}
             placeholder={t('courses.searchPlaceholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}

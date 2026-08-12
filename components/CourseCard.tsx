@@ -61,10 +61,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({
     }
   };
 
-  // The whole card is a link, so the bookmark button has to swallow the click
-  // instead of navigating to the course.
   const handleBookmarkClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+    // The button overlays the card, so keep the click from bubbling out to any
+    // handler on the wrapper.
     event.stopPropagation();
     onToggleBookmark(course.id);
   };
@@ -74,63 +73,68 @@ export const CourseCard: React.FC<CourseCardProps> = ({
     : t('courses.bookmarks.add', { title: course.title });
 
   return (
-    <Link
-      to={`/course/${course.id}`}
-      className="group relative bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-    >
-      <div className="flex justify-between items-start mb-4">
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-            LEVEL_BADGE_CLASSES[course.level] || 'bg-primary/10 text-primaryLight'
-          }`}
-        >
-          {getDifficultyLabel(course.level)}
-        </span>
+    // The bookmark button is a sibling of the link rather than a child: a
+    // <button> nested inside an <a> is invalid interactive-content nesting.
+    // The wrapper carries the card styling so the layout is unchanged.
+    <div className="group relative bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col">
+      <button
+        type="button"
+        onClick={handleBookmarkClick}
+        aria-pressed={isBookmarked}
+        aria-label={bookmarkLabel}
+        title={bookmarkLabel}
+        className={`absolute top-6 right-6 z-10 p-1.5 rounded-lg transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+          isBookmarked
+            ? 'text-primaryLight bg-primary/10'
+            : 'text-textMuted hover:text-primaryLight hover:bg-primary/10'
+        }`}
+      >
+        <Bookmark size={18} className={isBookmarked ? 'fill-current' : ''} />
+      </button>
 
-        <div className="flex items-center gap-2">
-          {isPassed && <CheckCircle className="text-success" size={20} />}
-          <button
-            type="button"
-            onClick={handleBookmarkClick}
-            aria-pressed={isBookmarked}
-            aria-label={bookmarkLabel}
-            title={bookmarkLabel}
-            className={`p-1.5 rounded-lg transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-              isBookmarked
-                ? 'text-primaryLight bg-primary/10'
-                : 'text-textMuted hover:text-primaryLight hover:bg-primary/10'
+      <Link
+        to={`/course/${course.id}`}
+        className="flex flex-col flex-1 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        {/* pr-9 keeps this row clear of the absolutely positioned bookmark. */}
+        <div className="flex justify-between items-start mb-4 pr-9">
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+              LEVEL_BADGE_CLASSES[course.level] || 'bg-primary/10 text-primaryLight'
             }`}
           >
-            <Bookmark size={18} className={isBookmarked ? 'fill-current' : ''} />
-          </button>
-        </div>
-      </div>
+            {getDifficultyLabel(course.level)}
+          </span>
 
-      <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
-        {course.title}
-      </h3>
-
-      <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">{course.description}</p>
-
-      <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-textMuted font-mono">{course.duration}</span>
-          {course.reviewCount ? (
-            <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
-              <Star size={12} className="fill-amber-500" />
-              {course.rating?.toFixed(1)}
-              <span className="text-textMuted font-normal">({course.reviewCount})</span>
-            </span>
-          ) : (
-            <span className="text-xs text-textMuted italic">{t('courses.noReviews')}</span>
-          )}
+          {isPassed && <CheckCircle className="text-success" size={20} />}
         </div>
 
-        <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
-          {isPassed ? t('courses.review') : t('courses.startLearning')}
-          <PlayCircle size={16} className="ml-2" />
-        </span>
-      </div>
-    </Link>
+        <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
+          {course.title}
+        </h3>
+
+        <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">{course.description}</p>
+
+        <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-textMuted font-mono">{course.duration}</span>
+            {course.reviewCount ? (
+              <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                <Star size={12} className="fill-amber-500" />
+                {course.rating?.toFixed(1)}
+                <span className="text-textMuted font-normal">({course.reviewCount})</span>
+              </span>
+            ) : (
+              <span className="text-xs text-textMuted italic">{t('courses.noReviews')}</span>
+            )}
+          </div>
+
+          <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
+            {isPassed ? t('courses.review') : t('courses.startLearning')}
+            <PlayCircle size={16} className="ml-2" />
+          </span>
+        </div>
+      </Link>
+    </div>
   );
 };

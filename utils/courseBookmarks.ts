@@ -92,7 +92,14 @@ export const courseBookmarks = {
     const handleLocal = () => listener(read());
 
     const handleCrossTab = (event: StorageEvent) => {
-      if (event.key === BOOKMARKS_KEY) listener(read());
+      // `key` is null when another tab calls localStorage.clear(), which wipes
+      // the bookmarks too — so that case has to refresh as well.
+      if (
+        event.storageArea === localStorage &&
+        (event.key === BOOKMARKS_KEY || event.key === null)
+      ) {
+        listener(read());
+      }
     };
 
     window.addEventListener(BOOKMARKS_EVENT, handleLocal);

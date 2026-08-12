@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Painel",
     "courses": "Cursos",
-    "saved": "Salvos",
+    "saved": "Guardados",
     "career": "Modo Carreira",
     "certifications": "Certificações",
     "admin": "Admin",
@@ -107,28 +107,28 @@
     "resultCount": "Resultados: {{count}}",
     "clearFilters": "Limpar filtros",
     "bookmarks": {
-      "add": "Salvar {{title}} para depois",
-      "remove": "Remover {{title}} dos salvos",
-      "savedOnly": "Somente salvos",
-      "emptyHint": "Você ainda não salvou nenhum curso."
+      "add": "Guardar {{title}} para mais tarde",
+      "remove": "Remover {{title}} dos guardados",
+      "savedOnly": "Apenas guardados",
+      "emptyHint": "Ainda não guardou nenhum curso."
     }
   },
   "savedCourses": {
-    "title": "Cursos salvos",
-    "subtitle": "Cursos que você marcou para ver mais tarde.",
+    "title": "Cursos guardados",
+    "subtitle": "Cursos que marcou para rever mais tarde.",
     "clearAll": "Limpar tudo",
     "stats": {
-      "saved": "Cursos salvos",
+      "saved": "Cursos guardados",
       "completed": "Já concluídos"
     },
     "empty": {
       "title": "Nada salvo ainda",
-      "body": "Toque no ícone de marcador em qualquer curso para guardá-lo aqui.",
+      "body": "Toque no ícone de marcador em qualquer curso para o guardar aqui.",
       "cta": "Explorar cursos"
     },
     "confirm": {
-      "title": "Limpar todos os cursos salvos?",
-      "body": "Isso remove todos os marcadores. Seu progresso e certificados não são afetados."
+      "title": "Limpar todos os cursos guardados?",
+      "body": "Isto remove todos os marcadores. O seu progresso e os seus certificados não são afetados."
     }
   },
   "categoryView": {

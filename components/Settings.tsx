@@ -20,6 +20,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { DataPortabilityPanel } from './DataPortabilityPanel';
 
 
 interface SettingsProps {
@@ -1247,6 +1248,10 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   </div>
                 )}
 
+                {/* Export / import before the destructive actions, so there is
+                    always a way to take a copy first. */}
+                <DataPortabilityPanel />
+
                 <div className="space-y-4">
                   <button
                     onClick={() => setModal({ type: 'reset' })}
@@ -1344,6 +1349,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     : t('settings.modals.clearBody')}
 
                 </p>
+                {modal.type === 'clear' && (
+                  <p className="text-sm text-orange-500 dark:text-orange-400 text-center -mt-3 mb-6">
+                    Tip: export a backup first — this cannot be undone.
+                  </p>
+                )}
                 <div className="flex gap-4">
                   <button
                     onClick={() => setModal({ type: null })}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2 } from 'lucide-react';
@@ -18,6 +18,8 @@ import { useActiveTimer } from '../hooks/useActiveTimer';
 import { LessonDiscussion } from './LessonDiscussion';
 import { LessonNotes } from './LessonNotes';
 import { CourseReview } from './CourseReview';
+import { CourseViewSkeleton } from './CourseViewSkeleton';
+import { CourseLoadError } from './CourseLoadError';
 
 export const CourseView: React.FC = () => {
   useActiveTimer();
@@ -26,40 +28,53 @@ export const CourseView: React.FC = () => {
   const { t } = useTranslation();
   const [course, setCourse] = useState<Course | null>(null);
   const [loadingCourse, setLoadingCourse] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  const fetchCourseData = useCallback(async () => {
+    if (!id) {
+      // Without an id there is nothing to fetch — stop loading so the
+      // not-found branch can render instead of spinning forever.
+      setCourse(null);
+      setLoadingCourse(false);
+      return;
+    }
+
+    setLoadingCourse(true);
+    setLoadFailed(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    try {
+      const localCourse = COURSES.find(c => c.id === id);
+      const c = await firestoreService.getCourse(id);
+      const activeCourse = localCourse || c;
+
+      if (activeCourse) {
+        const q = await firestoreService.getQuiz(id);
+        const dailyQuiz = getDailyQuiz(activeCourse.title);
+        const dynamicContent = generateRichContent(activeCourse.title, activeCourse.categoryId);
+
+        setCourse({
+          ...activeCourse,
+          content: dynamicContent,
+          quiz: dailyQuiz.length > 0 ? dailyQuiz : (q ? q.questions : (activeCourse.quiz || []))
+        });
+      } else {
+        setCourse(null);
+      }
+    } catch (err) {
+      console.error('Failed to load course details:', err);
+      const fallback = COURSES.find(c => c.id === id) || null;
+      setCourse(fallback);
+      // Only surface the error screen when the request left us with nothing.
+      // If a bundled course matched the id the page is still perfectly usable.
+      setLoadFailed(fallback === null);
+    } finally {
+      setLoadingCourse(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchCourseData = async () => {
-      if (!id) return;
-      setLoadingCourse(true);
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      try {
-        const localCourse = COURSES.find(c => c.id === id);
-        const c = await firestoreService.getCourse(id);
-        const activeCourse = localCourse || c;
-
-        if (activeCourse) {
-          const q = await firestoreService.getQuiz(id);
-          const dailyQuiz = getDailyQuiz(activeCourse.title);
-          const dynamicContent = generateRichContent(activeCourse.title, activeCourse.categoryId);
-
-          setCourse({
-            ...activeCourse,
-            content: dynamicContent,
-            quiz: dailyQuiz.length > 0 ? dailyQuiz : (q ? q.questions : (activeCourse.quiz || []))
-          });
-        } else {
-          setCourse(null);
-        }
-      } catch (err) {
-        console.error('Failed to load course details:', err);
-        const fallback = COURSES.find(c => c.id === id) || null;
-        setCourse(fallback);
-      } finally {
-        setLoadingCourse(false);
-      }
-    };
     fetchCourseData();
-  }, [id]);
+  }, [fetchCourseData]);
   const { appUser: user, completeCourse } = useAuth();
   const settings = user?.settings;
 
@@ -219,7 +234,13 @@ export const CourseView: React.FC = () => {
     };
   }, [id]);
 
-  if (!course) return <div>{t('courseView.notFound')}</div>;
+  // Render guards, in the order the states actually occur. These used to sit
+  // below the handlers, behind an unconditional `if (!course)` return, which
+  // meant the loading and not-found branches were unreachable and a bare
+  // "not found" line was rendered for the whole duration of the fetch.
+  if (loadingCourse) return <CourseViewSkeleton />;
+  if (loadFailed) return <CourseLoadError onRetry={fetchCourseData} />;
+  if (!course) return <NotFound />;
 
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
@@ -326,19 +347,6 @@ export const CourseView: React.FC = () => {
     };
     return wMap[rounded];
   };
-
-  if (loadingCourse) {
-    return (
-      <div className="min-h-screen bg-[#03060C] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-        <div className="mt-4 text-textMuted text-sm font-medium animate-pulse">{t('courseView.loading')}</div>
-      </div>
-    );
-  }
-
-  if (!course) {
-    return <NotFound />;
-  }
 
   // Remove HTML tags for raw context for AI
   const cleanContent = course.content ? course.content.replace(/<[^>]*>?/gm, '') : '';

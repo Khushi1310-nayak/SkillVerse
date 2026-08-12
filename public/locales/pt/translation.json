@@ -145,6 +145,12 @@
         "retryDisabled": "A repetição de questionários está desativada nas suas configurações.",
         "reviewAnswers": "Rever Respostas"
       }
+    },
+    "loadError": {
+      "title": "Não foi possível carregar este curso",
+      "body": "Algo deu errado ao buscar o curso. Verifique sua conexão e tente novamente.",
+      "retry": "Tentar novamente",
+      "backToCourses": "Voltar aos cursos"
     }
   },
   "aiAssistant": {

@@ -145,6 +145,12 @@
         "retryDisabled": "La possibilité de repasser les quiz est désactivée dans vos paramètres.",
         "reviewAnswers": "Revoir les réponses"
       }
+    },
+    "loadError": {
+      "title": "Impossible de charger ce cours",
+      "body": "Une erreur s'est produite lors du chargement du cours. Vérifiez votre connexion et réessayez.",
+      "retry": "Réessayer",
+      "backToCourses": "Retour aux cours"
     }
   },
   "aiAssistant": {

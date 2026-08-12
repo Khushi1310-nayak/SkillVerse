@@ -23,6 +23,7 @@ const CourseView = lazy(() => import('./components/CourseView').then(m => ({ def
 const Certificate = lazy(() => import('./components/Certificate').then(m => ({ default: m.Certificate })));
 const Settings = lazy(() => import('./components/Settings').then(m => ({ default: m.Settings })));
 const CoursesList = lazy(() => import('./components/CoursesList').then(m => ({ default: m.CoursesList })));
+const SavedCourses = lazy(() => import('./components/SavedCourses').then(m => ({ default: m.SavedCourses })));
 const CertificationsList = lazy(() => import('./components/CertificationsList').then(m => ({ default: m.CertificationsList })));
 const CareerMode = lazy(() => import('./components/CareerMode').then(m => ({ default: m.CareerMode })));
 const CodingPracticePlayground = lazy(() => import('./components/CodingPracticePlayground').then(m => ({ default: m.CodingPracticePlayground })));
@@ -103,6 +104,7 @@ const AppRoutes = () => {
                         <Routes>
                           <Route path="/" element={<Dashboard user={appUser} />} />
                           <Route path="/courses" element={<CoursesList />} />
+                          <Route path="/saved" element={<SavedCourses />} />
                           <Route path="/playground" element={<CodingPracticePlayground />} />
                           <Route path="/career" element={<CareerMode user={appUser} />} />
                           <Route path="/certifications" element={<CertificationsList />} />

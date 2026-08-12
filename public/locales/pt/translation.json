@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Painel",
     "courses": "Cursos",
+    "saved": "Salvos",
     "career": "Modo Carreira",
     "certifications": "Certificações",
     "admin": "Admin",
@@ -92,7 +93,43 @@
     },
     "review": "Revisar",
     "startLearning": "Começar a Aprender",
-    "empty": "Nenhum curso encontrado com os critérios selecionados."
+    "empty": "Nenhum curso encontrado com os critérios selecionados.",
+    "noReviews": "Ainda sem avaliações",
+    "allLevels": "Todos os níveis",
+    "levelFilterTitle": "Filtrar por dificuldade",
+    "sortTitle": "Ordenar cursos",
+    "sort": {
+      "default": "Ordem padrão",
+      "rating": "Melhor avaliados",
+      "reviews": "Mais avaliados",
+      "title": "Título (A–Z)"
+    },
+    "resultCount": "Resultados: {{count}}",
+    "clearFilters": "Limpar filtros",
+    "bookmarks": {
+      "add": "Salvar {{title}} para depois",
+      "remove": "Remover {{title}} dos salvos",
+      "savedOnly": "Somente salvos",
+      "emptyHint": "Você ainda não salvou nenhum curso."
+    }
+  },
+  "savedCourses": {
+    "title": "Cursos salvos",
+    "subtitle": "Cursos que você marcou para ver mais tarde.",
+    "clearAll": "Limpar tudo",
+    "stats": {
+      "saved": "Cursos salvos",
+      "completed": "Já concluídos"
+    },
+    "empty": {
+      "title": "Nada salvo ainda",
+      "body": "Toque no ícone de marcador em qualquer curso para guardá-lo aqui.",
+      "cta": "Explorar cursos"
+    },
+    "confirm": {
+      "title": "Limpar todos os cursos salvos?",
+      "body": "Isso remove todos os marcadores. Seu progresso e certificados não são afetados."
+    }
   },
   "categoryView": {
     "loading": "A carregar cursos da categoria...",

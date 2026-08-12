@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Tableau de bord",
     "courses": "Cours",
+    "saved": "Enregistrés",
     "career": "Mode Carrière",
     "certifications": "Certifications",
     "admin": "Admin",
@@ -92,7 +93,43 @@
     },
     "review": "Réviser",
     "startLearning": "Commencer l'apprentissage",
-    "empty": "Aucun cours ne correspond à vos critères."
+    "empty": "Aucun cours ne correspond à vos critères.",
+    "noReviews": "Pas encore d'avis",
+    "allLevels": "Tous les niveaux",
+    "levelFilterTitle": "Filtrer par difficulté",
+    "sortTitle": "Trier les cours",
+    "sort": {
+      "default": "Ordre par défaut",
+      "rating": "Les mieux notés",
+      "reviews": "Les plus commentés",
+      "title": "Titre (A–Z)"
+    },
+    "resultCount": "Résultats : {{count}}",
+    "clearFilters": "Effacer les filtres",
+    "bookmarks": {
+      "add": "Enregistrer {{title}} pour plus tard",
+      "remove": "Retirer {{title}} des enregistrés",
+      "savedOnly": "Enregistrés uniquement",
+      "emptyHint": "Vous n'avez encore enregistré aucun cours."
+    }
+  },
+  "savedCourses": {
+    "title": "Cours enregistrés",
+    "subtitle": "Les cours que vous avez mis de côté pour plus tard.",
+    "clearAll": "Tout effacer",
+    "stats": {
+      "saved": "Cours enregistrés",
+      "completed": "Déjà terminés"
+    },
+    "empty": {
+      "title": "Rien d'enregistré pour l'instant",
+      "body": "Touchez l'icône de signet sur un cours pour le retrouver ici.",
+      "cta": "Parcourir les cours"
+    },
+    "confirm": {
+      "title": "Effacer tous les cours enregistrés ?",
+      "body": "Cela supprime tous les signets. Votre progression et vos certificats ne sont pas affectés."
+    }
   },
   "categoryView": {
     "loading": "Chargement des cours de la catégorie...",

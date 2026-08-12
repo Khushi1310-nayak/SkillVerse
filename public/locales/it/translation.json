@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "courses": "Corsi",
+    "saved": "Salvati",
     "career": "Modalità Carriera",
     "certifications": "Certificazioni",
     "admin": "Admin",
@@ -92,7 +93,43 @@
     },
     "review": "Ripassa",
     "startLearning": "Inizia a imparare",
-    "empty": "Nessun corso trovato con i criteri selezionati."
+    "empty": "Nessun corso trovato con i criteri selezionati.",
+    "noReviews": "Ancora nessuna recensione",
+    "allLevels": "Tutti i livelli",
+    "levelFilterTitle": "Filtra per difficoltà",
+    "sortTitle": "Ordina i corsi",
+    "sort": {
+      "default": "Ordine predefinito",
+      "rating": "Più votati",
+      "reviews": "Più recensiti",
+      "title": "Titolo (A–Z)"
+    },
+    "resultCount": "Risultati: {{count}}",
+    "clearFilters": "Azzera filtri",
+    "bookmarks": {
+      "add": "Salva {{title}} per dopo",
+      "remove": "Rimuovi {{title}} dai salvati",
+      "savedOnly": "Solo salvati",
+      "emptyHint": "Non hai ancora salvato nessun corso."
+    }
+  },
+  "savedCourses": {
+    "title": "Corsi salvati",
+    "subtitle": "I corsi che hai messo da parte per dopo.",
+    "clearAll": "Cancella tutto",
+    "stats": {
+      "saved": "Corsi salvati",
+      "completed": "Già completati"
+    },
+    "empty": {
+      "title": "Non hai ancora salvato nulla",
+      "body": "Tocca l'icona del segnalibro su un corso per ritrovarlo qui.",
+      "cta": "Sfoglia i corsi"
+    },
+    "confirm": {
+      "title": "Cancellare tutti i corsi salvati?",
+      "body": "Verranno rimossi tutti i segnalibri. I tuoi progressi e i certificati non saranno modificati."
+    }
   },
   "categoryView": {
     "loading": "Caricamento dei corsi della categoria...",

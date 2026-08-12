@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "courses": "Kurse",
+    "saved": "Gespeichert",
     "career": "Karrieremodus",
     "certifications": "Zertifikate",
     "admin": "Admin",
@@ -92,7 +93,43 @@
     },
     "review": "Wiederholen",
     "startLearning": "Lernen starten",
-    "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen."
+    "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen.",
+    "noReviews": "Noch keine Bewertungen",
+    "allLevels": "Alle Stufen",
+    "levelFilterTitle": "Nach Schwierigkeit filtern",
+    "sortTitle": "Kurse sortieren",
+    "sort": {
+      "default": "Standardreihenfolge",
+      "rating": "Bestbewertet",
+      "reviews": "Meistbewertet",
+      "title": "Titel (A–Z)"
+    },
+    "resultCount": "Ergebnisse: {{count}}",
+    "clearFilters": "Filter zurücksetzen",
+    "bookmarks": {
+      "add": "{{title}} für später speichern",
+      "remove": "{{title}} aus Gespeicherten entfernen",
+      "savedOnly": "Nur gespeicherte",
+      "emptyHint": "Du hast noch keine Kurse gespeichert."
+    }
+  },
+  "savedCourses": {
+    "title": "Gespeicherte Kurse",
+    "subtitle": "Kurse, die du dir für später gemerkt hast.",
+    "clearAll": "Alle löschen",
+    "stats": {
+      "saved": "Gespeicherte Kurse",
+      "completed": "Bereits abgeschlossen"
+    },
+    "empty": {
+      "title": "Noch nichts gespeichert",
+      "body": "Tippe bei einem Kurs auf das Lesezeichen-Symbol, um ihn hier abzulegen.",
+      "cta": "Kurse durchsuchen"
+    },
+    "confirm": {
+      "title": "Alle gespeicherten Kurse löschen?",
+      "body": "Damit werden alle Lesezeichen entfernt. Dein Fortschritt und deine Zertifikate bleiben erhalten."
+    }
   },
   "categoryView": {
     "loading": "Kategoriekurse werden geladen...",

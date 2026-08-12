@@ -1,18 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { Search, Filter, PlayCircle, CheckCircle, ChevronDown, Star } from 'lucide-react';
+import { Search, ChevronDown, Bookmark, X } from 'lucide-react';
 import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
+import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import { Course } from '../types';
+import { CourseCard, CourseCardSkeleton } from './CourseCard';
+
+type SortOption = 'default' | 'rating' | 'reviews' | 'title';
+type LevelFilter = 'all' | Course['level'];
+
+const LEVEL_OPTIONS: LevelFilter[] = ['all', 'Beginner', 'Intermediate', 'Advanced'];
+const SORT_OPTIONS: SortOption[] = ['default', 'rating', 'reviews', 'title'];
 
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
   const [courses, setCourses] = useState<Course[]>(COURSES);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
+  const [filterLevel, setFilterLevel] = useState<LevelFilter>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [savedOnly, setSavedOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { bookmarks, isBookmarked, toggleBookmark } = useCourseBookmarks();
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -35,19 +47,6 @@ export const CoursesList: React.FC = () => {
 
   const progress = storageService.getAllProgress();
 
-  const getDifficultyLabel = (level: string) => {
-    switch (level) {
-      case 'Beginner':
-        return t('common.difficulty.beginner');
-      case 'Intermediate':
-        return t('common.difficulty.intermediate');
-      case 'Advanced':
-        return t('common.difficulty.advanced');
-      default:
-        return level;
-    }
-  };
-
   const getCategoryLabel = (categoryId: string) => {
     switch (categoryId) {
       case 'programming':
@@ -61,133 +60,222 @@ export const CoursesList: React.FC = () => {
     }
   };
 
-  const filtered = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
-    return matchesSearch && matchesCat;
-  });
+  const getLevelLabel = (level: LevelFilter) => {
+    switch (level) {
+      case 'Beginner':
+        return t('common.difficulty.beginner');
+      case 'Intermediate':
+        return t('common.difficulty.intermediate');
+      case 'Advanced':
+        return t('common.difficulty.advanced');
+      default:
+        return t('courses.allLevels');
+    }
+  };
+
+  const getSortLabel = (option: SortOption) => {
+    switch (option) {
+      case 'rating':
+        return t('courses.sort.rating');
+      case 'reviews':
+        return t('courses.sort.reviews');
+      case 'title':
+        return t('courses.sort.title');
+      default:
+        return t('courses.sort.default');
+    }
+  };
+
+  const hasActiveFilters =
+    search.trim() !== '' || filterCat !== 'all' || filterLevel !== 'all' || sortBy !== 'default' || savedOnly;
+
+  const clearFilters = () => {
+    setSearch('');
+    setFilterCat('all');
+    setFilterLevel('all');
+    setSortBy('default');
+    setSavedOnly(false);
+  };
+
+  const visibleCourses = useMemo(() => {
+    const term = search.trim().toLowerCase();
+
+    const filtered = courses.filter(course => {
+      // Search now covers the description too — previously a word that only
+      // appeared in the summary returned no results at all.
+      const matchesSearch =
+        term === '' ||
+        course.title.toLowerCase().includes(term) ||
+        (course.description || '').toLowerCase().includes(term);
+
+      const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
+      const matchesLevel = filterLevel === 'all' || course.level === filterLevel;
+      const matchesSaved = !savedOnly || bookmarks.includes(course.id);
+
+      return matchesSearch && matchesCat && matchesLevel && matchesSaved;
+    });
+
+    // `sort` mutates in place, so sort the copy produced by `filter`.
+    switch (sortBy) {
+      case 'rating':
+        return filtered.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+      case 'reviews':
+        return filtered.sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
+      case 'title':
+        return filtered.sort((a, b) => a.title.localeCompare(b.title));
+      default:
+        return filtered;
+    }
+  }, [courses, search, filterCat, filterLevel, sortBy, savedOnly, bookmarks]);
+
+  const selectClass =
+    'w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all';
+  const optionClass = 'bg-white dark:bg-[#0B1220] text-textMain';
 
   return (
     <div className="animate-fade-in space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold text-textMain mb-2">{t('courses.title')}</h1>
           <p className="text-textMuted">{t('courses.subtitle')}</p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors" size={18} />
-            <input
-              type="text"
-              placeholder={t('courses.searchPlaceholder')}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-11 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
-            />
-          </div>
-          <div className="relative group min-w-[180px]">
+        <div className="relative w-full md:w-64 group">
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder={t('courses.searchPlaceholder')}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-11 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+          />
+        </div>
+      </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
+          <div className="relative group">
             <select
               value={filterCat}
               onChange={e => setFilterCat(e.target.value)}
               title={t('courses.filterTitle')}
               aria-label={t('courses.filterTitle')}
-              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+              className={selectClass}
             >
-              <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allCategories')}</option>
+              <option value="all" className={optionClass}>
+                {t('courses.allCategories')}
+              </option>
               {CATEGORIES.map(c => (
-                <option key={c.id} value={c.id} className="bg-white dark:bg-[#0B1220] text-textMain">{getCategoryLabel(c.id)}</option>
+                <option key={c.id} value={c.id} className={optionClass}>
+                  {getCategoryLabel(c.id)}
+                </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors" size={16} />
+            <ChevronDown
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors"
+              size={16}
+            />
+          </div>
+
+          <div className="relative group">
+            <select
+              value={filterLevel}
+              onChange={e => setFilterLevel(e.target.value as LevelFilter)}
+              title={t('courses.levelFilterTitle')}
+              aria-label={t('courses.levelFilterTitle')}
+              className={selectClass}
+            >
+              {LEVEL_OPTIONS.map(level => (
+                <option key={level} value={level} className={optionClass}>
+                  {getLevelLabel(level)}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors"
+              size={16}
+            />
+          </div>
+
+          <div className="relative group">
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as SortOption)}
+              title={t('courses.sortTitle')}
+              aria-label={t('courses.sortTitle')}
+              className={selectClass}
+            >
+              {SORT_OPTIONS.map(option => (
+                <option key={option} value={option} className={optionClass}>
+                  {getSortLabel(option)}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors"
+              size={16}
+            />
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setSavedOnly(prev => !prev)}
+          aria-pressed={savedOnly}
+          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-medium transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+            savedOnly
+              ? 'bg-primary/15 border-primaryLight text-primaryLight'
+              : 'bg-primary/5 dark:bg-primary/10 border-primary/20 text-textMuted hover:text-textMain'
+          }`}
+        >
+          <Bookmark size={16} className={savedOnly ? 'fill-current' : ''} />
+          {t('courses.bookmarks.savedOnly')}
+          <span className="text-xs font-mono opacity-70">({bookmarks.length})</span>
+        </button>
       </div>
+
+      {/* Result summary */}
+      {!isLoading && (
+        <div className="flex items-center justify-between gap-4 -mt-2">
+          <p className="text-sm text-textMuted">
+            {t('courses.resultCount', { count: visibleCourses.length })}
+          </p>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="flex items-center gap-1.5 text-sm text-textMuted hover:text-primaryLight transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <X size={14} /> {t('courses.clearFilters')}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {isLoading ? (
-          Array.from({ length: 6 }).map((_, index) => (
-            <div
-              key={index}
-              className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 animate-pulse flex flex-col"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="h-6 w-20 rounded-full bg-white/10" />
-                <div className="h-5 w-5 rounded-full bg-white/10" />
-              </div>
-
-              <div className="h-6 w-3/4 rounded bg-white/10 mb-3" />
-              <div className="h-4 w-full rounded bg-white/10 mb-2" />
-              <div className="h-4 w-5/6 rounded bg-white/10 mb-6 flex-1" />
-
-              <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
-                <div className="h-4 w-16 rounded bg-white/10" />
-                <div className="h-4 w-24 rounded bg-white/10" />
-              </div>
-            </div>
-          ))
+          Array.from({ length: 6 }).map((_, index) => <CourseCardSkeleton key={index} />)
         ) : (
           <>
-            {filtered.map(course => {
-              const isPassed = progress.find(p => p.courseId === course.id)?.passed;
+            {visibleCourses.map(course => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                isPassed={progress.find(p => p.courseId === course.id)?.passed}
+                isBookmarked={isBookmarked(course.id)}
+                onToggleBookmark={toggleBookmark}
+              />
+            ))}
 
-              return (
-                <Link
-                  key={course.id}
-                  to={`/course/${course.id}`}
-                  className="group bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${course.level === "Beginner"
-                        ? "bg-emerald-500/10 text-emerald-500"
-                        : course.level === "Intermediate"
-                          ? "bg-blue-500/10 text-blue-500"
-                          : "bg-purple-500/10 text-purple-500"
-                        }`}
-                    >
-                      {getDifficultyLabel(course.level)}
-                    </span>
-
-                    {isPassed && <CheckCircle className="text-success" size={20} />}
-                  </div>
-
-                  <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
-                    {course.title}
-                  </h3>
-
-                  <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">
-                    {course.description}
-                  </p>
-
-                  <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-textMuted font-mono">
-                        {course.duration}
-                      </span>
-                      {course.reviewCount ? (
-                        <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                          <Star size={12} className="fill-amber-500" />
-                          {course.rating?.toFixed(1)}
-                          <span className="text-textMuted font-normal">({course.reviewCount})</span>
-                        </span>
-                      ) : (
-                        <span className="text-xs text-textMuted italic">No reviews yet</span>
-                      )}
-                    </div>
-
-                    <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
-                      {isPassed ? t('courses.review') : t('courses.startLearning')}
-                      <PlayCircle size={16} className="ml-2" />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-
-            {filtered.length === 0 && (
+            {visibleCourses.length === 0 && (
               <div className="col-span-full text-center py-20 text-textMuted">
-                {t('courses.empty')}
+                {savedOnly && bookmarks.length === 0
+                  ? t('courses.bookmarks.emptyHint')
+                  : t('courses.empty')}
               </div>
             )}
           </>

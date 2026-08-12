@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "대시보드",
     "courses": "코스",
+    "saved": "저장됨",
     "career": "커리어 모드",
     "certifications": "자격증",
     "admin": "관리자",
@@ -92,7 +93,43 @@
     },
     "review": "복습하기",
     "startLearning": "학습 시작",
-    "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다."
+    "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다.",
+    "noReviews": "아직 리뷰가 없습니다",
+    "allLevels": "모든 난이도",
+    "levelFilterTitle": "난이도로 필터링",
+    "sortTitle": "코스 정렬",
+    "sort": {
+      "default": "기본 순서",
+      "rating": "평점 높은 순",
+      "reviews": "리뷰 많은 순",
+      "title": "제목 (A–Z)"
+    },
+    "resultCount": "결과: {{count}}",
+    "clearFilters": "필터 지우기",
+    "bookmarks": {
+      "add": "{{title}}을(를) 나중에 보기 위해 저장",
+      "remove": "{{title}}을(를) 저장 목록에서 제거",
+      "savedOnly": "저장된 항목만",
+      "emptyHint": "아직 저장한 코스가 없습니다."
+    }
+  },
+  "savedCourses": {
+    "title": "저장한 코스",
+    "subtitle": "나중에 다시 보려고 북마크한 코스입니다.",
+    "clearAll": "모두 지우기",
+    "stats": {
+      "saved": "저장한 코스",
+      "completed": "이미 완료함"
+    },
+    "empty": {
+      "title": "아직 저장된 항목이 없습니다",
+      "body": "코스의 북마크 아이콘을 누르면 여기에 저장됩니다.",
+      "cta": "코스 둘러보기"
+    },
+    "confirm": {
+      "title": "저장한 코스를 모두 지울까요?",
+      "body": "모든 북마크가 삭제됩니다. 학습 진도와 수료증은 영향을 받지 않습니다."
+    }
   },
   "categoryView": {
     "loading": "카테고리 코스를 불러오는 중...",

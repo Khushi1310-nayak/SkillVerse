@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "courses": "Courses",
+    "saved": "Saved",
     "career": "Career Mode",
     "certifications": "Certifications",
     "admin": "Admin",
@@ -92,7 +93,43 @@
     },
     "review": "Review",
     "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "empty": "No courses found matching your criteria.",
+    "noReviews": "No reviews yet",
+    "allLevels": "All Levels",
+    "levelFilterTitle": "Filter by difficulty",
+    "sortTitle": "Sort courses",
+    "sort": {
+      "default": "Default order",
+      "rating": "Highest rated",
+      "reviews": "Most reviewed",
+      "title": "Title (A–Z)"
+    },
+    "resultCount": "Results: {{count}}",
+    "clearFilters": "Clear filters",
+    "bookmarks": {
+      "add": "Save {{title}} for later",
+      "remove": "Remove {{title}} from saved",
+      "savedOnly": "Saved only",
+      "emptyHint": "You haven't saved any courses yet."
+    }
+  },
+  "savedCourses": {
+    "title": "Saved Courses",
+    "subtitle": "Courses you bookmarked to come back to.",
+    "clearAll": "Clear all",
+    "stats": {
+      "saved": "Saved courses",
+      "completed": "Already completed"
+    },
+    "empty": {
+      "title": "Nothing saved yet",
+      "body": "Tap the bookmark icon on any course to keep it here for later.",
+      "cta": "Browse courses"
+    },
+    "confirm": {
+      "title": "Clear all saved courses?",
+      "body": "This removes every bookmark. Your progress and certificates are not affected."
+    }
   },
   "categoryView": {
     "loading": "Loading category courses...",

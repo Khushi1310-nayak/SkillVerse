@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Panel",
     "courses": "Cursos",
+    "saved": "Guardados",
     "career": "Modo Carrera",
     "certifications": "Certificaciones",
     "admin": "Administración",
@@ -92,7 +93,43 @@
     },
     "review": "Revisar",
     "startLearning": "Empezar a aprender",
-    "empty": "No se encontraron cursos que coincidan con tus criterios."
+    "empty": "No se encontraron cursos que coincidan con tus criterios.",
+    "noReviews": "Aún no hay reseñas",
+    "allLevels": "Todos los niveles",
+    "levelFilterTitle": "Filtrar por dificultad",
+    "sortTitle": "Ordenar cursos",
+    "sort": {
+      "default": "Orden predeterminado",
+      "rating": "Mejor valorados",
+      "reviews": "Más reseñados",
+      "title": "Título (A–Z)"
+    },
+    "resultCount": "Resultados: {{count}}",
+    "clearFilters": "Borrar filtros",
+    "bookmarks": {
+      "add": "Guardar {{title}} para después",
+      "remove": "Quitar {{title}} de guardados",
+      "savedOnly": "Solo guardados",
+      "emptyHint": "Todavía no has guardado ningún curso."
+    }
+  },
+  "savedCourses": {
+    "title": "Cursos guardados",
+    "subtitle": "Cursos que marcaste para retomar más tarde.",
+    "clearAll": "Borrar todo",
+    "stats": {
+      "saved": "Cursos guardados",
+      "completed": "Ya completados"
+    },
+    "empty": {
+      "title": "Aún no hay nada guardado",
+      "body": "Toca el icono de marcador en cualquier curso para guardarlo aquí.",
+      "cta": "Explorar cursos"
+    },
+    "confirm": {
+      "title": "¿Borrar todos los cursos guardados?",
+      "body": "Se eliminarán todos los marcadores. Tu progreso y certificados no se verán afectados."
+    }
   },
   "categoryView": {
     "loading": "Cargando cursos de la categoría...",

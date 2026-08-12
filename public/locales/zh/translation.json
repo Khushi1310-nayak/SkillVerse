@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "仪表板",
     "courses": "课程",
+    "saved": "已保存",
     "career": "职业模式",
     "certifications": "证书",
     "admin": "管理员",
@@ -92,7 +93,43 @@
     },
     "review": "复习",
     "startLearning": "开始学习",
-    "empty": "未找到符合条件的课程。"
+    "empty": "未找到符合条件的课程。",
+    "noReviews": "暂无评价",
+    "allLevels": "所有难度",
+    "levelFilterTitle": "按难度筛选",
+    "sortTitle": "课程排序",
+    "sort": {
+      "default": "默认排序",
+      "rating": "评分最高",
+      "reviews": "评价最多",
+      "title": "标题 (A–Z)"
+    },
+    "resultCount": "结果：{{count}}",
+    "clearFilters": "清除筛选",
+    "bookmarks": {
+      "add": "保存《{{title}}》稍后学习",
+      "remove": "从已保存中移除《{{title}}》",
+      "savedOnly": "仅看已保存",
+      "emptyHint": "你还没有保存任何课程。"
+    }
+  },
+  "savedCourses": {
+    "title": "已保存的课程",
+    "subtitle": "你收藏起来准备稍后学习的课程。",
+    "clearAll": "全部清除",
+    "stats": {
+      "saved": "已保存课程",
+      "completed": "已完成"
+    },
+    "empty": {
+      "title": "还没有保存任何内容",
+      "body": "点击任意课程上的书签图标，即可将其保存到这里。",
+      "cta": "浏览课程"
+    },
+    "confirm": {
+      "title": "清除所有已保存的课程？",
+      "body": "这将移除所有书签。你的学习进度和证书不受影响。"
+    }
   },
   "categoryView": {
     "loading": "正在加载分类课程...",

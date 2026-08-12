@@ -22,6 +22,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
     const [reviews, setReviews] = useState<CourseReviewType[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(false);
     const [selectedRating, setSelectedRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -95,6 +96,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         if (!user || selectedRating < 1) return;
 
         setSubmitting(true);
+        setSubmitError(false);
         try {
             const updated = await firestoreService.submitCourseReview(courseId, {
                 courseId,
@@ -107,7 +109,11 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
             });
             setReviews(updated);
         } catch (err) {
+            // The service now rejects instead of quietly saving locally, so the
+            // user has to be told — otherwise the form just resets and their
+            // review silently never existed.
             console.error('Error submitting review:', err);
+            setSubmitError(true);
         } finally {
             setSubmitting(false);
         }
@@ -197,6 +203,14 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                         placeholder={t('courseReview.placeholder', 'Share your experience with this course (optional)...')}
                         className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl p-3 text-sm text-textMain placeholder:text-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all resize-none"
                     />
+                    {submitError && (
+                        <p role="alert" className="text-sm text-red-500 dark:text-red-400">
+                            {t(
+                                'courseReview.submitError',
+                                "We couldn't save your review. Check your connection and try again."
+                            )}
+                        </p>
+                    )}
                     <div className="flex justify-end">
                         <button
                             type="submit"

@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Download, Upload, AlertTriangle, CheckCircle, FileJson, Loader2 } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import {
   buildBackup,
   downloadBackup,
@@ -27,7 +28,14 @@ export const DataPortabilityPanel: React.FC = () => {
   const [importMode, setImportMode] = useState<ImportMode>('merge');
   const [isReading, setIsReading] = useState(false);
 
-  const localSummary = summarize(buildBackup());
+  // Moves focus into the dialog, keeps Tab inside it, restores focus on close
+  // and closes on Escape — `aria-modal` alone does none of that.
+  const importDialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(importDialogRef, Boolean(pending?.envelope), () => setPending(null));
+
+  // buildBackup() reads and parses every SkillVerse key, so it must not run on
+  // each render. The counts only change after an import, which reloads anyway.
+  const localSummary = useMemo(() => summarize(buildBackup()), []);
 
   const handleExport = () => {
     try {
@@ -159,9 +167,11 @@ export const DataPortabilityPanel: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPending(null)} />
           <div
+            ref={importDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="import-backup-title"
+            tabIndex={-1}
             className="relative bg-background border border-black/20 dark:border-white/10 rounded-2xl p-8 max-w-lg w-full shadow-2xl animate-fade-in-up max-h-[90vh] overflow-y-auto"
           >
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primaryLight mb-4 mx-auto">

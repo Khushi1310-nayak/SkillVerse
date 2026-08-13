@@ -295,25 +295,65 @@ export const firestoreService = {
   },
 
   // --- COURSE RATINGS & REVIEWS ---
+
+  /**
+   * Reads every review for a course straight from Firestore, newest first.
+   * Throws if the read fails so callers can tell "no reviews" apart from
+   * "could not reach the server".
+   */
+  fetchRemoteCourseReviews: async (courseId: string): Promise<CourseReview[]> => {
+    const colRef = collection(db, 'courses', courseId, 'reviews');
+    const querySnapshot = await getDocs(colRef);
+
+    const reviews: CourseReview[] = [];
+    querySnapshot.forEach((docSnap) => {
+      reviews.push({ id: docSnap.id, ...docSnap.data() } as CourseReview);
+    });
+
+    return reviews.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  },
+
   getCourseReviews: async (courseId: string): Promise<CourseReview[]> => {
     const key = `course_reviews_${courseId}`;
     try {
-      const colRef = collection(db, 'courses', courseId, 'reviews');
-      const querySnapshot = await getDocs(colRef);
-      if (!querySnapshot.empty) {
-        const reviews: CourseReview[] = [];
-        querySnapshot.forEach((docSnap) => {
-          reviews.push({ id: docSnap.id, ...docSnap.data() } as CourseReview);
-        });
-        reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        localStorage.setItem(key, JSON.stringify(reviews));
-        return reviews;
-      }
+      const reviews = await firestoreService.fetchRemoteCourseReviews(courseId);
+      // Cache the remote result even when it is empty. Previously an empty
+      // result fell through to the local cache, so a review deleted server-side
+      // kept reappearing from this browser's copy.
+      localStorage.setItem(key, JSON.stringify(reviews));
+      return reviews;
     } catch (err) {
       console.warn('Firestore offline, falling back to local storage for reviews:', err);
     }
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : [];
+
+    try {
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  /** Average, total and 1–5 star breakdown for a set of reviews. */
+  summarizeCourseReviews: (
+    reviews: CourseReview[]
+  ): { average: number; count: number; distribution: Record<number, number> } => {
+    const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let sum = 0;
+
+    reviews.forEach(review => {
+      const rating = Math.round(review?.rating ?? 0);
+      if (rating < 1 || rating > 5) return; // ignore anything out of range
+      distribution[rating] += 1;
+      sum += rating;
+    });
+
+    const count = Object.values(distribution).reduce((total, n) => total + n, 0);
+    const average = count > 0 ? Math.round((sum / count) * 10) / 10 : 0;
+
+    return { average, count, distribution };
   },
 
   submitCourseReview: async (
@@ -327,26 +367,46 @@ export const firestoreService = {
       createdAt: new Date().toISOString(),
     };
 
-    // Upsert into local cache by userId first (offline-friendly, matches comment pattern)
-    const saved = localStorage.getItem(key);
-    let reviews: CourseReview[] = saved ? JSON.parse(saved) : [];
-    reviews = reviews.filter(r => r.userId !== newReview.userId);
-    reviews.unshift(newReview);
+    // Write remotely first. The cache is only updated once the review actually
+    // exists server-side — writing it up front meant a failed write left the
+    // user looking at a review that would silently vanish on the next load.
+    const docRef = doc(db, 'courses', courseId, 'reviews', newReview.id);
+    await setDoc(docRef, newReview);
+
+    // The aggregate on the course document must come from the reviews that
+    // actually exist, never from this browser's cache. A user whose cache was
+    // empty (any first visit) used to overwrite the true average with a count
+    // of one, permanently corrupting the rating shown to everybody.
+    let reviews: CourseReview[];
+    try {
+      reviews = await firestoreService.fetchRemoteCourseReviews(courseId);
+    } catch (err) {
+      // We could not confirm the full set, so leave the stored aggregate alone.
+      // A stale average is much better than a wrong one.
+      console.warn('Review saved, but the course rating could not be recomputed:', err);
+
+      let cached: CourseReview[] = [];
+      try {
+        const saved = localStorage.getItem(key);
+        cached = saved ? JSON.parse(saved) : [];
+      } catch {
+        cached = [];
+      }
+
+      // Dedupe by userId — the review id *is* the user id, one per course.
+      const merged = [newReview, ...cached.filter(r => r.userId !== newReview.userId)];
+      localStorage.setItem(key, JSON.stringify(merged));
+      return merged;
+    }
+
     localStorage.setItem(key, JSON.stringify(reviews));
 
+    const { average, count } = firestoreService.summarizeCourseReviews(reviews);
     try {
-      const docRef = doc(db, 'courses', courseId, 'reviews', newReview.id);
-      await setDoc(docRef, newReview);
-
-      // Recompute and persist the denormalized average rating on the course doc
-      const ratingSum = reviews.reduce((sum, r) => sum + r.rating, 0);
-      const reviewCount = reviews.length;
-      const avgRating = reviewCount > 0 ? Math.round((ratingSum / reviewCount) * 10) / 10 : 0;
-
       const courseRef = doc(db, 'courses', courseId);
-      await updateDoc(courseRef, { rating: avgRating, reviewCount }).catch(() => { });
+      await updateDoc(courseRef, { rating: average, reviewCount: count });
     } catch (err) {
-      console.warn('Firestore write failed, review saved locally only:', err);
+      console.warn('Could not update the denormalized course rating:', err);
     }
 
     return reviews;

@@ -17,7 +17,7 @@ import {
   increment
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User } from '../types';
 import { COURSES, COMPANIES } from '../constants';
 
 // Helper to structure chapters for initial seed courses
@@ -410,6 +410,37 @@ export const firestoreService = {
     }
 
     return reviews;
+  },
+
+  // --- PUBLIC PROFILE (by username) ---
+  getUserByUsername: async (username: string): Promise<(User & { uid: string }) | null> => {
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', username), limit(1));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) return null;
+
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data() as any;
+      return {
+        uid: docSnap.id,
+        username: data.username || 'Learner',
+        email: data.email || '',
+        enrolledDate: data.enrolledDate || 'Recent',
+        settings: data.preferences?.settings || data.settings || { avatarId: '1', activeFrame: 'none' },
+        xp: data.xp || 0,
+        level: data.level || 1,
+        courses: data.courses || [],
+        photoURL: data.photoURL,
+        streak: data.streak || 0,
+        lastActiveDate: data.lastActiveDate || '',
+        badges: data.badges || ['first_step'],
+        role: data.role || 'user',
+      } as User & { uid: string };
+    } catch (err) {
+      console.error('Error fetching public profile by username:', err);
+      return null;
+    }
   },
 
   // --- SOCIAL & ACTIVITY FEED ---

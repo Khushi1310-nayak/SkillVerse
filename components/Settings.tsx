@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -60,6 +60,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     setSavedNotes(storageService.deleteAINote(id));
   };
   const [formData, setFormData] = useState<UserType>(user);
+  const [profileLinkCopied, setProfileLinkCopied] = useState(false);
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | 'unsaved' | null }>({ type: null });
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const { showToast } = useToast();
@@ -168,6 +169,18 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
 
   const handleProfileChange = (field: keyof UserType, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCopyProfileLink = async () => {
+    const profileUrl = `${window.location.origin}${window.location.pathname}#/u/${encodeURIComponent(user.username)}`;
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setProfileLinkCopied(true);
+      showToast({ message: 'Profile Link Copied!', type: 'success' });
+      setTimeout(() => setProfileLinkCopied(false), 2000);
+    } catch (err) {
+      showToast({ message: 'Failed to copy profile link', type: 'error' });
+    }
   };
 
   const handleAvatarSelect = async (avatarId: string) => {
@@ -501,8 +514,18 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-black/20 dark:border-white/10">
+                <div className="pt-4 border-t border-black/20 dark:border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-textMuted">{t('settings.profile.memberSince')} <span className="text-textMain font-medium">{new Date(formData.enrolledDate).toLocaleDateString(i18n.language)}</span></p>
+                  <button
+                    type="button"
+                    onClick={handleCopyProfileLink}
+                    aria-label="Copy shareable public profile link"
+                    title="Copy shareable public profile link"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary/10 text-primaryLight border border-primary/20 hover:bg-primary/20 font-bold text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    {profileLinkCopied ? <Check size={16} /> : <Link2 size={16} />}
+                    {profileLinkCopied ? 'Copied!' : 'Copy Profile Link'}
+                  </button>
                 </div>
               </div>
             )}

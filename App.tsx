@@ -29,6 +29,7 @@ const CodingPracticePlayground = lazy(() => import('./components/CodingPracticeP
 const Onboarding = lazy(() => import('./components/Onboarding').then(m => ({ default: m.Onboarding })));
 const CredentialVerification = lazy(() => import('./components/CredentialVerification').then(m => ({ default: m.CredentialVerification })));
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
+const PublicProfilePage = lazy(() => import('./components/PublicProfilePage').then(m => ({ default: m.PublicProfilePage })));
 
 const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
   <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
@@ -78,6 +79,7 @@ const AppRoutes = () => {
         <Routes>
           <Route path="/docs" element={<DocumentationPage />} />
           <Route path="/credential/:token" element={<CredentialVerification />} />
+          <Route path="/u/:username" element={<PublicProfilePage />} />
 
           {/* Verification Wall */}
           <Route path="/verify-email" element={

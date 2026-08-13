@@ -145,6 +145,12 @@
         "retryDisabled": "Reintentar exámenes está deshabilitado en tu configuración.",
         "reviewAnswers": "Revisar respuestas"
       }
+    },
+    "loadError": {
+      "title": "No pudimos cargar este curso",
+      "body": "Algo salió mal al obtener el curso. Comprueba tu conexión e inténtalo de nuevo.",
+      "retry": "Reintentar",
+      "backToCourses": "Volver a los cursos"
     }
   },
   "aiAssistant": {

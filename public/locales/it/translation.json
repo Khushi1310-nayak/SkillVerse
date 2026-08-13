@@ -145,6 +145,12 @@
         "retryDisabled": "La possibilità di riprovare i quiz è disattivata nelle tue impostazioni.",
         "reviewAnswers": "Rivedi le risposte"
       }
+    },
+    "loadError": {
+      "title": "Non siamo riusciti a caricare questo corso",
+      "body": "Si è verificato un errore durante il caricamento del corso. Controlla la connessione e riprova.",
+      "retry": "Riprova",
+      "backToCourses": "Torna ai corsi"
     }
   },
   "aiAssistant": {

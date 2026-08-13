@@ -145,6 +145,12 @@
         "retryDisabled": "Retrying quizzes is disabled in your settings.",
         "reviewAnswers": "Review Answers"
       }
+    },
+    "loadError": {
+      "title": "We couldn't load this course",
+      "body": "Something went wrong while fetching the course. Check your connection and try again.",
+      "retry": "Try again",
+      "backToCourses": "Back to courses"
     }
   },
   "aiAssistant": {

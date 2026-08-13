@@ -145,6 +145,12 @@
         "retryDisabled": "您的设置中已禁用重新测试功能。",
         "reviewAnswers": "查看答案解析"
       }
+    },
+    "loadError": {
+      "title": "无法加载此课程",
+      "body": "获取课程时出错。请检查网络连接后重试。",
+      "retry": "重试",
+      "backToCourses": "返回课程列表"
     }
   },
   "aiAssistant": {

@@ -145,6 +145,12 @@
         "retryDisabled": "설정에서 퀴즈 재시도가 비활성화되어 있습니다.",
         "reviewAnswers": "답안 검토"
       }
+    },
+    "loadError": {
+      "title": "이 코스를 불러오지 못했습니다",
+      "body": "코스를 가져오는 중 문제가 발생했습니다. 연결을 확인한 후 다시 시도해 주세요.",
+      "retry": "다시 시도",
+      "backToCourses": "코스 목록으로"
     }
   },
   "aiAssistant": {

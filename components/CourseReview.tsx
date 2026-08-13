@@ -22,6 +22,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
     const [reviews, setReviews] = useState<CourseReviewType[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(false);
     const [selectedRating, setSelectedRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -54,17 +55,48 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         }
     }, [myReview]);
 
-    const { average, count } = useMemo(() => {
-        if (reviews.length === 0) return { average: 0, count: 0 };
-        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-        return { average: Math.round((sum / reviews.length) * 10) / 10, count: reviews.length };
-    }, [reviews]);
+    // Uses the same helper the service writes the denormalized course rating
+    // with, so what is shown here and what is stored can never drift apart.
+    const { average, count, distribution } = useMemo(
+        () => firestoreService.summarizeCourseReviews(reviews),
+        [reviews]
+    );
+
+    const barWidthClass = (value: number) => {
+        if (count === 0) return 'w-0';
+        const rounded = Math.max(0, Math.min(100, Math.round((value / count) * 20) * 5));
+        const widths: Record<number, string> = {
+            0: 'w-0', 5: 'w-[5%]', 10: 'w-[10%]', 15: 'w-[15%]', 20: 'w-[20%]', 25: 'w-[25%]',
+            30: 'w-[30%]', 35: 'w-[35%]', 40: 'w-[40%]', 45: 'w-[45%]', 50: 'w-[50%]',
+            55: 'w-[55%]', 60: 'w-[60%]', 65: 'w-[65%]', 70: 'w-[70%]', 75: 'w-[75%]',
+            80: 'w-[80%]', 85: 'w-[85%]', 90: 'w-[90%]', 95: 'w-[95%]', 100: 'w-full',
+        };
+        return widths[rounded] || 'w-0';
+    };
+
+    const RatingBreakdown = () => (
+        <div className="space-y-1.5 max-w-xs w-full">
+            {[5, 4, 3, 2, 1].map(star => (
+                <div key={star} className="flex items-center gap-2">
+                    <span className="text-xs text-textMuted w-3 text-right font-mono">{star}</span>
+                    <Star size={11} className="text-amber-500 fill-amber-500 shrink-0" />
+                    <div className="flex-1 h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                        <div
+                            className={`h-full bg-amber-500 rounded-full transition-all duration-500 ${barWidthClass(distribution[star])}`}
+                        />
+                    </div>
+                    <span className="text-xs text-textMuted w-6 font-mono">{distribution[star]}</span>
+                </div>
+            ))}
+        </div>
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user || selectedRating < 1) return;
 
         setSubmitting(true);
+        setSubmitError(false);
         try {
             const updated = await firestoreService.submitCourseReview(courseId, {
                 courseId,
@@ -77,7 +109,11 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
             });
             setReviews(updated);
         } catch (err) {
+            // The service now rejects instead of quietly saving locally, so the
+            // user has to be told — otherwise the form just resets and their
+            // review silently never existed.
             console.error('Error submitting review:', err);
+            setSubmitError(true);
         } finally {
             setSubmitting(false);
         }
@@ -126,10 +162,13 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                     </div>
                 </div>
                 {count > 0 && (
-                    <div className="flex items-center gap-2">
-                        {renderStars(average, 18)}
-                        <span className="text-sm font-bold text-textMain">{average.toFixed(1)}</span>
-                        <span className="text-xs text-textMuted">({count} {count === 1 ? 'review' : 'reviews'})</span>
+                    <div className="flex flex-col sm:items-end gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
+                            {renderStars(average, 18)}
+                            <span className="text-sm font-bold text-textMain">{average.toFixed(1)}</span>
+                            <span className="text-xs text-textMuted">({count} {count === 1 ? 'review' : 'reviews'})</span>
+                        </div>
+                        <RatingBreakdown />
                     </div>
                 )}
             </div>
@@ -164,6 +203,14 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                         placeholder={t('courseReview.placeholder', 'Share your experience with this course (optional)...')}
                         className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl p-3 text-sm text-textMain placeholder:text-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all resize-none"
                     />
+                    {submitError && (
+                        <p role="alert" className="text-sm text-red-500 dark:text-red-400">
+                            {t(
+                                'courseReview.submitError',
+                                "We couldn't save your review. Check your connection and try again."
+                            )}
+                        </p>
+                    )}
                     <div className="flex justify-end">
                         <button
                             type="submit"

@@ -1,6 +1,7 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Progress, CareerProgress, SavedAINote, LessonNote } from '../types';
+import { safeStorage, isArray, isPlainObject } from '../utils/safeStorage';
 
 const PROGRESS_KEY = 'skillverse_progress';
 const CAREER_KEY = 'skillverse_career';
@@ -38,6 +39,24 @@ const DEFAULT_CAREER_PROGRESS: CareerProgress = {
   mockInterviewScores: [],
   srsData: {},
 };
+
+/**
+ * Career progress is read from storage in several places, so normalise the
+ * arrays here rather than trusting whatever shape was persisted. An older
+ * build (or a hand-edited value) that is missing `savedQuestions` would
+ * otherwise crash the first caller that reaches for `.includes`.
+ */
+const normalizeCareerProgress = (value: CareerProgress): CareerProgress => ({
+  practicedQuestions: isArray(value.practicedQuestions) ? value.practicedQuestions : [],
+  savedQuestions: isArray(value.savedQuestions) ? value.savedQuestions : [],
+  mockInterviewScores: isArray(value.mockInterviewScores) ? value.mockInterviewScores : [],
+  srsData: isPlainObject(value.srsData) ? value.srsData : {},
+});
+
+const normalizeStreakData = (value: StreakData): StreakData => ({
+  longestStreak: typeof value.longestStreak === 'number' ? value.longestStreak : 0,
+  activities: isPlainObject(value.activities) ? value.activities : {},
+});
 
 export const storageService = {
   updateUser: async (user: any) => {
@@ -77,13 +96,10 @@ export const storageService = {
       current.push(progress);
     }
 
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(current));
+    safeStorage.writeJSON(PROGRESS_KEY, current);
   },
 
-  getAllProgress: (): Progress[] => {
-    const data = localStorage.getItem(PROGRESS_KEY);
-    return data ? JSON.parse(data) : [];
-  },
+  getAllProgress: (): Progress[] => safeStorage.readJSON<Progress[]>(PROGRESS_KEY, [], isArray),
 
   getProgress: (courseId: string): Progress | undefined => {
     const all = storageService.getAllProgress();
@@ -94,28 +110,34 @@ export const storageService = {
 
   setLastVisited: (courseId: string) => {
     const record = { courseId, visitedAt: new Date().toISOString() };
-    localStorage.setItem(LAST_VISITED_KEY, JSON.stringify(record));
+    safeStorage.writeJSON(LAST_VISITED_KEY, record);
   },
 
-  getLastVisited: (): { courseId: string; visitedAt: string } | null => {
-    const data = localStorage.getItem(LAST_VISITED_KEY);
-    return data ? JSON.parse(data) : null;
-  },
+  getLastVisited: (): { courseId: string; visitedAt: string } | null =>
+    safeStorage.readJSON<{ courseId: string; visitedAt: string } | null>(
+      LAST_VISITED_KEY,
+      null,
+      isPlainObject
+    ),
 
   resetProgress: () => {
-    localStorage.removeItem(PROGRESS_KEY);
-    localStorage.removeItem(CAREER_KEY);
+    safeStorage.remove(PROGRESS_KEY);
+    safeStorage.remove(CAREER_KEY);
   },
 
   clearData: () => {
-    localStorage.clear();
+    safeStorage.clear();
   },
 
   // --- CAREER MODE METHODS ---
 
   getCareerProgress: (): CareerProgress => {
-    const data = localStorage.getItem(CAREER_KEY);
-    return data ? JSON.parse(data) : DEFAULT_CAREER_PROGRESS;
+    const stored = safeStorage.readJSON<CareerProgress>(
+      CAREER_KEY,
+      DEFAULT_CAREER_PROGRESS,
+      isPlainObject
+    );
+    return normalizeCareerProgress(stored);
   },
 
   toggleQuestionPractice: (questionId: string) => {
@@ -128,7 +150,7 @@ export const storageService = {
       progress.practicedQuestions.splice(index, 1);
     }
 
-    localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
+    safeStorage.writeJSON(CAREER_KEY, progress);
     return progress;
   },
 
@@ -142,7 +164,7 @@ export const storageService = {
       progress.savedQuestions.splice(index, 1);
     }
 
-    localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
+    safeStorage.writeJSON(CAREER_KEY, progress);
     return progress;
   },
 
@@ -153,7 +175,7 @@ export const storageService = {
       score,
       date: new Date().toISOString()
     });
-    localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
+    safeStorage.writeJSON(CAREER_KEY, progress);
     return progress;
   },
 
@@ -197,36 +219,32 @@ export const storageService = {
       progress.practicedQuestions.push(questionId);
     }
 
-    localStorage.setItem(CAREER_KEY, JSON.stringify(progress));
+    safeStorage.writeJSON(CAREER_KEY, progress);
     return progress;
   },
 
   // --- AI ASSISTANT: SAVED NOTES ---
 
-  getSavedAINotes: (): SavedAINote[] => {
-    const data = localStorage.getItem(AI_NOTES_KEY);
-    return data ? JSON.parse(data) : [];
-  },
+  getSavedAINotes: (): SavedAINote[] =>
+    safeStorage.readJSON<SavedAINote[]>(AI_NOTES_KEY, [], isArray),
 
   saveAINote: (note: SavedAINote) => {
     const notes = storageService.getSavedAINotes();
     notes.unshift(note);
-    localStorage.setItem(AI_NOTES_KEY, JSON.stringify(notes));
+    safeStorage.writeJSON(AI_NOTES_KEY, notes);
     return notes;
   },
 
   deleteAINote: (id: string) => {
     const notes = storageService.getSavedAINotes().filter(n => n.id !== id);
-    localStorage.setItem(AI_NOTES_KEY, JSON.stringify(notes));
+    safeStorage.writeJSON(AI_NOTES_KEY, notes);
     return notes;
   },
 
   // --- PERSONAL LESSON NOTES ---
 
-  getAllLessonNotes: (): LessonNote[] => {
-    const data = localStorage.getItem(LESSON_NOTES_KEY);
-    return data ? JSON.parse(data) : [];
-  },
+  getAllLessonNotes: (): LessonNote[] =>
+    safeStorage.readJSON<LessonNote[]>(LESSON_NOTES_KEY, [], isArray),
 
   getLessonNotes: (courseId: string, lessonId: string): LessonNote[] => {
     return storageService.getAllLessonNotes()
@@ -246,7 +264,7 @@ export const storageService = {
       updatedAt: now,
     };
     notes.unshift(note);
-    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return note;
   },
 
@@ -254,24 +272,28 @@ export const storageService = {
     const notes = storageService.getAllLessonNotes().map(n =>
       n.id === id ? { ...n, text, updatedAt: new Date().toISOString() } : n
     );
-    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return notes;
   },
 
   deleteLessonNote: (id: string): LessonNote[] => {
     const notes = storageService.getAllLessonNotes().filter(n => n.id !== id);
-    localStorage.setItem(LESSON_NOTES_KEY, JSON.stringify(notes));
+    safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return notes;
   },
   // --- STREAK CALENDAR ---
 
   getStreakData: (): StreakData => {
-    const data = localStorage.getItem(STREAK_KEY);
-    return data ? JSON.parse(data) : { longestStreak: 0, activities: {} };
+    const stored = safeStorage.readJSON<StreakData>(
+      STREAK_KEY,
+      { longestStreak: 0, activities: {} },
+      isPlainObject
+    );
+    return normalizeStreakData(stored);
   },
 
   saveStreakData: (data: StreakData): void => {
-    localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+    safeStorage.writeJSON(STREAK_KEY, data);
   },
 
   /**
@@ -283,7 +305,7 @@ export const storageService = {
     const level: 0 | 1 | 2 | 3 =
       xp === 0 ? 0 : xp < 50 ? 1 : xp < 100 ? 2 : 3;
     data.activities[date] = { date, xp, courses, level };
-    localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+    safeStorage.writeJSON(STREAK_KEY, data);
   },
 
   // --- STUDY TIME TRACKER ---
@@ -291,14 +313,12 @@ export const storageService = {
     const today = getLocalDateString();
     const currentData = storageService.getStudyTimeRecords();
     currentData[today] = (currentData[today] || 0) + secondsToAdd;
-    localStorage.setItem(STUDY_TIME_KEY, JSON.stringify(currentData));
+    safeStorage.writeJSON(STUDY_TIME_KEY, currentData);
     return currentData;
   },
 
-  getStudyTimeRecords: (): Record<string, number> => {
-    const data = localStorage.getItem(STUDY_TIME_KEY);
-    return data ? JSON.parse(data) : {};
-  },
+  getStudyTimeRecords: (): Record<string, number> =>
+    safeStorage.readJSON<Record<string, number>>(STUDY_TIME_KEY, {}, isPlainObject),
 
   getWeeklyStudyStats: (dailyGoalMinutes: number = 60): {
     totalSeconds: number;

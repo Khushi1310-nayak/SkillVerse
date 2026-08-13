@@ -145,6 +145,12 @@
         "retryDisabled": "Das Wiederholen von Tests ist in Ihren Einstellungen deaktiviert.",
         "reviewAnswers": "Antworten überprüfen"
       }
+    },
+    "loadError": {
+      "title": "Dieser Kurs konnte nicht geladen werden",
+      "body": "Beim Laden des Kurses ist etwas schiefgelaufen. Prüfe deine Verbindung und versuche es erneut.",
+      "retry": "Erneut versuchen",
+      "backToCourses": "Zurück zu den Kursen"
     }
   },
   "aiAssistant": {

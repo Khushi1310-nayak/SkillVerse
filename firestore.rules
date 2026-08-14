@@ -1,8 +1,24 @@
 rules_version = '2';
+
+// SkillVerse Firestore security rules.
+//
+// Two things are worth remembering before editing this file:
+//
+//   1. Rules do NOT cascade into subcollections. `match /courses/{courseId}`
+//      matches the course document and nothing below it, so every subcollection
+//      the client touches needs its own `match` block. A path with no matching
+//      block is denied, and the SDK surfaces that as `permission-denied`.
+//   2. Several features fall back to localStorage when a write fails, which
+//      makes a missing rule look like a working feature locally and a silently
+//      broken one everywhere else. Add the rule at the same time as the code.
+//
+// See docs/firestore-security-rules.md for the collection-by-collection map.
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // --- HELPERS -----------------------------------------------------------
+
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -11,22 +27,61 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Read defensively: `request.auth.token.admin` raises "Property admin is
+    // undefined on object" for every token without the custom claim, which is
+    // most of them. The `||` still falls through to the role check, so this is
+    // not a functional bug, but it means every ordinary user's request carries
+    // an evaluation error through the rules engine and every denial message in
+    // the emulator and in Rules Playground is buried under that noise instead
+    // of naming the rule that actually rejected the write. `get()` with a
+    // default keeps the expression total.
     function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.admin == true || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      return isAuthenticated() &&
+        (request.auth.token.get('admin', false) == true ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'admin');
+    }
+
+    // Reviews and lesson comments store the author as the signed-in user's
+    // email address rather than the uid (`userId: user.email` in
+    // CourseReview.tsx and LessonDiscussion.tsx), so ownership of those
+    // documents is checked against the verified email claim on the token.
+    // Those fields should hold the uid eventually; until then this is the only
+    // claim that can be matched against what the client actually writes.
+    function isEmailOwner(emailField) {
+      return isAuthenticated() && request.auth.token.email == emailField;
+    }
+
+    // True when an update touches nothing outside `fields`.
+    function onlyChanges(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function isNonEmptyString(value, maxLength) {
+      return value is string && value.size() > 0 && value.size() <= maxLength;
     }
 
     // --- USERS COLLECTION ---
     match /users/{userId} {
-      // Authenticated users can read user profiles (needed for Leaderboard)
-      allow read: if isAuthenticated();
-      
+      // Read is open because the shareable profile route `/u/:username` is
+      // deliberately outside ProtectedRoute — a link shared on LinkedIn has to
+      // resolve for a logged-out visitor, and requiring auth here is why every
+      // such link rendered "Profile Not Found".
+      //
+      // This is only safe because the user document holds no contact details:
+      // createUserDocument writes uid, username, photoURL, provider, progress
+      // and preferences, and never the email address. DO NOT add email,
+      // phone numbers or any other PII to this document — put it in a
+      // separate, owner-only collection instead.
+      allow read: if true;
+
       // Users can create and update their own document
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && 
+
+      // `role` stays admin-only — otherwise a user could grant themselves the
+      // admin bit that isAdmin() above trusts.
+      allow update: if isOwner(userId) &&
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
-      
+
       // Users or admins can delete their own account profile
       allow delete: if isOwner(userId) || isAdmin();
     }
@@ -35,16 +90,101 @@ service cloud.firestore {
     match /courses/{courseId} {
       // Public read access for course catalog
       allow read: if true;
-      
-      // Admin-only write access
-      allow write: if isAdmin();
+
+      // Course content is admin-only, with one carve-out: submitting a review
+      // recomputes the denormalised `rating` / `reviewCount` aggregate on the
+      // course document. Without this every review write from a normal user
+      // logged "Could not update the denormalized course rating" and the
+      // catalog kept showing a stale average forever.
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        (isAuthenticated() &&
+         onlyChanges(['rating', 'reviewCount']) &&
+         request.resource.data.rating is number &&
+         request.resource.data.rating >= 0 &&
+         request.resource.data.rating <= 5 &&
+         request.resource.data.reviewCount is int &&
+         request.resource.data.reviewCount >= 0);
+
+      // --- COURSE REVIEWS (subcollection) ---
+      // One review per user per course: the document id *is* the author's
+      // identifier, which is what makes re-submitting overwrite instead of
+      // duplicate.
+      match /reviews/{reviewId} {
+
+        function isValidReview() {
+          let review = request.resource.data;
+          return review.courseId == courseId &&
+                 review.userId == reviewId &&
+                 isEmailOwner(review.userId) &&
+                 review.rating is number &&
+                 review.rating >= 1 &&
+                 review.rating <= 5 &&
+                 isNonEmptyString(review.username, 100) &&
+                 review.createdAt is string &&
+                 (!('comment' in review) ||
+                   (review.comment is string && review.comment.size() <= 2000));
+        }
+
+        // Ratings are shown on the public catalog, so reads stay open.
+        allow read: if true;
+
+        // Requiring the id to equal the author's identifier is both the
+        // uniqueness constraint and what stops one user writing a review that
+        // claims to be somebody else's.
+        allow create, update: if isValidReview();
+
+        allow delete: if isEmailOwner(resource.data.userId) || isAdmin();
+      }
+
+      // --- LESSON DISCUSSION (subcollection) ---
+      match /lessons/{lessonId}/comments/{commentId} {
+
+        function isValidComment() {
+          let comment = request.resource.data;
+          return comment.courseId == courseId &&
+                 comment.lessonId == lessonId &&
+                 isEmailOwner(comment.userId) &&
+                 isNonEmptyString(comment.content, 5000) &&
+                 isNonEmptyString(comment.username, 100) &&
+                 comment.createdAt is string &&
+                 comment.upvotes is int &&
+                 comment.upvotes >= 0 &&
+                 comment.upvotedBy is list;
+        }
+
+        // A vote may only add or remove the caller, and may only move the
+        // counter by one. This is what lets other learners upvote a comment
+        // they did not write without also being able to rewrite its text.
+        function isVoteOnly() {
+          let before = resource.data;
+          let after = request.resource.data;
+          return onlyChanges(['upvotes', 'upvotedBy']) &&
+                 after.upvotedBy is list &&
+                 after.upvotes is int &&
+                 after.upvotes >= 0 &&
+                 after.upvotedBy.hasOnly(before.upvotedBy.concat([request.auth.token.email])) &&
+                 before.upvotedBy.hasOnly(after.upvotedBy.concat([request.auth.token.email]));
+        }
+
+        allow read: if isAuthenticated();
+
+        allow create: if isAuthenticated() && isValidComment();
+
+        allow update: if isAuthenticated() &&
+          (isEmailOwner(resource.data.userId)
+            ? isValidComment()
+            : isVoteOnly());
+
+        allow delete: if isEmailOwner(resource.data.userId) || isAdmin();
+      }
     }
 
     // --- QUIZZES COLLECTION ---
     match /quizzes/{courseId} {
       // Authenticated users can access quiz questions
       allow read: if isAuthenticated();
-      
+
       // Admin-only write access
       allow write: if isAdmin();
     }
@@ -53,9 +193,46 @@ service cloud.firestore {
     match /companies/{companyId} {
       // Public read access for interview preparation
       allow read: if true;
-      
+
       // Admin-only write access (Cloud Functions & Admins)
       allow write: if isAdmin();
+    }
+
+    // --- ACTIVITY FEED COLLECTION ---
+    match /activities/{activityId} {
+
+      function isValidActivity() {
+        let activity = request.resource.data;
+        return activity.userId == request.auth.uid &&
+               isNonEmptyString(activity.userName, 100) &&
+               activity.type in ['badge', 'course', 'streak'] &&
+               isNonEmptyString(activity.details, 500) &&
+               activity.kudosCount is int &&
+               activity.kudosCount == 0 &&
+               activity.kudosUsers is list &&
+               activity.kudosUsers.size() == 0;
+      }
+
+      // Kudos are the only thing a third party may change, and only by adding
+      // themselves, once.
+      function isKudosOnly() {
+        return onlyChanges(['kudosCount', 'kudosUsers']) &&
+               request.resource.data.kudosCount == resource.data.kudosCount + 1 &&
+               request.resource.data.kudosUsers.hasAll(resource.data.kudosUsers) &&
+               request.resource.data.kudosUsers.hasOnly(
+                 resource.data.kudosUsers.concat([request.auth.uid])
+               ) &&
+               !(request.auth.uid in resource.data.kudosUsers);
+      }
+
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated() && isValidActivity();
+
+      allow update: if isAuthenticated() &&
+        (isOwner(resource.data.userId) || isKudosOnly());
+
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
   }
 }

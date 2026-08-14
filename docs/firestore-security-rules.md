@@ -55,8 +55,8 @@ pull request.** If you cannot, say so in the PR description.
 
 | Path | Read | Create | Update | Delete |
 | --- | --- | --- | --- | --- |
-| `users/{uid}` | anyone | owner | owner (never `role`) | owner or admin |
-| `courses/{id}` | anyone | admin | admin, **or** any signed-in user changing only `rating` + `reviewCount` | admin |
+| `users/{uid}` | anyone | owner, and `role` must be absent or `user` | owner (never `role`) | owner or admin |
+| `courses/{id}` | anyone | admin | admin, **or** a user who has reviewed this course changing only `rating` + `reviewCount` | admin |
 | `courses/{id}/reviews/{authorId}` | anyone | author, id must equal author | author | author or admin |
 | `courses/{id}/lessons/{lessonId}/comments/{id}` | signed in | author | author (full), others (vote fields only) | author or admin |
 | `quizzes/{courseId}` | signed in | admin | admin | admin |
@@ -81,9 +81,15 @@ review recomputes the denormalised `rating`/`reviewCount` aggregate on the
 course document (`firestoreService.submitCourseReview`). Without the carve-out
 every review write from an ordinary user logged
 `Could not update the denormalized course rating` and the catalog kept showing
-a stale average. The carve-out is narrow: `onlyChanges(['rating',
-'reviewCount'])` plus range checks, so it cannot be used to touch course
-content.
+a stale average. The carve-out is as narrow as rules allow: `onlyChanges(['rating',
+'reviewCount'])`, range checks, and an `exists()` check that the caller has
+actually reviewed this course.
+
+It is **not** airtight, and it is worth being honest about why. Rules cannot
+count documents, so they cannot verify that the average being written matches
+the reviews that exist — a reviewer can still write a wrong one. Recomputing
+the aggregate in a Cloud Function (the `functions/` workspace already exists)
+and making the field admin-only again is the real fix.
 
 **`reviews` / `comments` — identity is the email, not the uid.** Both
 `CourseReview.tsx` and `LessonDiscussion.tsx` write `userId: user.email`, and
@@ -107,9 +113,23 @@ The two directions together mean the two lists may differ by the caller and
 nothing else, so a voter cannot add other people, drop other people's votes, or
 inflate the list.
 
+The counter is tied to the direction of that change — exactly `+1` when the
+caller is added, exactly `-1` when removed. The list constraint alone is not
+enough: it is satisfied by a legitimate list change carrying `upvotes: 9999`
+alongside it.
+
 **`activities`.** Kudos are the mirror image: a third party may only increment
 `kudosCount` by exactly one while adding themselves once to `kudosUsers`, and
-only if they are not already in it.
+only if they are not already in it. Note the "adding themselves" half is load
+bearing — `hasAll(before) && hasOnly(before + uid)` is satisfied by an
+*unchanged* list, so without an explicit `uid in after` the counter could be
+incremented forever without anybody being recorded.
+
+**`users` — `role` on create.** Restricting `role` on *update* is pointless on
+its own, because a user's first write is a create: `allow create: if
+isOwner(userId)` would let them author their initial document with
+`role: "admin"`, which `isAdmin()` then trusts. Create requires the field to be
+absent or `"user"`.
 
 ---
 

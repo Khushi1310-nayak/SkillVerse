@@ -74,8 +74,13 @@ service cloud.firestore {
       // separate, owner-only collection instead.
       allow read: if true;
 
-      // Users can create and update their own document
-      allow create: if isOwner(userId);
+      // Users can create their own document, but never with a role attached.
+      // `allow create: if isOwner(userId)` on its own let a user write their
+      // very first document with `role: "admin"` — which isAdmin() then trusts
+      // — so the update rule below was guarding a door that could simply be
+      // walked around at signup. createUserDocument writes `role: "user"`.
+      allow create: if isOwner(userId) &&
+        request.resource.data.get('role', 'user') == 'user';
 
       // `role` stays admin-only — otherwise a user could grant themselves the
       // admin bit that isAdmin() above trusts.
@@ -96,6 +101,15 @@ service cloud.firestore {
       // course document. Without this every review write from a normal user
       // logged "Could not update the denormalized course rating" and the
       // catalog kept showing a stale average forever.
+      //
+      // The carve-out is as narrow as rules can make it — only those two
+      // fields, only in range, and only from somebody who has actually
+      // reviewed this course. It is NOT airtight: rules cannot count the
+      // reviews, so a reviewer can still write an average that does not match
+      // them. Moving this recomputation into a Cloud Function (the `functions/`
+      // workspace already exists) is the real fix and is worth its own issue;
+      // this at least stops any signed-in account rewriting any course's
+      // rating, which is where it stood before.
       allow create, delete: if isAdmin();
       allow update: if isAdmin() ||
         (isAuthenticated() &&
@@ -104,7 +118,8 @@ service cloud.firestore {
          request.resource.data.rating >= 0 &&
          request.resource.data.rating <= 5 &&
          request.resource.data.reviewCount is int &&
-         request.resource.data.reviewCount >= 0);
+         request.resource.data.reviewCount >= 0 &&
+         exists(/databases/$(database)/documents/courses/$(courseId)/reviews/$(request.auth.token.email)));
 
       // --- COURSE REVIEWS (subcollection) ---
       // One review per user per course: the document id *is* the author's
@@ -117,7 +132,10 @@ service cloud.firestore {
           return review.courseId == courseId &&
                  review.userId == reviewId &&
                  isEmailOwner(review.userId) &&
-                 review.rating is number &&
+                 // `is int`, not `is number`: the star picker only ever
+                 // produces whole numbers, and `is number` would have accepted
+                 // a hand-crafted 4.7 that then skews the course average.
+                 review.rating is int &&
                  review.rating >= 1 &&
                  review.rating <= 5 &&
                  isNonEmptyString(review.username, 100) &&
@@ -153,18 +171,31 @@ service cloud.firestore {
                  comment.upvotedBy is list;
         }
 
-        // A vote may only add or remove the caller, and may only move the
-        // counter by one. This is what lets other learners upvote a comment
-        // they did not write without also being able to rewrite its text.
+        // A vote may only add or remove the caller, and the counter has to move
+        // with them. This is what lets other learners upvote a comment they did
+        // not write without also being able to rewrite its text.
+        //
+        // The two `hasOnly` lines constrain the *list*: they say the before and
+        // after lists may differ by the caller and nobody else. On their own
+        // they still allowed `upvotes: 9999` alongside a legitimate list
+        // change, so the counter is now tied to the direction of that change —
+        // exactly +1 when the caller is added, exactly -1 when removed, and no
+        // update at all when the list is untouched.
         function isVoteOnly() {
           let before = resource.data;
           let after = request.resource.data;
+          let voter = request.auth.token.email;
+          let joining = !(voter in before.upvotedBy) && voter in after.upvotedBy;
+          let leaving = voter in before.upvotedBy && !(voter in after.upvotedBy);
+
           return onlyChanges(['upvotes', 'upvotedBy']) &&
                  after.upvotedBy is list &&
                  after.upvotes is int &&
                  after.upvotes >= 0 &&
-                 after.upvotedBy.hasOnly(before.upvotedBy.concat([request.auth.token.email])) &&
-                 before.upvotedBy.hasOnly(after.upvotedBy.concat([request.auth.token.email]));
+                 after.upvotedBy.hasOnly(before.upvotedBy.concat([voter])) &&
+                 before.upvotedBy.hasOnly(after.upvotedBy.concat([voter])) &&
+                 ((joining && after.upvotes == before.upvotes + 1) ||
+                  (leaving && after.upvotes == before.upvotes - 1));
         }
 
         allow read: if isAuthenticated();
@@ -215,6 +246,11 @@ service cloud.firestore {
 
       // Kudos are the only thing a third party may change, and only by adding
       // themselves, once.
+      //
+      // `hasAll(before) && hasOnly(before + uid)` is satisfied by a list that
+      // is completely unchanged, so on its own it let the counter be
+      // incremented over and over without anybody ever being added. The caller
+      // now has to actually appear in the new list.
       function isKudosOnly() {
         return onlyChanges(['kudosCount', 'kudosUsers']) &&
                request.resource.data.kudosCount == resource.data.kudosCount + 1 &&
@@ -222,6 +258,7 @@ service cloud.firestore {
                request.resource.data.kudosUsers.hasOnly(
                  resource.data.kudosUsers.concat([request.auth.uid])
                ) &&
+               request.auth.uid in request.resource.data.kudosUsers &&
                !(request.auth.uid in resource.data.kudosUsers);
       }
 

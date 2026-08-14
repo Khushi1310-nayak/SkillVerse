@@ -20,6 +20,12 @@ import { db } from '../firebase/firebase';
 import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User } from '../types';
 import { COURSES, COMPANIES } from '../constants';
 
+/**
+ * Maximum number of values Firestore accepts in a single `in` filter. Queries
+ * over a longer list have to be split into batches and merged client-side.
+ */
+const ACTIVITY_FEED_IN_LIMIT = 30;
+
 // Helper to structure chapters for initial seed courses
 const generateInitialChapters = (topic: string): Chapter[] => {
   const sections = [
@@ -465,19 +471,88 @@ export const firestoreService = {
     });
   },
 
-  getFriendActivityFeed: async (followingIds: string[]): Promise<any[]> => {
+  /**
+   * Splits `items` into batches of at most `size`. Firestore's `in` operator
+   * caps the number of values in a single query, so a feed for someone
+   * following more people than that has to be assembled from several queries.
+   */
+  chunk: <T>(items: T[], size: number): T[][] => {
+    const batches: T[][] = [];
+    for (let i = 0; i < items.length; i += size) {
+      batches.push(items.slice(i, i + size));
+    }
+    return batches;
+  },
+
+  /**
+   * Sort key for an activity. `createdAt` is written with `serverTimestamp()`,
+   * so a document that was just created and has not round-tripped yet carries
+   * `null` until the server resolves it. Treat those as "now" rather than
+   * letting them sort randomly or throw on `.toMillis()`.
+   */
+  activityTimestamp: (activity: any): number => {
+    const createdAt = activity?.createdAt;
+    if (!createdAt) return Date.now();
+    if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
+    if (typeof createdAt.seconds === 'number') return createdAt.seconds * 1000;
+    const parsed = new Date(createdAt).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  },
+
+  /**
+   * Recent activity from everyone the user follows.
+   *
+   * This used to be a single query over `followingIds.slice(0, 10)`. The
+   * follow list is unbounded and appended to with `arrayUnion`, so anyone
+   * following an eleventh person got a feed of the ten they followed *first* —
+   * the oldest follows, silently, with no indication in the UI. The ids are
+   * batched instead, queried in parallel, and merged.
+   */
+  getFriendActivityFeed: async (followingIds: string[], maxItems: number = 20): Promise<any[]> => {
     if (!followingIds || followingIds.length === 0) return [];
 
     const activitiesRef = collection(db, 'activities');
-    const q = query(
-      activitiesRef,
-      where('userId', 'in', followingIds.slice(0, 10)),
-      orderBy('createdAt', 'desc'),
-      limit(20)
+    const batches = firestoreService.chunk(followingIds, ACTIVITY_FEED_IN_LIMIT);
+
+    const results = await Promise.allSettled(
+      batches.map(batch =>
+        getDocs(
+          query(
+            activitiesRef,
+            where('userId', 'in', batch),
+            orderBy('createdAt', 'desc'),
+            // Each batch needs its own limit: the newest `maxItems` overall
+            // could all come from a single batch.
+            limit(maxItems)
+          )
+        )
+      )
     );
 
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    const byId = new Map<string, any>();
+    let failedBatches = 0;
+
+    results.forEach(result => {
+      if (result.status === 'rejected') {
+        // One failing batch should cost the user that batch, not the feed.
+        failedBatches += 1;
+        console.warn('An activity feed batch failed:', result.reason);
+        return;
+      }
+      result.value.docs.forEach(docSnap => {
+        byId.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+      });
+    });
+
+    if (failedBatches === batches.length) {
+      // Every batch failed — that is a connection or permissions problem, not
+      // an empty feed, and the caller should be able to tell the difference.
+      throw new Error('Could not load the activity feed.');
+    }
+
+    return Array.from(byId.values())
+      .sort((a, b) => firestoreService.activityTimestamp(b) - firestoreService.activityTimestamp(a))
+      .slice(0, maxItems);
   },
 
   sendKudos: async (activityId: string, currentUserId: string): Promise<void> => {

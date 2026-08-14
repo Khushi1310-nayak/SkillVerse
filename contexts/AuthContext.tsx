@@ -142,6 +142,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
              }
 
              const mappedAppUser: AppUser = {
+                // `uid` and `following` were missing from this mapping, so
+                // every consumer of them saw `undefined`: the Dashboard passed
+                // `currentUserId={undefined}` to the activity feed (kudos did
+                // nothing) and `followingIds={[]}` (the feed never queried).
+                uid: currentUser.uid,
                 username: data.username || currentUser.displayName || "User",
                 email: data.email || currentUser.email || "",
                 enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
@@ -155,12 +160,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 streak: computedStreak,
                 lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
                 badges: allBadges,
-                role: data.role || 'user'
+                role: data.role || 'user',
+                following: Array.isArray(data.following) ? data.following : []
              };
              setAppUser(mappedAppUser);
              setLoading(false);
            } else {
              setAppUser({
+                uid: currentUser.uid,
                 username: currentUser.displayName || "User",
                 email: currentUser.email || "",
                 enrolledDate: new Date().toISOString(),
@@ -174,7 +181,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 streak: 0,
                 lastActiveDate: "",
                 badges: [],
-                role: 'user'
+                role: 'user',
+                following: []
              });
              setLoading(false);
            }

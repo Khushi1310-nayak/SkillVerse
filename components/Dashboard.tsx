@@ -32,6 +32,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
   const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
 
+  // Held here as well as on `user` so that following somebody from the
+  // Leaderboard refreshes the activity feed straight away. The Firestore
+  // snapshot in AuthContext delivers the same list a moment later; this only
+  // stops the feed lagging a round-trip behind the button.
+  const [followingIds, setFollowingIds] = useState<string[]>(user.following || []);
+
+  useEffect(() => {
+    setFollowingIds(user.following || []);
+  }, [user.following]);
+
+  const handleFollowChange = (targetUserId: string, isNowFollowing: boolean) => {
+    setFollowingIds(prev =>
+      isNowFollowing
+        ? (prev.includes(targetUserId) ? prev : [...prev, targetUserId])
+        : prev.filter(id => id !== targetUserId)
+    );
+  };
+
   const [weeklyStats, setWeeklyStats] = useState(() =>
     storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60)
   );
@@ -674,12 +692,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Study Activity Feed */}
       <div id="dash-activity-feed" className="mt-8">
-        <ActivityFeedWidget currentUserId={user.uid} followingIds={user.following || []} />
+        <ActivityFeedWidget currentUserId={user.uid} followingIds={followingIds} />
       </div>
 
       {/* Global Leaderboard */}
       <div id="dash-leaderboard" className="mt-8">
-        <Leaderboard />
+        {/* Leaderboard was rendered without props, so `currentUserId` was
+            undefined and its follow button — gated on that value — never
+            rendered on any row. */}
+        <Leaderboard
+          currentUserId={user.uid}
+          followingIds={followingIds}
+          onFollowChange={handleFollowChange}
+        />
       </div>
 
       {showStreakModal && (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { firestoreService } from '../services/firestoreService';
-import { ThumbsUp, Award, BookOpen, Flame, Users, Sparkles, Clock } from 'lucide-react';
+import { ThumbsUp, Award, BookOpen, Flame, Users, Sparkles, Clock, AlertTriangle } from 'lucide-react';
 
 export interface ActivityFeedItem {
   id: string;
@@ -22,25 +22,42 @@ interface ActivityFeedWidgetProps {
 export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({ currentUserId, followingIds = [] }) => {
   const [activities, setActivities] = useState<ActivityFeedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [kudosLoadingId, setKudosLoadingId] = useState<string | null>(null);
+
+  // The effect depends on the *contents* of followingIds, not its identity. The
+  // Dashboard used to pass `user.following || []`, a fresh array on every
+  // render, which re-ran this effect and called setActivities([]) each time —
+  // a new array, so React never bailed out and the render loop kept spinning.
+  const followingKey = followingIds.join(',');
 
   useEffect(() => {
     let isMounted = true;
+    const ids = followingKey ? followingKey.split(',') : [];
+
     const fetchFeed = async () => {
-      if (!followingIds || followingIds.length === 0) {
+      if (ids.length === 0) {
         setActivities([]);
+        setLoadFailed(false);
         setLoading(false);
         return;
       }
 
       setLoading(true);
+      setLoadFailed(false);
       try {
-        const data = await firestoreService.getFriendActivityFeed(followingIds);
+        const data = await firestoreService.getFriendActivityFeed(ids);
         if (isMounted) {
           setActivities(data as ActivityFeedItem[]);
         }
       } catch (err) {
+        // "Nothing happened today" and "we could not read the feed" looked
+        // identical before — both rendered the empty state.
         console.error('Error fetching activity feed:', err);
+        if (isMounted) {
+          setActivities([]);
+          setLoadFailed(true);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -48,7 +65,7 @@ export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({ currentU
 
     fetchFeed();
     return () => { isMounted = false; };
-  }, [followingIds]);
+  }, [followingKey]);
 
   const handleSendKudos = async (activityId: string) => {
     if (!currentUserId || kudosLoadingId) return;
@@ -114,6 +131,14 @@ export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({ currentU
             Follow top learners on the Leaderboard to see their learning streaks, badges, and completed courses in your live feed!
           </p>
         </div>
+      ) : loadFailed ? (
+        <div className="py-10 text-center bg-[#0f1623]/60 rounded-2xl border border-white/5 p-6">
+          <AlertTriangle size={36} className="mx-auto text-orange-400 mb-3 opacity-70" />
+          <h3 className="text-sm font-bold text-white mb-1">Couldn't load the feed</h3>
+          <p className="text-xs text-textMuted">
+            We couldn't reach the activity feed just now. Check your connection and try again.
+          </p>
+        </div>
       ) : activities.length === 0 ? (
         <div className="py-10 text-center bg-[#0f1623]/60 rounded-2xl border border-white/5 p-6">
           <Clock size={36} className="mx-auto text-textMuted mb-3 opacity-40" />
@@ -150,7 +175,10 @@ export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({ currentU
 
                 <button
                   onClick={() => handleSendKudos(act.id)}
-                  disabled={!currentUserId || !!hasGivenKudos}
+                  disabled={!currentUserId || !!hasGivenKudos || kudosLoadingId === act.id}
+                  aria-label={hasGivenKudos
+                    ? `You gave kudos to ${act.userName}`
+                    : `Give kudos to ${act.userName}`}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
                     hasGivenKudos
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'

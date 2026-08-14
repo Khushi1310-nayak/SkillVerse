@@ -69,6 +69,9 @@ export interface User {
   badges: string[];
   role?: 'admin' | 'instructor' | 'user';
   following?: string[];
+  // --- Daily Challenge (Spaced Repetition Practice Room) ---
+  dailyChallengeCompletedDate?: string; // YYYY-MM-DD of the last date the daily challenge bonus was claimed
+  dailyMasteryMultiplier?: number; // cumulative count of fully-completed daily challenges
 }
 
 export interface Lesson {

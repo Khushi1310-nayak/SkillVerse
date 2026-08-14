@@ -155,7 +155,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 streak: computedStreak,
                 lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
                 badges: allBadges,
-                role: data.role || 'user'
+                role: data.role || 'user',
+                dailyChallengeCompletedDate: data.dailyChallengeCompletedDate || undefined,
+                dailyMasteryMultiplier: data.dailyMasteryMultiplier || 0
              };
              setAppUser(mappedAppUser);
              setLoading(false);

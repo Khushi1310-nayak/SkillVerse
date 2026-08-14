@@ -144,6 +144,11 @@
         "retry": "Réessayer le quiz",
         "retryDisabled": "La possibilité de repasser les quiz est désactivée dans vos paramètres.",
         "reviewAnswers": "Revoir les réponses"
+      },
+      "unavailable": {
+        "title": "Pas encore de quiz pour ce cours",
+        "description": "Ce cours ne contient pas encore de questions. Poursuivez la leçon : le quiz apparaîtra ici dès qu'il aura été ajouté.",
+        "back": "Retour à la leçon"
       }
     },
     "loadError": {

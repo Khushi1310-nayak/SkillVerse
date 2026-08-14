@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, FileQuestion } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
 import { aiService } from '../services/aiService';
@@ -15,11 +15,21 @@ import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
 import { useActiveTimer } from '../hooks/useActiveTimer';
+import { useQuizCooldown } from '../hooks/useQuizCooldown';
+import { safeStorage, isPlainObject } from '../utils/safeStorage';
 import { LessonDiscussion } from './LessonDiscussion';
 import { LessonNotes } from './LessonNotes';
 import { CourseReview } from './CourseReview';
 import { CourseViewSkeleton } from './CourseViewSkeleton';
 import { CourseLoadError } from './CourseLoadError';
+
+/** Shape of the autosaved, in-progress quiz attempt. */
+interface SavedQuizState {
+  selectedAnswers?: number[];
+  currentQuestion?: number;
+}
+
+const quizStateKey = (courseId: string) => `quizState_${courseId}`;
 
 export const CourseView: React.FC = () => {
   useActiveTimer();
@@ -79,7 +89,8 @@ export const CourseView: React.FC = () => {
   const settings = user?.settings;
 
   const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
-  const cooldownKey = `cooldown_${id}`;
+  const cooldown = useQuizCooldown(id, COOLDOWN_MS);
+  const timeLeft = cooldown.secondsLeft;
 
   const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -90,8 +101,6 @@ export const CourseView: React.FC = () => {
   const [aiExplainLoading, setAiExplainLoading] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState(0);
   const [passed, setPassed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const rootsRef = useRef<any[]>([]);
 
@@ -176,14 +185,20 @@ export const CourseView: React.FC = () => {
         setScore(existing.score);
         setQuizSubmitted(true);
       } else if (settings?.autoSave) {
-        const saved = localStorage.getItem(`quizState_${id}`);
+        // safeStorage discards a corrupt entry instead of the old empty
+        // `catch (e) { }`, which left the bad value in place to fail again on
+        // every single load.
+        const saved = safeStorage.readJSON<SavedQuizState | null>(
+          quizStateKey(id),
+          null,
+          isPlainObject
+        );
         if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed.selectedAnswers) setSelectedAnswers(parsed.selectedAnswers);
-            if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
-            if (parsed.selectedAnswers && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
-          } catch (e) { }
+          if (Array.isArray(saved.selectedAnswers)) setSelectedAnswers(saved.selectedAnswers);
+          if (typeof saved.currentQuestion === 'number') setCurrentQuestion(saved.currentQuestion);
+          if (Array.isArray(saved.selectedAnswers) && saved.selectedAnswers.length > 0) {
+            setActiveTab('quiz');
+          }
         }
       }
     }
@@ -197,42 +212,9 @@ export const CourseView: React.FC = () => {
 
   useEffect(() => {
     if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
-      localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
+      safeStorage.writeJSON(quizStateKey(id), { selectedAnswers, currentQuestion });
     }
   }, [selectedAnswers, currentQuestion, id, settings?.autoSave, quizSubmitted]);
-
-  // Cooldown timer — read from localStorage and start a live countdown
-  const startCooldownInterval = (remaining: number) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setTimeLeft(remaining);
-    intervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          localStorage.removeItem(cooldownKey);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem(cooldownKey);
-    if (saved) {
-      const elapsed = Date.now() - parseInt(saved, 10);
-      const remaining = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
-      if (remaining > 0) {
-        startCooldownInterval(remaining);
-      } else {
-        localStorage.removeItem(cooldownKey);
-      }
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [id]);
 
   // Render guards, in the order the states actually occur. These used to sit
   // below the handlers, behind an unconditional `if (!course)` return, which
@@ -242,15 +224,31 @@ export const CourseView: React.FC = () => {
   if (loadFailed) return <CourseLoadError onRetry={fetchCourseData} />;
   if (!course) return <NotFound />;
 
+  // A course can legitimately have no questions: `createCourse` writes
+  // `questions: []` for every course an admin adds, and the daily generator can
+  // come back empty. Nothing checked for it, so the quiz tab dereferenced
+  // `course.quiz[0].question` and took the whole page down with the error
+  // boundary.
+  const quiz = Array.isArray(course.quiz) ? course.quiz : [];
+  const hasQuiz = quiz.length > 0;
+
+  // The daily generator can hand back a different number of questions from one
+  // day to the next, so a restored autosave can point past the end of today's
+  // quiz. Clamping here keeps `quiz[questionIndex]` defined in every case.
+  const questionIndex = hasQuiz
+    ? Math.min(Math.max(0, currentQuestion), quiz.length - 1)
+    : 0;
+  const activeQuestion = hasQuiz ? quiz[questionIndex] : null;
+
   const handleOptionSelect = (optionIndex: number) => {
-    if (quizSubmitted) return;
-    if (settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined) return;
+    if (quizSubmitted || !activeQuestion) return;
+    if (settings?.instantFeedback && selectedAnswers[questionIndex] !== undefined) return;
     const newAnswers = [...selectedAnswers];
-    newAnswers[currentQuestion] = optionIndex;
+    newAnswers[questionIndex] = optionIndex;
     setSelectedAnswers(newAnswers);
 
     if (settings?.soundEffects !== false) {
-      if (optionIndex === course.quiz[currentQuestion].correctAnswer) {
+      if (optionIndex === activeQuestion.correctAnswer) {
         soundManager.playCorrect();
       } else {
         soundManager.playIncorrect();
@@ -259,12 +257,18 @@ export const CourseView: React.FC = () => {
   };
 
   const submitQuiz = () => {
+    // Guard the division below. With no questions this produced 0 / 0 = NaN:
+    // `NaN >= 70` is false so the learner was marked failed, "You scored NaN%"
+    // was rendered, a cooldown started, and saveProgress persisted a score that
+    // JSON.stringify turned into null.
+    if (!hasQuiz) return;
+
     let correctCount = 0;
-    course.quiz.forEach((q, idx) => {
+    quiz.forEach((q, idx) => {
       if (selectedAnswers[idx] === q.correctAnswer) correctCount++;
     });
 
-    const finalScore = Math.round((correctCount / course.quiz.length) * 100);
+    const finalScore = Math.round((correctCount / quiz.length) * 100);
     const isPassed = finalScore >= 70;
 
     setScore(finalScore);
@@ -277,8 +281,7 @@ export const CourseView: React.FC = () => {
 
     // Start cooldown on failure
     if (!isPassed) {
-      localStorage.setItem(cooldownKey, Date.now().toString());
-      startCooldownInterval(COOLDOWN_MS / 1000);
+      cooldown.start();
     }
 
     storageService.saveProgress({
@@ -301,7 +304,7 @@ export const CourseView: React.FC = () => {
     setCurrentQuestion(0);
     setScore(0);
     setPassed(false);
-    if (id) localStorage.removeItem(`quizState_${id}`);
+    if (id) safeStorage.remove(quizStateKey(id));
     // Note: we do NOT clear the cooldown here — it must expire naturally
   };
 
@@ -316,7 +319,7 @@ export const CourseView: React.FC = () => {
 
     setAiExplainLoading(prev => ({ ...prev, [qIdx]: true }));
     try {
-      const q = course.quiz[qIdx];
+      const q = quiz[qIdx];
       const explanation = await aiService.explainQuizAnswer({
         courseTitle: course.title,
         question: q.question,
@@ -429,31 +432,55 @@ export const CourseView: React.FC = () => {
                 </button>
               </div>
             </div>
+          ) : !hasQuiz ? (
+            /* A course can legitimately have no questions yet. This branch
+               replaces the crash that used to happen one line into the quiz
+               render. */
+            <div className="animate-fade-in max-w-2xl mx-auto text-center py-16">
+              <div className="mb-6 inline-flex p-4 rounded-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10">
+                <FileQuestion size={48} className="text-textMuted" />
+              </div>
+              <h2 className="text-2xl font-bold text-textMain mb-2">
+                {t('courseView.quiz.unavailable.title', 'No quiz for this course yet')}
+              </h2>
+              <p className="text-textMuted max-w-md mx-auto mb-8">
+                {t(
+                  'courseView.quiz.unavailable.description',
+                  "This course doesn't have any questions yet. Work through the lesson material — the quiz will appear here once it has been added."
+                )}
+              </p>
+              <button
+                onClick={() => setActiveTab('learn')}
+                className="bg-gradient-main text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                {t('courseView.quiz.unavailable.back', 'Back to the lesson')}
+              </button>
+            </div>
           ) : (
             <div className="animate-fade-in max-w-2xl mx-auto">
-              {!quizSubmitted ? (
+              {!quizSubmitted && activeQuestion ? (
                 <>
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-textMain">
-                      {t('courseView.quiz.question', { current: currentQuestion + 1 })}{' '}
-                      <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: course.quiz.length })}</span>
+                      {t('courseView.quiz.question', { current: questionIndex + 1 })}{' '}
+                      <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: quiz.length })}</span>
                     </h2>
                     <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
-                      <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
+                      <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(questionIndex + 1, quiz.length)}`} />
                     </div>
                   </div>
 
                   <div className="mb-8">
                     <p className="text-xl text-textMain font-medium leading-relaxed">
-                      {course.quiz[currentQuestion].question}
+                      {activeQuestion.question}
                     </p>
                   </div>
 
-                  <div className="space-y-4 mb-10" role="radiogroup" aria-label={course.quiz[currentQuestion].question}>
-                    {course.quiz[currentQuestion].options.map((option, idx) => {
-                      const isSelected = selectedAnswers[currentQuestion] === idx;
-                      const isCorrect = idx === course.quiz[currentQuestion].correctAnswer;
-                      const showInstant = settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined;
+                  <div className="space-y-4 mb-10" role="radiogroup" aria-label={activeQuestion.question}>
+                    {activeQuestion.options.map((option, idx) => {
+                      const isSelected = selectedAnswers[questionIndex] === idx;
+                      const isCorrect = idx === activeQuestion.correctAnswer;
+                      const showInstant = settings?.instantFeedback && selectedAnswers[questionIndex] !== undefined;
 
                       let btnClass = isSelected
                         ? 'bg-primary/20 border-primaryLight text-textMain'
@@ -492,15 +519,15 @@ export const CourseView: React.FC = () => {
 
                   <div className="flex justify-between">
                     <button
-                      onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-                      disabled={currentQuestion === 0}
+                      onClick={() => setCurrentQuestion(Math.max(0, questionIndex - 1))}
+                      disabled={questionIndex === 0}
                       className="px-6 py-2 rounded-lg text-textMuted hover:text-textMain disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       {t('courseView.quiz.previous')}
                     </button>
-                    {currentQuestion < course.quiz.length - 1 ? (
+                    {questionIndex < quiz.length - 1 ? (
                       <button
-                        onClick={() => setCurrentQuestion(currentQuestion + 1)}
+                        onClick={() => setCurrentQuestion(questionIndex + 1)}
                         className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {t('courseView.quiz.next')}
@@ -508,7 +535,7 @@ export const CourseView: React.FC = () => {
                     ) : (
                       <button
                         onClick={submitQuiz}
-                        disabled={selectedAnswers.length < course.quiz.length}
+                        disabled={selectedAnswers.length < quiz.length}
                         className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {t('courseView.quiz.submit')}
@@ -576,7 +603,7 @@ export const CourseView: React.FC = () => {
                   {settings?.showAnswers && (
                     <div className="mt-16 space-y-6 text-left border-t border-black/20 dark:border-white/10 pt-10">
                       <h3 className="text-2xl font-bold text-textMain text-center mb-8">{t('courseView.quiz.result.reviewAnswers')}</h3>
-                      {course.quiz.map((q, qIdx) => (
+                      {quiz.map((q, qIdx) => (
                         <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/20 dark:border-white/10">
                           <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
                           <div className="space-y-3">

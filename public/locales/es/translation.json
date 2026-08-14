@@ -144,6 +144,11 @@
         "retry": "Reintentar examen",
         "retryDisabled": "Reintentar exámenes está deshabilitado en tu configuración.",
         "reviewAnswers": "Revisar respuestas"
+      },
+      "unavailable": {
+        "title": "Aún no hay cuestionario para este curso",
+        "description": "Este curso todavía no tiene preguntas. Sigue con el material de la lección: el cuestionario aparecerá aquí cuando se añada.",
+        "back": "Volver a la lección"
       }
     },
     "loadError": {

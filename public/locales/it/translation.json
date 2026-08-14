@@ -144,6 +144,11 @@
         "retry": "Riprova il quiz",
         "retryDisabled": "La possibilità di riprovare i quiz è disattivata nelle tue impostazioni.",
         "reviewAnswers": "Rivedi le risposte"
+      },
+      "unavailable": {
+        "title": "Nessun quiz per questo corso, per ora",
+        "description": "Questo corso non ha ancora domande. Prosegui con il materiale della lezione: il quiz comparirà qui una volta aggiunto.",
+        "back": "Torna alla lezione"
       }
     },
     "loadError": {

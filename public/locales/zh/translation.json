@@ -144,6 +144,11 @@
         "retry": "重新测试",
         "retryDisabled": "您的设置中已禁用重新测试功能。",
         "reviewAnswers": "查看答案解析"
+      },
+      "unavailable": {
+        "title": "本课程暂时没有测验",
+        "description": "本课程还没有题目。先学习课程内容吧——测验添加后会显示在这里。",
+        "back": "返回课程"
       }
     },
     "loadError": {

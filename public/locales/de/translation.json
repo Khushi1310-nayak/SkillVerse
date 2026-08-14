@@ -144,6 +144,11 @@
         "retry": "Test wiederholen",
         "retryDisabled": "Das Wiederholen von Tests ist in Ihren Einstellungen deaktiviert.",
         "reviewAnswers": "Antworten überprüfen"
+      },
+      "unavailable": {
+        "title": "Für diesen Kurs gibt es noch kein Quiz",
+        "description": "Dieser Kurs hat noch keine Fragen. Arbeite das Lernmaterial durch – das Quiz erscheint hier, sobald es hinzugefügt wurde.",
+        "back": "Zurück zur Lektion"
       }
     },
     "loadError": {

@@ -144,6 +144,11 @@
         "retry": "Retry Quiz",
         "retryDisabled": "Retrying quizzes is disabled in your settings.",
         "reviewAnswers": "Review Answers"
+      },
+      "unavailable": {
+        "title": "No quiz for this course yet",
+        "description": "This course doesn't have any questions yet. Work through the lesson material — the quiz will appear here once it has been added.",
+        "back": "Back to the lesson"
       }
     },
     "loadError": {

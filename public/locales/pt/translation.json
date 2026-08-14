@@ -144,6 +144,11 @@
         "retry": "Repetir Questionário",
         "retryDisabled": "A repetição de questionários está desativada nas suas configurações.",
         "reviewAnswers": "Rever Respostas"
+      },
+      "unavailable": {
+        "title": "Ainda não há questionário para este curso",
+        "description": "Este curso ainda não tem perguntas. Continue com o material da lição — o questionário aparecerá aqui assim que for adicionado.",
+        "back": "Voltar à lição"
       }
     },
     "loadError": {

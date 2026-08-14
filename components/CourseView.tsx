@@ -15,6 +15,7 @@ import NotFound from './NotFound';
 import { createRoot } from 'react-dom/client';
 import { CodePlayground } from './CodePlayground';
 import { useActiveTimer } from '../hooks/useActiveTimer';
+import { sanitizeHtml, htmlToPlainText } from '../utils/sanitizeHtml';
 import { LessonDiscussion } from './LessonDiscussion';
 import { LessonNotes } from './LessonNotes';
 import { CourseReview } from './CourseReview';
@@ -348,8 +349,10 @@ export const CourseView: React.FC = () => {
     return wMap[rounded];
   };
 
-  // Remove HTML tags for raw context for AI
-  const cleanContent = course.content ? course.content.replace(/<[^>]*>?/gm, '') : '';
+  // Sanitised once per render and used for both the rendered markup and the
+  // plain-text context handed to the AI assistant.
+  const safeContent = sanitizeHtml(course.content);
+  const cleanContent = htmlToPlainText(course.content);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in relative">
@@ -397,7 +400,7 @@ export const CourseView: React.FC = () => {
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
-                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: course.content }} />
+                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: safeContent }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">

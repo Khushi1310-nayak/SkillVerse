@@ -474,6 +474,10 @@
     "loginRequired": "Accedi per partecipare alla discussione e inviare domande.",
     "emptyTitle": "Ancora nessuna discussione",
     "emptySubtitle": "Sii il primo a fare una domanda o a lasciare una nota su questa lezione!",
+    "offlineNotice": "Salvato su questo dispositivo, ma non siamo riusciti a raggiungere il server: gli altri studenti non lo vedranno ancora.",
+    "postFailed": "Non è stato possibile pubblicare il tuo commento. Riprova.",
+    "voteOfflineNotice": "Il tuo voto è stato salvato su questo dispositivo, ma non siamo riusciti a raggiungere il server.",
+    "voteFailed": "Non è stato possibile registrare il tuo voto. Riprova.",
     "time": {
       "justNow": "Proprio ora"
     }

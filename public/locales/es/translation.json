@@ -474,6 +474,10 @@
     "loginRequired": "Inicia sesión para participar en la discusión y hacer preguntas.",
     "emptyTitle": "Aún no hay discusiones",
     "emptySubtitle": "¡Sé el primero en hacer una pregunta o dejar una nota sobre esta lección!",
+    "offlineNotice": "Guardado en este dispositivo, pero no pudimos conectar con el servidor: otros estudiantes aún no lo verán.",
+    "postFailed": "No se pudo publicar tu comentario. Inténtalo de nuevo.",
+    "voteOfflineNotice": "Tu voto se guardó en este dispositivo, pero no pudimos conectar con el servidor.",
+    "voteFailed": "No se pudo registrar tu voto. Inténtalo de nuevo.",
     "time": {
       "justNow": "Justo ahora"
     }

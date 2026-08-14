@@ -474,6 +474,10 @@
     "loginRequired": "Faça login para participar da discussão e enviar perguntas.",
     "emptyTitle": "Nenhuma discussão ainda",
     "emptySubtitle": "Seja o primeiro a fazer uma pergunta ou deixar uma anotação nesta aula!",
+    "offlineNotice": "Salvo neste dispositivo, mas não conseguimos contactar o servidor — outros alunos ainda não verão isto.",
+    "postFailed": "Não foi possível publicar o seu comentário. Tente novamente.",
+    "voteOfflineNotice": "O seu voto foi salvo neste dispositivo, mas não conseguimos contactar o servidor.",
+    "voteFailed": "Não foi possível registar o seu voto. Tente novamente.",
     "time": {
       "justNow": "Agora mesmo"
     }

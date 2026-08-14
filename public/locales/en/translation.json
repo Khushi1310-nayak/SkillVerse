@@ -474,6 +474,10 @@
     "loginRequired": "Please log in to join the discussion and post questions.",
     "emptyTitle": "No discussions yet",
     "emptySubtitle": "Be the first to ask a question or leave a note on this lesson!",
+    "offlineNotice": "Saved on this device, but we could not reach the server — other learners will not see this yet.",
+    "postFailed": "Your comment could not be posted. Please try again.",
+    "voteOfflineNotice": "Your vote was saved on this device, but we could not reach the server.",
+    "voteFailed": "Could not register your vote. Please try again.",
     "time": {
       "justNow": "Just now"
     }

@@ -474,6 +474,10 @@
     "loginRequired": "Veuillez vous connecter pour participer à la discussion et poser des questions.",
     "emptyTitle": "Aucune discussion pour le moment",
     "emptySubtitle": "Soyez le premier à poser une question ou à laisser une note sur cette leçon !",
+    "offlineNotice": "Enregistré sur cet appareil, mais le serveur est injoignable : les autres apprenants ne le verront pas encore.",
+    "postFailed": "Votre commentaire n'a pas pu être publié. Veuillez réessayer.",
+    "voteOfflineNotice": "Votre vote a été enregistré sur cet appareil, mais le serveur est injoignable.",
+    "voteFailed": "Votre vote n'a pas pu être enregistré. Veuillez réessayer.",
     "time": {
       "justNow": "À l'instant"
     }

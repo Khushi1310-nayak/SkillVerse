@@ -19,6 +19,7 @@ import {
 import { db } from '../firebase/firebase';
 import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User } from '../types';
 import { COURSES, COMPANIES } from '../constants';
+import { safeStorage, isArray } from '../utils/safeStorage';
 
 // Helper to structure chapters for initial seed courses
 const generateInitialChapters = (topic: string): Chapter[] => {
@@ -221,28 +222,59 @@ export const firestoreService = {
   },
 
   // --- LESSON DISCUSSIONS & Q&A ---
+
+  /**
+   * The comment cache is a mirror of the server, not a source of truth. It only
+   * exists so a thread stays readable while offline, so every access goes
+   * through these two helpers: `safeStorage` degrades instead of throwing when
+   * the browser blocks storage, and a cache entry that is not an array of
+   * comments is discarded rather than handed to a `.map` further down.
+   */
+  cachedCommentsKey: (courseId: string, lessonId: string): string =>
+    `lesson_comments_${courseId}_${lessonId}`,
+
+  readCachedComments: (courseId: string, lessonId: string): LessonComment[] =>
+    safeStorage.readJSON<LessonComment[]>(
+      firestoreService.cachedCommentsKey(courseId, lessonId),
+      [],
+      isArray
+    ),
+
+  writeCachedComments: (courseId: string, lessonId: string, comments: LessonComment[]): void => {
+    safeStorage.writeJSON(firestoreService.cachedCommentsKey(courseId, lessonId), comments);
+  },
+
+  sortCommentsByNewest: (comments: LessonComment[]): LessonComment[] =>
+    [...comments].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ),
+
   getLessonComments: async (courseId: string, lessonId: string): Promise<LessonComment[]> => {
-    const key = `lesson_comments_${courseId}_${lessonId}`;
     try {
       const colRef = collection(db, 'courses', courseId, 'lessons', lessonId, 'comments');
       const querySnapshot = await getDocs(colRef);
-      if (!querySnapshot.empty) {
-        const comments: LessonComment[] = [];
-        querySnapshot.forEach((docSnap) => {
-          comments.push({ id: docSnap.id, ...docSnap.data() } as LessonComment);
-        });
-        comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        localStorage.setItem(key, JSON.stringify(comments));
-        return comments;
-      }
+
+      const comments: LessonComment[] = [];
+      querySnapshot.forEach((docSnap) => {
+        comments.push({ id: docSnap.id, ...docSnap.data() } as LessonComment);
+      });
+
+      // Cache the remote result even when it is empty. Previously an empty
+      // snapshot fell through to the cache, so a thread whose comments were
+      // deleted server-side kept resurrecting from this browser's copy — the
+      // same bug that was fixed for reviews in #227.
+      const sorted = firestoreService.sortCommentsByNewest(comments);
+      firestoreService.writeCachedComments(courseId, lessonId, sorted);
+      return sorted;
     } catch (err) {
       console.warn('Firestore offline, falling back to local storage for comments:', err);
+      return firestoreService.readCachedComments(courseId, lessonId);
     }
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : [];
   },
 
-  postLessonComment: async (commentData: Omit<LessonComment, 'id' | 'createdAt' | 'upvotes' | 'upvotedBy'>): Promise<LessonComment> => {
+  postLessonComment: async (
+    commentData: Omit<LessonComment, 'id' | 'createdAt' | 'upvotes' | 'upvotedBy'>
+  ): Promise<{ comment: LessonComment; persisted: boolean }> => {
     const newComment: LessonComment = {
       ...commentData,
       id: `comment-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -250,48 +282,91 @@ export const firestoreService = {
       upvotes: 0,
       upvotedBy: [],
     };
-    const key = `lesson_comments_${commentData.courseId}_${commentData.lessonId}`;
+
+    let persisted = true;
     try {
-      const docRef = doc(db, 'courses', commentData.courseId, 'lessons', commentData.lessonId, 'comments', newComment.id);
+      const docRef = doc(
+        db,
+        'courses',
+        commentData.courseId,
+        'lessons',
+        commentData.lessonId,
+        'comments',
+        newComment.id
+      );
       await setDoc(docRef, newComment);
     } catch (err) {
-      console.warn('Firestore write failed, saving locally:', err);
+      // Keep the local copy so the thread still reads correctly offline, but
+      // tell the caller it never reached the server instead of letting the
+      // user believe a comment was posted that nobody else will ever see.
+      console.warn('Firestore write failed, saving the comment locally only:', err);
+      persisted = false;
     }
-    const saved = localStorage.getItem(key);
-    const comments: LessonComment[] = saved ? JSON.parse(saved) : [];
-    comments.unshift(newComment);
-    localStorage.setItem(key, JSON.stringify(comments));
-    return newComment;
+
+    const cached = firestoreService.readCachedComments(commentData.courseId, commentData.lessonId);
+    firestoreService.writeCachedComments(commentData.courseId, commentData.lessonId, [
+      newComment,
+      ...cached,
+    ]);
+
+    return { comment: newComment, persisted };
   },
 
-  upvoteLessonComment: async (commentId: string, userId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
-    const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+  /**
+   * Toggles the caller's vote on a single comment.
+   *
+   * The previous implementation rebuilt the whole thread from localStorage,
+   * recomputed `upvotes` from that snapshot and wrote the entire array back —
+   * which meant an empty or missing cache returned an empty thread (the caller
+   * rendered it, so upvoting wiped the discussion), and two people voting on
+   * the same comment produced last-writer-wins with one of them silently
+   * dropped.
+   *
+   * It now takes the comment being voted on, sends an additive update
+   * (`increment` + `arrayUnion`/`arrayRemove`) so concurrent votes from
+   * different users compose on the server, and returns only that comment.
+   */
+  toggleLessonCommentUpvote: async (
+    courseId: string,
+    lessonId: string,
+    comment: LessonComment,
+    userId: string
+  ): Promise<{ comment: LessonComment; persisted: boolean }> => {
+    const upvotedBy = Array.isArray(comment.upvotedBy) ? comment.upvotedBy : [];
+    const hasUpvoted = upvotedBy.includes(userId);
+    const delta = hasUpvoted ? -1 : 1;
 
-    comments = comments.map(comment => {
-      if (comment.id === commentId) {
-        const upvotedBy = comment.upvotedBy || [];
-        const hasUpvoted = upvotedBy.includes(userId);
-        const newUpvotedBy = hasUpvoted
-          ? upvotedBy.filter(id => id !== userId)
-          : [...upvotedBy, userId];
-        const newUpvotes = newUpvotedBy.length;
-        const updated = { ...comment, upvotes: newUpvotes, upvotedBy: newUpvotedBy };
+    const nextComment: LessonComment = {
+      ...comment,
+      upvotedBy: hasUpvoted ? upvotedBy.filter(id => id !== userId) : [...upvotedBy, userId],
+      // Clamped because the stored counter and the stored list can already
+      // disagree, thanks to the writes the old implementation made.
+      upvotes: Math.max(0, (comment.upvotes || 0) + delta),
+    };
 
-        // Try updating firestore as well asynchronously
-        try {
-          const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
-          updateDoc(docRef, { upvotes: newUpvotes, upvotedBy: newUpvotedBy }).catch(() => { });
-        } catch (e) { }
+    let persisted = true;
+    try {
+      const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', comment.id);
+      await updateDoc(docRef, {
+        upvotes: increment(delta),
+        upvotedBy: hasUpvoted ? arrayRemove(userId) : arrayUnion(userId),
+      });
+    } catch (err) {
+      // A comment that only ever existed locally has no document to update, and
+      // the write also fails offline. Either way the caller decides what to do
+      // rather than the failure being swallowed by a `.catch(() => {})`.
+      console.warn('Could not persist the upvote:', err);
+      persisted = false;
+    }
 
-        return updated;
-      }
-      return comment;
-    });
+    const cached = firestoreService.readCachedComments(courseId, lessonId);
+    firestoreService.writeCachedComments(
+      courseId,
+      lessonId,
+      cached.map(c => (c.id === nextComment.id ? nextComment : c))
+    );
 
-    localStorage.setItem(key, JSON.stringify(comments));
-    return comments;
+    return { comment: nextComment, persisted };
   },
 
   // --- COURSE RATINGS & REVIEWS ---

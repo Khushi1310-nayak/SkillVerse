@@ -474,6 +474,10 @@
     "loginRequired": "Bitte melde dich an, um an der Diskussion teilzunehmen und Fragen zu stellen.",
     "emptyTitle": "Noch keine Diskussionen",
     "emptySubtitle": "Sei der Erste, der eine Frage stellt oder eine Anmerkung zu dieser Lektion hinterlässt!",
+    "offlineNotice": "Auf diesem Gerät gespeichert, aber der Server war nicht erreichbar – andere Lernende sehen das noch nicht.",
+    "postFailed": "Dein Kommentar konnte nicht gepostet werden. Bitte versuche es erneut.",
+    "voteOfflineNotice": "Deine Stimme wurde auf diesem Gerät gespeichert, aber der Server war nicht erreichbar.",
+    "voteFailed": "Deine Stimme konnte nicht gezählt werden. Bitte versuche es erneut.",
     "time": {
       "justNow": "Gerade eben"
     }

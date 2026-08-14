@@ -474,6 +474,10 @@
     "loginRequired": "请先登录以参与讨论和发布问题。",
     "emptyTitle": "暂无讨论",
     "emptySubtitle": "成为第一个在本课提问或留下的心得的人吧！",
+    "offlineNotice": "已保存在本设备上，但无法连接服务器——其他学习者暂时看不到。",
+    "postFailed": "评论发布失败，请重试。",
+    "voteOfflineNotice": "你的投票已保存在本设备上，但无法连接服务器。",
+    "voteFailed": "无法记录你的投票，请重试。",
     "time": {
       "justNow": "刚刚"
     }

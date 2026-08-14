@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2, AlertTriangle } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { User, LessonComment } from '../types';
 
@@ -27,6 +27,10 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
   const [submitting, setSubmitting] = useState(false);
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
+  // Votes in flight, by comment id. Prevents a double-click from sending two
+  // toggles that cancel each other out on the server.
+  const [pendingVoteIds, setPendingVoteIds] = useState<string[]>([]);
 
   const fetchComments = useCallback(async () => {
     setLoading(true);
@@ -50,8 +54,9 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
     if (!content || !user) return;
 
     setSubmitting(true);
+    setNotice(null);
     try {
-      const created = await firestoreService.postLessonComment({
+      const { comment: created, persisted } = await firestoreService.postLessonComment({
         courseId,
         lessonId,
         userId: user.email, // using email or username as ID
@@ -69,17 +74,59 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
       } else {
         setNewComment('');
       }
+
+      if (!persisted) {
+        setNotice(t(
+          'lessonDiscussion.offlineNotice',
+          'Saved on this device, but we could not reach the server — other learners will not see this yet.'
+        ));
+      }
     } catch (err) {
       console.error('Error posting comment:', err);
+      setNotice(t('lessonDiscussion.postFailed', 'Your comment could not be posted. Please try again.'));
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleUpvote = async (commentId: string) => {
-    if (!user) return;
-    const updatedComments = await firestoreService.upvoteLessonComment(commentId, user.email, courseId, lessonId);
-    setComments(updatedComments);
+  /**
+   * Toggles the current user's vote on one comment.
+   *
+   * The whole thread used to be replaced with whatever the service returned,
+   * which was rebuilt from localStorage — so an empty cache blanked the
+   * discussion. Only the comment that was voted on is touched now, and the
+   * previous list is restored if the write fails.
+   */
+  const handleUpvote = async (comment: LessonComment) => {
+    if (!user || pendingVoteIds.includes(comment.id)) return;
+
+    const previousComments = comments;
+    setPendingVoteIds(ids => [...ids, comment.id]);
+    setNotice(null);
+
+    try {
+      const { comment: updated, persisted } = await firestoreService.toggleLessonCommentUpvote(
+        courseId,
+        lessonId,
+        comment,
+        user.email
+      );
+
+      setComments(prev => prev.map(c => (c.id === updated.id ? updated : c)));
+
+      if (!persisted) {
+        setNotice(t(
+          'lessonDiscussion.voteOfflineNotice',
+          'Your vote was saved on this device, but we could not reach the server.'
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating upvote:', err);
+      setComments(previousComments);
+      setNotice(t('lessonDiscussion.voteFailed', 'Could not register your vote. Please try again.'));
+    } finally {
+      setPendingVoteIds(ids => ids.filter(id => id !== comment.id));
+    }
   };
 
   const getAvatar = (comment: LessonComment) => {
@@ -141,6 +188,18 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
       {/* Accordion Body */}
       {isOpen && (
         <div className="p-6 border-t border-black/10 dark:border-white/10 space-y-6 animate-fade-in">
+          {/* Anything that did not reach the server. Previously these failures
+              were swallowed and the user had no way to know. */}
+          {notice && (
+            <div
+              role="status"
+              className="flex items-start gap-2 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-500 dark:text-orange-300 text-xs font-medium"
+            >
+              <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+              <span>{notice}</span>
+            </div>
+          )}
+
           {/* Post Comment Input */}
           {user ? (
             <form onSubmit={(e) => handlePostComment(e)} className="flex flex-col gap-3">
@@ -232,8 +291,11 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
 
                       <div className="flex items-center gap-4 text-xs font-medium">
                         <button
-                          onClick={() => handleUpvote(comment.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
+                          onClick={() => handleUpvote(comment)}
+                          disabled={!user || pendingVoteIds.includes(comment.id)}
+                          aria-pressed={!!hasUpvoted}
+                          aria-label={`${hasUpvoted ? 'Remove your upvote from' : 'Upvote'} ${comment.username}'s comment`}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                             hasUpvoted
                               ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
                               : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain hover:bg-black/10 dark:hover:bg-white/10'
@@ -311,8 +373,11 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                                   {reply.content}
                                 </p>
                                 <button
-                                  onClick={() => handleUpvote(reply.id)}
-                                  className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] border transition-all ${
+                                  onClick={() => handleUpvote(reply)}
+                                  disabled={!user || pendingVoteIds.includes(reply.id)}
+                                  aria-pressed={!!replyHasUpvoted}
+                                  aria-label={`${replyHasUpvoted ? 'Remove your upvote from' : 'Upvote'} ${reply.username}'s reply`}
+                                  className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] border transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                                     replyHasUpvoted
                                       ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
                                       : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain'

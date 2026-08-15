@@ -99,11 +99,17 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface BadgeRequirement {
+  metric: 'courses' | 'streak' | 'mockInterviews';
+  target: number;
+}
+
 export interface BadgeDefinition {
   id: string;
   name: string;
   description: string;
   icon: string; // lucide-react icon name
+  requirement: BadgeRequirement;
 }
 
 export interface QuizQuestion {

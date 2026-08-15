@@ -84,38 +84,42 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     name: 'First Steps',
     description: 'Complete your first course',
     icon: 'Footprints',
+    requirement: { metric: 'courses', target: 1 },
   },
   {
     id: 'certified',
     name: 'Certified',
     description: 'Earn your first certificate',
     icon: 'Award',
+    requirement: { metric: 'courses', target: 1 },
   },
   {
     id: 'on-fire',
     name: 'On Fire',
     description: 'Reach a 3-day streak',
     icon: 'Flame',
+    requirement: { metric: 'streak', target: 3 },
   },
   {
     id: 'interview-ready',
     name: 'Interview Ready',
     description: 'Complete a mock interview',
     icon: 'Briefcase',
+    requirement: { metric: 'mockInterviews', target: 1 },
   },
 ];
 
 const getDocLink = (topic: string) => {
-    const t = topic.toLowerCase();
-    if(t.includes('java') && !t.includes('script')) return 'https://docs.oracle.com/en/java/';
-    if(t.includes('script') || t.includes('react') || t.includes('node')) return 'https://developer.mozilla.org/en-US/';
-    if(t.includes('python')) return 'https://docs.python.org/3/';
-    if(t.includes('c++') || t.includes('cpp')) return 'https://en.cppreference.com/w/';
-    if(t.includes('go')) return 'https://go.dev/doc/';
-    if(t.includes('rust')) return 'https://www.rust-lang.org/learn';
-    if(t.includes('figma')) return 'https://help.figma.com/';
-    if(t.includes('ui') || t.includes('ux')) return 'https://www.nngroup.com/articles/';
-    return `https://www.google.com/search?q=${topic}+documentation`;
+  const t = topic.toLowerCase();
+  if (t.includes('java') && !t.includes('script')) return 'https://docs.oracle.com/en/java/';
+  if (t.includes('script') || t.includes('react') || t.includes('node')) return 'https://developer.mozilla.org/en-US/';
+  if (t.includes('python')) return 'https://docs.python.org/3/';
+  if (t.includes('c++') || t.includes('cpp')) return 'https://en.cppreference.com/w/';
+  if (t.includes('go')) return 'https://go.dev/doc/';
+  if (t.includes('rust')) return 'https://www.rust-lang.org/learn';
+  if (t.includes('figma')) return 'https://help.figma.com/';
+  if (t.includes('ui') || t.includes('ux')) return 'https://www.nngroup.com/articles/';
+  return `https://www.google.com/search?q=${topic}+documentation`;
 };
 
 const generateQuiz = (subject: string): any[] => {
@@ -281,17 +285,17 @@ const TOPIC_QUESTION_MAP: Record<string, string[]> = {
 
 const generateQuestionsForCompany = (companyId: string, focus: string[]): InterviewQuestion[] => {
   const diffs: ('Easy' | 'Medium' | 'Hard')[] = ['Easy', 'Easy', 'Medium', 'Medium', 'Medium', 'Medium', 'Hard', 'Hard', 'Hard', 'Hard'];
-  
+
   // Mix questions from both focus tags, fallback to generic if tag missing
   const questionsList1 = TOPIC_QUESTION_MAP[focus[0]] || ['Explain core concept', 'Solve basic problem', 'Design system component', 'Optimize algorithm', 'Debug edge case'];
   const questionsList2 = TOPIC_QUESTION_MAP[focus[1]] || questionsList1;
-  
+
   // Combine and deduplicate
   const allQuestions = Array.from(new Set([...questionsList1, ...questionsList2]));
-  
+
   // Shuffle exactly once
   const shuffledQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
-  
+
   return Array.from({ length: 10 }).map((_, i) => {
     // Safely pick unique questions if there are enough, otherwise wrap around
     const title = shuffledQuestions[i % shuffledQuestions.length];
@@ -323,7 +327,7 @@ const COMPANY_LIST = [
   { name: 'Airbnb', focus: ['Dynamic Programming', 'Experience Design'], domain: 'airbnb.com' },
   { name: 'Spotify', focus: ['Streaming Architecture', 'Mobile'], domain: 'spotify.com' },
   { name: 'Tesla', focus: ['Embedded Systems', 'C/C++'], domain: 'tesla.com' },
-  { name: ' X (Twitter)', focus: ['Distributed Systems', 'Scala'], domain: 'x.com' }, 
+  { name: ' X (Twitter)', focus: ['Distributed Systems', 'Scala'], domain: 'x.com' },
   { name: 'LinkedIn', focus: ['Social Graphs', 'Big Data'], domain: 'linkedin.com' },
   { name: 'Oracle', focus: ['Database Internals', 'Cloud'], domain: 'oracle.com' },
   { name: 'IBM', focus: ['Mainframe/Legacy', 'AI'], domain: 'ibm.com' },
@@ -338,13 +342,13 @@ export const COMPANIES: Company[] = COMPANY_LIST.map((c, index) => {
     id: companyId,
     name: c.name,
     // Reliable mock logos using UI Avatars
-    logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&rounded=true&bold=true&size=128`, 
+    logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&rounded=true&bold=true&size=128`,
     description: `Prepare for ${c.name} with curated questions focusing on ${c.focus.join(' and ')}.`,
     roles: ['SDE I', 'SDE II', 'Frontend', 'Backend'],
     difficulty: index % 3 === 0 ? 'Very Hard' : index % 3 === 1 ? 'Hard' : 'Moderate',
     focus: c.focus,
-    questions: typeof getDailyCompanyQuestions === 'function' 
-      ? getDailyCompanyQuestions(companyId, c.focus) 
+    questions: typeof getDailyCompanyQuestions === 'function'
+      ? getDailyCompanyQuestions(companyId, c.focus)
       : generateQuestionsForCompany(companyId, c.focus),
   };
 });

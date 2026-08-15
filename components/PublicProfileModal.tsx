@@ -4,6 +4,8 @@ import { X, Trophy, Flame, BookOpen, Award, Shield, Calendar, Lock, Footprints, 
 import { db } from '../firebase/firebase';
 import { BADGE_DEFINITIONS, XP_STORE_FRAMES } from '../constants';
 import { User } from '../types';
+import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
+import { BadgeProgressBar } from './ui/BadgeProgressBar';
 
 interface PublicProfileModalProps {
   userId: string | null;
@@ -67,7 +69,7 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div 
+      <div
         className="relative w-full max-w-xl bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl max-h-[90vh] overflow-y-auto custom-scrollbar animate-fade-in-up"
         onClick={(e) => e.stopPropagation()}
       >
@@ -97,9 +99,8 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
                   className="w-24 h-24 rounded-full object-cover border-2 border-primaryLight/50 bg-black/20 shadow-xl"
                 />
                 {profile.settings?.activeFrame && profile.settings.activeFrame !== 'none' && (
-                  <div className={`absolute inset-0 rounded-full pointer-events-none ${
-                    XP_STORE_FRAMES.find(f => f.id === profile.settings.activeFrame)?.frameClass || ''
-                  }`} />
+                  <div className={`absolute inset-0 rounded-full pointer-events-none ${XP_STORE_FRAMES.find(f => f.id === profile.settings.activeFrame)?.frameClass || ''
+                    }`} />
                 )}
                 <div className="absolute -bottom-2 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-0 px-2.5 py-0.5 rounded-full bg-gradient-main text-white font-bold text-xs shadow-md">
                   Lvl {profile.level}
@@ -170,31 +171,41 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {BADGE_DEFINITIONS.map(badge => {
-                  const earned = (profile.badges || []).includes(badge.id);
-                  const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                {(() => {
+                  const badgeMetrics: BadgeMetrics = {
+                    courses: profile.courses.length,
+                    streak: profile.streak,
+                    mockInterviews: 0,
+                  };
 
-                  return (
-                    <div
-                      key={badge.id}
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
-                        earned
-                          ? 'bg-primary/10 border-primary/20'
-                          : 'bg-white/5 border-black/10 dark:border-white/5 opacity-40'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        earned ? 'bg-gradient-main text-white shadow-md' : 'bg-black/10 dark:bg-white/10 text-textMuted'
-                      }`}>
-                        {earned ? <BadgeIcon size={20} /> : <Lock size={18} />}
+                  return BADGE_DEFINITIONS.map(badge => {
+                    const earned = (profile.badges || []).includes(badge.id);
+                    const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                    const progress = !earned ? getBadgeProgress(badge, badgeMetrics) : null;
+
+                    return (
+                      <div
+                        key={badge.id}
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${earned
+                            ? 'bg-primary/10 border-primary/20'
+                            : 'bg-white/5 border-black/10 dark:border-white/5 opacity-40'
+                          }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${earned ? 'bg-gradient-main text-white shadow-md' : 'bg-black/10 dark:bg-white/10 text-textMuted'
+                          }`}>
+                          {earned ? <BadgeIcon size={20} /> : <Lock size={18} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm text-textMain">{badge.name}</div>
+                          <div className="text-xs text-textMuted">{badge.description}</div>
+                          {progress && (
+                            <BadgeProgressBar current={progress.current} target={progress.target} label={progress.label} />
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-bold text-sm text-textMain">{badge.name}</div>
-                        <div className="text-xs text-textMuted">{badge.description}</div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             </div>
 

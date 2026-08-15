@@ -15,6 +15,8 @@ import { storageService } from '../services/storageService';
 import { soundManager } from '../utils/soundManager';
 import { useInstallPrompt } from '../contexts/InstallPromptContext';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
+import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
+import { BadgeProgressBar } from './ui/BadgeProgressBar';
 import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
@@ -1209,30 +1211,43 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {BADGE_DEFINITIONS.map(badge => {
-                    const earned = (formData.badges || []).includes(badge.id);
-                    const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
-                    return (
-                      <div
-                        key={badge.id}
-                        className={`flex items-center gap-4 p-4 rounded-xl border transition-all
-                          ${earned
-                            ? 'bg-primary/10 border-primary/20'
-                            : 'bg-white/50 dark:bg-white/5 border-black/20 dark:border-white/10 opacity-50'
-                          }`}
-                      >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0
-                          ${earned ? 'bg-gradient-main text-white' : 'bg-black/10 dark:bg-white/10 text-textMuted'}`}
+                  {(() => {
+                    const badgeMetrics: BadgeMetrics = {
+                      courses: (formData.courses || []).length,
+                      streak: formData.streak || 0,
+                      mockInterviews: storageService.getCareerProgress().mockInterviewScores.length,
+                    };
+
+                    return BADGE_DEFINITIONS.map(badge => {
+                      const earned = (formData.badges || []).includes(badge.id);
+                      const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                      const progress = !earned ? getBadgeProgress(badge, badgeMetrics) : null;
+
+                      return (
+                        <div
+                          key={badge.id}
+                          className={`flex items-center gap-4 p-4 rounded-xl border transition-all
+                            ${earned
+                              ? 'bg-primary/10 border-primary/20'
+                              : 'bg-white/50 dark:bg-white/5 border-black/20 dark:border-white/10 opacity-50'
+                            }`}
                         >
-                          {earned ? <BadgeIcon size={22} /> : <Lock size={20} />}
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0
+                            ${earned ? 'bg-gradient-main text-white' : 'bg-black/10 dark:bg-white/10 text-textMuted'}`}
+                          >
+                            {earned ? <BadgeIcon size={22} /> : <Lock size={20} />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-textMain">{badge.name}</div>
+                            <div className="text-sm text-textMuted">{badge.description}</div>
+                            {progress && (
+                              <BadgeProgressBar current={progress.current} target={progress.target} label={progress.label} />
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-bold text-textMain">{badge.name}</div>
-                          <div className="text-sm text-textMuted">{badge.description}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}

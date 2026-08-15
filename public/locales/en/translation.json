@@ -76,6 +76,18 @@
       "title": "Mock Interview History",
       "emptyMessage": "Start a Mock Interview in Career Mode to test your skills under real-world conditions.",
       "button": "Start Mock Interview"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {

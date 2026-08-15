@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase } from 'lucide-react';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase, Trophy, Circle } from 'lucide-react';
 import { CATEGORIES, COURSES, COMPANIES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
-import { storageService } from '../services/storageService';
+import { storageService, DailyChallengeSummary } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
@@ -31,6 +31,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [companies, setCompanies] = useState<any[]>([]);
   const [careerProgress, setCareerProgress] = useState<any>(storageService.getCareerProgress());
   const [dueQuestionsCount, setDueQuestionsCount] = useState<number>(0);
+  const [dailyChallenge, setDailyChallenge] = useState<DailyChallengeSummary | null>(null);
 
   const [weeklyStats, setWeeklyStats] = useState(() =>
     storageService.getWeeklyStudyStats(user.settings?.dailyGoal ?? 60)
@@ -69,6 +70,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     return (Math.round(hours * 10) / 10).toFixed(1);
   }, [weeklyStats.totalSeconds]);
 
+  // Loads today's Daily Challenge for a given company list, and — if the
+  // user has just finished all 3 questions for the first time today —
+  // silently claims the one-time +50 XP bonus and lets them know via toast.
+  const refreshDailyChallenge = React.useCallback(async (targetCompanies: any[]) => {
+    try {
+      const summary = storageService.getDailyChallenge(targetCompanies);
+      setDailyChallenge(summary);
+
+      if (summary.allCompleted && !summary.rewardClaimed) {
+        const result = await storageService.completeDailyChallenge(targetCompanies);
+        if (result.awarded) {
+          showToast({
+            message: t('dashboard.dailyChallenge.toast.bonusAwarded', { xp: result.xp }),
+            type: 'success'
+          });
+          setDailyChallenge(storageService.getDailyChallenge(targetCompanies));
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing Daily Challenge:', error);
+    }
+  }, [showToast, t]);
+
   useEffect(() => {
     const loadCompanies = async () => {
       try {
@@ -95,13 +119,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           });
         });
         setDueQuestionsCount(count);
+        refreshDailyChallenge(targetCompanies);
       } catch (error) {
         console.error('Error fetching companies in Dashboard:', error);
         setCompanies(COMPANIES);
+        refreshDailyChallenge(COMPANIES);
       }
     };
     loadCompanies();
   }, []);
+
+  // Keep the Daily Challenge card fresh while the Dashboard stays mounted -
+  // e.g. the user reviews a question in Career Mode in another tab, or the
+  // SPA doesn't fully unmount Dashboard between route visits.
+  useEffect(() => {
+    if (companies.length === 0) return;
+    const interval = setInterval(() => {
+      refreshDailyChallenge(companies);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [companies, refreshDailyChallenge]);
 
   useEffect(() => {
     if (user.streak > 0) {
@@ -335,6 +372,70 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           )}
         </div>
       </div>
+
+      {/* Daily Coding Challenge Hero Card */}
+      {dailyChallenge && dailyChallenge.total > 0 && (
+        <div className="relative overflow-hidden bg-gradient-main rounded-2xl p-5 sm:p-6 shadow-lg">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" aria-hidden="true" />
+          <div className="relative z-10 flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                  <Trophy className="text-white" size={22} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-0.5">
+                    {t('dashboard.dailyChallenge.title')}
+                  </div>
+                  <div className="text-base font-bold text-white">
+                    {dailyChallenge.allCompleted
+                      ? t('dashboard.dailyChallenge.completeMessage')
+                      : t('dashboard.dailyChallenge.progressMessage', {
+                          completed: dailyChallenge.completedCount,
+                          total: dailyChallenge.total
+                        })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="px-3 py-1.5 rounded-full bg-white/15 text-white text-xs font-bold whitespace-nowrap">
+                  {dailyChallenge.allCompleted && dailyChallenge.rewardClaimed
+                    ? t('dashboard.dailyChallenge.bonusClaimed')
+                    : t('dashboard.dailyChallenge.bonusXp', { xp: 50 })}
+                </span>
+                <Link
+                  to="/career?review=true"
+                  className="px-5 py-2.5 bg-white text-primary rounded-lg font-bold shadow-lg hover:shadow-white/25 hover:scale-[1.02] active:scale-[0.98] transition-all text-center whitespace-nowrap"
+                >
+                  {dailyChallenge.allCompleted
+                    ? t('dashboard.dailyChallenge.reviewButton')
+                    : t('dashboard.dailyChallenge.startButton')}
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {dailyChallenge.items.map(({ question, completed }) => (
+                <div
+                  key={question.id}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium max-w-full ${
+                    completed ? 'bg-white/25 text-white' : 'bg-white/10 text-white/80'
+                  }`}
+                  title={question.title}
+                >
+                  {completed ? (
+                    <CheckCircle size={14} className="shrink-0" />
+                  ) : (
+                    <Circle size={14} className="shrink-0" />
+                  )}
+                  <span className="truncate max-w-[160px]">{question.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Continue Where You Left Off */}
       {showContinueWidget && lastVisitedCourse && (

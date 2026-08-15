@@ -29,6 +29,7 @@ interface PaletteItem {
     group: string;
     icon: React.ElementType;
     onSelect: () => void;
+    content?: string; // full-text body used for matching only, not displayed
 }
 
 const SETTINGS_TABS = [
@@ -41,6 +42,10 @@ const SETTINGS_TABS = [
     { id: 'achievements', label: 'Achievements' },
     { id: 'account', label: 'Account' },
 ];
+
+// Strips HTML tags so lesson/answer content can be matched as plain text
+const stripHtml = (html: string): string =>
+    html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
@@ -105,6 +110,30 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             onSelect: () => goTo('/career'),
         }));
 
+        // Full-content search: course content
+        const courseContentItems: PaletteItem[] = COURSES.map(course => ({
+            id: `course-content-${course.id}`,
+            title: course.title,
+            subtitle: 'Course Content',
+            group: 'Course Content',
+            icon: BookOpen,
+            content: stripHtml(course.content),
+            onSelect: () => goTo(`/course/${course.id}`),
+        }));
+
+        // Full-content search: interview question answers
+        const interviewAnswerItems: PaletteItem[] = COMPANIES.flatMap(company =>
+            company.questions.map(question => ({
+                id: `interview-answer-${company.id}-${question.id}`,
+                title: question.title,
+                subtitle: `${company.name} · Interview Answer`,
+                group: 'Interview Answers',
+                icon: Building2,
+                content: stripHtml(question.answer),
+                onSelect: () => goTo('/career'),
+            }))
+        );
+
         const settingsItems: PaletteItem[] = SETTINGS_TABS.map(tab => ({
             id: `settings-${tab.id}`,
             title: `Settings — ${tab.label}`,
@@ -114,7 +143,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             onSelect: () => goToSettingsTab(tab.id),
         }));
 
-        return [...navItems, ...categoryItems, ...courseItems, ...careerItems, ...settingsItems];
+        return [...navItems, ...categoryItems, ...courseItems, ...careerItems, ...courseContentItems, ...interviewAnswerItems, ...settingsItems];
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -126,7 +155,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             .filter(item =>
                 item.title.toLowerCase().includes(q) ||
                 item.group.toLowerCase().includes(q) ||
-                (item.subtitle || '').toLowerCase().includes(q)
+                (item.subtitle || '').toLowerCase().includes(q) ||
+                (item.content || '').toLowerCase().includes(q)
             )
             .slice(0, 50);
     }, [query, allItems]);

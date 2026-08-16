@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Star, Loader2, MessageSquareText } from 'lucide-react';
+import { Star, Loader2, MessageSquareText, Trash2 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
+import { useToast } from '../contexts/ToastContext';
 import { User, CourseReview as CourseReviewType } from '../types';
 
 interface CourseReviewProps {
@@ -19,6 +20,7 @@ const AVATARS: Record<string, string> = {
 
 export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) => {
     const { t } = useTranslation();
+    const { showToast } = useToast();
     const [reviews, setReviews] = useState<CourseReviewType[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -119,6 +121,21 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         }
     };
 
+    const handleDeleteReview = async () => {
+        if (!user || !myReview) return;
+        if (!confirm('Delete your review? This cannot be undone.')) return;
+        try {
+            const updated = await firestoreService.deleteCourseReview(courseId, user.email);
+            setReviews(updated);
+            setSelectedRating(0);
+            setComment('');
+            showToast({ message: 'Review deleted.', type: 'success' });
+        } catch (err) {
+            console.error('Error deleting review:', err);
+            showToast({ message: 'Failed to delete review.', type: 'error' });
+        }
+    };
+
     const getAvatar = (review: CourseReviewType) => {
         if (review.photoURL) return review.photoURL;
         return AVATARS[review.avatarId || '1'] || AVATARS['1'];
@@ -211,7 +228,18 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                             )}
                         </p>
                     )}
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
+                        {myReview && (
+                            <button
+                                type="button"
+                                onClick={handleDeleteReview}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-500/30 text-red-500 dark:text-red-400 font-bold text-sm hover:bg-red-500/10 transition-all"
+                                aria-label="Delete your review"
+                            >
+                                <Trash2 size={14} />
+                                Delete
+                            </button>
+                        )}
                         <button
                             type="submit"
                             disabled={selectedRating < 1 || submitting}

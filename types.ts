@@ -9,6 +9,7 @@ export interface UserSettings {
   showAnswers: boolean;
   retryQuiz: boolean;
   soundEffects?: boolean;
+  reducedMotion?: boolean;
   certificateName: string;
   avatarId: string;
   // Onboarding Fields

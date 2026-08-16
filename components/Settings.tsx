@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -17,6 +17,7 @@ import { useInstallPrompt } from '../contexts/InstallPromptContext';
 import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
 import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
 import { BadgeProgressBar } from './ui/BadgeProgressBar';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { User as UserType, UserSettings, SavedAINote } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
@@ -66,6 +67,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [modal, setModal] = useState<{ type: 'reset' | 'clear' | 'unsaved' | null }>({ type: null });
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const { showToast } = useToast();
+  const systemPrefersReducedMotion = usePrefersReducedMotion();
   const { purchaseItem } = useAuth();
   const navigate = useNavigate();
 
@@ -562,6 +564,23 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     >
                       {t('settings.appearance.dark')}
                     </button>
+                  </div>
+                </div>
+
+                <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <Waves className="text-cyan-500 dark:text-cyan-400 mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-textMain">Reduce Motion</div>
+                      <div className="text-sm text-textMuted">Turn off non-essential animations and transitions across the app</div>
+                    </div>
+                  </div>
+                  <div className="shrink-0 mt-1">
+                    <Toggle
+                      checked={formData.settings.reducedMotion ?? systemPrefersReducedMotion}
+                      onChange={(v) => handleChange('reducedMotion', v)}
+                      ariaLabel="Toggle reduced motion"
+                    />
                   </div>
                 </div>
 

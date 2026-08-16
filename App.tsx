@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { InstallPromptProvider } from './contexts/InstallPromptContext';
 import { useAuth } from './hooks/useAuth';
+import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { AdminRoute } from './guards/AdminRoute';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -46,6 +47,7 @@ const AppRoutes = () => {
   const { user, appUser, logout, updateUserSettings, updateUserAccount, updateLocalUser, } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (appUser && !appUser.settings.onboardingCompleted) {
@@ -54,6 +56,10 @@ const AppRoutes = () => {
       setShowOnboarding(false);
     }
   }, [appUser]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('reduce-motion', reducedMotion);
+  }, [reducedMotion]);
 
   const handleUpdateUser = async (updatedUser: any) => {
     await updateUserAccount(updatedUser);

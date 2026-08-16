@@ -77,6 +77,35 @@
     }
   </script>
   <style>
+    /* Reduced motion: neutralizes decorative keyframe animations app-wide
+       when either the user's in-app setting or the OS prefers-reduced-motion
+       preference is active. Loading spinners (animate-spin) and instant
+       transitions are left untouched since they signal real state, not decoration. */
+    .reduce-motion .animate-fade-in,
+    .reduce-motion .animate-fade-in-up,
+    .reduce-motion .animate-float,
+    .reduce-motion .animate-pulse,
+    .reduce-motion .animate-pulse-slow,
+    .reduce-motion .animate-bounce {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .animate-fade-in,
+      .animate-fade-in-up,
+      .animate-float,
+      .animate-pulse,
+      .animate-pulse-slow,
+      .animate-bounce {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+
     :root {
       /* Light Mode Defaults */
       --bg-background: #F8FAFC;

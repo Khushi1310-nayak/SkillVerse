@@ -9,7 +9,8 @@
     "logout": "로그아웃",
     "menu": "메뉴",
     "openMenu": "메뉴 열기",
-    "closeMenu": "메뉴 닫기"
+    "closeMenu": "메뉴 닫기",
+    "saved": "저장됨"
   },
   "common": {
     "cancel": "취소",
@@ -92,7 +93,28 @@
     },
     "review": "복습하기",
     "startLearning": "학습 시작",
-    "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다."
+    "empty": "선택한 조건에 맞는 코스를 찾을 수 없습니다.",
+    "difficultyFilterTitle": "난이도로 필터링",
+    "allLevels": "모든 난이도",
+    "sortTitle": "정렬 기준",
+    "sortDefault": "기본",
+    "sortRating": "평점 높은 순",
+    "sortReviews": "리뷰 많은 순",
+    "sortAZ": "가나다순",
+    "savedOnly": "저장한 항목만",
+    "resultsCount": "{{count}}개의 강좌를 찾았습니다",
+    "resultsCount_plural": "{{count}}개의 강좌를 찾았습니다",
+    "clearFilters": "필터 초기화",
+    "bookmarkAdd": "강좌 저장",
+    "bookmarkRemove": "저장 목록에서 제거"
+  },
+  "savedCourses": {
+    "title": "저장한 강좌",
+    "subtitle": "나중에 다시 보기 위해 저장한 강좌입니다.",
+    "emptyTitle": "아직 저장한 강좌가 없습니다",
+    "emptyBody": "카탈로그에서 강좌를 저장하면 여기에 표시됩니다.",
+    "emptyCta": "강좌 둘러보기",
+    "removeBookmark": "저장 목록에서 제거"
   },
   "categoryView": {
     "loading": "카테고리 코스를 불러오는 중...",

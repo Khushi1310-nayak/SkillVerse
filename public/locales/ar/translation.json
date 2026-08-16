@@ -9,7 +9,8 @@
     "logout": "تسجيل الخروج",
     "menu": "القائمة",
     "openMenu": "فتح القائمة",
-    "closeMenu": "إغلاق القائمة"
+    "closeMenu": "إغلاق القائمة",
+    "saved": "المحفوظة"
   },
   "common": {
     "cancel": "إلغاء",
@@ -92,7 +93,28 @@
     },
     "review": "مراجعة",
     "startLearning": "بدء التعلم",
-    "empty": "لم يتم العثور على دورات تطابق المعايير المحددة."
+    "empty": "لم يتم العثور على دورات تطابق معايير المحددة.",
+    "difficultyFilterTitle": "التصفية حسب الصعوبة",
+    "allLevels": "جميع المستويات",
+    "sortTitle": "الترتيب حسب",
+    "sortDefault": "الافتراضي",
+    "sortRating": "الأعلى تقييمًا",
+    "sortReviews": "الأكثر مراجعة",
+    "sortAZ": "أ–ي",
+    "savedOnly": "المحفوظة فقط",
+    "resultsCount": "تم العثور على {{count}} دورة",
+    "resultsCount_plural": "تم العثور على {{count}} دورة",
+    "clearFilters": "مسح عوامل التصفية",
+    "bookmarkAdd": "حفظ الدورة",
+    "bookmarkRemove": "إزالة من المحفوظات"
+  },
+  "savedCourses": {
+    "title": "الدورات المحفوظة",
+    "subtitle": "الدورات التي حفظتها للرجوع إليها لاحقًا.",
+    "emptyTitle": "لا توجد دورات محفوظة بعد",
+    "emptyBody": "احفظ دورة من الكتالوج وستظهر هنا.",
+    "emptyCta": "تصفح الدورات",
+    "removeBookmark": "إزالة من المحفوظات"
   },
   "categoryView": {
     "loading": "جاري تحميل دورات الفئة...",

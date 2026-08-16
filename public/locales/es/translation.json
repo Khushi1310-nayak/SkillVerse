@@ -9,7 +9,8 @@
     "logout": "Cerrar Sesión",
     "menu": "Menú",
     "openMenu": "Abrir Menú",
-    "closeMenu": "Cerrar Menú"
+    "closeMenu": "Cerrar Menú",
+    "saved": "Guardados"
   },
   "common": {
     "cancel": "Cancelar",
@@ -92,7 +93,28 @@
     },
     "review": "Revisar",
     "startLearning": "Empezar a aprender",
-    "empty": "No se encontraron cursos que coincidan con tus criterios."
+    "empty": "No se encontraron cursos que coincidan con tus criterios.",
+    "difficultyFilterTitle": "Filtrar por dificultad",
+    "allLevels": "Todos los niveles",
+    "sortTitle": "Ordenar por",
+    "sortDefault": "Predeterminado",
+    "sortRating": "Mejor valorados",
+    "sortReviews": "Más reseñados",
+    "sortAZ": "A–Z",
+    "savedOnly": "Solo guardados",
+    "resultsCount": "{{count}} curso encontrado",
+    "resultsCount_plural": "{{count}} cursos encontrados",
+    "clearFilters": "Borrar filtros",
+    "bookmarkAdd": "Guardar curso",
+    "bookmarkRemove": "Quitar de guardados"
+  },
+  "savedCourses": {
+    "title": "Cursos guardados",
+    "subtitle": "Cursos que has guardado para más tarde.",
+    "emptyTitle": "Aún no hay cursos guardados",
+    "emptyBody": "Guarda un curso del catálogo y aparecerá aquí.",
+    "emptyCta": "Explorar cursos",
+    "removeBookmark": "Quitar de guardados"
   },
   "categoryView": {
     "loading": "Cargando cursos de la categoría...",

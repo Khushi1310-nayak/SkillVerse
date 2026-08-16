@@ -9,7 +9,8 @@
     "logout": "ログアウト",
     "menu": "メニュー",
     "openMenu": "メニューを開く",
-    "closeMenu": "メニューを閉じる"
+    "closeMenu": "メニューを閉じる",
+    "saved": "保存済み"
   },
   "common": {
     "cancel": "キャンセル",
@@ -92,7 +93,28 @@
     },
     "review": "復習する",
     "startLearning": "学習を開始",
-    "empty": "選択した条件に一致するコースは見つかりませんでした。"
+    "empty": "選択した条件に一致するコースは見つかりませんでした。",
+    "difficultyFilterTitle": "難易度で絞り込む",
+    "allLevels": "すべてのレベル",
+    "sortTitle": "並び替え",
+    "sortDefault": "デフォルト",
+    "sortRating": "評価が高い順",
+    "sortReviews": "レビューが多い順",
+    "sortAZ": "A–Z順",
+    "savedOnly": "保存済みのみ",
+    "resultsCount": "{{count}}件のコースが見つかりました",
+    "resultsCount_plural": "{{count}}件のコースが見つかりました",
+    "clearFilters": "フィルターをクリア",
+    "bookmarkAdd": "コースを保存",
+    "bookmarkRemove": "保存済みから削除"
+  },
+  "savedCourses": {
+    "title": "保存済みコース",
+    "subtitle": "後で見返すために保存したコースです。",
+    "emptyTitle": "保存されたコースはまだありません",
+    "emptyBody": "カタログからコースを保存すると、ここに表示されます。",
+    "emptyCta": "コースを見る",
+    "removeBookmark": "保存済みから削除"
   },
   "categoryView": {
     "loading": "カテゴリーのコースを読み込み中...",

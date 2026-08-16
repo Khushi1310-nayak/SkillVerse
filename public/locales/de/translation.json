@@ -9,7 +9,8 @@
     "logout": "Abmelden",
     "menu": "Menü",
     "openMenu": "Menü öffnen",
-    "closeMenu": "Menü schließen"
+    "closeMenu": "Menü schließen",
+    "saved": "Gespeichert"
   },
   "common": {
     "cancel": "Abbrechen",
@@ -92,7 +93,28 @@
     },
     "review": "Wiederholen",
     "startLearning": "Lernen starten",
-    "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen."
+    "empty": "Keine Kurse gefunden, die Ihren Kriterien entsprechen.",
+    "difficultyFilterTitle": "Nach Schwierigkeit filtern",
+    "allLevels": "Alle Stufen",
+    "sortTitle": "Sortieren nach",
+    "sortDefault": "Standard",
+    "sortRating": "Beste Bewertung",
+    "sortReviews": "Meiste Bewertungen",
+    "sortAZ": "A–Z",
+    "savedOnly": "Nur gespeicherte",
+    "resultsCount": "{{count}} Kurs gefunden",
+    "resultsCount_plural": "{{count}} Kurse gefunden",
+    "clearFilters": "Filter zurücksetzen",
+    "bookmarkAdd": "Kurs speichern",
+    "bookmarkRemove": "Aus Gespeichert entfernen"
+  },
+  "savedCourses": {
+    "title": "Gespeicherte Kurse",
+    "subtitle": "Kurse, die du für später gespeichert hast.",
+    "emptyTitle": "Noch keine gespeicherten Kurse",
+    "emptyBody": "Speichere einen Kurs aus dem Katalog und er erscheint hier.",
+    "emptyCta": "Kurse durchsuchen",
+    "removeBookmark": "Aus Gespeichert entfernen"
   },
   "categoryView": {
     "loading": "Kategoriekurse werden geladen...",

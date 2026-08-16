@@ -294,6 +294,50 @@ export const firestoreService = {
     return comments;
   },
 
+  editLessonComment: async (commentId: string, courseId: string, lessonId: string, content: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    const saved = localStorage.getItem(key);
+    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+
+    comments = comments.map(comment =>
+      comment.id === commentId ? { ...comment, content } : comment
+    );
+
+    try {
+      const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
+      await updateDoc(docRef, { content });
+    } catch (err) {
+      console.warn('Firestore update failed, comment edited locally only:', err);
+    }
+
+    localStorage.setItem(key, JSON.stringify(comments));
+    return comments;
+  },
+
+  deleteLessonComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    const saved = localStorage.getItem(key);
+    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+
+    // Deleting a top-level comment also removes its replies, so no reply is
+    // ever left pointing at a parentId that no longer exists.
+    const idsToRemove = new Set([commentId, ...comments.filter(c => c.parentId === commentId).map(c => c.id)]);
+    comments = comments.filter(comment => !idsToRemove.has(comment.id));
+
+    try {
+      await Promise.all(
+        Array.from(idsToRemove).map(id =>
+          deleteDoc(doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', id))
+        )
+      );
+    } catch (err) {
+      console.warn('Firestore delete failed, comment removed locally only:', err);
+    }
+
+    localStorage.setItem(key, JSON.stringify(comments));
+    return comments;
+  },
+
   // --- COURSE RATINGS & REVIEWS ---
 
   /**
@@ -397,6 +441,39 @@ export const firestoreService = {
       const merged = [newReview, ...cached.filter(r => r.userId !== newReview.userId)];
       localStorage.setItem(key, JSON.stringify(merged));
       return merged;
+    }
+
+    localStorage.setItem(key, JSON.stringify(reviews));
+
+    const { average, count } = firestoreService.summarizeCourseReviews(reviews);
+    try {
+      const courseRef = doc(db, 'courses', courseId);
+      await updateDoc(courseRef, { rating: average, reviewCount: count });
+    } catch (err) {
+      console.warn('Could not update the denormalized course rating:', err);
+    }
+
+    return reviews;
+  },
+
+  deleteCourseReview: async (courseId: string, userId: string): Promise<CourseReview[]> => {
+    const key = `course_reviews_${courseId}`;
+
+    // The review id is the user id (one review per user per course), so this
+    // is the same doc submitCourseReview writes.
+    const docRef = doc(db, 'courses', courseId, 'reviews', userId);
+    await deleteDoc(docRef);
+
+    let reviews: CourseReview[];
+    try {
+      reviews = await firestoreService.fetchRemoteCourseReviews(courseId);
+    } catch (err) {
+      console.warn('Review deleted, but the course rating could not be recomputed:', err);
+      const saved = localStorage.getItem(key);
+      const cached: CourseReview[] = saved ? JSON.parse(saved) : [];
+      const filtered = cached.filter(r => r.userId !== userId);
+      localStorage.setItem(key, JSON.stringify(filtered));
+      return filtered;
     }
 
     localStorage.setItem(key, JSON.stringify(reviews));

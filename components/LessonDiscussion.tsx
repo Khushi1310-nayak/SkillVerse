@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2, Pencil, Trash2, Check, X } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
+import { useToast } from '../contexts/ToastContext';
 import { User, LessonComment } from '../types';
 
 interface LessonDiscussionProps {
@@ -20,6 +21,7 @@ const AVATARS: Record<string, string> = {
 
 export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, lessonId, user }) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [isOpen, setIsOpen] = useState(true);
   const [comments, setComments] = useState<LessonComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,8 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
   const [submitting, setSubmitting] = useState(false);
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
 
   const fetchComments = useCallback(async () => {
     setLoading(true);
@@ -80,6 +84,42 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
     if (!user) return;
     const updatedComments = await firestoreService.upvoteLessonComment(commentId, user.email, courseId, lessonId);
     setComments(updatedComments);
+  };
+
+  const handleStartEdit = (comment: LessonComment) => {
+    setEditingId(comment.id);
+    setEditText(comment.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditText('');
+  };
+
+  const handleSaveEdit = async (commentId: string) => {
+    const trimmed = editText.trim();
+    if (!trimmed) return;
+    try {
+      const updated = await firestoreService.editLessonComment(commentId, courseId, lessonId, trimmed);
+      setComments(updated);
+      setEditingId(null);
+      setEditText('');
+    } catch (err) {
+      console.error('Error editing comment:', err);
+      showToast({ message: 'Failed to update comment.', type: 'error' });
+    }
+  };
+
+  const handleDelete = async (commentId: string) => {
+    if (!confirm('Delete this comment? This cannot be undone.')) return;
+    try {
+      const updated = await firestoreService.deleteLessonComment(commentId, courseId, lessonId);
+      setComments(updated);
+      showToast({ message: 'Comment deleted.', type: 'success' });
+    } catch (err) {
+      console.error('Error deleting comment:', err);
+      showToast({ message: 'Failed to delete comment.', type: 'error' });
+    }
   };
 
   const getAvatar = (comment: LessonComment) => {
@@ -226,18 +266,41 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                         </div>
                       </div>
 
-                      <p className="text-sm text-textMain leading-relaxed mb-3 whitespace-pre-wrap">
-                        {comment.content}
-                      </p>
+                      {editingId === comment.id ? (
+                        <div className="mb-3 flex flex-col gap-2">
+                          <textarea
+                            rows={3}
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-xl p-3 text-sm text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all resize-none"
+                          />
+                          <div className="flex justify-end gap-2">
+                            <button type="button" onClick={handleCancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-textMuted hover:text-textMain">
+                              <X size={14} /> Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEdit(comment.id)}
+                              disabled={!editText.trim()}
+                              className="flex items-center gap-1 px-4 py-1.5 rounded-lg bg-gradient-main text-white font-bold text-xs shadow hover:scale-105 transition-all disabled:opacity-50"
+                            >
+                              <Check size={14} /> Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-textMain leading-relaxed mb-3 whitespace-pre-wrap">
+                          {comment.content}
+                        </p>
+                      )}
 
                       <div className="flex items-center gap-4 text-xs font-medium">
                         <button
                           onClick={() => handleUpvote(comment.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
-                            hasUpvoted
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${hasUpvoted
                               ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
                               : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain hover:bg-black/10 dark:hover:bg-white/10'
-                          }`}
+                            }`}
                         >
                           <ThumbsUp size={14} className={hasUpvoted ? 'fill-primaryLight' : ''} />
                           <span>{comment.upvotes || 0}</span>
@@ -254,6 +317,19 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                             <Reply size={14} />
                             <span>Reply</span>
                           </button>
+                        )}
+
+                        {user && user.email === comment.userId && editingId !== comment.id && (
+                          <>
+                            <button onClick={() => handleStartEdit(comment)} className="flex items-center gap-1 text-textMuted hover:text-textMain transition-colors" aria-label="Edit comment">
+                              <Pencil size={14} />
+                              <span>Edit</span>
+                            </button>
+                            <button onClick={() => handleDelete(comment.id)} className="flex items-center gap-1 text-textMuted hover:text-red-500 transition-colors" aria-label="Delete comment">
+                              <Trash2 size={14} />
+                              <span>Delete</span>
+                            </button>
+                          </>
                         )}
                       </div>
 
@@ -307,20 +383,55 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                                     <span className="text-[10px] text-textMuted">{formatTimestamp(reply.createdAt)}</span>
                                   </div>
                                 </div>
-                                <p className="text-xs text-textMain leading-relaxed mb-2 whitespace-pre-wrap">
-                                  {reply.content}
-                                </p>
-                                <button
-                                  onClick={() => handleUpvote(reply.id)}
-                                  className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] border transition-all ${
-                                    replyHasUpvoted
-                                      ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
-                                      : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain'
-                                  }`}
-                                >
-                                  <ThumbsUp size={12} className={replyHasUpvoted ? 'fill-primaryLight' : ''} />
-                                  <span>{reply.upvotes || 0}</span>
-                                </button>
+                                {editingId === reply.id ? (
+                                  <div className="mb-2 flex flex-col gap-2">
+                                    <textarea
+                                      rows={2}
+                                      value={editText}
+                                      onChange={(e) => setEditText(e.target.value)}
+                                      className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/10 rounded-lg p-2 text-xs text-textMain focus:outline-none focus:border-primaryLight transition-all resize-none"
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                      <button type="button" onClick={handleCancelEdit} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium text-textMuted hover:text-textMain">
+                                        <X size={12} /> Cancel
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleSaveEdit(reply.id)}
+                                        disabled={!editText.trim()}
+                                        className="flex items-center gap-1 px-3 py-1 rounded bg-gradient-main text-white font-bold text-[10px] disabled:opacity-50"
+                                      >
+                                        <Check size={12} /> Save
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-textMain leading-relaxed mb-2 whitespace-pre-wrap">
+                                    {reply.content}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-3">
+                                  <button
+                                    onClick={() => handleUpvote(reply.id)}
+                                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] border transition-all ${replyHasUpvoted
+                                        ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
+                                        : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain'
+                                      }`}
+                                  >
+                                    <ThumbsUp size={12} className={replyHasUpvoted ? 'fill-primaryLight' : ''} />
+                                    <span>{reply.upvotes || 0}</span>
+                                  </button>
+                                  {user && user.email === reply.userId && editingId !== reply.id && (
+                                    <>
+                                      <button onClick={() => handleStartEdit(reply)} className="flex items-center gap-1 text-[10px] text-textMuted hover:text-textMain transition-colors" aria-label="Edit reply">
+                                        <Pencil size={12} /> Edit
+                                      </button>
+                                      <button onClick={() => handleDelete(reply.id)} className="flex items-center gap-1 text-[10px] text-textMuted hover:text-red-500 transition-colors" aria-label="Delete reply">
+                                        <Trash2 size={12} /> Delete
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           );

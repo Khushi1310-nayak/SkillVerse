@@ -19,6 +19,7 @@ import { User } from '../types';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
 import { CommandPalette } from './CommandPalette';
+import { ShortcutsModal } from './ShortcutsModal';
 import { XP_STORE_THEMES, XP_STORE_FRAMES } from '../constants';
 interface LayoutProps {
   children: React.ReactNode;
@@ -56,13 +57,33 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
-  // Global Cmd/Ctrl + K shortcut to open the Command Palette
+  // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd+K: open Command Palette (chord — no input guard needed)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setCommandPaletteOpen(true);
+        return;
+      }
+
+      // '?': open Keyboard Shortcuts modal
+      // Guard: do not fire when the user is typing inside an interactive element
+      if (e.key === '?') {
+        const target = e.target as HTMLElement;
+        const tag = target.tagName.toLowerCase();
+        if (
+          tag === 'input' ||
+          tag === 'textarea' ||
+          tag === 'select' ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+        e.preventDefault();
+        setShortcutsOpen(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -308,6 +329,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
         </div>
       )}
       <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
+      <ShortcutsModal isOpen={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
       <ScrollToTop />
     </div>
   );

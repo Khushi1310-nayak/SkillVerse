@@ -67,6 +67,7 @@ export interface User {
   photoURL?: string;
   streak: number;
   lastActiveDate: string;
+  streakFreezes?: number;
   badges: string[];
   role?: 'admin' | 'instructor' | 'user';
   following?: string[];

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User as FirebaseUser, 
+import {
+  User as FirebaseUser,
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword,
@@ -32,10 +32,10 @@ interface AuthContextType {
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (displayName: string) => Promise<void>;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
-  updateUserAccount: (updatedUser: AppUser) => Promise<void>; 
-  updateLocalUser: (updatedUser: AppUser) => void; 
+  updateUserAccount: (updatedUser: AppUser) => Promise<void>;
+  updateLocalUser: (updatedUser: AppUser) => void;
   completeCourse: (courseId: string, xpEarned: number) => Promise<void>;
-  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => Promise<void>;
+  purchaseItem: (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame' | 'consumable') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -50,136 +50,158 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
+
       if (currentUser) {
         // Listen to Firestore document changes for real-time appUser updates
         unsubscribeSnapshot = onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
-           if (docSnap.exists()) {
-             const data = docSnap.data();
+          if (docSnap.exists()) {
+            const data = docSnap.data();
 
-             // --- Streak calculation ---
-             const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-             const storedStreak: number = data.streak || 0;
-             const storedLastActiveDate: string | null = data.lastActiveDate || null;
-             let computedStreak = storedStreak;
+            // --- Streak calculation ---
+            const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const storedStreak: number = data.streak || 0;
+            const storedLastActiveDate: string | null = data.lastActiveDate || null;
+            const storedStreakFreezes: number = data.streakFreezes || 0;
+            let computedStreak = storedStreak;
+            let computedStreakFreezes = storedStreakFreezes;
 
-             if (storedLastActiveDate !== todayStr) {
-                if (storedLastActiveDate) {
-                  const prevDate = new Date(storedLastActiveDate);
-                  const currDate = new Date(todayStr);
-                  const dayDiff = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
-                  computedStreak = dayDiff === 1 ? storedStreak + 1 : 1;
+            if (storedLastActiveDate !== todayStr) {
+              let usedFreeze = false;
+
+              if (storedLastActiveDate) {
+                const prevDate = new Date(storedLastActiveDate);
+                const currDate = new Date(todayStr);
+                const dayDiff = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+                if (dayDiff === 1) {
+                  computedStreak = storedStreak + 1;
+                } else if (dayDiff > 1 && storedStreakFreezes > 0) {
+                  // Missed a day, but a Streak Freeze absorbs it: the streak
+                  // is preserved (not incremented, not reset) and one freeze is spent.
+                  computedStreak = storedStreak;
+                  computedStreakFreezes = storedStreakFreezes - 1;
+                  usedFreeze = true;
                 } else {
                   computedStreak = 1;
                 }
+              } else {
+                computedStreak = 1;
+              }
 
-                setDoc(
-                  doc(db, "users", currentUser.uid),
-                  { streak: computedStreak, lastActiveDate: todayStr },
-                  { merge: true }
-                ).catch(err => console.error("Error updating streak:", err));
-             }
+              const streakUpdate: Record<string, any> = { streak: computedStreak, lastActiveDate: todayStr };
+              if (usedFreeze) {
+                streakUpdate.streakFreezes = increment(-1);
+              }
 
-             // --- Weekly & Monthly XP Reset Logic ---
-             const now = new Date();
-             const day = now.getDay();
-             const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-             const monday = new Date(now);
-             monday.setDate(diff);
-             monday.setHours(0, 0, 0, 0);
-             const currentWeekStr = monday.toISOString().split('T')[0];
-             
-             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+              setDoc(
+                doc(db, "users", currentUser.uid),
+                streakUpdate,
+                { merge: true }
+              ).catch(err => console.error("Error updating streak:", err));
+            }
 
-             let resetUpdates: any = {};
-             let needsReset = false;
+            // --- Weekly & Monthly XP Reset Logic ---
+            const now = new Date();
+            const day = now.getDay();
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(now);
+            monday.setDate(diff);
+            monday.setHours(0, 0, 0, 0);
+            const currentWeekStr = monday.toISOString().split('T')[0];
 
-             if (data.lastWeeklyResetDate !== currentWeekStr) {
-               resetUpdates.weeklyXP = 0;
-               resetUpdates.lastWeeklyResetDate = currentWeekStr;
-               needsReset = true;
-             }
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-             if (data.lastMonthlyResetDate !== currentMonthStr) {
-               resetUpdates.monthlyXP = 0;
-               resetUpdates.lastMonthlyResetDate = currentMonthStr;
-               needsReset = true;
-             }
+            let resetUpdates: any = {};
+            let needsReset = false;
 
-             if (needsReset) {
-               setDoc(
-                 doc(db, "users", currentUser.uid),
-                 resetUpdates,
-                 { merge: true }
-               ).catch(err => console.error("Error resetting weekly/monthly XP:", err));
-             }
+            if (data.lastWeeklyResetDate !== currentWeekStr) {
+              resetUpdates.weeklyXP = 0;
+              resetUpdates.lastWeeklyResetDate = currentWeekStr;
+              needsReset = true;
+            }
 
-             const displayWeeklyXP = (data.lastWeeklyResetDate !== currentWeekStr) ? 0 : (data.weeklyXP || 0);
-             const displayMonthlyXP = (data.lastMonthlyResetDate !== currentMonthStr) ? 0 : (data.monthlyXP || 0);
-             // ------------------------------------------
+            if (data.lastMonthlyResetDate !== currentMonthStr) {
+              resetUpdates.monthlyXP = 0;
+              resetUpdates.lastMonthlyResetDate = currentMonthStr;
+              needsReset = true;
+            }
 
-             // --- Badge calculation ---
-             const existingBadges: string[] = data.badges || [];
-             const courseCount = (data.courses || []).length;
-             const careerProgress = storageService.getCareerProgress();
-             const hasMockInterview = careerProgress.mockInterviewScores.length > 0;
+            if (needsReset) {
+              setDoc(
+                doc(db, "users", currentUser.uid),
+                resetUpdates,
+                { merge: true }
+              ).catch(err => console.error("Error resetting weekly/monthly XP:", err));
+            }
 
-             const earnedNow: string[] = [];
-             if (courseCount >= 1) earnedNow.push('first-steps');
-             if (courseCount >= 1) earnedNow.push('certified');
-             if (computedStreak >= 3) earnedNow.push('on-fire');
-             if (hasMockInterview) earnedNow.push('interview-ready');
+            const displayWeeklyXP = (data.lastWeeklyResetDate !== currentWeekStr) ? 0 : (data.weeklyXP || 0);
+            const displayMonthlyXP = (data.lastMonthlyResetDate !== currentMonthStr) ? 0 : (data.monthlyXP || 0);
+            // ------------------------------------------
 
-             const newBadges = earnedNow.filter(id => !existingBadges.includes(id));
-             const allBadges = newBadges.length > 0 ? [...existingBadges, ...newBadges] : existingBadges;
+            // --- Badge calculation ---
+            const existingBadges: string[] = data.badges || [];
+            const courseCount = (data.courses || []).length;
+            const careerProgress = storageService.getCareerProgress();
+            const hasMockInterview = careerProgress.mockInterviewScores.length > 0;
 
-             if (newBadges.length > 0) {
-                setDoc(
-                  doc(db, "users", currentUser.uid),
-                  { badges: allBadges },
-                  { merge: true }
-                ).catch(err => console.error("Error updating badges:", err));
-             }
+            const earnedNow: string[] = [];
+            if (courseCount >= 1) earnedNow.push('first-steps');
+            if (courseCount >= 1) earnedNow.push('certified');
+            if (computedStreak >= 3) earnedNow.push('on-fire');
+            if (hasMockInterview) earnedNow.push('interview-ready');
 
-             const mappedAppUser: AppUser = {
-                username: data.username || currentUser.displayName || "User",
-                email: data.email || currentUser.email || "",
-                enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-                settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) },
-                xp: data.xp || 0,
-                weeklyXP: displayWeeklyXP,     // 👈 Added
-                monthlyXP: displayMonthlyXP,   // 👈 Added
-                level: data.level || 1,
-                courses: data.courses || [],
-                photoURL: data.photoURL || currentUser.photoURL || "",
-                streak: computedStreak,
-                lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
-                badges: allBadges,
-                role: data.role || 'user',
-                dailyChallengeCompletedDate: data.dailyChallengeCompletedDate || undefined,
-                dailyMasteryMultiplier: data.dailyMasteryMultiplier || 0
-             };
-             setAppUser(mappedAppUser);
-             setLoading(false);
-           } else {
-             setAppUser({
-                username: currentUser.displayName || "User",
-                email: currentUser.email || "",
-                enrolledDate: new Date().toISOString(),
-                settings: DEFAULT_SETTINGS,
-                xp: 0,
-                weeklyXP: 0,       // 👈 Added
-                monthlyXP: 0,      // 👈 Added
-                level: 1,
-                courses: [],
-                photoURL: currentUser.photoURL || "",
-                streak: 0,
-                lastActiveDate: "",
-                badges: [],
-                role: 'user'
-             });
-             setLoading(false);
-           }
+            const newBadges = earnedNow.filter(id => !existingBadges.includes(id));
+            const allBadges = newBadges.length > 0 ? [...existingBadges, ...newBadges] : existingBadges;
+
+            if (newBadges.length > 0) {
+              setDoc(
+                doc(db, "users", currentUser.uid),
+                { badges: allBadges },
+                { merge: true }
+              ).catch(err => console.error("Error updating badges:", err));
+            }
+
+            const mappedAppUser: AppUser = {
+              username: data.username || currentUser.displayName || "User",
+              email: data.email || currentUser.email || "",
+              enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+              settings: { ...DEFAULT_SETTINGS, ...(data.preferences?.settings || {}) },
+              xp: data.xp || 0,
+              weeklyXP: displayWeeklyXP,     // 👈 Added
+              monthlyXP: displayMonthlyXP,   // 👈 Added
+              level: data.level || 1,
+              courses: data.courses || [],
+              photoURL: data.photoURL || currentUser.photoURL || "",
+              streak: computedStreak,
+              lastActiveDate: storedLastActiveDate === todayStr ? storedLastActiveDate : todayStr,
+              streakFreezes: computedStreakFreezes,
+              badges: allBadges,
+              role: data.role || 'user',
+              dailyChallengeCompletedDate: data.dailyChallengeCompletedDate || undefined,
+              dailyMasteryMultiplier: data.dailyMasteryMultiplier || 0
+            };
+            setAppUser(mappedAppUser);
+            setLoading(false);
+          } else {
+            setAppUser({
+              username: currentUser.displayName || "User",
+              email: currentUser.email || "",
+              enrolledDate: new Date().toISOString(),
+              settings: DEFAULT_SETTINGS,
+              xp: 0,
+              weeklyXP: 0,       // 👈 Added
+              monthlyXP: 0,      // 👈 Added
+              level: 1,
+              courses: [],
+              photoURL: currentUser.photoURL || "",
+              streak: 0,
+              lastActiveDate: "",
+              streakFreezes: 0,
+              badges: [],
+              role: 'user'
+            });
+            setLoading(false);
+          }
         });
       } else {
         setAppUser(null);
@@ -189,8 +211,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => {
-       unsubscribeAuth();
-       if (unsubscribeSnapshot) unsubscribeSnapshot();
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
   }, []);
 
@@ -246,11 +268,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resendVerificationEmail = async () => {
     if (auth.currentUser) {
-       try {
-         await sendEmailVerification(auth.currentUser);
-       } catch (error) {
-         throw new Error(mapFirebaseError(error));
-       }
+      try {
+        await sendEmailVerification(auth.currentUser);
+      } catch (error) {
+        throw new Error(mapFirebaseError(error));
+      }
     }
   };
 
@@ -342,15 +364,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame') => {
+  const purchaseItem = async (itemId: string, cost: number, type: 'theme' | 'cursor' | 'frame' | 'consumable') => {
     if (!auth.currentUser || !appUser) return;
     if (appUser.xp < cost) {
       throw new Error("Insufficient XP");
     }
 
     const userRef = doc(db, "users", auth.currentUser.uid);
+
+    if (type === 'consumable') {
+      const previousAppUser = appUser;
+      const updatedAppUser: AppUser = {
+        ...appUser,
+        xp: appUser.xp - cost,
+        streakFreezes: (appUser.streakFreezes || 0) + 1,
+      };
+      setAppUser(updatedAppUser);
+
+      try {
+        await setDoc(
+          userRef,
+          {
+            xp: increment(-cost),
+            weeklyXP: increment(-cost),
+            monthlyXP: increment(-cost),
+            streakFreezes: increment(1),
+          },
+          { merge: true }
+        );
+      } catch (error) {
+        setAppUser(previousAppUser);
+        console.error("Error purchasing consumable:", error);
+        throw error;
+      }
+      return;
+    }
+
     const updatedSettings = { ...appUser.settings };
-    
+
     if (type === 'theme') {
       const unlocked = updatedSettings.unlockedThemes || ['dark', 'light'];
       if (!unlocked.includes(itemId)) {

@@ -9,7 +9,8 @@
     "logout": "退出登录",
     "menu": "菜单",
     "openMenu": "打开菜单",
-    "closeMenu": "关闭菜单"
+    "closeMenu": "关闭菜单",
+    "saved": "已保存"
   },
   "common": {
     "cancel": "取消",
@@ -92,7 +93,28 @@
     },
     "review": "复习",
     "startLearning": "开始学习",
-    "empty": "未找到符合条件的课程。"
+    "empty": "未找到符合条件的课程。",
+    "difficultyFilterTitle": "按难度筛选",
+    "allLevels": "所有难度",
+    "sortTitle": "排序方式",
+    "sortDefault": "默认",
+    "sortRating": "评分最高",
+    "sortReviews": "评价最多",
+    "sortAZ": "A–Z",
+    "savedOnly": "仅显示已保存",
+    "resultsCount": "找到 {{count}} 门课程",
+    "resultsCount_plural": "找到 {{count}} 门课程",
+    "clearFilters": "清除筛选",
+    "bookmarkAdd": "保存课程",
+    "bookmarkRemove": "从已保存中移除"
+  },
+  "savedCourses": {
+    "title": "已保存的课程",
+    "subtitle": "你保存以便稍后查看的课程。",
+    "emptyTitle": "暂无已保存的课程",
+    "emptyBody": "从课程目录中保存一门课程，它就会显示在这里。",
+    "emptyCta": "浏览课程",
+    "removeBookmark": "从已保存中移除"
   },
   "categoryView": {
     "loading": "正在加载分类课程...",

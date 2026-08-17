@@ -9,7 +9,8 @@
     "logout": "Disconnettiti",
     "menu": "Menu",
     "openMenu": "Apri Menu",
-    "closeMenu": "Chiudi Menu"
+    "closeMenu": "Chiudi Menu",
+    "saved": "Salvati"
   },
   "common": {
     "cancel": "Annulla",
@@ -92,7 +93,28 @@
     },
     "review": "Ripassa",
     "startLearning": "Inizia a imparare",
-    "empty": "Nessun corso trovato con i criteri selezionati."
+    "empty": "Nessun corso trovato con i criteri selezionati.",
+    "difficultyFilterTitle": "Filtra per difficoltà",
+    "allLevels": "Tutti i livelli",
+    "sortTitle": "Ordina per",
+    "sortDefault": "Predefinito",
+    "sortRating": "Più votati",
+    "sortReviews": "Più recensiti",
+    "sortAZ": "A–Z",
+    "savedOnly": "Solo salvati",
+    "resultsCount": "{{count}} corso trovato",
+    "resultsCount_plural": "{{count}} corsi trovati",
+    "clearFilters": "Cancella filtri",
+    "bookmarkAdd": "Salva corso",
+    "bookmarkRemove": "Rimuovi dai salvati"
+  },
+  "savedCourses": {
+    "title": "Corsi salvati",
+    "subtitle": "Corsi che hai salvato per dopo.",
+    "emptyTitle": "Ancora nessun corso salvato",
+    "emptyBody": "Salva un corso dal catalogo e apparirà qui.",
+    "emptyCta": "Sfoglia i corsi",
+    "removeBookmark": "Rimuovi dai salvati"
   },
   "categoryView": {
     "loading": "Caricamento dei corsi della categoria...",

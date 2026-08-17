@@ -9,7 +9,8 @@
     "logout": "लॉग आउट",
     "menu": "मेनू",
     "openMenu": "मेनू खोलें",
-    "closeMenu": "मेनू बंद करें"
+    "closeMenu": "मेनू बंद करें",
+    "saved": "सहेजे गए"
   },
   "common": {
     "cancel": "रद्द करें",
@@ -92,7 +93,28 @@
     },
     "review": "दोहराएं",
     "startLearning": "सीखना शुरू करें",
-    "empty": "चयनित मानदंडों से मेल खाने वाला कोई कोर्स नहीं मिला।"
+    "empty": "चयनित मानदंडों से मेल खाने वाला कोई कोर्स नहीं मिला।",
+    "difficultyFilterTitle": "कठिनाई के अनुसार फ़िल्टर करें",
+    "allLevels": "सभी स्तर",
+    "sortTitle": "इसके अनुसार क्रमबद्ध करें",
+    "sortDefault": "डिफ़ॉल्ट",
+    "sortRating": "सर्वोच्च रेटिंग",
+    "sortReviews": "सबसे अधिक समीक्षित",
+    "sortAZ": "A–Z",
+    "savedOnly": "केवल सहेजे गए",
+    "resultsCount": "{{count}} कोर्स मिला",
+    "resultsCount_plural": "{{count}} कोर्स मिले",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "bookmarkAdd": "कोर्स सहेजें",
+    "bookmarkRemove": "सहेजे गए से हटाएं"
+  },
+  "savedCourses": {
+    "title": "सहेजे गए कोर्स",
+    "subtitle": "वे कोर्स जिन्हें आपने बाद में देखने के लिए सहेजा है।",
+    "emptyTitle": "अभी तक कोई कोर्स सहेजा नहीं गया",
+    "emptyBody": "कैटलॉग से एक कोर्स सहेजें और वह यहां दिखाई देगा।",
+    "emptyCta": "कोर्स ब्राउज़ करें",
+    "removeBookmark": "सहेजे गए से हटाएं"
   },
   "categoryView": {
     "loading": "श्रेणी के कोर्स लोड हो रहे हैं...",

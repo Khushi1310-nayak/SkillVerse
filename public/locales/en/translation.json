@@ -9,7 +9,8 @@
     "logout": "Log Out",
     "menu": "Menu",
     "openMenu": "Open Menu",
-    "closeMenu": "Close Menu"
+    "closeMenu": "Close Menu",
+    "saved": "Saved"
   },
   "common": {
     "cancel": "Cancel",
@@ -104,7 +105,28 @@
     },
     "review": "Review",
     "startLearning": "Start Learning",
-    "empty": "No courses found matching your criteria."
+    "empty": "No courses found matching your criteria.",
+    "difficultyFilterTitle": "Filter by difficulty",
+    "allLevels": "All Levels",
+    "sortTitle": "Sort by",
+    "sortDefault": "Default",
+    "sortRating": "Highest rated",
+    "sortReviews": "Most reviewed",
+    "sortAZ": "A–Z",
+    "savedOnly": "Saved only",
+    "resultsCount": "{{count}} course found",
+    "resultsCount_plural": "{{count}} courses found",
+    "clearFilters": "Clear filters",
+    "bookmarkAdd": "Save course",
+    "bookmarkRemove": "Remove from saved"
+  },
+  "savedCourses": {
+    "title": "Saved Courses",
+    "subtitle": "Courses you've bookmarked to come back to later.",
+    "emptyTitle": "No saved courses yet",
+    "emptyBody": "Bookmark a course from the catalog and it will show up here.",
+    "emptyCta": "Browse Courses",
+    "removeBookmark": "Remove from saved"
   },
   "categoryView": {
     "loading": "Loading category courses...",

@@ -9,7 +9,8 @@
     "logout": "Déconnexion",
     "menu": "Menu",
     "openMenu": "Ouvrir le menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "saved": "Enregistrés"
   },
   "common": {
     "cancel": "Annuler",
@@ -92,7 +93,28 @@
     },
     "review": "Réviser",
     "startLearning": "Commencer l'apprentissage",
-    "empty": "Aucun cours ne correspond à vos critères."
+    "empty": "Aucun cours ne correspond à vos critères.",
+    "difficultyFilterTitle": "Filtrer par difficulté",
+    "allLevels": "Tous les niveaux",
+    "sortTitle": "Trier par",
+    "sortDefault": "Par défaut",
+    "sortRating": "Mieux notés",
+    "sortReviews": "Les plus commentés",
+    "sortAZ": "A–Z",
+    "savedOnly": "Enregistrés uniquement",
+    "resultsCount": "{{count}} cours trouvé",
+    "resultsCount_plural": "{{count}} cours trouvés",
+    "clearFilters": "Effacer les filtres",
+    "bookmarkAdd": "Enregistrer le cours",
+    "bookmarkRemove": "Retirer des enregistrés"
+  },
+  "savedCourses": {
+    "title": "Cours enregistrés",
+    "subtitle": "Cours que vous avez enregistrés pour plus tard.",
+    "emptyTitle": "Aucun cours enregistré pour l'instant",
+    "emptyBody": "Enregistrez un cours du catalogue et il apparaîtra ici.",
+    "emptyCta": "Parcourir les cours",
+    "removeBookmark": "Retirer des enregistrés"
   },
   "categoryView": {
     "loading": "Chargement des cours de la catégorie...",

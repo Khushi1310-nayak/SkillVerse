@@ -10,6 +10,7 @@ export interface UserSettings {
   retryQuiz: boolean;
   soundEffects?: boolean;
   reducedMotion?: boolean;
+  reminderTime?: string; // HH:MM local time for the daily study reminder notification
   fontSize?: 'sm' | 'md' | 'lg';
   dyslexiaFont?: boolean;
   certificateName: string;
@@ -43,6 +44,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showAnswers: false,
   retryQuiz: true,
   soundEffects: true,
+  reminderTime: '18:00',
   fontSize: 'md',
   dyslexiaFont: false,
   certificateName: '',

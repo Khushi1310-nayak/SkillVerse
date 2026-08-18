@@ -11,6 +11,13 @@ export interface InterviewReportData {
   aiFeedback: string;
 }
 
+export interface LessonNotesExportData {
+  courseName: string;
+  lessonTitle: string;
+  date: string;
+  notes: { text: string; updatedAt: string }[];
+}
+
 /**
  * Generates and downloads a professional, high-DPI PDF report for the AI Interview Feedback.
  * Styled in print-friendly light mode with SkillVerse brand colors and typography.
@@ -95,7 +102,7 @@ export const generateInterviewReportPDF = async (data: InterviewReportData): Pro
   try {
     // Render HTML container to high-resolution canvas to avoid blurriness
     const canvas = await html2canvas(container, {
-      scale: 2, 
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#FFFFFF',
@@ -153,11 +160,11 @@ export const generateInterviewReportPDF = async (data: InterviewReportData): Pro
     while (heightLeft > 0) {
       page += 1;
       pdf.addPage();
-      
+
       const position = -pdfHeight * (page - 1);
       pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
       decoratePage(page);
-      
+
       heightLeft -= pdfHeight;
     }
 
@@ -167,6 +174,139 @@ export const generateInterviewReportPDF = async (data: InterviewReportData): Pro
     throw error;
   } finally {
     // Remove temporary node from document
+    document.body.removeChild(container);
+  }
+};
+
+
+/**
+ * Generates and downloads a PDF of a learner's personal notes for one lesson.
+ * Reuses the exact same offscreen-render → html2canvas → jsPDF pipeline as
+ * generateInterviewReportPDF, so styling and pagination stay consistent.
+ */
+export const generateLessonNotesPDF = async (data: LessonNotesExportData): Promise<void> => {
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '-9999px';
+  container.style.width = '794px';
+  container.style.backgroundColor = '#FFFFFF';
+  container.style.color = '#1E293B';
+  container.style.padding = '60px 50px';
+  container.style.boxSizing = 'border-box';
+
+  const escapeHtml = (text: string) =>
+    text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+  container.innerHTML = `
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <div style="font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.6;">
+      <div style="height: 8px; background: linear-gradient(90deg, #6968A6 0%, #CF9893 100%); margin: -60px -50px 40px -50px; border-top-left-radius: 4px; border-top-right-radius: 4px;"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #F1F5F9; padding-bottom: 24px; margin-bottom: 32px;">
+        <div>
+          <h1 style="font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800; color: #0F172A; margin: 0; letter-spacing: -0.5px;">SKILLVERSE</h1>
+          <p style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; tracking-wider; margin: 4px 0 0 0;">Personal Lesson Notes</p>
+        </div>
+        <div style="text-align: right;">
+          <p style="font-size: 12px; color: #64748B; margin: 0;">Exported: <strong style="color: #334155;">${data.date}</strong></p>
+          <p style="font-size: 12px; color: #64748B; margin: 4px 0 0 0;">${data.notes.length} note${data.notes.length === 1 ? '' : 's'}</p>
+        </div>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 20px; padding: 24px; margin-bottom: 36px;">
+        <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: #0F172A; margin: 0 0 6px 0;">${escapeHtml(data.lessonTitle)}</h3>
+        <p style="font-size: 13.5px; color: #475569; margin: 0;">${escapeHtml(data.courseName)}</p>
+      </div>
+
+      <div>
+        ${data.notes
+      .map(
+        (note, index) => `
+          <div style="margin-bottom: 28px; ${index > 0 ? 'border-top: 1px solid #E2E8F0; padding-top: 24px;' : ''}">
+            <p style="font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">${new Date(note.updatedAt).toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+            <p style="font-size: 13.5px; color: #334155; line-height: 1.85; white-space: pre-wrap; margin: 0;">${escapeHtml(note.text)}</p>
+          </div>
+        `
+      )
+      .join('')}
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#FFFFFF',
+      windowWidth: 794
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const pdfWidth = 210;
+    const pdfHeight = 297;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvasHeight * pdfWidth) / canvasWidth;
+
+    let heightLeft = imgHeight;
+    let page = 1;
+
+    const decoratePage = (currentPage: number) => {
+      if (currentPage > 1) {
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, pdfWidth, 16, 'F');
+      }
+
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, pdfHeight - 16, pdfWidth, 16, 'F');
+
+      pdf.setDrawColor(241, 245, 249);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, pdfHeight - 16, pdfWidth - 15, pdfHeight - 16);
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text('Generated by SkillVerse', 15, pdfHeight - 8);
+      pdf.text(`Page ${currentPage}`, pdfWidth - 25, pdfHeight - 8);
+    };
+
+    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+    decoratePage(page);
+    heightLeft -= pdfHeight;
+
+    while (heightLeft > 0) {
+      page += 1;
+      pdf.addPage();
+
+      const position = -pdfHeight * (page - 1);
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      decoratePage(page);
+
+      heightLeft -= pdfHeight;
+    }
+
+    const safeFileName = data.lessonTitle.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+    pdf.save(`${safeFileName || 'Lesson-Notes'}-Notes.pdf`);
+  } catch (error) {
+    console.error('Error generating notes PDF:', error);
+    throw error;
+  } finally {
     document.body.removeChild(container);
   }
 };

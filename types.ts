@@ -10,6 +10,8 @@ export interface UserSettings {
   retryQuiz: boolean;
   soundEffects?: boolean;
   reducedMotion?: boolean;
+  fontSize?: 'sm' | 'md' | 'lg';
+  dyslexiaFont?: boolean;
   certificateName: string;
   avatarId: string;
   // Onboarding Fields
@@ -41,6 +43,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showAnswers: false,
   retryQuiz: true,
   soundEffects: true,
+  fontSize: 'md',
+  dyslexiaFont: false,
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,

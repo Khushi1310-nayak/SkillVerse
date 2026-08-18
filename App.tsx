@@ -62,6 +62,13 @@ const AppRoutes = () => {
     document.documentElement.classList.toggle('reduce-motion', reducedMotion);
   }, [reducedMotion]);
 
+  useEffect(() => {
+    const fontSize = appUser?.settings.fontSize ?? 'md';
+    document.documentElement.classList.remove('font-size-sm', 'font-size-md', 'font-size-lg');
+    document.documentElement.classList.add(`font-size-${fontSize}`);
+    document.documentElement.classList.toggle('dyslexia-font', !!appUser?.settings.dyslexiaFont);
+  }, [appUser?.settings.fontSize, appUser?.settings.dyslexiaFont]);
+
   const handleUpdateUser = async (updatedUser: any) => {
     await updateUserAccount(updatedUser);
   };

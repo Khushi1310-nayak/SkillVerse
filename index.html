@@ -106,6 +106,35 @@
       }
     }
 
+    /* Adjustable font size: applied on <html> via .font-size-sm/md/lg */
+    html.font-size-sm {
+      font-size: 14px;
+    }
+
+    html.font-size-md {
+      font-size: 16px;
+    }
+
+    html.font-size-lg {
+      font-size: 19px;
+    }
+
+    /* Dyslexia-friendly font */
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    html.dyslexia-font body,
+    html.dyslexia-font input,
+    html.dyslexia-font textarea,
+    html.dyslexia-font button {
+      font-family: 'OpenDyslexic', "Plus Jakarta Sans", sans-serif !important;
+    }
+
     :root {
       /* Light Mode Defaults */
       --bg-background: #F8FAFC;

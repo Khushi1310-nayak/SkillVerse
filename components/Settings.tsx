@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves, Snowflake
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves, Snowflake, Type, SpellCheck
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -580,6 +580,46 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       checked={formData.settings.reducedMotion ?? systemPrefersReducedMotion}
                       onChange={(v) => handleChange('reducedMotion', v)}
                       ariaLabel="Toggle reduced motion"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                  <div className="flex items-center gap-3">
+                    <Type size={24} className="text-primaryLight" />
+                    <div>
+                      <div className="font-bold text-textMain">Font Size</div>
+                      <div className="text-sm text-textMuted">Adjust the text size used across lessons and the app</div>
+                    </div>
+                  </div>
+                  <div className="flex self-start sm:self-auto bg-black/5 dark:bg-black/30 rounded-lg p-1 shrink-0">
+                    {(['sm', 'md', 'lg'] as const).map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => handleChange('fontSize', size)}
+                        aria-pressed={(formData.settings.fontSize ?? 'md') === size}
+                        aria-label={`Set font size to ${size === 'sm' ? 'small' : size === 'md' ? 'medium' : 'large'}`}
+                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${(formData.settings.fontSize ?? 'md') === size ? 'bg-white dark:bg-gray-700 text-black dark:text-white shadow-md' : 'text-textMuted hover:text-textMain'}`}
+                      >
+                        {size === 'sm' ? 'Small' : size === 'md' ? 'Medium' : 'Large'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <SpellCheck className="text-primaryLight mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-textMain">Dyslexia-Friendly Font</div>
+                      <div className="text-sm text-textMuted">Switch body text to a font designed for easier reading with dyslexia</div>
+                    </div>
+                  </div>
+                  <div className="shrink-0 mt-1">
+                    <Toggle
+                      checked={!!formData.settings.dyslexiaFont}
+                      onChange={(v) => handleChange('dyslexiaFont', v)}
+                      ariaLabel="Toggle dyslexia-friendly font"
                     />
                   </div>
                 </div>

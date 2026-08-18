@@ -415,7 +415,7 @@ export const CourseView: React.FC = () => {
               <CourseReview courseId={course.id} user={user} />
 
               {/* Personal Lesson Notes */}
-              <LessonNotes courseId={course.id} lessonId="main-lesson" />
+              <LessonNotes courseId={course.id} lessonId="main-lesson" courseName={course.title} lessonTitle={course.title} />
 
               {/* Lesson Discussion & Q&A Drawer */}
               <LessonDiscussion courseId={course.id} lessonId="main-lesson" user={user} />

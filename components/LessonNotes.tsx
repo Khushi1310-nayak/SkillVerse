@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { NotebookPen, Trash2, Pencil, X, Check, Plus } from 'lucide-react';
+import { NotebookPen, Trash2, Pencil, X, Check, Plus, Download, Loader2 } from 'lucide-react';
 import { storageService } from '../services/storageService';
+import { generateLessonNotesPDF } from '../utils/pdfGenerator';
+import { useToast } from '../contexts/ToastContext';
 import { LessonNote } from '../types';
 
 interface LessonNotesProps {
     courseId: string;
     lessonId: string;
+    courseName: string;
+    lessonTitle: string;
 }
 
-export const LessonNotes: React.FC<LessonNotesProps> = ({ courseId, lessonId }) => {
+export const LessonNotes: React.FC<LessonNotesProps> = ({ courseId, lessonId, courseName, lessonTitle }) => {
     const [notes, setNotes] = useState<LessonNote[]>([]);
     const [draft, setDraft] = useState('');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingText, setEditingText] = useState('');
+    const [isExporting, setIsExporting] = useState(false);
+    const { showToast } = useToast();
 
     const loadNotes = useCallback(() => {
         setNotes(storageService.getLessonNotes(courseId, lessonId));
@@ -54,6 +60,25 @@ export const LessonNotes: React.FC<LessonNotesProps> = ({ courseId, lessonId }) 
         loadNotes();
     };
 
+    const handleExportNotes = async () => {
+        if (notes.length === 0 || isExporting) return;
+        setIsExporting(true);
+        try {
+            await generateLessonNotesPDF({
+                courseName,
+                lessonTitle,
+                date: new Date().toLocaleDateString(),
+                notes: notes.map(n => ({ text: n.text, updatedAt: n.updatedAt })),
+            });
+            showToast({ message: 'Notes exported successfully!', type: 'success' });
+        } catch (err) {
+            console.error('Notes export failed:', err);
+            showToast({ message: 'Failed to export notes. Please try again.', type: 'error' });
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     const formatDate = (iso: string) =>
         new Date(iso).toLocaleString(undefined, {
             month: 'short',
@@ -64,13 +89,27 @@ export const LessonNotes: React.FC<LessonNotesProps> = ({ courseId, lessonId }) 
 
     return (
         <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-8">
-            <div className="flex items-center gap-2 mb-4">
-                <NotebookPen size={20} className="text-primaryLight" />
-                <h3 className="text-lg font-bold text-textMain">My Notes</h3>
+            <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                    <NotebookPen size={20} className="text-primaryLight" />
+                    <h3 className="text-lg font-bold text-textMain">My Notes</h3>
+                    {notes.length > 0 && (
+                        <span className="text-xs font-medium text-textMuted bg-black/5 dark:bg-white/10 rounded-full px-2 py-0.5">
+                            {notes.length}
+                        </span>
+                    )}
+                </div>
+
                 {notes.length > 0 && (
-                    <span className="text-xs font-medium text-textMuted bg-black/5 dark:bg-white/10 rounded-full px-2 py-0.5">
-                        {notes.length}
-                    </span>
+                    <button
+                        onClick={handleExportNotes}
+                        disabled={isExporting}
+                        aria-label="Export notes as PDF"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-textMuted hover:text-textMain bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                        {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                        {isExporting ? 'Exporting...' : 'Export Notes'}
+                    </button>
                 )}
             </div>
 

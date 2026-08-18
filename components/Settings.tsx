@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves, Snowflake, Type, SpellCheck
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves, Snowflake, Type, SpellCheck, Bell, BellOff, Clock, AlertCircle
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -24,6 +24,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { DataPortabilityPanel } from './DataPortabilityPanel';
+import { useNotifications } from '../hooks/useNotifications';
 
 
 interface SettingsProps {
@@ -70,6 +71,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const systemPrefersReducedMotion = usePrefersReducedMotion();
   const { purchaseItem } = useAuth();
   const navigate = useNavigate();
+  const { isSupported: notifSupported, permission: notifPermission, requestPermission } = useNotifications();
 
   // Compute dirty state by comparing current formData with original user prop
   const isDirty = JSON.stringify(formData) !== JSON.stringify(user);
@@ -1157,17 +1159,85 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <Smartphone className="text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-textMain">{t('settings.learning.reminders')}</div>
-                        <div className="text-sm text-textMuted">{t('settings.learning.remindersDesc')}</div>
+                  {/* Study Reminders — browser notification control */}
+                  <div className="flex flex-col gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <Smartphone className="text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-textMain">{t('settings.learning.reminders')}</div>
+                          <div className="text-sm text-textMuted">{t('settings.learning.remindersDesc')}</div>
+                        </div>
+                      </div>
+                      <div className="shrink-0 mt-1">
+                        <Toggle
+                          checked={formData.settings.reminders}
+                          ariaLabel="Toggle study reminders"
+                          onChange={async (v) => {
+                            if (v) {
+                              // Don't allow enabling when notifications are unsupported
+                              if (!notifSupported) return;
+                              // If permission is denied we cannot enable — user must change browser settings
+                              if (notifPermission === 'denied') return;
+                              // If permission has not been asked yet, request it now (user intent)
+                              if (notifPermission === 'default') {
+                                const result = await requestPermission();
+                                if (result !== 'granted') return;
+                              }
+                            }
+                            handleChange('reminders', v);
+                          }}
+                        />
                       </div>
                     </div>
-                    <div className="shrink-0 mt-1">
-                      <Toggle checked={formData.settings.reminders} onChange={(v) => handleChange('reminders', v)} />
-                    </div>
+
+                    {/* Status banners */}
+                    {!notifSupported && (
+                      <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm">
+                        <BellOff size={16} className="text-amber-500 mt-0.5 shrink-0" />
+                        <p className="text-amber-600 dark:text-amber-400">
+                          Browser notifications are not supported in your browser. Study reminders will not be delivered.
+                        </p>
+                      </div>
+                    )}
+
+                    {notifSupported && notifPermission === 'denied' && (
+                      <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm">
+                        <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                        <p className="text-red-600 dark:text-red-400">
+                          Notification permission has been blocked. To receive reminders, enable notifications for this site in your browser settings, then reload the page.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Reminder time picker — only shown when everything is operational */}
+                    {notifSupported && notifPermission === 'granted' && formData.settings.reminders && (
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
+                        <div className="flex items-center gap-2 text-sm text-textMuted">
+                          <Clock size={15} className="text-primaryLight shrink-0" />
+                          <span>Daily reminder time</span>
+                        </div>
+                        <input
+                          id="reminderTime"
+                          type="time"
+                          value={formData.settings.reminderTime ?? '18:00'}
+                          onChange={(e) => handleChange('reminderTime', e.target.value)}
+                          aria-label="Set daily reminder time"
+                          title="Daily reminder time"
+                          className="w-full sm:w-auto bg-white/50 dark:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl px-4 py-2 text-textMain focus:border-primaryLight focus:outline-none transition-colors font-mono text-sm cursor-pointer"
+                        />
+                      </div>
+                    )}
+
+                    {/* Granted but reminder off — reassurance banner */}
+                    {notifSupported && notifPermission === 'granted' && !formData.settings.reminders && (
+                      <div className="flex items-start gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-sm">
+                        <Bell size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+                        <p className="text-emerald-600 dark:text-emerald-400">
+                          Notifications are allowed by your browser. Toggle on to activate study reminders.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">

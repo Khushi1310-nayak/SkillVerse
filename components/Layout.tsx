@@ -22,6 +22,7 @@ import { ScrollToTop } from './ScrollToTop';
 import { CommandPalette } from './CommandPalette';
 import { ShortcutsModal } from './ShortcutsModal';
 import { XP_STORE_THEMES, XP_STORE_FRAMES } from '../constants';
+import { useStudyReminders } from '../hooks/useStudyReminders';
 interface LayoutProps {
   children: React.ReactNode;
   user: User | null;
@@ -59,6 +60,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+
+  // Run background study reminder checks for the authenticated session
+  useStudyReminders(user);
 
   // Global keyboard shortcuts
   useEffect(() => {

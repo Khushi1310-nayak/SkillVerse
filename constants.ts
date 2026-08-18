@@ -393,6 +393,22 @@ export interface XPStoreFrame {
   frameClass: string;
 }
 
+export interface XPStoreConsumable {
+  id: string;
+  name: string;
+  cost: number;
+  description: string;
+}
+
+export const XP_STORE_CONSUMABLES: XPStoreConsumable[] = [
+  {
+    id: 'streak_freeze',
+    name: 'Streak Freeze',
+    cost: 250,
+    description: 'Automatically protects your streak if you miss a day. Stacks — buy more than one to cover multiple missed days.',
+  },
+];
+
 export const XP_STORE_THEMES: XPStoreTheme[] = [
   {
     id: 'dark',

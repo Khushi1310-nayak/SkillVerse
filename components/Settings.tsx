@@ -5,7 +5,7 @@ import {
   User, Palette, BookOpen, Brain, Award, Shield,
   Moon, Sun, Save, CheckCircle, RefreshCcw, Trash2,
   LogOut, AlertTriangle, Smartphone, Zap, Upload, Loader2,
-  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves
+  Trophy, Lock, Footprints, Flame, Briefcase, ShoppingBag, Bookmark, Volume2, Download, Link2, Check, Waves, Snowflake
 } from 'lucide-react';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
@@ -14,7 +14,7 @@ import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { soundManager } from '../utils/soundManager';
 import { useInstallPrompt } from '../contexts/InstallPromptContext';
-import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
+import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XP_STORE_CONSUMABLES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
 import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
 import { BadgeProgressBar } from './ui/BadgeProgressBar';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
@@ -1018,6 +1018,69 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                                 Buy Frame
                               </button>
                             )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Streak Freeze Shelf */}
+                <div className="space-y-4 pt-4 border-t border-black/20 dark:border-white/10">
+                  <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+                    <Snowflake size={18} className="text-primaryLight" /> Power-Ups
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {XP_STORE_CONSUMABLES.map(item => {
+                      const owned = formData.streakFreezes || 0;
+                      const canAfford = formData.xp >= item.cost;
+
+                      const handleBuyConsumable = async () => {
+                        try {
+                          await purchaseItem(item.id, item.cost, 'consumable');
+                          if (formData.settings.soundEffects !== false) soundManager.playCoin();
+                          showToast({ message: `Purchased ${item.name}! You now have ${owned + 1}.`, type: 'success' });
+                          setFormData(prev => ({
+                            ...prev,
+                            xp: prev.xp - item.cost,
+                            streakFreezes: (prev.streakFreezes || 0) + 1,
+                          }));
+                        } catch (err: any) {
+                          showToast({ message: err.message || 'Failed to purchase item', type: 'error' });
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-5 rounded-2xl border border-black/10 dark:border-white/10 transition-all flex flex-col justify-between h-48 bg-white/30 dark:bg-white/5"
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-bold text-textMain">{item.name}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full">{item.cost} XP</span>
+                            </div>
+                            <p className="text-xs text-textMuted mt-2 line-clamp-3">{item.description}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-black/10 dark:border-white/5">
+                            <div className="flex items-center gap-2 text-textMain">
+                              <Snowflake size={16} className="text-cyan-400" />
+                              <span className="text-sm font-bold">{owned} owned</span>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={handleBuyConsumable}
+                              disabled={!canAfford}
+                              aria-label={`Buy ${item.name} for ${item.cost} XP`}
+                              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all
+                                ${canAfford
+                                  ? 'bg-gradient-main text-white hover:shadow-md active:scale-95'
+                                  : 'bg-black/10 dark:bg-white/5 text-textMuted cursor-not-allowed'}`}
+                            >
+                              Buy
+                            </button>
                           </div>
                         </div>
                       );

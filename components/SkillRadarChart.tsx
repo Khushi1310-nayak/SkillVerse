@@ -15,6 +15,10 @@ interface SkillRadarChartProps {
   programming?: number;
   dsa?: number;
   design?: number;
+  // Optional external target overlay (e.g. a chosen career role's required
+  // skill levels). Independent of the built-in top10/senior benchmark toggle
+  // below, and does not affect existing callers that omit it.
+  roleTarget?: { label: string; programming: number; dsa: number; design: number } | null;
 }
 
 type BenchmarkMode = "none" | "top10" | "senior";
@@ -33,6 +37,7 @@ const SkillRadarChart = ({
   programming = 0,
   dsa = 0,
   design = 0,
+  roleTarget = null,
 }: SkillRadarChartProps) => {
   const [benchmarkMode, setBenchmarkMode] = useState<BenchmarkMode>("none");
 
@@ -44,16 +49,19 @@ const SkillRadarChart = ({
       skill: "Programming",
       score: programming,
       ...(benchmark ? { benchmark: benchmark.programming } : {}),
+      ...(roleTarget ? { roleTarget: roleTarget.programming } : {}),
     },
     {
       skill: "DSA",
       score: dsa,
       ...(benchmark ? { benchmark: benchmark.dsa } : {}),
+      ...(roleTarget ? { roleTarget: roleTarget.dsa } : {}),
     },
     {
       skill: "Design",
       score: design,
       ...(benchmark ? { benchmark: benchmark.design } : {}),
+      ...(roleTarget ? { roleTarget: roleTarget.design } : {}),
     },
   ];
 
@@ -92,8 +100,8 @@ const SkillRadarChart = ({
               key={opt.key}
               onClick={() => setBenchmarkMode(opt.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${benchmarkMode === opt.key
-                  ? "bg-gradient-main text-white shadow-sm"
-                  : "text-textMuted hover:text-textMain"
+                ? "bg-gradient-main text-white shadow-sm"
+                : "text-textMuted hover:text-textMain"
                 }`}
             >
               {opt.label}
@@ -145,6 +153,24 @@ const SkillRadarChart = ({
               />
             )}
 
+            {roleTarget && (
+              <Radar
+                name={roleTarget.label}
+                dataKey="roleTarget"
+                stroke="#22C55E"
+                fill="#22C55E"
+                fillOpacity={0.1}
+                strokeWidth={2}
+                strokeDasharray="6 3"
+                dot={{
+                  r: 3,
+                  fill: "#22C55E",
+                  stroke: "#ffffff",
+                  strokeWidth: 1,
+                }}
+              />
+            )}
+
             <Radar
               name="My Skill Level"
               dataKey="score"
@@ -160,7 +186,7 @@ const SkillRadarChart = ({
               }}
             />
 
-            {benchmark && (
+            {(benchmark || roleTarget) && (
               <Legend
                 wrapperStyle={{ fontSize: 12, color: "#B9B6E3" }}
               />

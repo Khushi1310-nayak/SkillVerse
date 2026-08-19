@@ -11,6 +11,7 @@ import { Course } from '../types';
 
 type SortOption = 'default' | 'rating' | 'reviews' | 'az';
 type LevelFilter = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
+type TimeFilter = 'all' | 'under30' | '30to60' | '1to2h' | '2hplus';
 
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export const CoursesList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
   const [filterLevel, setFilterLevel] = useState<LevelFilter>('all');
+  const [filterTime, setFilterTime] = useState<TimeFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [savedOnly, setSavedOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +45,22 @@ export const CoursesList: React.FC = () => {
   }, []);
 
   const progress = storageService.getAllProgress();
+
+  /**
+   * Parse a human-readable duration string such as "8 Hours", "45 Minutes",
+   * or "1.5 Hours" into a total number of minutes for bucketing purposes.
+   * Falls back to 0 if the string cannot be parsed.
+   */
+  const parseDurationMinutes = (duration: string): number => {
+    const lower = duration.toLowerCase().trim();
+    const numMatch = lower.match(/([\d.]+)/);
+    if (!numMatch) return 0;
+    const value = parseFloat(numMatch[1]);
+    if (lower.includes('hour')) return Math.round(value * 60);
+    if (lower.includes('min')) return Math.round(value);
+    // Fallback: treat bare numbers as hours (matches existing "8 Hours" format)
+    return Math.round(value * 60);
+  };
 
   const getDifficultyLabel = (level: string) => {
     switch (level) {
@@ -78,7 +96,17 @@ export const CoursesList: React.FC = () => {
       const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
       const matchesLevel = filterLevel === 'all' || course.level === filterLevel;
       const matchesSaved = !savedOnly || bookmarkedIds.includes(course.id);
-      return matchesSearch && matchesCat && matchesLevel && matchesSaved;
+
+      let matchesTime = true;
+      if (filterTime !== 'all') {
+        const mins = parseDurationMinutes(course.duration);
+        if (filterTime === 'under30') matchesTime = mins < 30;
+        else if (filterTime === '30to60') matchesTime = mins >= 30 && mins <= 60;
+        else if (filterTime === '1to2h') matchesTime = mins > 60 && mins <= 120;
+        else if (filterTime === '2hplus') matchesTime = mins > 120;
+      }
+
+      return matchesSearch && matchesCat && matchesLevel && matchesSaved && matchesTime;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -94,12 +122,13 @@ export const CoursesList: React.FC = () => {
     });
 
   const hasActiveFilters =
-    search !== '' || filterCat !== 'all' || filterLevel !== 'all' || sortBy !== 'default' || savedOnly;
+    search !== '' || filterCat !== 'all' || filterLevel !== 'all' || filterTime !== 'all' || sortBy !== 'default' || savedOnly;
 
   const clearFilters = () => {
     setSearch('');
     setFilterCat('all');
     setFilterLevel('all');
+    setFilterTime('all');
     setSortBy('default');
     setSavedOnly(false);
   };
@@ -154,6 +183,23 @@ export const CoursesList: React.FC = () => {
               <option value="Beginner" className="bg-white dark:bg-[#0B1220] text-textMain">{t('common.difficulty.beginner')}</option>
               <option value="Intermediate" className="bg-white dark:bg-[#0B1220] text-textMain">{t('common.difficulty.intermediate')}</option>
               <option value="Advanced" className="bg-white dark:bg-[#0B1220] text-textMain">{t('common.difficulty.advanced')}</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors" size={16} />
+          </div>
+
+          <div className="relative group min-w-[160px]">
+            <select
+              value={filterTime}
+              onChange={e => setFilterTime(e.target.value as TimeFilter)}
+              title={t('courses.timeFilterTitle')}
+              aria-label={t('courses.timeFilterTitle')}
+              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+            >
+              <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allDurations')}</option>
+              <option value="under30" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.timeUnder30')}</option>
+              <option value="30to60" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.time30to60')}</option>
+              <option value="1to2h" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.time1to2h')}</option>
+              <option value="2hplus" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.time2hPlus')}</option>
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none group-hover:text-primaryLight transition-colors" size={16} />
           </div>

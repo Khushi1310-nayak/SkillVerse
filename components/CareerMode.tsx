@@ -10,8 +10,10 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { useSearchParams } from 'react-router-dom';
 import { storageService } from '../services/storageService';
-import { Company, InterviewQuestion, CareerProgress, User as AppUser } from '../types';
-import { getRecommendedCompanies } from '../utils/recommendations';
+import { Company, InterviewQuestion, CareerProgress, User as AppUser, Course, Progress } from '../types';
+import { getRecommendedCompanies, getSkillGaps, getCoursesForSkillGaps, getTargetRoleSkills, SkillGap } from '../utils/recommendations';
+import SkillRadarChart from './SkillRadarChart';
+import { COURSES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { auth } from '../firebase/firebase';
 import { generateInterviewReportPDF } from '../utils/pdfGenerator';
@@ -97,14 +99,14 @@ const CompanyCardComponent: React.FC<{ company: Company; progress: CareerProgres
     >
       <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-white border border-black/20 p-2 sm:p-3 shadow-lg group-hover:scale-110 transition-transform duration-500 flex items-center justify-center overflow-hidden">
-<img
-  src={company.logo}
-  alt={company.name}
-  className="w-full h-full object-contain"
-  loading="lazy"
-  width={64}
-  height={64}
-/>
+          <img
+            src={company.logo}
+            alt={company.name}
+            className="w-full h-full object-contain"
+            loading="lazy"
+            width={64}
+            height={64}
+          />
         </div>
         <div className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border text-center
            ${company.difficulty === 'Moderate' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
@@ -145,11 +147,11 @@ interface QuestionItemProps {
   onSrsUpdate?: (qId: string, gotRight: boolean) => void;
 }
 
-const QuestionItemComponent: React.FC<QuestionItemProps> = ({ 
-  question, 
-  isPracticed, 
-  isSaved, 
-  onTogglePractice, 
+const QuestionItemComponent: React.FC<QuestionItemProps> = ({
+  question,
+  isPracticed,
+  isSaved,
+  onTogglePractice,
   onToggleSave,
   srsData,
   onSrsUpdate
@@ -179,36 +181,36 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
               ? 'bg-success border-success text-white'
               : 'border-textMuted text-transparent hover:border-primaryLight'}
            `}
-         >
-           <CheckCircle size={14} className={isPracticed ? 'scale-100' : 'scale-0'} />
-           {/* XP Popup Animation */}
-           {showXp && (
-             <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-success font-bold text-sm animate-fade-in-up whitespace-nowrap">
-               {t('careerMode.question.xpAward')}
-             </div>
-           )}
-         </button>
-
-         <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap gap-2 mb-2">
-               {question.difficulty === 'Easy'
-  ? t('careerMode.question.difficulty.easy')
-  : question.difficulty === 'Medium'
-  ? t('careerMode.question.difficulty.medium')
-  : question.difficulty === 'Hard'
-  ? t('careerMode.question.difficulty.hard')
-  : question.difficulty}
-               {question.tags.map(tag => (
-                 <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
-               ))}
-               {srsData && (
-                 <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 font-bold uppercase whitespace-nowrap">
-                   {t('careerMode.question.box', {
-  number: srsData.srsInterval,
-})}
-                 </span>
-               )}
+        >
+          <CheckCircle size={14} className={isPracticed ? 'scale-100' : 'scale-0'} />
+          {/* XP Popup Animation */}
+          {showXp && (
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-success font-bold text-sm animate-fade-in-up whitespace-nowrap">
+              {t('careerMode.question.xpAward')}
             </div>
+          )}
+        </button>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap gap-2 mb-2">
+            {question.difficulty === 'Easy'
+              ? t('careerMode.question.difficulty.easy')
+              : question.difficulty === 'Medium'
+                ? t('careerMode.question.difficulty.medium')
+                : question.difficulty === 'Hard'
+                  ? t('careerMode.question.difficulty.hard')
+                  : question.difficulty}
+            {question.tags.map(tag => (
+              <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-textMuted border border-black/20 dark:border-white/5 whitespace-nowrap">{tag}</span>
+            ))}
+            {srsData && (
+              <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 font-bold uppercase whitespace-nowrap">
+                {t('careerMode.question.box', {
+                  number: srsData.srsInterval,
+                })}
+              </span>
+            )}
+          </div>
           <h4 className="font-bold text-textMain text-sm md:text-base pr-2 truncate md:whitespace-normal">{question.title}</h4>
         </div>
 
@@ -217,15 +219,15 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
             onClick={(e) => { e.stopPropagation(); onToggleSave(question.id); }}
             className={`p-1 hover:scale-110 transition-transform ${isSaved ? 'text-primaryLight fill-primaryLight' : 'text-textMuted hover:text-textMain'}`}
             title={
-  isSaved
-    ? t('careerMode.question.removeSaved')
-    : t('careerMode.question.saveQuestion')
-}
-aria-label={
-  isSaved
-    ? t('careerMode.question.removeSaved')
-    : t('careerMode.question.saveQuestion')
-}
+              isSaved
+                ? t('careerMode.question.removeSaved')
+                : t('careerMode.question.saveQuestion')
+            }
+            aria-label={
+              isSaved
+                ? t('careerMode.question.removeSaved')
+                : t('careerMode.question.saveQuestion')
+            }
           >
             <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
           </button>
@@ -234,57 +236,57 @@ aria-label={
       </div>
 
       <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
-         <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
-            <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
-               <div dangerouslySetInnerHTML={{ __html: question.answer }} />
-            </div>
-            
-            <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">
-               <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">{t('careerMode.question.srsStage')}</span>
-                  {srsData ? (
-                     <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded">
-                           Box {srsData.srsInterval}
-                        </span>
-                        <span className="text-[10px] text-textMuted">
-                           {t('careerMode.question.nextReview')} {new Date(srsData.nextReviewDate).toLocaleDateString()}
-                        </span>
-                     </div>
-                  ) : (
-                     <span className="text-xs text-textMuted italic">{t('careerMode.question.notScheduled')}</span>
-                  )}
-               </div>
-               
-               {onSrsUpdate && (
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                     <button
-                       onClick={() => onSrsUpdate(question.id, false)}
-                       className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold text-xs transition-colors"
-                     >
-                        {t('careerMode.question.forgotWrong')}
-                     </button>
-                     <button
-                       onClick={() => onSrsUpdate(question.id, true)}
-                       className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 font-bold text-xs transition-colors"
-                     >
-                        {t('careerMode.question.rememberedRight')}
-                     </button>
-                  </div>
-               )}
+        <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
+          <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
+            <div dangerouslySetInnerHTML={{ __html: question.answer }} />
+          </div>
+
+          <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-textMuted uppercase tracking-wider">{t('careerMode.question.srsStage')}</span>
+              {srsData ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded">
+                    Box {srsData.srsInterval}
+                  </span>
+                  <span className="text-[10px] text-textMuted">
+                    {t('careerMode.question.nextReview')} {new Date(srsData.nextReviewDate).toLocaleDateString()}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-xs text-textMuted italic">{t('careerMode.question.notScheduled')}</span>
+              )}
             </div>
 
-            <div className="mt-4 flex justify-end">
-               <a 
-                 href={question.resourceLink} 
-                 target="_blank" 
-                 rel="noopener noreferrer"
-                 className="flex items-center gap-2 text-primaryLight text-xs font-bold hover:underline"
-               >
-                 {t('careerMode.question.viewSolution')} <ExternalLink size={12} />
-               </a>
-            </div>
-         </div>
+            {onSrsUpdate && (
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  onClick={() => onSrsUpdate(question.id, false)}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 font-bold text-xs transition-colors"
+                >
+                  {t('careerMode.question.forgotWrong')}
+                </button>
+                <button
+                  onClick={() => onSrsUpdate(question.id, true)}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-500 font-bold text-xs transition-colors"
+                >
+                  {t('careerMode.question.rememberedRight')}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 flex justify-end">
+            <a
+              href={question.resourceLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-primaryLight text-xs font-bold hover:underline"
+            >
+              {t('careerMode.question.viewSolution')} <ExternalLink size={12} />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -308,48 +310,48 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   timerRef
 }) => {
   const [localTimer, setLocalTimer] = useState(initialTime);
-const onTimeUpRef = useRef(onTimeUp);
+  const onTimeUpRef = useRef(onTimeUp);
 
-useEffect(() => {
-  timerRef.current = localTimer;
-}, [localTimer, timerRef]);
+  useEffect(() => {
+    timerRef.current = localTimer;
+  }, [localTimer, timerRef]);
 
   // Handle when parent adds extra time
-// Handle when parent adds extra time
-const prevExtraTimeRef = useRef(extraTimeSeconds);
+  // Handle when parent adds extra time
+  const prevExtraTimeRef = useRef(extraTimeSeconds);
 
-useEffect(() => {
-  const diff = extraTimeSeconds - prevExtraTimeRef.current;
-  if (diff > 0) {
-    setLocalTimer(prev => prev + diff);
-  }
-  prevExtraTimeRef.current = extraTimeSeconds;
-}, [extraTimeSeconds]);
+  useEffect(() => {
+    const diff = extraTimeSeconds - prevExtraTimeRef.current;
+    if (diff > 0) {
+      setLocalTimer(prev => prev + diff);
+    }
+    prevExtraTimeRef.current = extraTimeSeconds;
+  }, [extraTimeSeconds]);
 
-// Keep the latest callback in the ref
-useEffect(() => {
-  onTimeUpRef.current = onTimeUp;
-}, [onTimeUp]);
+  // Keep the latest callback in the ref
+  useEffect(() => {
+    onTimeUpRef.current = onTimeUp;
+  }, [onTimeUp]);
 
-// Tick down
-useEffect(() => {
-  let interval: any;
+  // Tick down
+  useEffect(() => {
+    let interval: any;
 
-  if (mockState === 'active' || mockState === 'active_voice') {
-    interval = setInterval(() => {
-      setLocalTimer(t => {
-        if (t <= 1) {
-          clearInterval(interval);
-          onTimeUpRef.current();
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-  }
+    if (mockState === 'active' || mockState === 'active_voice') {
+      interval = setInterval(() => {
+        setLocalTimer(t => {
+          if (t <= 1) {
+            clearInterval(interval);
+            onTimeUpRef.current();
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
 
-  return () => clearInterval(interval);
-}, [mockState]);
+    return () => clearInterval(interval);
+  }, [mockState]);
 
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
@@ -417,7 +419,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     const list: { question: InterviewQuestion; company: Company }[] = [];
     const now = new Date();
     const srsMap = progress.srsData || {};
-    
+
     companiesList.forEach(company => {
       company.questions.forEach(q => {
         const srs = srsMap[q.id];
@@ -435,6 +437,43 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
     () => getRecommendedCompanies(user?.settings, progress, companiesList),
     [user?.settings, progress, companiesList]
   );
+
+  // --- Skill Gap Analysis ---
+  const [targetRoleId, setTargetRoleId] = useState<string>('');
+  const allCourseProgress: Progress[] = useMemo(() => storageService.getAllProgress(), []);
+
+  const mySkills = useMemo(() => {
+    const categoryPercent = (catId: string) => {
+      const catCourses = COURSES.filter(c => c.categoryId === catId);
+      const catPassed = catCourses.filter(c => allCourseProgress.find(p => p.courseId === c.id)?.passed).length;
+      return catCourses.length ? Math.round((catPassed / catCourses.length) * 100) : 0;
+    };
+    return {
+      programming: categoryPercent('programming'),
+      dsa: categoryPercent('dsa'),
+      design: categoryPercent('design'),
+    };
+  }, [allCourseProgress]);
+
+  const targetRoleCompany = useMemo(
+    () => companiesList.find(c => c.id === targetRoleId) ?? null,
+    [companiesList, targetRoleId]
+  );
+
+  const skillGaps: SkillGap[] = useMemo(
+    () => targetRoleCompany ? getSkillGaps(targetRoleCompany, mySkills) : [],
+    [targetRoleCompany, mySkills]
+  );
+
+  const skillGapCourses: Course[] = useMemo(
+    () => targetRoleCompany ? getCoursesForSkillGaps(skillGaps, allCourseProgress, COURSES) : [],
+    [targetRoleCompany, skillGaps, allCourseProgress]
+  );
+
+  const skillGapLabel = (skill: SkillGap['skill']) =>
+    skill === 'dsa' ? 'DSA' : skill.charAt(0).toUpperCase() + skill.slice(1);
+  // --- End Skill Gap Analysis ---
+
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [activeTab, setActiveTab] = useState<'study' | 'mock'>('study');
 
@@ -446,11 +485,11 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
   const timerRef = useRef(0);
 
   // References to keep callbacks stable and break circular dependency
-  const startListeningRef = useRef<() => void>(() => {});
-  const stopListeningAndSubmitRef = useRef<(forceEnd?: boolean) => Promise<void>>(async () => {});
-  const speakQuestionRef = useRef<(text: string) => void>(() => {});
-  const generateAIResponseRef = useRef<(history: any[]) => Promise<void>>(async () => {});
-  const generateVoiceReportRef = useRef<(history: any[]) => Promise<void>>(async () => {});
+  const startListeningRef = useRef<() => void>(() => { });
+  const stopListeningAndSubmitRef = useRef<(forceEnd?: boolean) => Promise<void>>(async () => { });
+  const speakQuestionRef = useRef<(text: string) => void>(() => { });
+  const generateAIResponseRef = useRef<(history: any[]) => Promise<void>>(async () => { });
+  const generateVoiceReportRef = useRef<(history: any[]) => Promise<void>>(async () => { });
   const [mockAnswers, setMockAnswers] = useState<string[]>([]); // user text answers
   const [textReport, setTextReport] = useState("");
   const [isGeneratingText, setIsGeneratingText] = useState(false);
@@ -611,24 +650,24 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
 
         // Section header identification
         if (
-          lowerLine.includes('key strengths') || 
-          lowerLine.includes('strengths') || 
+          lowerLine.includes('key strengths') ||
+          lowerLine.includes('strengths') ||
           lowerLine.includes('what they did well')
         ) {
           currentSection = 'strengths';
           return;
         } else if (
-          lowerLine.includes('areas for improvement') || 
-          lowerLine.includes('improvement') || 
+          lowerLine.includes('areas for improvement') ||
+          lowerLine.includes('improvement') ||
           lowerLine.includes('need to work on') ||
           lowerLine.includes('what they need to work on')
         ) {
           currentSection = 'improvements';
           return;
         } else if (
-          /^\d+\.\s+\*\*/.test(line) || 
-          line.startsWith('###') || 
-          line.startsWith('##') || 
+          /^\d+\.\s+\*\*/.test(line) ||
+          line.startsWith('###') ||
+          line.startsWith('##') ||
           line.startsWith('#')
         ) {
           currentSection = 'feedback';
@@ -639,7 +678,7 @@ export const CareerMode: React.FC<CareerModeProps> = ({ user }) => {
           .replace(/^[-*+\d.]\s*/, '') // Remove list bullets
           .replace(/\*\*/g, '')         // Remove bold markers
           .trim();
-        
+
         if (!cleanLine) return;
 
         if (currentSection === 'strengths') {
@@ -1084,63 +1123,63 @@ ${transcriptText}`;
   if (showReviewQueue) {
     return (
       <div className="space-y-8 animate-fade-in pb-20">
-         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-               <button 
-                 onClick={() => setSearchParams({})} 
-                 className="flex items-center gap-2 text-primaryLight font-bold text-sm mb-2 hover:underline"
-               >
-                  &larr; {t('careerMode.reviewQueue.backToCompanies')}
-               </button>
-               <h2 className="text-3xl font-display font-bold text-textMain flex items-center gap-2">
-                  <Clock size={28} className="text-orange-500" />
-                  {t('careerMode.reviewQueue.title')}
-               </h2>
-               <p className="text-textMuted mt-1">{t('careerMode.reviewQueue.description')}</p>
-            </div>
-         </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <button
+              onClick={() => setSearchParams({})}
+              className="flex items-center gap-2 text-primaryLight font-bold text-sm mb-2 hover:underline"
+            >
+              &larr; {t('careerMode.reviewQueue.backToCompanies')}
+            </button>
+            <h2 className="text-3xl font-display font-bold text-textMain flex items-center gap-2">
+              <Clock size={28} className="text-orange-500" />
+              {t('careerMode.reviewQueue.title')}
+            </h2>
+            <p className="text-textMuted mt-1">{t('careerMode.reviewQueue.description')}</p>
+          </div>
+        </div>
 
-         <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8">
-            {dueQuestions.length > 0 ? (
-               <div className="space-y-4 max-w-4xl">
-                  <p className="text-sm text-textMuted mb-4">
-                     {t('careerMode.reviewQueue.instructions')}
-                  </p>
-                  {dueQuestions.map(({ question, company }) => (
-                     <div key={question.id} className="relative">
-                        <div className="absolute top-4 right-12 bg-primary/10 text-primaryLight text-[10px] px-2 py-0.5 rounded border border-primary/20 font-bold uppercase z-10">
-                           {company.name}
-                        </div>
-                        <QuestionItem 
-                          question={question}
-                          isPracticed={progress.practicedQuestions.includes(question.id)}
-                          isSaved={progress.savedQuestions.includes(question.id)}
-                          onTogglePractice={handleTogglePractice}
-                          onToggleSave={handleToggleSave}
-                          srsData={progress.srsData?.[question.id]}
-                          onSrsUpdate={handleSrsUpdate}
-                        />
-                     </div>
-                  ))}
-               </div>
-            ) : (
-               <div className="text-center py-16">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
-                     <CheckCircle size={32} />
+        <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 md:p-8">
+          {dueQuestions.length > 0 ? (
+            <div className="space-y-4 max-w-4xl">
+              <p className="text-sm text-textMuted mb-4">
+                {t('careerMode.reviewQueue.instructions')}
+              </p>
+              {dueQuestions.map(({ question, company }) => (
+                <div key={question.id} className="relative">
+                  <div className="absolute top-4 right-12 bg-primary/10 text-primaryLight text-[10px] px-2 py-0.5 rounded border border-primary/20 font-bold uppercase z-10">
+                    {company.name}
                   </div>
-                  <h3 className="text-xl font-bold text-textMain mb-2">{t('careerMode.reviewQueue.caughtUpTitle')}</h3>
-                  <p className="text-textMuted max-w-md mx-auto mb-6">
-                     {t('careerMode.reviewQueue.caughtUpDescription')}
-                  </p>
-                  <button 
-                    onClick={() => setSearchParams({})}
-                    className="px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium transition-all"
-                  >
-                     {t('careerMode.reviewQueue.exploreCompanies')}
-                  </button>
-               </div>
-            )}
-         </div>
+                  <QuestionItem
+                    question={question}
+                    isPracticed={progress.practicedQuestions.includes(question.id)}
+                    isSaved={progress.savedQuestions.includes(question.id)}
+                    onTogglePractice={handleTogglePractice}
+                    onToggleSave={handleToggleSave}
+                    srsData={progress.srsData?.[question.id]}
+                    onSrsUpdate={handleSrsUpdate}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
+                <CheckCircle size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-textMain mb-2">{t('careerMode.reviewQueue.caughtUpTitle')}</h3>
+              <p className="text-textMuted max-w-md mx-auto mb-6">
+                {t('careerMode.reviewQueue.caughtUpDescription')}
+              </p>
+              <button
+                onClick={() => setSearchParams({})}
+                className="px-6 py-2.5 bg-gradient-main text-white rounded-lg font-medium transition-all"
+              >
+                {t('careerMode.reviewQueue.exploreCompanies')}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -1173,61 +1212,152 @@ ${transcriptText}`;
         </div>
       </div>
 
-{/* Search Bar */}
-<div className="relative max-w-md group">
-  <Search
-    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors"
-    size={20}
-  />
-  <input
-    type="text"
-    placeholder={t('careerMode.roleSearchFilters.placeholder')}
-    aria-label={t('careerMode.roleSearchFilters.label')}
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
-  />
-</div>
-
-{/* Recommended Companies */}
-{!isLoadingCompanies && recommendedCompanies.length > 0 && (
-  <div>
-    <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
-      <span className="w-2 h-5 rounded-full bg-primaryLight" />
-      {t('careerMode.companyCards.recommendedTitle')}
-    </h3>
-
-    <div className="flex gap-4 overflow-x-auto pb-2">
-      {recommendedCompanies.map(company => (
-        <div
-          key={company.id}
-          onClick={() => handleSelectCompany(company)}
-          className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
-        >
-          <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
-            <img
-              src={company.logo}
-              alt={company.name}
-              className="w-full h-full object-contain"
-              loading="lazy"
-              width={40}
-              height={40}
-            />
-          </div>
-
-          <div className="min-w-0">
-            <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">
-              {company.name}
-            </h4>
-            <p className="text-xs text-textMuted truncate">
-              {company.focus.join(', ')}
+      {/* Skill Gap Analysis */}
+      <div className="bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+              <BarChart size={20} className="text-primaryLight" />
+              Skill Gap Analysis
+            </h3>
+            <p className="text-sm text-textMuted mt-1">
+              Pick a target role to see how your current skills compare.
             </p>
           </div>
+
+          <select
+            value={targetRoleId}
+            onChange={(e) => setTargetRoleId(e.target.value)}
+            aria-label="Select a target role"
+            className="bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-2.5 px-4 text-black focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all w-full sm:w-64"
+          >
+            <option value="">Select a target role...</option>
+            {companiesList.map(company => (
+              <option key={company.id} value={company.id}>{company.name}</option>
+            ))}
+          </select>
         </div>
-      ))}
-    </div>
-  </div>
-)}
+
+        {targetRoleCompany && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SkillRadarChart
+              programming={mySkills.programming}
+              dsa={mySkills.dsa}
+              design={mySkills.design}
+              roleTarget={{ label: `${targetRoleCompany.name} Target`, ...getTargetRoleSkills(targetRoleCompany) }}
+            />
+
+            <div>
+              {skillGaps.length > 0 ? (
+                <>
+                  <h4 className="text-sm font-bold text-textMain mb-3">
+                    Skills to improve for {targetRoleCompany.name}
+                  </h4>
+                  <div className="space-y-3 mb-6">
+                    {skillGaps.map(gap => (
+                      <div key={gap.skill} className="bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3">
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="font-medium text-textMain">{skillGapLabel(gap.skill)}</span>
+                          <span className="text-orange-500 font-semibold">{gap.current}% / {gap.target}% target</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-main"
+                            style={{ width: `${gap.current}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {skillGapCourses.length > 0 && (
+                    <>
+                      <h4 className="text-sm font-bold text-textMain mb-3">Recommended courses</h4>
+                      <div className="space-y-2">
+                        {skillGapCourses.map(course => (
+                          <a
+                            key={course.id}
+                            href={`#/course/${course.id}`}
+                            className="flex items-center justify-between gap-3 bg-white/50 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 rounded-xl p-3 text-sm font-medium text-textMain transition-colors"
+                          >
+                            {course.title}
+                            <ArrowRight size={16} className="text-primaryLight shrink-0" />
+                          </a>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="h-full flex items-center justify-center text-center py-8">
+                  <div>
+                    <CheckCircle size={32} className="text-emerald-500 mx-auto mb-2" />
+                    <p className="text-sm text-textMuted">
+                      You already meet the target skill levels for {targetRoleCompany.name}!
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative max-w-md group">
+        <Search
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primaryLight transition-colors"
+          size={20}
+        />
+        <input
+          type="text"
+          placeholder={t('careerMode.roleSearchFilters.placeholder')}
+          aria-label={t('careerMode.roleSearchFilters.label')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
+        />
+      </div>
+
+      {/* Recommended Companies */}
+      {!isLoadingCompanies && recommendedCompanies.length > 0 && (
+        <div>
+          <h3 className="text-lg font-bold text-textMain mb-4 flex items-center gap-2">
+            <span className="w-2 h-5 rounded-full bg-primaryLight" />
+            {t('careerMode.companyCards.recommendedTitle')}
+          </h3>
+
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {recommendedCompanies.map(company => (
+              <div
+                key={company.id}
+                onClick={() => handleSelectCompany(company)}
+                className="group flex-shrink-0 w-64 bg-glass hover:bg-glass-hover border border-black/5 dark:border-white/20 rounded-2xl p-4 cursor-pointer hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
+              >
+                <div className="w-10 h-10 rounded-lg bg-white border border-black/5 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={company.logo}
+                    alt={company.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                    width={40}
+                    height={40}
+                  />
+                </div>
+
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-textMain truncate group-hover:text-primaryLight transition-colors">
+                    {company.name}
+                  </h4>
+                  <p className="text-xs text-textMuted truncate">
+                    {company.focus.join(', ')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Company Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

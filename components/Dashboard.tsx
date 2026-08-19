@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase, Trophy, Circle } from 'lucide-react';
-import { CATEGORIES, COURSES, COMPANIES } from '../constants';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase, Trophy, Circle, Download } from 'lucide-react';
+import { CATEGORIES, COURSES, COMPANIES, BADGE_DEFINITIONS } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 import { storageService, DailyChallengeSummary } from '../services/storageService';
@@ -14,6 +14,7 @@ import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
 import SkillRadarChart from "../components/SkillRadarChart";
+import { generateProgressReport } from '../utils/pdfGenerator';
 
 interface DashboardProps {
   user: User;
@@ -235,6 +236,60 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const totalCourses = courses.length;
   const completionPercentage = totalCourses ? Math.round((completedCount / totalCourses) * 100) : 0;
 
+  const [isExportingReport, setIsExportingReport] = useState(false);
+
+  const handleExportReport = async () => {
+    if (isExportingReport) return;
+
+    const attemptedCourseIds = new Set(allProgress.map(p => p.courseId));
+    const attemptedCourses = courses.filter(course => attemptedCourseIds.has(course.id));
+
+    if (attemptedCourses.length === 0) {
+      showToast({ message: 'Start or complete a course first to generate a progress report.', type: 'info' });
+      return;
+    }
+
+    setIsExportingReport(true);
+    try {
+      const earnedBadges = BADGE_DEFINITIONS
+        .filter(b => (user.badges || []).includes(b.id))
+        .map(b => ({ name: b.name, description: b.description }));
+
+      const courseEntries = attemptedCourses.map(course => {
+        const progress = allProgress.find(p => p.courseId === course.id);
+        const totalChapters = course.chapters?.length || 0;
+        const passed = !!progress?.passed;
+        return {
+          title: course.title,
+          level: course.level,
+          passed,
+          score: progress?.score ?? 0,
+          completedDate: progress?.completedDate,
+          totalChapters,
+          completedChapters: passed ? totalChapters : 0,
+        };
+      });
+
+      await generateProgressReport({
+        username: user.username,
+        date: new Date().toLocaleDateString(),
+        xp: user.xp,
+        level: user.level,
+        streak: user.streak,
+        overallCompletionPercent: completionPercentage,
+        courses: courseEntries,
+        earnedBadges,
+      });
+
+      showToast({ message: 'Progress report exported successfully!', type: 'success' });
+    } catch (err) {
+      console.error('Progress report export failed:', err);
+      showToast({ message: 'Failed to export progress report. Please try again.', type: 'error' });
+    } finally {
+      setIsExportingReport(false);
+    }
+  };
+
   const getCategoryProgress = (catId: string) => {
     const catCourses = courses.filter(c => c.categoryId === catId);
     const catPassed = catCourses.filter(c => allProgress.find(p => p.courseId === c.id)?.passed).length;
@@ -330,6 +385,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             >
               <Map size={14} /> {t('dashboard.header.tourButton')}
             </button>
+            <button
+              onClick={handleExportReport}
+              disabled={isExportingReport}
+              aria-label="Export progress report as PDF"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primaryLight text-xs font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors border border-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isExportingReport ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+              {isExportingReport ? 'Exporting...' : 'Export Report'}
+            </button>
           </div>
           <p className="text-textMuted">{t('dashboard.header.subtitle')}</p>
         </div>
@@ -391,9 +455,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     {dailyChallenge.allCompleted
                       ? t('dashboard.dailyChallenge.completeMessage')
                       : t('dashboard.dailyChallenge.progressMessage', {
-                          completed: dailyChallenge.completedCount,
-                          total: dailyChallenge.total
-                        })}
+                        completed: dailyChallenge.completedCount,
+                        total: dailyChallenge.total
+                      })}
                   </div>
                 </div>
               </div>
@@ -419,9 +483,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               {dailyChallenge.items.map(({ question, completed }) => (
                 <div
                   key={question.id}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium max-w-full ${
-                    completed ? 'bg-white/25 text-white' : 'bg-white/10 text-white/80'
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium max-w-full ${completed ? 'bg-white/25 text-white' : 'bg-white/10 text-white/80'
+                    }`}
                   title={question.title}
                 >
                   {completed ? (

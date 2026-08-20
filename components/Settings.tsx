@@ -533,6 +533,28 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                     {profileLinkCopied ? 'Copied!' : 'Copy Profile Link'}
                   </button>
                 </div>
+
+                <div className="space-y-4 pt-4 border-t border-black/20 dark:border-white/10">
+                  <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
+                    <Shield size={18} className="text-primaryLight" /> Privacy
+                  </h3>
+
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-textMain">Hide Me from Leaderboard</div>
+                      <div className="text-sm text-textMuted">
+                        When enabled, your XP, rank, and profile won't appear on the public Leaderboard. Your progress inside SkillVerse is unaffected.
+                      </div>
+                    </div>
+                    <div className="shrink-0 mt-1">
+                      <Toggle
+                        checked={!!formData.settings.hideFromLeaderboard}
+                        onChange={(v) => handleChange('hideFromLeaderboard', v)}
+                        ariaLabel="Toggle hide me from leaderboard"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

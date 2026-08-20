@@ -203,6 +203,15 @@ export interface LessonNote {
   updatedAt: string; // ISO timestamp
 }
 
+export interface SavedSnippet {
+  id: string;
+  name: string;
+  language: string;
+  code: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+}
+
 export interface LessonComment {
   id: string;
   courseId: string;

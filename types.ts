@@ -13,6 +13,7 @@ export interface UserSettings {
   reminderTime?: string; // HH:MM local time for the daily study reminder notification
   fontSize?: 'sm' | 'md' | 'lg';
   dyslexiaFont?: boolean;
+  hideFromLeaderboard?: boolean;
   certificateName: string;
   avatarId: string;
   // Onboarding Fields

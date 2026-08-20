@@ -52,22 +52,28 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
 
   useEffect(() => {
     setLoading(true);
-    
+
     // Determine which field to order by based on selected timeframe
     let orderField = 'weeklyXP';
     if (timeframe === 'month') orderField = 'monthlyXP';
     if (timeframe === 'all') orderField = 'xp';
 
+    // Fetch a larger batch than we actually display — some of these may have
+    // opted out of the leaderboard, and Firestore can't combine an inequality
+    // filter on a nested field with an orderBy on a different field, so the
+    // opt-out is applied client-side before trimming to the top 10.
     const q = query(
-      collection(db, 'users'), 
-      orderBy(orderField, 'desc'), 
-      limit(10)
+      collection(db, 'users'),
+      orderBy(orderField, 'desc'),
+      limit(25)
     );
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const topUsers: LeaderboardUser[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
+        if (data.preferences?.settings?.hideFromLeaderboard) return;
+
         topUsers.push({
           id: doc.id,
           username: data.username || 'Anonymous',
@@ -80,7 +86,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
           activeFrame: data.preferences?.settings?.activeFrame || 'none'
         });
       });
-      setUsers(topUsers);
+      setUsers(topUsers.slice(0, 10));
       setLoading(false);
     }, (error) => {
       console.error("Error fetching leaderboard:", error);
@@ -169,33 +175,30 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setTimeframe('week')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-            timeframe === 'week'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'week'
               ? 'bg-gradient-main text-white shadow-lg scale-105'
               : 'bg-white/10 text-textMain hover:bg-white/20'
-          }`}
+            }`}
         >
           <Clock size={16} />
           <span>This Week</span>
         </button>
         <button
           onClick={() => setTimeframe('month')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-            timeframe === 'month'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'month'
               ? 'bg-gradient-main text-white shadow-lg scale-105'
               : 'bg-white/10 text-textMain hover:bg-white/20'
-          }`}
+            }`}
         >
           <Calendar size={16} />
           <span>This Month</span>
         </button>
         <button
           onClick={() => setTimeframe('all')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-            timeframe === 'all'
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'all'
               ? 'bg-gradient-main text-white shadow-lg scale-105'
               : 'bg-white/10 text-textMain hover:bg-white/20'
-          }`}
+            }`}
         >
           <Award size={16} />
           <span>All Time</span>
@@ -228,7 +231,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
                   <div className="flex justify-center items-center w-8">
                     {getRankIcon(index)}
                   </div>
-                  
+
                   <div className="relative group-hover:scale-105 transition-transform">
                     <img
                       src={user.photoURL || AVATARS[user.avatarId || '1']}
@@ -239,19 +242,17 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
                       height={48}
                     />
                     {user.activeFrame && user.activeFrame !== 'none' && (
-                      <div className={`absolute inset-0 rounded-full pointer-events-none ${
-                        XP_STORE_FRAMES.find(f => f.id === user.activeFrame)?.frameClass || ''
-                      }`} />
+                      <div className={`absolute inset-0 rounded-full pointer-events-none ${XP_STORE_FRAMES.find(f => f.id === user.activeFrame)?.frameClass || ''
+                        }`} />
                     )}
                     {index < 3 && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-background rounded-full flex items-center justify-center">
-                        <div className={`w-3 h-3 rounded-full ${
-                          index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : 'bg-amber-600'
-                        }`} />
+                        <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : 'bg-amber-600'
+                          }`} />
                       </div>
                     )}
                   </div>
-                  
+
                   <div>
                     <h3 className="font-bold text-textMain text-lg leading-tight group-hover:underline group-hover:text-primaryLight transition-colors">
                       {user.username}
@@ -275,11 +276,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
                     <button
                       onClick={(e) => handleFollowToggle(e, user.id)}
                       disabled={isLoadingThis}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
-                        isFollowing
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${isFollowing
                           ? 'bg-white/10 text-textMain hover:bg-red-500/20 hover:text-red-400 border border-white/10'
                           : 'bg-gradient-main text-white hover:opacity-90 shadow-primary/20'
-                      }`}
+                        }`}
                     >
                       {isLoadingThis ? (
                         <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -308,7 +308,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followi
           </div>
         )}
       </div>
-      
+
       {/* Background decoration */}
       <div className="absolute right-[-5%] top-[-5%] w-[30%] h-[50%] rounded-full bg-primaryLight/10 blur-[80px] pointer-events-none" />
 

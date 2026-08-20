@@ -96,6 +96,32 @@ export default defineConfig(({ mode }) => {
       'process.env.API_KEY': JSON.stringify(env.OPENROUTER_API_KEY),
       'process.env.OPENROUTER_API_KEY': JSON.stringify(env.OPENROUTER_API_KEY)
     },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('canvg') || id.includes('dompurify')) {
+                return 'pdf-vendor';
+              }
+              if (id.includes('recharts') || id.includes('d3')) {
+                return 'charts-vendor';
+              }
+              if (id.includes('firebase')) {
+                return 'firebase-vendor';
+              }
+              if (id.includes('lucide-react')) {
+                return 'icons-vendor';
+              }
+              if (id.includes('i18next')) {
+                return 'i18n-vendor';
+              }
+            }
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

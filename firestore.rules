@@ -12,50 +12,207 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.admin == true || 
+      return isAuthenticated() &&
+        (request.auth.token.admin == true ||
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
 
+    // -----------------------------------------------------------------------
+    // IMPORTANT: Firestore rules are NOT inherited by subcollections.
+    // When adding a collection/subcollection used by the client, add an
+    // explicit match block here and redeploy with:
+    //   firebase deploy --only firestore:rules
+    // -----------------------------------------------------------------------
+
     // --- USERS COLLECTION ---
+    // Public reads are required for /u/:username, which is intentionally
+    // available to logged-out visitors. Writes remain owner-controlled.
     match /users/{userId} {
-      // Authenticated users can read user profiles (needed for Leaderboard)
-      allow read: if isAuthenticated();
-      
-      // Users can create and update their own document
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && 
+      allow read: if true;
+
+      allow create: if isOwner(userId)
+        && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user');
+
+      allow update: if isOwner(userId) &&
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
-      
-      // Users or admins can delete their own account profile
+
       allow delete: if isOwner(userId) || isAdmin();
     }
 
     // --- COURSES COLLECTION ---
     match /courses/{courseId} {
-      // Public read access for course catalog
       allow read: if true;
-      
-      // Admin-only write access
       allow write: if isAdmin();
+    }
+
+    // Course reviews are intentionally public to support the ratings section.
+    // The document id must be the reviewer's UID, giving each user one review
+    // per course and preventing a user from writing under another user's id.
+    match /courses/{courseId}/reviews/{userId} {
+      allow read: if true;
+
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll([
+          'courseId', 'userId', 'username', 'rating', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'courseId', 'userId', 'username', 'avatarId', 'photoURL',
+          'rating', 'comment', 'createdAt'
+        ])
+        && request.resource.data.courseId == courseId
+        && request.resource.data.userId == userId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.username is string
+        && request.resource.data.createdAt is string
+        && (!request.resource.data.keys().hasAny(['comment']) ||
+            request.resource.data.comment is string)
+        && (!request.resource.data.keys().hasAny(['avatarId']) ||
+            request.resource.data.avatarId is string)
+        && (!request.resource.data.keys().hasAny(['photoURL']) ||
+            request.resource.data.photoURL is string);
+
+      allow update: if isOwner(userId)
+        && request.resource.data.courseId == resource.data.courseId
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'username', 'avatarId', 'photoURL', 'rating', 'comment'
+        ]);
+
+      allow delete: if isOwner(userId);
     }
 
     // --- QUIZZES COLLECTION ---
     match /quizzes/{courseId} {
-      // Authenticated users can access quiz questions
       allow read: if isAuthenticated();
-      
-      // Admin-only write access
       allow write: if isAdmin();
     }
 
     // --- COMPANIES COLLECTION ---
     match /companies/{companyId} {
-      // Public read access for interview preparation
       allow read: if true;
-      
-      // Admin-only write access (Cloud Functions & Admins)
       allow write: if isAdmin();
+    }
+
+    // Lesson comments use separate permissions for authorship and voting:
+    // - authenticated users can read;
+    // - only the comment author can create/delete/edit content;
+    // - any authenticated user may update only upvote fields.
+    match /courses/{courseId}/lessons/{lessonId}/comments/{commentId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'courseId', 'lessonId', 'userId', 'username',
+          'content', 'createdAt', 'upvotes', 'upvotedBy'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'courseId', 'lessonId', 'userId', 'username',
+          'avatarId', 'photoURL', 'content', 'createdAt',
+          'upvotes', 'upvotedBy', 'parentId'
+        ])
+        && request.resource.data.courseId == courseId
+        && request.resource.data.lessonId == lessonId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.content is string
+        && request.resource.data.content.size() > 0
+        && request.resource.data.content.size() <= 5000
+        && request.resource.data.username is string
+        && request.resource.data.createdAt is string
+        && request.resource.data.upvotes is int
+        && request.resource.data.upvotes == 0
+        && request.resource.data.upvotedBy is list
+        && request.resource.data.upvotedBy.size() == 0
+        && (!request.resource.data.keys().hasAny(['parentId']) ||
+            request.resource.data.parentId == null ||
+            request.resource.data.parentId is string)
+        && (!request.resource.data.keys().hasAny(['avatarId']) ||
+            request.resource.data.avatarId is string)
+        && (!request.resource.data.keys().hasAny(['photoURL']) ||
+            request.resource.data.photoURL is string);
+
+      allow update: if isAuthenticated()
+        && request.resource.data.courseId == resource.data.courseId
+        && request.resource.data.lessonId == resource.data.lessonId
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.upvotes is int
+        && request.resource.data.upvotes >= 0
+        && request.resource.data.upvotedBy is list
+        && request.resource.data.upvotedBy.size() == request.resource.data.upvotes
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'content', 'upvotes', 'upvotedBy'
+        ])
+        && (
+          request.auth.uid == resource.data.userId
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'upvotes', 'upvotedBy'
+          ])
+        )
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['content'])
+          || (
+            request.auth.uid == resource.data.userId
+            && request.resource.data.content is string
+            && request.resource.data.content.size() > 0
+            && request.resource.data.content.size() <= 5000
+          )
+        );
+
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // --- ACTIVITIES COLLECTION ---
+    // Activity documents are authored by the user whose uid is stored in
+    // userId. Other authenticated users may read the feed and update only
+    // kudosCount/kudosUsers.
+    match /activities/{activityId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'userId', 'userName', 'userAvatar', 'type',
+          'details', 'kudosCount', 'kudosUsers', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'userId', 'userName', 'userAvatar', 'type',
+          'details', 'kudosCount', 'kudosUsers', 'createdAt'
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userName is string
+        && request.resource.data.userAvatar is string
+        && request.resource.data.type in ['badge', 'course', 'streak']
+        && request.resource.data.details is string
+        && request.resource.data.details.size() > 0
+        && request.resource.data.details.size() <= 2000
+        && request.resource.data.kudosCount is int
+        && request.resource.data.kudosCount == 0
+        && request.resource.data.kudosUsers is list
+        && request.resource.data.kudosUsers.size() == 0;
+
+      allow update: if isAuthenticated()
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.userName == resource.data.userName
+        && request.resource.data.userAvatar == resource.data.userAvatar
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.details == resource.data.details
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.kudosCount is int
+        && request.resource.data.kudosCount == resource.data.kudosCount + 1
+        && request.resource.data.kudosUsers is list
+        && request.resource.data.kudosUsers.size() == resource.data.kudosUsers.size() + 1
+        && request.resource.data.kudosUsers.hasAll([request.auth.uid])
+        && !resource.data.kudosUsers.hasAll([request.auth.uid])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'kudosCount', 'kudosUsers'
+        ]);
+
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
   }
 }

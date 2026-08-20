@@ -1,6 +1,6 @@
 import { doc, setDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { Progress, CareerProgress, SavedAINote, LessonNote, Company, InterviewQuestion } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, Company, InterviewQuestion } from '../types';
 import { safeStorage, isArray, isPlainObject } from '../utils/safeStorage';
 
 const PROGRESS_KEY = 'skillverse_progress';
@@ -8,6 +8,7 @@ const CAREER_KEY = 'skillverse_career';
 const LAST_VISITED_KEY = 'skillverse_last_visited';
 const AI_NOTES_KEY = 'skillverse_ai_notes';
 const LESSON_NOTES_KEY = 'skillverse_lesson_notes';
+const CODE_SNIPPETS_KEY = 'skillverse_code_snippets';
 const STREAK_KEY = 'skillverse_streak_data';
 const STUDY_TIME_KEY = 'skillverse_study_time';
 const DAILY_CHALLENGE_KEY = 'skillverse_daily_challenge';
@@ -108,9 +109,9 @@ const normalizeDailyChallengeState = (value: DailyChallengeState): DailyChalleng
   date: typeof value.date === 'string' ? value.date : '',
   questions: isArray(value.questions)
     ? value.questions.filter(
-        (q): q is DailyChallengeQuestionRef =>
-          isPlainObject(q) && typeof (q as any).questionId === 'string' && typeof (q as any).companyId === 'string'
-      )
+      (q): q is DailyChallengeQuestionRef =>
+        isPlainObject(q) && typeof (q as any).questionId === 'string' && typeof (q as any).companyId === 'string'
+    )
     : [],
   rewardClaimed: typeof value.rewardClaimed === 'boolean' ? value.rewardClaimed : false,
 });
@@ -491,6 +492,43 @@ export const storageService = {
     safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return notes;
   },
+
+  // --- SAVED CODE SNIPPETS (Playground) ---
+
+  getSavedSnippets: (): SavedSnippet[] =>
+    safeStorage.readJSON<SavedSnippet[]>(CODE_SNIPPETS_KEY, [], isArray)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
+
+  saveSnippet: (name: string, language: string, code: string): SavedSnippet => {
+    const snippets = storageService.getSavedSnippets();
+    const now = new Date().toISOString();
+    const snippet: SavedSnippet = {
+      id: `snippet_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+      name,
+      language,
+      code,
+      createdAt: now,
+      updatedAt: now,
+    };
+    snippets.unshift(snippet);
+    safeStorage.writeJSON(CODE_SNIPPETS_KEY, snippets);
+    return snippet;
+  },
+
+  updateSnippet: (id: string, code: string): SavedSnippet[] => {
+    const snippets = storageService.getSavedSnippets().map(s =>
+      s.id === id ? { ...s, code, updatedAt: new Date().toISOString() } : s
+    );
+    safeStorage.writeJSON(CODE_SNIPPETS_KEY, snippets);
+    return snippets;
+  },
+
+  deleteSnippet: (id: string): SavedSnippet[] => {
+    const snippets = storageService.getSavedSnippets().filter(s => s.id !== id);
+    safeStorage.writeJSON(CODE_SNIPPETS_KEY, snippets);
+    return snippets;
+  },
+
   // --- STREAK CALENDAR ---
 
   getStreakData: (): StreakData => {

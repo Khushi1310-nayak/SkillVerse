@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, AlertTriangle } from 'lucide-react';
+import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X } from 'lucide-react';
+import { storageService } from '../services/storageService';
+import { SavedSnippet } from '../types';
 
 interface CodePlaygroundProps {
   initialCode: string;
@@ -25,6 +27,33 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
   const [isExecuting, setIsExecuting] = useState(false);
   const [srcDoc, setSrcDoc] = useState('');
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+
+  const [savedSnippets, setSavedSnippets] = useState<SavedSnippet[]>([]);
+  const [showSnippetsPanel, setShowSnippetsPanel] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [snippetNameDraft, setSnippetNameDraft] = useState('');
+
+  useEffect(() => {
+    setSavedSnippets(storageService.getSavedSnippets());
+  }, []);
+
+  const handleSaveSnippet = () => {
+    const name = snippetNameDraft.trim();
+    if (!name) return;
+    storageService.saveSnippet(name, 'javascript', code);
+    setSavedSnippets(storageService.getSavedSnippets());
+    setSnippetNameDraft('');
+    setShowSaveDialog(false);
+  };
+
+  const handleLoadSnippet = (snippet: SavedSnippet) => {
+    setCode(snippet.code);
+    setShowSnippetsPanel(false);
+  };
+
+  const handleDeleteSnippet = (id: string) => {
+    setSavedSnippets(storageService.deleteSnippet(id));
+  };
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -142,9 +171,31 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
           </div>
           <span className="text-xs font-mono text-textMuted font-semibold tracking-wide select-none">sandbox.js</span>
         </div>
-        
+
         <div className="flex items-center gap-3">
-          <button 
+          <button
+            type="button"
+            onClick={() => setShowSnippetsPanel(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 rounded-lg border border-black/10 dark:border-white/5 font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight"
+            title="View saved snippets"
+            aria-label="View saved snippets"
+          >
+            <FolderOpen size={12} />
+            My Snippets{savedSnippets.length > 0 ? ` (${savedSnippets.length})` : ''}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setSnippetNameDraft(''); setShowSaveDialog(true); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 rounded-lg border border-black/10 dark:border-white/5 font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight"
+            title="Save current code as a snippet"
+            aria-label="Save current code as a snippet"
+          >
+            <Save size={12} />
+            Save
+          </button>
+
+          <button
             type="button"
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 rounded-lg border border-black/10 dark:border-white/5 font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight"
@@ -153,8 +204,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
             <RotateCcw size={12} />
             Reset
           </button>
-          
-          <button 
+
+          <button
             type="button"
             onClick={handleExecute}
             disabled={isExecuting}
@@ -231,7 +282,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
               <span className="whitespace-pre-wrap leading-relaxed">{log.message}</span>
             </div>
           ))}
-          
+
           {error && (
             <div className="text-red-400 bg-red-950/25 p-3 rounded-xl border border-red-500/20 flex gap-2.5 mt-2 animate-fade-in">
               <AlertTriangle size={16} className="shrink-0 mt-0.5 text-red-400" />
@@ -253,6 +304,116 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
           <div ref={terminalEndRef} />
         </div>
       </div>
+
+      {/* Save Snippet Dialog */}
+      {showSaveDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setShowSaveDialog(false)}
+        >
+          <div
+            className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-textMain">Save Snippet</h3>
+              <button
+                type="button"
+                onClick={() => setShowSaveDialog(false)}
+                aria-label="Close save dialog"
+                className="text-textMuted hover:text-textMain"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <input
+              type="text"
+              autoFocus
+              value={snippetNameDraft}
+              onChange={(e) => setSnippetNameDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSaveSnippet(); }}
+              placeholder="Snippet name (e.g. Two Sum solution)"
+              className="w-full rounded-xl border border-black/20 dark:border-white/10 bg-white/50 dark:bg-white/5 p-2.5 text-sm text-textMain placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-primaryLight"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => setShowSaveDialog(false)}
+                className="px-3 py-1.5 text-xs font-medium text-textMuted hover:text-textMain rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveSnippet}
+                disabled={!snippetNameDraft.trim()}
+                className="px-4 py-1.5 text-xs bg-gradient-main text-white font-bold rounded-lg disabled:opacity-40 transition-all"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Snippets Panel */}
+      {showSnippetsPanel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setShowSnippetsPanel(false)}
+        >
+          <div
+            className="bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 w-full max-w-md max-h-[70vh] flex flex-col shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4 shrink-0">
+              <h3 className="text-sm font-bold text-textMain">My Saved Snippets</h3>
+              <button
+                type="button"
+                onClick={() => setShowSnippetsPanel(false)}
+                aria-label="Close saved snippets panel"
+                className="text-textMuted hover:text-textMain"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {savedSnippets.length === 0 ? (
+              <p className="text-sm text-textMuted italic">
+                No saved snippets yet. Write some code and hit "Save" to keep it here.
+              </p>
+            ) : (
+              <div className="space-y-2 overflow-y-auto custom-scrollbar pr-1">
+                {savedSnippets.map((snippet) => (
+                  <div
+                    key={snippet.id}
+                    className="flex items-center justify-between gap-3 bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSnippet(snippet)}
+                      className="flex-1 min-w-0 text-left"
+                    >
+                      <div className="text-sm font-semibold text-textMain truncate">{snippet.name}</div>
+                      <div className="text-[11px] text-textMuted">
+                        {snippet.language} &middot; {new Date(snippet.updatedAt).toLocaleDateString()}
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSnippet(snippet.id)}
+                      aria-label={`Delete snippet ${snippet.name}`}
+                      className="p-1.5 rounded-lg text-textMuted hover:text-danger hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

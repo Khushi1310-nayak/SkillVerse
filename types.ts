@@ -225,6 +225,7 @@ export interface LessonComment {
   upvotes: number;
   upvotedBy: string[];
   parentId?: string | null;
+  pinned?: boolean;
 }
 
 export interface CourseReview {

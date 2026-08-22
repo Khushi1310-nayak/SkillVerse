@@ -22,6 +22,7 @@ import Editor from '@monaco-editor/react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useToast } from '../contexts/ToastContext';
 import { useTranslation } from 'react-i18next';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const getTimeOfDay = () => {
   const hour = new Date().getHours();
@@ -238,7 +239,7 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
       <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
           <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
-            <div dangerouslySetInnerHTML={{ __html: question.answer }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(question.answer) }} />
           </div>
 
           <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">

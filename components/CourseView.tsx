@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, Lock } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
 import { aiService } from '../services/aiService';
@@ -9,6 +9,7 @@ import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { COURSES, generateRichContent } from '../constants';
+import { isCourseUnlocked, getIncompletePrerequisites } from '../utils/prerequisites';
 import { getDailyQuiz } from '../utils/dailyQuizGenerator';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
@@ -242,6 +243,13 @@ export const CourseView: React.FC = () => {
   if (loadFailed) return <CourseLoadError onRetry={fetchCourseData} />;
   if (!course) return <NotFound />;
 
+  // --- Prerequisite guard (no new storage — reuses existing localStorage progress) ---
+  const allProgress = storageService.getAllProgress();
+  const isCourseLocked = !isCourseUnlocked(course, allProgress);
+  const incompletePrereqs = isCourseLocked
+    ? getIncompletePrerequisites(course, COURSES, allProgress)
+    : [];
+
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
     if (settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined) return;
@@ -363,29 +371,31 @@ export const CourseView: React.FC = () => {
 
         <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-2xl p-6 sticky top-28">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
-            <BookOpen className="text-white" />
+            {isCourseLocked ? <Lock className="text-amber-400" /> : <BookOpen className="text-white" />}
           </div>
           <h2 className="text-xl font-bold text-textMain mb-2">{course.title}</h2>
-          <div className="flex flex-col gap-2 mt-6" role="tablist" aria-label="Course sections">
-            <button
-              onClick={() => setActiveTab('learn')}
-              role="tab"
-              aria-selected={activeTab === 'learn'}
-              className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
-            >
-              <span>{t('courseView.navigation.notesResources')}</span>
-              {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
-            </button>
-            <button
-              onClick={() => setActiveTab('quiz')}
-              role="tab"
-              aria-selected={activeTab === 'quiz'}
-              className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
-            >
-              <span>{t('courseView.navigation.finalQuiz')}</span>
-              {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
-            </button>
-          </div>
+          {!isCourseLocked && (
+            <div className="flex flex-col gap-2 mt-6" role="tablist" aria-label="Course sections">
+              <button
+                onClick={() => setActiveTab('learn')}
+                role="tab"
+                aria-selected={activeTab === 'learn'}
+                className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'learn' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+              >
+                <span>{t('courseView.navigation.notesResources')}</span>
+                {activeTab === 'learn' && <div className="w-2 h-2 rounded-full bg-primaryLight" />}
+              </button>
+              <button
+                onClick={() => setActiveTab('quiz')}
+                role="tab"
+                aria-selected={activeTab === 'quiz'}
+                className={`flex items-center justify-between p-3 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background ${activeTab === 'quiz' ? 'bg-black/5 dark:bg-white/10 text-textMain font-medium' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5'}`}
+              >
+                <span>{t('courseView.navigation.finalQuiz')}</span>
+                {passed ? <CheckCircle size={16} className="text-success" /> : <div className="w-2 h-2 rounded-full border border-textMuted" />}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -393,7 +403,39 @@ export const CourseView: React.FC = () => {
       <div className="lg:col-span-3">
         <div className="bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 rounded-3xl p-8 md:p-12 min-h-[600px]">
 
-          {activeTab === 'learn' ? (
+          {isCourseLocked ? (
+            /* Prerequisite banner — shown instead of course content when locked */
+            <div
+              className="animate-fade-in flex flex-col items-center justify-center min-h-[400px] text-center px-4"
+              aria-live="polite"
+              aria-label={`${course.title} is locked. Complete all prerequisite courses to unlock it.`}
+            >
+              <div className="mb-6 inline-flex p-5 rounded-full bg-amber-500/10 border border-amber-500/30">
+                <Lock size={48} className="text-amber-400" aria-hidden="true" />
+              </div>
+              <h2 className="text-2xl font-bold text-textMain mb-3">Prerequisites Required</h2>
+              <p className="text-textMuted mb-8 max-w-md leading-relaxed">
+                Complete the following course{incompletePrereqs.length !== 1 ? 's' : ''} before you can access{' '}
+                <span className="font-semibold text-textMain">{course.title}</span>.
+              </p>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
+                {incompletePrereqs.map(prereq => (
+                  <Link
+                    key={prereq.id}
+                    to={`/course/${prereq.id}`}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-main text-white font-bold hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    aria-label={`Start prerequisite course: ${prereq.title}`}
+                  >
+                    <BookOpen size={18} aria-hidden="true" />
+                    {prereq.title}
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-10 text-xs text-textMuted">
+                Once you've passed all prerequisites, this course will unlock automatically.
+              </p>
+            </div>
+          ) : activeTab === 'learn' ? (
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}

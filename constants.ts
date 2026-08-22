@@ -240,6 +240,22 @@ export const COURSES: Course[] = [
   ...createCourses(DESIGN_TOPICS, 'design'),
 ];
 
+// --- PREREQUISITE PATCH ---
+// Applied after generation so we don't touch the generic createCourses logic.
+// Only courses that genuinely build on another receive prerequisiteCourseIds.
+const PREREQUISITE_MAP: Record<string, string[]> = {
+  'typescript':      ['javascript'],   // Programming: master JS basics before TypeScript
+  'linked-lists':    ['arrays'],       // DSA: Arrays are the foundation for Linked Lists
+  'trees':           ['linked-lists'], // DSA: Linked Lists before Trees
+  'ux-fundamentals': ['ui-design'],   // Design: UI Design before UX Fundamentals
+};
+
+COURSES.forEach(course => {
+  if (PREREQUISITE_MAP[course.id]) {
+    course.prerequisiteCourseIds = PREREQUISITE_MAP[course.id];
+  }
+});
+
 // --- CAREER MODE DATA ---
 
 const TOPIC_QUESTION_MAP: Record<string, string[]> = {

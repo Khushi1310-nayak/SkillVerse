@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X } from 'lucide-react';
+import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X, Lock } from 'lucide-react';
+import { isCourseUnlocked, getIncompletePrerequisites } from '../utils/prerequisites';
 import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
@@ -274,12 +275,21 @@ export const CoursesList: React.FC = () => {
             {filtered.map(course => {
               const isPassed = progress.find(p => p.courseId === course.id)?.passed;
               const isBookmarked = bookmarkedIds.includes(course.id);
+              const isLocked = !isCourseUnlocked(course, progress);
+              const incompletePrereqs = isLocked
+                ? getIncompletePrerequisites(course, courses, progress)
+                : [];
 
               return (
                 <div
                   key={course.id}
-                  className="group relative bg-glass border border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col"
+                  className={`group relative bg-glass border rounded-2xl p-6 transition-all duration-300 flex flex-col ${
+                    isLocked
+                      ? 'border-black/10 dark:border-white/10 opacity-80'
+                      : 'border-black/20 dark:border-white/20 dark:border-white/10 hover:border-black/20 dark:border-white/40 hover:shadow-xl hover:shadow-primary/5'
+                  }`}
                 >
+                  {/* Bookmark — always accessible regardless of locked state */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -293,52 +303,126 @@ export const CoursesList: React.FC = () => {
                     <Bookmark size={18} className={isBookmarked ? 'fill-primaryLight text-primaryLight' : ''} />
                   </button>
 
-                  <Link to={`/course/${course.id}`} className="flex flex-col flex-1">
-                    <div className="flex justify-between items-start mb-4 pr-8">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${course.level === "Beginner"
-                          ? "bg-emerald-500/10 text-emerald-500"
-                          : course.level === "Intermediate"
-                            ? "bg-blue-500/10 text-blue-500"
-                            : "bg-purple-500/10 text-purple-500"
+                  {isLocked ? (
+                    /* ── LOCKED CARD ─────────────────────────────────────────── */
+                    <div
+                      className="flex flex-col flex-1"
+                      role="region"
+                      aria-label={`${course.title} — locked. Complete prerequisites first.`}
+                    >
+                      <div className="flex justify-between items-start mb-4 pr-8">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                            course.level === 'Beginner'
+                              ? 'bg-emerald-500/10 text-emerald-500'
+                              : course.level === 'Intermediate'
+                                ? 'bg-blue-500/10 text-blue-500'
+                                : 'bg-purple-500/10 text-purple-500'
                           }`}
-                      >
-                        {getDifficultyLabel(course.level)}
-                      </span>
-
-                      {isPassed && <CheckCircle className="text-success" size={20} />}
-                    </div>
-
-                    <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
-                      {course.title}
-                    </h3>
-
-                    <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">
-                      {course.description}
-                    </p>
-
-                    <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-textMuted font-mono">
-                          {course.duration}
+                        >
+                          {getDifficultyLabel(course.level)}
                         </span>
-                        {course.reviewCount ? (
-                          <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                            <Star size={12} className="fill-amber-500" />
-                            {course.rating?.toFixed(1)}
-                            <span className="text-textMuted font-normal">({course.reviewCount})</span>
-                          </span>
-                        ) : (
-                          <span className="text-xs text-textMuted italic">No reviews yet</span>
-                        )}
+                        <Lock size={20} className="text-amber-500" aria-hidden="true" />
                       </div>
 
-                      <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
-                        {isPassed ? t('courses.review') : t('courses.startLearning')}
-                        <PlayCircle size={16} className="ml-2" />
-                      </span>
+                      <h3 className="text-xl font-bold text-textMain mb-2">
+                        {course.title}
+                      </h3>
+
+                      <p className="text-sm text-textMuted mb-4 flex-1 line-clamp-3">
+                        {course.description}
+                      </p>
+
+                      {/* Prerequisite chips */}
+                      <div className="mb-4">
+                        <p className="text-xs text-amber-500 font-semibold mb-2 flex items-center gap-1">
+                          <Lock size={12} aria-hidden="true" />
+                          Complete first:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {incompletePrereqs.map(prereq => (
+                            <Link
+                              key={prereq.id}
+                              to={`/course/${prereq.id}`}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primaryLight text-xs font-semibold hover:bg-primary/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                              aria-label={`Go to prerequisite course: ${prereq.title}`}
+                            >
+                              {prereq.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-textMuted font-mono">
+                            {course.duration}
+                          </span>
+                          {course.reviewCount ? (
+                            <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                              <Star size={12} className="fill-amber-500" />
+                              {course.rating?.toFixed(1)}
+                              <span className="text-textMuted font-normal">({course.reviewCount})</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs text-textMuted italic">No reviews yet</span>
+                          )}
+                        </div>
+                        <span className="flex items-center text-sm font-semibold text-textMuted" aria-hidden="true">
+                          Locked
+                          <Lock size={16} className="ml-2 text-amber-500" />
+                        </span>
+                      </div>
                     </div>
-                  </Link>
+                  ) : (
+                    /* ── UNLOCKED CARD — identical to existing behaviour ─────── */
+                    <Link to={`/course/${course.id}`} className="flex flex-col flex-1">
+                      <div className="flex justify-between items-start mb-4 pr-8">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${course.level === "Beginner"
+                            ? "bg-emerald-500/10 text-emerald-500"
+                            : course.level === "Intermediate"
+                              ? "bg-blue-500/10 text-blue-500"
+                              : "bg-purple-500/10 text-purple-500"
+                            }`}
+                        >
+                          {getDifficultyLabel(course.level)}
+                        </span>
+
+                        {isPassed && <CheckCircle className="text-success" size={20} />}
+                      </div>
+
+                      <h3 className="text-xl font-bold text-textMain mb-2 group-hover:text-primaryLight transition-colors">
+                        {course.title}
+                      </h3>
+
+                      <p className="text-sm text-textMuted mb-6 flex-1 line-clamp-3">
+                        {course.description}
+                      </p>
+
+                      <div className="pt-4 border-t border-black/20 dark:border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-textMuted font-mono">
+                            {course.duration}
+                          </span>
+                          {course.reviewCount ? (
+                            <span className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                              <Star size={12} className="fill-amber-500" />
+                              {course.rating?.toFixed(1)}
+                              <span className="text-textMuted font-normal">({course.reviewCount})</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs text-textMuted italic">No reviews yet</span>
+                          )}
+                        </div>
+
+                        <span className="flex items-center text-sm font-bold text-textMain group-hover:translate-x-1 transition-transform">
+                          {isPassed ? t('courses.review') : t('courses.startLearning')}
+                          <PlayCircle size={16} className="ml-2" />
+                        </span>
+                      </div>
+                    </Link>
+                  )}
                 </div>
               );
             })}

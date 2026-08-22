@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, Lock } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
+import { safeStorage, isPlainObject } from '../utils/safeStorage';
 import { aiService } from '../services/aiService';
 import { soundManager } from '../utils/soundManager';
 import { useAuth } from '../hooks/useAuth';
@@ -177,14 +178,15 @@ export const CourseView: React.FC = () => {
         setScore(existing.score);
         setQuizSubmitted(true);
       } else if (settings?.autoSave) {
-        const saved = localStorage.getItem(`quizState_${id}`);
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed.selectedAnswers) setSelectedAnswers(parsed.selectedAnswers);
-            if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
-            if (parsed.selectedAnswers && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
-          } catch (e) { }
+        const parsed = safeStorage.readJSON<{ selectedAnswers?: number[]; currentQuestion?: number } | null>(
+          `quizState_${id}`,
+          null,
+          isPlainObject
+        );
+        if (parsed) {
+          if (Array.isArray(parsed.selectedAnswers)) setSelectedAnswers(parsed.selectedAnswers);
+          if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
+          if (Array.isArray(parsed.selectedAnswers) && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
         }
       }
     }
@@ -198,42 +200,47 @@ export const CourseView: React.FC = () => {
 
   useEffect(() => {
     if (settings?.autoSave && id && !quizSubmitted && selectedAnswers.length > 0) {
-      localStorage.setItem(`quizState_${id}`, JSON.stringify({ selectedAnswers, currentQuestion }));
+      safeStorage.writeJSON(`quizState_${id}`, { selectedAnswers, currentQuestion });
     }
   }, [selectedAnswers, currentQuestion, id, settings?.autoSave, quizSubmitted]);
 
-  // Cooldown timer — read from localStorage and start a live countdown
-  const startCooldownInterval = (remaining: number) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+  // Cooldown timer — always re-derived from the stored deadline, so it stays
+  // accurate to wall-clock time even when the tab was backgrounded and the
+  // browser throttled setInterval.
+  const syncCooldown = useCallback(() => {
+    const saved = safeStorage.getString(cooldownKey);
+    if (!saved) {
+      setTimeLeft(0);
+      return;
+    }
+    const startedAt = parseInt(saved, 10);
+    if (Number.isNaN(startedAt)) {
+      safeStorage.remove(cooldownKey);
+      setTimeLeft(0);
+      return;
+    }
+    const elapsed = Date.now() - startedAt;
+    const remaining = Math.max(0, Math.ceil((COOLDOWN_MS - elapsed) / 1000));
     setTimeLeft(remaining);
-    intervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          localStorage.removeItem(cooldownKey);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+    if (remaining <= 0) {
+      safeStorage.remove(cooldownKey);
+    }
+  }, [cooldownKey, COOLDOWN_MS]);
 
   useEffect(() => {
-    const saved = localStorage.getItem(cooldownKey);
-    if (saved) {
-      const elapsed = Date.now() - parseInt(saved, 10);
-      const remaining = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
-      if (remaining > 0) {
-        startCooldownInterval(remaining);
-      } else {
-        localStorage.removeItem(cooldownKey);
-      }
-    }
+    syncCooldown();
+    intervalRef.current = setInterval(syncCooldown, 1000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') syncCooldown();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [id]);
+  }, [id, syncCooldown]);
 
   // Render guards, in the order the states actually occur. These used to sit
   // below the handlers, behind an unconditional `if (!course)` return, which
@@ -249,6 +256,10 @@ export const CourseView: React.FC = () => {
   const incompletePrereqs = isCourseLocked
     ? getIncompletePrerequisites(course, COURSES, allProgress)
     : [];
+
+  // A quiz document with `questions: []` (what createCourse writes for every
+  // new course) must never reach the question-indexing / scoring code below.
+  const hasQuiz = !!course.quiz && course.quiz.length > 0;
 
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
@@ -267,6 +278,8 @@ export const CourseView: React.FC = () => {
   };
 
   const submitQuiz = () => {
+    if (!hasQuiz) return; // No questions to grade — submit is unreachable via the UI, but guard defensively.
+
     let correctCount = 0;
     course.quiz.forEach((q, idx) => {
       if (selectedAnswers[idx] === q.correctAnswer) correctCount++;
@@ -285,8 +298,8 @@ export const CourseView: React.FC = () => {
 
     // Start cooldown on failure
     if (!isPassed) {
-      localStorage.setItem(cooldownKey, Date.now().toString());
-      startCooldownInterval(COOLDOWN_MS / 1000);
+      safeStorage.setString(cooldownKey, Date.now().toString());
+      syncCooldown();
     }
 
     storageService.saveProgress({
@@ -309,7 +322,7 @@ export const CourseView: React.FC = () => {
     setCurrentQuestion(0);
     setScore(0);
     setPassed(false);
-    if (id) localStorage.removeItem(`quizState_${id}`);
+    if (id) safeStorage.remove(`quizState_${id}`);
     // Note: we do NOT clear the cooldown here — it must expire naturally
   };
 
@@ -473,7 +486,23 @@ export const CourseView: React.FC = () => {
             </div>
           ) : (
             <div className="animate-fade-in max-w-2xl mx-auto">
-              {!quizSubmitted ? (
+              {!hasQuiz ? (
+                <div className="flex flex-col items-center justify-center text-center py-16">
+                  <div className="mb-6 inline-flex p-5 rounded-full bg-black/5 dark:bg-white/10">
+                    <BookOpen size={40} className="text-textMuted" aria-hidden="true" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-textMain mb-2">No Quiz Available Yet</h2>
+                  <p className="text-textMuted max-w-md">
+                    This course doesn't have a quiz ready yet. Check back soon, or continue exploring the lesson content.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('learn')}
+                    className="mt-8 bg-gradient-main text-white px-6 py-2.5 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    Back to Lesson
+                  </button>
+                </div>
+              ) : !quizSubmitted ? (
                 <>
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-textMain">

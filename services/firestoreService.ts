@@ -585,16 +585,60 @@ export const firestoreService = {
   getFriendActivityFeed: async (followingIds: string[]): Promise<any[]> => {
     if (!followingIds || followingIds.length === 0) return [];
 
+    const IN_QUERY_CHUNK_SIZE = 30; // Firestore's current cap for the `in` operator
+    const FEED_LIMIT = 20; // overall feed size — also used as each chunk's per-query cap,
+    // since no single chunk can contribute more than the final feed size anyway
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < followingIds.length; i += IN_QUERY_CHUNK_SIZE) {
+      chunks.push(followingIds.slice(i, i + IN_QUERY_CHUNK_SIZE));
+    }
+
     const activitiesRef = collection(db, 'activities');
-    const q = query(
-      activitiesRef,
-      where('userId', 'in', followingIds.slice(0, 10)),
-      orderBy('createdAt', 'desc'),
-      limit(20)
+    const chunkResults = await Promise.allSettled(
+      chunks.map(chunk =>
+        getDocs(
+          query(
+            activitiesRef,
+            where('userId', 'in', chunk),
+            orderBy('createdAt', 'desc'),
+            limit(FEED_LIMIT)
+          )
+        )
+      )
     );
 
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    // A document's createdAt is written with serverTimestamp(), which can
+    // still read as null if the client sees the write before the server
+    // timestamp has resolved. Treat that as "just now" so it sorts to the
+    // top predictably instead of throwing or landing at a random position.
+    const getCreatedAtMillis = (activity: any): number => {
+      const createdAt = activity?.createdAt;
+      if (!createdAt) return Date.now();
+      if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
+      if (typeof createdAt === 'string') {
+        const parsed = new Date(createdAt).getTime();
+        return Number.isNaN(parsed) ? Date.now() : parsed;
+      }
+      return Date.now();
+    };
+
+    const merged = new Map<string, any>();
+    chunkResults.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        result.value.docs.forEach(docSnap => {
+          merged.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+        });
+      } else {
+        // One chunk failing (e.g. a transient network error) shouldn't blank
+        // out activity from everyone else the user follows.
+        console.error(`Activity feed chunk ${index} failed, showing partial results:`, result.reason);
+      }
+    });
+
+    return Array.from(merged.values())
+      .sort((a, b) => getCreatedAtMillis(b) - getCreatedAtMillis(a))
+      .slice(0, FEED_LIMIT);
   },
 
   sendKudos: async (activityId: string, currentUserId: string): Promise<void> => {

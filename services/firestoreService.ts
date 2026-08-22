@@ -338,6 +338,46 @@ export const firestoreService = {
     return comments;
   },
 
+  pinComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    const saved = localStorage.getItem(key);
+    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+
+    comments = comments.map(comment =>
+      comment.id === commentId ? { ...comment, pinned: true } : comment
+    );
+
+    try {
+      const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
+      await updateDoc(docRef, { pinned: true });
+    } catch (err) {
+      console.warn('Firestore update failed, comment pinned locally only:', err);
+    }
+
+    localStorage.setItem(key, JSON.stringify(comments));
+    return comments;
+  },
+
+  unpinComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
+    const key = `lesson_comments_${courseId}_${lessonId}`;
+    const saved = localStorage.getItem(key);
+    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+
+    comments = comments.map(comment =>
+      comment.id === commentId ? { ...comment, pinned: false } : comment
+    );
+
+    try {
+      const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
+      await updateDoc(docRef, { pinned: false });
+    } catch (err) {
+      console.warn('Firestore update failed, comment unpinned locally only:', err);
+    }
+
+    localStorage.setItem(key, JSON.stringify(comments));
+    return comments;
+  },
+
   // --- COURSE RATINGS & REVIEWS ---
 
   /**

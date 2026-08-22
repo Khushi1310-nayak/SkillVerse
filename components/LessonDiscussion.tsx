@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2, Pencil, Trash2, Check, X } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2, Pencil, Trash2, Check, X, Pin, PinOff, ArrowUpDown } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { useToast } from '../contexts/ToastContext';
 import { User, LessonComment } from '../types';
@@ -31,6 +31,9 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
   const [replyText, setReplyText] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'top'>('newest');
+
+  const isModerator = !!user && (user.role === 'admin' || user.role === 'instructor');
 
   const fetchComments = useCallback(async () => {
     setLoading(true);
@@ -122,6 +125,19 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
     }
   };
 
+  const handleTogglePin = async (comment: LessonComment) => {
+    try {
+      const updated = comment.pinned
+        ? await firestoreService.unpinComment(comment.id, courseId, lessonId)
+        : await firestoreService.pinComment(comment.id, courseId, lessonId);
+      setComments(updated);
+      showToast({ message: comment.pinned ? 'Comment unpinned.' : 'Comment pinned to the top.', type: 'success' });
+    } catch (err) {
+      console.error('Error toggling pin state:', err);
+      showToast({ message: 'Failed to update pin status.', type: 'error' });
+    }
+  };
+
   const getAvatar = (comment: LessonComment) => {
     if (comment.photoURL) return comment.photoURL;
     return AVATARS[comment.avatarId || '1'] || AVATARS['1'];
@@ -149,6 +165,19 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
   // Group top-level comments and replies
   const rootComments = comments.filter(c => !c.parentId);
   const getReplies = (parentId: string) => comments.filter(c => c.parentId === parentId);
+
+  // Pinned comments always come first, regardless of the selected sort order.
+  const sortedRootComments = useMemo(() => {
+    return [...rootComments].sort((a, b) => {
+      const pinDiff = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      if (pinDiff !== 0) return pinDiff;
+
+      if (sortBy === 'top') {
+        return (b.upvotes || 0) - (a.upvotes || 0);
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [rootComments, sortBy]);
 
   return (
     <div className="mt-12 border border-black/20 dark:border-white/10 rounded-2xl bg-glass overflow-hidden shadow-lg transition-all">
@@ -226,6 +255,26 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
             </div>
           )}
 
+          {/* Sort Control */}
+          {!loading && rootComments.length > 0 && (
+            <div className="flex justify-end">
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'top')}
+                  aria-label="Sort comments"
+                  title="Sort comments"
+                  className="appearance-none bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-1.5 pl-8 pr-8 text-xs font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all cursor-pointer"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="top">Top / Most Upvoted</option>
+                </select>
+                <ArrowUpDown size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" />
+                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" />
+              </div>
+            </div>
+          )}
+
           {/* Comment List */}
           {loading ? (
             <div className="flex items-center justify-center py-8 text-textMuted gap-2">
@@ -244,14 +293,17 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
             </div>
           ) : (
             <div className="space-y-6">
-              {rootComments.map(comment => {
+              {sortedRootComments.map(comment => {
                 const replies = getReplies(comment.id);
                 const hasUpvoted = user && comment.upvotedBy?.includes(user.email);
 
                 return (
                   <div key={comment.id} className="space-y-4">
                     {/* Top Level Comment Card */}
-                    <div className="p-4 rounded-xl bg-white/40 dark:bg-white/5 border border-black/10 dark:border-white/10 transition-all hover:border-primary/20">
+                    <div className={`p-4 rounded-xl border transition-all hover:border-primary/20 ${comment.pinned
+                      ? 'bg-primary/5 border-primary/30'
+                      : 'bg-white/40 dark:bg-white/5 border-black/10 dark:border-white/10'
+                      }`}>
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex items-center gap-3">
                           <img
@@ -260,7 +312,15 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                             className="w-9 h-9 rounded-full border border-black/10 dark:border-white/10 object-cover"
                           />
                           <div>
-                            <div className="font-bold text-sm text-textMain">{comment.username}</div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-sm text-textMain">{comment.username}</span>
+                              {comment.pinned && (
+                                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-primary/15 text-primaryLight text-[10px] font-bold uppercase tracking-wide">
+                                  <Pin size={10} className="fill-primaryLight" />
+                                  Pinned
+                                </span>
+                              )}
+                            </div>
                             <div className="text-[10px] text-textMuted">{formatTimestamp(comment.createdAt)}</div>
                           </div>
                         </div>
@@ -298,8 +358,8 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                         <button
                           onClick={() => handleUpvote(comment.id)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${hasUpvoted
-                              ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
-                              : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain hover:bg-black/10 dark:hover:bg-white/10'
+                            ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
+                            : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain hover:bg-black/10 dark:hover:bg-white/10'
                             }`}
                         >
                           <ThumbsUp size={14} className={hasUpvoted ? 'fill-primaryLight' : ''} />
@@ -330,6 +390,17 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                               <span>Delete</span>
                             </button>
                           </>
+                        )}
+
+                        {isModerator && (
+                          <button
+                            onClick={() => handleTogglePin(comment)}
+                            className="flex items-center gap-1 text-textMuted hover:text-primaryLight transition-colors"
+                            aria-label={comment.pinned ? 'Unpin comment' : 'Pin comment'}
+                          >
+                            {comment.pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                            <span>{comment.pinned ? 'Unpin' : 'Pin'}</span>
+                          </button>
                         )}
                       </div>
 
@@ -414,8 +485,8 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                                   <button
                                     onClick={() => handleUpvote(reply.id)}
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] border transition-all ${replyHasUpvoted
-                                        ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
-                                        : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain'
+                                      ? 'bg-primary/20 border-primary/40 text-primaryLight font-bold'
+                                      : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-textMuted hover:text-textMain'
                                       }`}
                                   >
                                     <ThumbsUp size={12} className={replyHasUpvoted ? 'fill-primaryLight' : ''} />

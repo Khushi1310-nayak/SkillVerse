@@ -17,6 +17,12 @@ service cloud.firestore {
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
 
+    function isAdminOrInstructor() {
+      return isAuthenticated() &&
+        (request.auth.token.admin == true ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'instructor']);
+    }
+
     // -----------------------------------------------------------------------
     // IMPORTANT: Firestore rules are NOT inherited by subcollections.
     // When adding a collection/subcollection used by the client, add an
@@ -114,8 +120,10 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           'courseId', 'lessonId', 'userId', 'username',
           'avatarId', 'photoURL', 'content', 'createdAt',
-          'upvotes', 'upvotedBy', 'parentId'
+          'upvotes', 'upvotedBy', 'parentId', 'pinned'
         ])
+        && (!request.resource.data.keys().hasAny(['pinned']) ||
+            request.resource.data.pinned == false)
         && request.resource.data.courseId == courseId
         && request.resource.data.lessonId == lessonId
         && request.resource.data.userId == request.auth.uid
@@ -146,13 +154,17 @@ service cloud.firestore {
         && request.resource.data.upvotedBy is list
         && request.resource.data.upvotedBy.size() == request.resource.data.upvotes
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'content', 'upvotes', 'upvotedBy'
+          'content', 'upvotes', 'upvotedBy', 'pinned'
         ])
         && (
           request.auth.uid == resource.data.userId
           || request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'upvotes', 'upvotedBy'
           ])
+          || (
+            isAdminOrInstructor()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned'])
+          )
         )
         && (
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['content'])
@@ -161,6 +173,13 @@ service cloud.firestore {
             && request.resource.data.content is string
             && request.resource.data.content.size() > 0
             && request.resource.data.content.size() <= 5000
+          )
+        )
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['pinned'])
+          || (
+            isAdminOrInstructor()
+            && request.resource.data.pinned is bool
           )
         );
 

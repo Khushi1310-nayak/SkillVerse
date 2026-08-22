@@ -142,6 +142,7 @@ export interface Course {
   chapters?: Chapter[];
   rating?: number; // denormalized average rating (0-5), recomputed on each review
   reviewCount?: number; // denormalized total number of reviews
+  prerequisiteCourseIds?: string[]; // IDs of courses that must be passed before this one unlocks
 }
 
 export interface Progress {

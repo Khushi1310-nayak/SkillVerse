@@ -162,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             const mappedAppUser: AppUser = {
+              uid: currentUser.uid,
               username: data.username || currentUser.displayName || "User",
               email: data.email || currentUser.email || "",
               enrolledDate: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
@@ -184,6 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setLoading(false);
           } else {
             setAppUser({
+              uid: currentUser.uid,
               username: currentUser.displayName || "User",
               email: currentUser.email || "",
               enrolledDate: new Date().toISOString(),

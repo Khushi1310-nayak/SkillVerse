@@ -61,7 +61,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
       const created = await firestoreService.postLessonComment({
         courseId,
         lessonId,
-        userId: user.email, // using email or username as ID
+        userId: user.uid || user.email,
         username: user.username || 'Learner',
         avatarId: user.settings?.avatarId || '1',
         photoURL: user.photoURL,
@@ -85,7 +85,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
 
   const handleUpvote = async (commentId: string) => {
     if (!user) return;
-    const updatedComments = await firestoreService.upvoteLessonComment(commentId, user.email, courseId, lessonId);
+    const updatedComments = await firestoreService.upvoteLessonComment(commentId, user.uid || user.email, courseId, lessonId);
     setComments(updatedComments);
   };
 
@@ -295,7 +295,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
             <div className="space-y-6">
               {sortedRootComments.map(comment => {
                 const replies = getReplies(comment.id);
-                const hasUpvoted = user && comment.upvotedBy?.includes(user.email);
+                const hasUpvoted = user && ((user.uid && comment.upvotedBy?.includes(user.uid)) || comment.upvotedBy?.includes(user.email));
 
                 return (
                   <div key={comment.id} className="space-y-4">
@@ -379,7 +379,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                           </button>
                         )}
 
-                        {user && user.email === comment.userId && editingId !== comment.id && (
+                        {user && ((user.uid && user.uid === comment.userId) || user.email === comment.userId) && editingId !== comment.id && (
                           <>
                             <button onClick={() => handleStartEdit(comment)} className="flex items-center gap-1 text-textMuted hover:text-textMain transition-colors" aria-label="Edit comment">
                               <Pencil size={14} />
@@ -438,7 +438,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                     {replies.length > 0 && (
                       <div className="pl-6 space-y-3 border-l-2 border-primary/20 ml-4">
                         {replies.map(reply => {
-                          const replyHasUpvoted = user && reply.upvotedBy?.includes(user.email);
+                          const replyHasUpvoted = user && ((user.uid && reply.upvotedBy?.includes(user.uid)) || reply.upvotedBy?.includes(user.email));
                           return (
                             <div key={reply.id} className="p-3 rounded-xl bg-white/20 dark:bg-white/[0.03] border border-black/5 dark:border-white/5 flex items-start gap-3">
                               <CornerDownRight size={14} className="text-primaryLight shrink-0 mt-2" />
@@ -492,7 +492,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                                     <ThumbsUp size={12} className={replyHasUpvoted ? 'fill-primaryLight' : ''} />
                                     <span>{reply.upvotes || 0}</span>
                                   </button>
-                                  {user && user.email === reply.userId && editingId !== reply.id && (
+                                  {user && ((user.uid && user.uid === reply.userId) || user.email === reply.userId) && editingId !== reply.id && (
                                     <>
                                       <button onClick={() => handleStartEdit(reply)} className="flex items-center gap-1 text-[10px] text-textMuted hover:text-textMain transition-colors" aria-label="Edit reply">
                                         <Pencil size={12} /> Edit

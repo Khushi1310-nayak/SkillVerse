@@ -46,7 +46,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
     }, [fetchReviews]);
 
     const myReview = useMemo(
-        () => (user ? reviews.find(r => r.userId === user.email) : undefined),
+        () => (user ? reviews.find(r => (user.uid && r.userId === user.uid) || r.userId === user.email) : undefined),
         [reviews, user]
     );
 
@@ -102,7 +102,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         try {
             const updated = await firestoreService.submitCourseReview(courseId, {
                 courseId,
-                userId: user.email,
+                userId: user.uid || user.email,
                 username: user.username || 'Learner',
                 avatarId: user.settings?.avatarId || '1',
                 photoURL: user.photoURL,
@@ -125,7 +125,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         if (!user || !myReview) return;
         if (!confirm('Delete your review? This cannot be undone.')) return;
         try {
-            const updated = await firestoreService.deleteCourseReview(courseId, user.email);
+            const updated = await firestoreService.deleteCourseReview(courseId, myReview.userId || user.uid || user.email);
             setReviews(updated);
             setSelectedRating(0);
             setComment('');

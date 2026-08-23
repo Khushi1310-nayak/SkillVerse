@@ -13,7 +13,8 @@ import {
   Briefcase,
   Shield,
   Code2,
-  Bookmark
+  Bookmark,
+  Map
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
@@ -220,6 +221,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} id="nav-dashboard" />
           <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} id="nav-courses" />
           <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} id="nav-saved" />
+          <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} id="nav-roadmap" />
           <NavItem to="/playground" icon={Code2} label="Playground" id="nav-playground" />
           <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
           <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
@@ -280,6 +282,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
               <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
               <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} />
+              <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} />
               <NavItem to="/playground" icon={Code2} label="Playground" />
               <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
               <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />

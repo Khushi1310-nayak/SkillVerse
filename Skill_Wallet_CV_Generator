@@ -1,0 +1,662 @@
+"""
+Skill Wallet CV Generator
+Transforms sustainability skills, achievements, and badges into professional CV formats
+"""
+
+import json
+import pickle
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any
+from enum import Enum
+import pandas as pd
+import numpy as np
+from dataclasses import dataclass, asdict, field
+import uuid
+import re
+from collections import defaultdict
+import markdown
+from jinja2 import Template
+import warnings
+warnings.filterwarnings('ignore')
+
+
+class CVTemplate(Enum):
+    """CV template styles"""
+    PROFESSIONAL = "professional"
+    MODERN = "modern"
+    MINIMAL = "minimal"
+    CREATIVE = "creative"
+    EXECUTIVE = "executive"
+    ACADEMIC = "academic"
+    SUSTAINABILITY = "sustainability"
+    DIGITAL = "digital"
+
+
+class CVSection(Enum):
+    """CV sections"""
+    HEADER = "header"
+    SUMMARY = "summary"
+    SKILLS = "skills"
+    EXPERIENCE = "experience"
+    EDUCATION = "education"
+    CERTIFICATIONS = "certifications"
+    ACHIEVEMENTS = "achievements"
+    PROJECTS = "projects"
+    BADGES = "badges"
+    CHALLENGES = "challenges"
+    IMPACT = "impact"
+    PUBLICATIONS = "publications"
+    REFERENCES = "references"
+    PORTFOLIO = "portfolio"
+
+
+@dataclass
+class CVExperience:
+    """Work/volunteer experience entry"""
+    title: str
+    organization: str
+    start_date: datetime
+    end_date: Optional[datetime]
+    current: bool = False
+    description: List[str] = field(default_factory=list)
+    skills_used: List[str] = field(default_factory=list)
+    achievements: List[str] = field(default_factory=list)
+    location: Optional[str] = None
+    
+    def get_duration(self) -> str:
+        """Calculate duration in months/years"""
+        if self.current:
+            end = datetime.now()
+        else:
+            end = self.end_date or datetime.now()
+        
+        months = (end.year - self.start_date.year) * 12 + (end.month - self.start_date.month)
+        years = months // 12
+        remaining_months = months % 12
+        
+        if years == 0:
+            return f"{remaining_months} months"
+        elif remaining_months == 0:
+            return f"{years} years"
+        else:
+            return f"{years} years, {remaining_months} months"
+
+
+@dataclass
+class CVProject:
+    """Project entry"""
+    name: str
+    description: str
+    role: str
+    start_date: datetime
+    end_date: Optional[datetime]
+    skills: List[str] = field(default_factory=list)
+    outcomes: List[str] = field(default_factory=list)
+    link: Optional[str] = None
+    is_sustainability: bool = True
+
+
+@dataclass
+class CVCertification:
+    """Certification entry"""
+    name: str
+    issuing_organization: str
+    date_issued: datetime
+    expiration_date: Optional[datetime]
+    credential_id: Optional[str] = None
+    skills_covered: List[str] = field(default_factory=list)
+    level: Optional[str] = None
+
+
+@dataclass
+class CVPublication:
+    """Publication entry"""
+    title: str
+    authors: List[str]
+    journal: str
+    year: int
+    doi: Optional[str] = None
+    citation_count: Optional[int] = None
+    abstract: Optional[str] = None
+    is_sustainability_related: bool = True
+
+
+@dataclass
+class CVData:
+    """Complete CV data structure"""
+    personal_info: Dict[str, Any]
+    summary: str
+    experience: List[CVExperience]
+    skills: Dict[str, List[str]]  # Category -> Skills
+    certifications: List[CVCertification]
+    projects: List[CVProject]
+    achievements: List[str]
+    badges: List[str]
+    challenges_completed: int
+    sustainability_impact: Dict[str, float]
+    publications: List[CVPublication]
+    education: List[Dict[str, Any]]
+    languages: List[Dict[str, str]]
+    references: List[Dict[str, str]]
+    portfolio_url: Optional[str] = None
+
+
+class SkillCVGenerator:
+    """
+    Generates professional CVs from Skill Wallet data
+    """
+    
+    def __init__(self):
+        self.templates = self._initialize_templates()
+        self.skill_level_map = {
+            'NOVICE': 'Fundamental understanding',
+            'BEGINNER': 'Basic practical skills',
+            'INTERMEDIATE': 'Independent practitioner',
+            'ADVANCED': 'Advanced expertise',
+            'EXPERT': 'Subject matter expert',
+            'MASTER': 'Industry leader'
+        }
+        self.skill_category_weights = {
+            'energy_management': 0.85,
+            'waste_reduction': 0.80,
+            'water_conservation': 0.80,
+            'sustainable_transport': 0.75,
+            'sustainable_food': 0.75,
+            'green_building': 0.90,
+            'carbon_literacy': 0.95,
+            'circular_economy': 0.85,
+            'renewable_energy': 0.90,
+            'sustainable_finance': 0.80,
+            'eco_innovation': 0.85,
+            'community_engagement': 0.70
+        }
+        
+    def _initialize_templates(self) -> Dict:
+        """Initialize CV templates"""
+        return {
+            'professional': self._get_professional_template(),
+            'modern': self._get_modern_template(),
+            'minimal': self._get_minimal_template(),
+            'creative': self._get_creative_template(),
+            'executive': self._get_executive_template(),
+            'academic': self._get_academic_template(),
+            'sustainability': self._get_sustainability_template(),
+            'digital': self._get_digital_template()
+        }
+    
+    def _get_professional_template(self) -> str:
+        """Professional CV template"""
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ personal_info.name }} - Professional CV</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #2c3e50; line-height: 1.6; background: #f5f6fa; }
+        .container { max-width: 900px; margin: 40px auto; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: #2c3e50; color: white; padding: 40px; }
+        .header h1 { font-size: 36px; margin-bottom: 10px; letter-spacing: 1px; }
+        .header .title { font-size: 20px; color: #ecf0f1; font-weight: 300; }
+        .header .contact { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px; font-size: 14px; }
+        .header .contact span { color: #bdc3c7; }
+        .body { padding: 40px; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .summary { font-size: 16px; color: #34495e; line-height: 1.8; margin-bottom: 20px; }
+        .skill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .skill-category { background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 3px solid #3498db; }
+        .skill-category h4 { color: #2c3e50; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; }
+        .skill-tag { display: inline-block; background: #ecf0f1; padding: 4px 12px; margin: 3px; border-radius: 15px; font-size: 12px; color: #2c3e50; }
+        .experience-item { margin-bottom: 20px; }
+        .experience-item h3 { color: #2c3e50; font-size: 18px; }
+        .experience-item .org { color: #3498db; font-weight: 600; }
+        .experience-item .date { color: #7f8c8d; font-size: 14px; float: right; }
+        .experience-item ul { margin-top: 10px; padding-left: 20px; }
+        .experience-item ul li { margin-bottom: 5px; }
+        .badge-item { display: inline-block; background: #2ecc71; color: white; padding: 4px 15px; border-radius: 20px; margin: 3px; font-size: 12px; }
+        .cert-item { background: #f8f9fa; padding: 12px; margin-bottom: 10px; border-radius: 5px; }
+        .cert-item .name { font-weight: 600; color: #2c3e50; }
+        .cert-item .org { color: #7f8c8d; font-size: 14px; }
+        .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .impact-item { text-align: center; background: #f8f9fa; padding: 15px; border-radius: 5px; }
+        .impact-item .value { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .impact-item .label { font-size: 12px; color: #7f8c8d; text-transform: uppercase; }
+        @media print { .container { margin: 0; box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ personal_info.name }}</h1>
+            <div class="title">{{ personal_info.title }}</div>
+            <div class="contact">
+                <span>📧 {{ personal_info.email }}</span>
+                <span>📱 {{ personal_info.phone }}</span>
+                <span>📍 {{ personal_info.location }}</span>
+                {% if personal_info.linkedin %}
+                <span>🔗 {{ personal_info.linkedin }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="body">
+            <!-- Summary -->
+            <div class="section">
+                <div class="section-title">Professional Summary</div>
+                <div class="summary">{{ summary }}</div>
+            </div>
+            
+            <!-- Skills -->
+            <div class="section">
+                <div class="section-title">Sustainability Skills & Competencies</div>
+                <div class="skill-grid">
+                    {% for category, skills in skills.items() %}
+                    <div class="skill-category">
+                        <h4>{{ category.replace('_', ' ').title() }}</h4>
+                        {% for skill in skills %}
+                        <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Experience -->
+            {% if experience %}
+            <div class="section">
+                <div class="section-title">Professional Experience</div>
+                {% for exp in experience %}
+                <div class="experience-item">
+                    <h3>{{ exp.title }}</h3>
+                    <span class="org">{{ exp.organization }}</span>
+                    <span class="date">{{ exp.start_date.strftime('%B %Y') }} - {% if exp.current %}Present{% else %}{{ exp.end_date.strftime('%B %Y') }}{% endif %}</span>
+                    <ul>
+                        {% for desc in exp.description %}
+                        <li>{{ desc }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Certifications -->
+            {% if certifications %}
+            <div class="section">
+                <div class="section-title">Certifications</div>
+                {% for cert in certifications %}
+                <div class="cert-item">
+                    <div class="name">{{ cert.name }}</div>
+                    <div class="org">{{ cert.issuing_organization }} | {{ cert.date_issued.strftime('%B %Y') }}</div>
+                    {% if cert.level %}
+                    <div style="font-size: 12px; color: #3498db;">Level: {{ cert.level }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Badges & Achievements -->
+            <div class="section">
+                <div class="section-title">Badges & Recognition</div>
+                <div>
+                    {% for badge in badges %}
+                    <span class="badge-item">🏅 {{ badge }}</span>
+                    {% endfor %}
+                </div>
+                <div style="margin-top: 15px;">
+                    <h4>Achievements</h4>
+                    <ul>
+                        {% for achievement in achievements %}
+                        <li>{{ achievement }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Sustainability Impact -->
+            <div class="section">
+                <div class="section-title">Sustainability Impact</div>
+                <div class="impact-grid">
+                    <div class="impact-item">
+                        <div class="value">{{ sustainability_impact.get('co2_reduced', 0)|int }}</div>
+                        <div class="label">CO₂ Reduced (kg)</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="value">{{ sustainability_impact.get('energy_saved', 0)|int }}</div>
+                        <div class="label">Energy Saved (kWh)</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="value">{{ sustainability_impact.get('waste_diverted', 0)|int }}</div>
+                        <div class="label">Waste Diverted (kg)</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="value">{{ sustainability_impact.get('water_saved', 0)|int }}</div>
+                        <div class="label">Water Saved (L)</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                    <strong>Challenges Completed:</strong> {{ challenges_completed }}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
+    def _get_modern_template(self) -> str:
+        """Modern CV template"""
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ personal_info.name }} - Modern CV</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        .container { max-width: 1000px; margin: 30px auto; display: grid; grid-template-columns: 280px 1fr; background: white; box-shadow: 0 5px 30px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; }
+        .sidebar h1 { font-size: 28px; font-weight: 300; margin-bottom: 5px; }
+        .sidebar .title { font-size: 16px; opacity: 0.9; font-weight: 300; margin-bottom: 20px; }
+        .sidebar .contact-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 14px; opacity: 0.9; }
+        .sidebar .contact-item .icon { margin-right: 10px; font-size: 16px; }
+        .sidebar .section-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin: 25px 0 15px 0; }
+        .main { padding: 30px; }
+        .main .section { margin-bottom: 25px; }
+        .main .section-title { font-size: 18px; font-weight: 600; color: #2d3436; border-bottom: 3px solid #667eea; padding-bottom: 8px; margin-bottom: 15px; }
+        .skill-bar { margin-bottom: 12px; }
+        .skill-bar .skill-name { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 3px; }
+        .skill-bar .skill-level { height: 6px; background: #dfe6e9; border-radius: 3px; overflow: hidden; }
+        .skill-bar .skill-level .fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 3px; transition: width 0.3s; }
+        .badge-modern { display: inline-block; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 4px 12px; border-radius: 20px; margin: 3px; font-size: 11px; font-weight: 600; }
+        .cert-modern { background: #f8f9fa; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #667eea; }
+        .achievement-item { background: #f8f9fa; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+        .achievement-item::before { content: "✓"; color: #667eea; font-weight: bold; margin-right: 10px; }
+        .impact-stat { display: inline-block; background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin: 5px; text-align: center; min-width: 120px; }
+        .impact-stat .value { font-size: 22px; font-weight: bold; color: #667eea; }
+        .impact-stat .label { font-size: 11px; color: #636e72; text-transform: uppercase; margin-top: 5px; }
+        @media print { .container { margin: 0; border-radius: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>{{ personal_info.name }}</h1>
+            <div class="title">{{ personal_info.title }}</div>
+            
+            <div style="margin-top: 30px;">
+                <div class="contact-item"><span class="icon">📧</span> {{ personal_info.email }}</div>
+                <div class="contact-item"><span class="icon">📱</span> {{ personal_info.phone }}</div>
+                <div class="contact-item"><span class="icon">📍</span> {{ personal_info.location }}</div>
+                {% if personal_info.linkedin %}
+                <div class="contact-item"><span class="icon">🔗</span> {{ personal_info.linkedin }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="section-title">Skills</div>
+            {% for category, skills in skills.items() %}
+            <div style="margin-bottom: 15px;">
+                <div style="font-size: 12px; text-transform: uppercase; opacity: 0.7; font-weight: 600;">{{ category.replace('_', ' ').title() }}</div>
+                {% for skill in skills[:5] %}
+                <div style="font-size: 13px; margin: 3px 0; opacity: 0.9;">• {{ skill }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            <div class="section-title">Badges</div>
+            <div>
+                {% for badge in badges[:8] %}
+                <span class="badge-modern">{{ badge }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main">
+            <div class="section">
+                <div class="section-title">Professional Summary</div>
+                <p style="font-size: 15px; line-height: 1.8; color: #2d3436;">{{ summary }}</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Sustainability Impact</div>
+                <div>
+                    <span class="impact-stat"><div class="value">{{ sustainability_impact.get('co2_reduced', 0)|int }}</div><div class="label">CO₂ Reduced (kg)</div></span>
+                    <span class="impact-stat"><div class="value">{{ sustainability_impact.get('energy_saved', 0)|int }}</div><div class="label">Energy Saved (kWh)</div></span>
+                    <span class="impact-stat"><div class="value">{{ sustainability_impact.get('waste_diverted', 0)|int }}</div><div class="label">Waste Diverted (kg)</div></span>
+                    <span class="impact-stat"><div class="value">{{ sustainability_impact.get('water_saved', 0)|int }}</div><div class="label">Water Saved (L)</div></span>
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; color: #636e72;">
+                    <strong>{{ challenges_completed }}</strong> Challenges Completed
+                </div>
+            </div>
+            
+            {% if experience %}
+            <div class="section">
+                <div class="section-title">Experience</div>
+                {% for exp in experience %}
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <h3 style="color: #2d3436; font-size: 16px;">{{ exp.title }}</h3>
+                        <span style="font-size: 13px; color: #636e72;">{{ exp.start_date.strftime('%b %Y') }} - {% if exp.current %}Present{% else %}{{ exp.end_date.strftime('%b %Y') }}{% endif %}</span>
+                    </div>
+                    <div style="color: #667eea; font-weight: 600; font-size: 14px;">{{ exp.organization }}</div>
+                    <ul style="margin-top: 8px; padding-left: 20px; font-size: 14px; color: #2d3436;">
+                        {% for desc in exp.description %}
+                        <li>{{ desc }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if certifications %}
+            <div class="section">
+                <div class="section-title">Certifications</div>
+                {% for cert in certifications %}
+                <div class="cert-modern">
+                    <div style="font-weight: 600;">{{ cert.name }}</div>
+                    <div style="font-size: 13px; color: #636e72;">{{ cert.issuing_organization }} • {{ cert.date_issued.strftime('%B %Y') }}</div>
+                    {% if cert.level %}
+                    <div style="font-size: 12px; color: #667eea;">Level: {{ cert.level }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="section">
+                <div class="section-title">Key Achievements</div>
+                {% for achievement in achievements[:6] %}
+                <div class="achievement-item">{{ achievement }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
+    def _get_minimal_template(self) -> str:
+        """Minimal CV template"""
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ personal_info.name }} - Minimal CV</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; line-height: 1.6; max-width: 800px; margin: 50px auto; padding: 0 20px; }
+        .header { margin-bottom: 40px; }
+        .header h1 { font-size: 32px; font-weight: 300; letter-spacing: -1px; }
+        .header .title { font-size: 18px; color: #666; font-weight: 300; }
+        .header .contact { font-size: 14px; color: #666; margin-top: 10px; }
+        .header .contact span { margin-right: 20px; }
+        .section { margin-bottom: 35px; }
+        .section-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: #999; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 15px; }
+        .summary { font-size: 16px; color: #444; }
+        .skill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-item { background: #f5f5f5; padding: 4px 14px; border-radius: 20px; font-size: 13px; }
+        .exp-item { margin-bottom: 20px; }
+        .exp-item h3 { font-size: 16px; font-weight: 600; }
+        .exp-item .org { color: #666; font-weight: 500; }
+        .exp-item .date { font-size: 13px; color: #999; float: right; }
+        .badge-minimal { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 12px; border-radius: 12px; margin: 3px; font-size: 12px; }
+        .cert-minimal { margin-bottom: 8px; }
+        .cert-minimal .name { font-weight: 500; }
+        .cert-minimal .org { color: #666; font-size: 14px; }
+        .impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 10px; }
+        .impact-item { text-align: center; }
+        .impact-item .value { font-size: 20px; font-weight: 500; }
+        .impact-item .label { font-size: 11px; color: #999; text-transform: uppercase; }
+        .achievement-item { font-size: 14px; margin-bottom: 5px; }
+        .achievement-item::before { content: "– "; color: #999; }
+        @media (max-width: 600px) { .impact-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ personal_info.name }}</h1>
+        <div class="title">{{ personal_info.title }}</div>
+        <div class="contact">
+            <span>{{ personal_info.email }}</span>
+            <span>{{ personal_info.phone }}</span>
+            <span>{{ personal_info.location }}</span>
+            {% if personal_info.linkedin %}
+            <span>{{ personal_info.linkedin }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Summary</div>
+        <div class="summary">{{ summary }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skill-list">
+            {% for category, skills in skills.items() %}
+            {% for skill in skills %}
+            <span class="skill-item">{{ skill }}</span>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    {% if experience %}
+    <div class="section">
+        <div class="section-title">Experience</div>
+        {% for exp in experience %}
+        <div class="exp-item">
+            <h3>{{ exp.title }}</h3>
+            <span class="org">{{ exp.organization }}</span>
+            <span class="date">{{ exp.start_date.strftime('%b %Y') }} - {% if exp.current %}Present{% else %}{{ exp.end_date.strftime('%b %Y') }}{% endif %}</span>
+            <ul style="margin-top: 5px; padding-left: 20px; font-size: 14px; color: #444;">
+                {% for desc in exp.description %}
+                <li>{{ desc }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="section">
+        <div class="section-title">Certifications</div>
+        {% for cert in certifications %}
+        <div class="cert-minimal">
+            <span class="name">{{ cert.name }}</span>
+            <span class="org">• {{ cert.issuing_organization }}</span>
+            <span style="font-size: 13px; color: #999;">({{ cert.date_issued.strftime('%b %Y') }})</span>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Impact</div>
+        <div class="impact-grid">
+            <div class="impact-item">
+                <div class="value">{{ sustainability_impact.get('co2_reduced', 0)|int }}</div>
+                <div class="label">CO₂ Reduced (kg)</div>
+            </div>
+            <div class="impact-item">
+                <div class="value">{{ sustainability_impact.get('energy_saved', 0)|int }}</div>
+                <div class="label">Energy Saved (kWh)</div>
+            </div>
+            <div class="impact-item">
+                <div class="value">{{ sustainability_impact.get('waste_diverted', 0)|int }}</div>
+                <div class="label">Waste Diverted (kg)</div>
+            </div>
+            <div class="impact-item">
+                <div class="value">{{ sustainability_impact.get('water_saved', 0)|int }}</div>
+                <div class="label">Water Saved (L)</div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 10px; font-size: 14px; color: #666;">
+            {{ challenges_completed }} Challenges Completed • {{ badges|length }} Badges Earned
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Badges</div>
+        <div>
+            {% for badge in badges %}
+            <span class="badge-minimal">{{ badge }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Achievements</div>
+        {% for achievement in achievements %}
+        <div class="achievement-item">{{ achievement }}</div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+"""
+    
+    def _get_sustainability_template(self) -> str:
+        """Sustainability-focused CV template with green theme"""
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ personal_info.name }} - Sustainability CV</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a3a2a; background: #f0f7f0; }
+        .container { max-width: 900px; margin: 30px auto; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,50,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #1a3a2a 0%, #2d6a4f 100%); color: white; padding: 40px; }
+        .header h1 { font-size: 36px; font-weight: 300; letter-spacing: 1px; }
+        .header .title { font-size: 18px; opacity: 0.9; font-weight: 300; margin-top: 5px; }
+        .header .subtitle { font-size: 14px; opacity: 0.7; margin-top: 10px; }
+        .body { padding: 40px; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #1a3a2a; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 15px; }
+        .summary { font-size: 16px; line-height: 1.8; color: #2d3a2d; }
+        .skill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .skill-card { background: #f5faf5; padding: 15px; border-radius: 10px; border-left: 4px solid #2d6a4f; }
+        .skill-card h4 { color: #1a3a2a; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .skill-tag-sustainable { display: inline-block; background: #e8f5e9; color: #1a3a2a; padding: 3px 12px; border-radius: 12px; margin: 3px; font-size: 12px; }
+        .exp-sustainable { background: #f8fbf8; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .exp-sustainable h3 { color: #1a3a2a; font-size: 16px; }
+        .exp-sustainable .org { color: #2d6a4f; font-weight: 600; }
+        .exp-sustainable .date { color: #6d8a7a; font-size: 13px; float: right; }
+        .badge-sustainable { display: inline-block; background: #2d6a4f; color: white; padding: 4px 14px; border-radius: 20px; margin: 3px; font-size: 12px; }
+        .badge-sustainable.gold { background: #d4a017; }
+        .badge-sustainable.silver { background: #8a9ba8; }
+        .impact-grid-sustainable { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .impact-card { text-align: center; background: #f5faf5; padding: 20px; border-radius: 10px; }
+        .impact-card .value { font-size: 28px; font-weight: bold; color: #1a3a2a; }
+        .impact-card .label { font-size: 12px; color: #6d8a7a; text-transform: uppercase; margin-top: 5px; }
+        .impact-card .icon { font-size: 30

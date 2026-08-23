@@ -33,7 +33,13 @@ const AVATARS: Record<string, string> = {
   '5': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha',
 };
 
-export const Leaderboard: React.FC<LeaderboardProps> = ({ currentUserId, followingIds = [], onFollowChange }) => {
+const EMPTY_FOLLOWING_IDS: string[] = [];
+
+export const Leaderboard: React.FC<LeaderboardProps> = ({
+  currentUserId,
+  followingIds = EMPTY_FOLLOWING_IDS,
+  onFollowChange
+}) => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');

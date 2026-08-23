@@ -10,7 +10,8 @@
     "menu": "Menu",
     "openMenu": "Open Menu",
     "closeMenu": "Close Menu",
-    "saved": "Saved"
+    "saved": "Saved",
+    "roadmap": "Roadmap"
   },
   "common": {
     "cancel": "Cancel",

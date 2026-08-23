@@ -11,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Course } from '../types';
 import { COURSES, generateRichContent } from '../constants';
 import { isCourseUnlocked, getIncompletePrerequisites } from '../utils/prerequisites';
+import { sanitizeHtml, htmlToPlainText } from '../utils/sanitizeHtml';
 import { getDailyQuiz } from '../utils/dailyQuizGenerator';
 import { AIAssistant } from './AIAssistant';
 import NotFound from './NotFound';
@@ -455,8 +456,8 @@ export const CourseView: React.FC = () => {
     return wMap[rounded];
   };
 
-  // Remove HTML tags for raw context for AI
-  const cleanContent = course.content ? course.content.replace(/<[^>]*>?/gm, '') : '';
+  // Remove HTML tags for raw context for AI (sanitised + entity-decoded, not a regex strip)
+  const cleanContent = course.content ? htmlToPlainText(course.content) : '';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in relative">
@@ -538,7 +539,7 @@ export const CourseView: React.FC = () => {
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
-                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: course.content }} />
+                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">

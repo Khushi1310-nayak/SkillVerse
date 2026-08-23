@@ -94,6 +94,19 @@ export const CourseView: React.FC = () => {
   const [passed, setPassed] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // --- Timed Practice Exam Mode ---
+  const EXAM_SECONDS_PER_QUESTION = 60; // 1 minute per question, matching real exam pacing
+  const [quizStarted, setQuizStarted] = useState(false); // has the learner passed the setup screen?
+  const [examMode, setExamMode] = useState(false);
+  const [examTimeLeft, setExamTimeLeft] = useState(0);
+  const [examAutoSubmitted, setExamAutoSubmitted] = useState(false);
+  const examDeadlineRef = useRef<number | null>(null);
+  const examIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Holds the latest submitQuiz so the exam-timer hooks (declared above the
+  // early-return guards) can call it without depending on `course`.
+  const submitQuizRef = useRef<() => void>(() => { });
+  // --- End Timed Practice Exam Mode ---
   const contentRef = useRef<HTMLDivElement>(null);
   const rootsRef = useRef<any[]>([]);
 
@@ -186,7 +199,10 @@ export const CourseView: React.FC = () => {
         if (parsed) {
           if (Array.isArray(parsed.selectedAnswers)) setSelectedAnswers(parsed.selectedAnswers);
           if (parsed.currentQuestion !== undefined) setCurrentQuestion(parsed.currentQuestion);
-          if (Array.isArray(parsed.selectedAnswers) && parsed.selectedAnswers.length > 0) setActiveTab('quiz');
+          if (Array.isArray(parsed.selectedAnswers) && parsed.selectedAnswers.length > 0) {
+            setActiveTab('quiz');
+            setQuizStarted(true); // resuming mid-quiz skips the setup screen; resumed sessions are always untimed
+          }
         }
       }
     }
@@ -242,6 +258,46 @@ export const CourseView: React.FC = () => {
     };
   }, [id, syncCooldown]);
 
+  // Exam timer — same wall-clock-derived pattern as syncCooldown above, so a
+  // backgrounded/throttled tab never lets the countdown drift. Auto-submits
+  // once the deadline passes.
+  const syncExamTimer = useCallback(() => {
+    if (!examDeadlineRef.current) return;
+    const remaining = Math.max(0, Math.ceil((examDeadlineRef.current - Date.now()) / 1000));
+    setExamTimeLeft(remaining);
+    if (remaining <= 0) {
+      examDeadlineRef.current = null;
+      setExamAutoSubmitted(true);
+      submitQuizRef.current();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!examMode || !quizStarted || quizSubmitted) {
+      if (examIntervalRef.current) {
+        clearInterval(examIntervalRef.current);
+        examIntervalRef.current = null;
+      }
+      return;
+    }
+
+    syncExamTimer();
+    examIntervalRef.current = setInterval(syncExamTimer, 1000);
+
+    const handleExamVisibility = () => {
+      if (document.visibilityState === 'visible') syncExamTimer();
+    };
+    document.addEventListener('visibilitychange', handleExamVisibility);
+
+    return () => {
+      if (examIntervalRef.current) {
+        clearInterval(examIntervalRef.current);
+        examIntervalRef.current = null;
+      }
+      document.removeEventListener('visibilitychange', handleExamVisibility);
+    };
+  }, [examMode, quizStarted, quizSubmitted, syncExamTimer]);
+
   // Render guards, in the order the states actually occur. These used to sit
   // below the handlers, behind an unconditional `if (!course)` return, which
   // meant the loading and not-found branches were unreachable and a bare
@@ -261,6 +317,20 @@ export const CourseView: React.FC = () => {
   // new course) must never reach the question-indexing / scoring code below.
   const hasQuiz = !!course.quiz && course.quiz.length > 0;
 
+  const startExam = (timed: boolean) => {
+    setExamMode(timed);
+    setExamAutoSubmitted(false);
+    setQuizStarted(true);
+    if (timed && hasQuiz) {
+      const totalSeconds = course.quiz.length * EXAM_SECONDS_PER_QUESTION;
+      examDeadlineRef.current = Date.now() + totalSeconds * 1000;
+      setExamTimeLeft(totalSeconds);
+    } else {
+      examDeadlineRef.current = null;
+      setExamTimeLeft(0);
+    }
+  };
+
   const handleOptionSelect = (optionIndex: number) => {
     if (quizSubmitted) return;
     if (settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined) return;
@@ -279,6 +349,13 @@ export const CourseView: React.FC = () => {
 
   const submitQuiz = () => {
     if (!hasQuiz) return; // No questions to grade — submit is unreachable via the UI, but guard defensively.
+
+    // Stop the exam clock the moment we submit, whether manually or via auto-submit.
+    if (examIntervalRef.current) {
+      clearInterval(examIntervalRef.current);
+      examIntervalRef.current = null;
+    }
+    examDeadlineRef.current = null;
 
     let correctCount = 0;
     course.quiz.forEach((q, idx) => {
@@ -316,12 +393,21 @@ export const CourseView: React.FC = () => {
     }
   };
 
+  // Keep the ref current every render so the exam-timer hook (declared above
+  // the early-return guards) always auto-submits with the latest closure.
+  submitQuizRef.current = submitQuiz;
+
   const resetQuiz = () => {
     setQuizSubmitted(false);
     setSelectedAnswers([]);
     setCurrentQuestion(0);
     setScore(0);
     setPassed(false);
+    setQuizStarted(false);
+    setExamMode(false);
+    setExamTimeLeft(0);
+    setExamAutoSubmitted(false);
+    examDeadlineRef.current = null;
     if (id) safeStorage.remove(`quizState_${id}`);
     // Note: we do NOT clear the cooldown here — it must expire naturally
   };
@@ -502,6 +588,33 @@ export const CourseView: React.FC = () => {
                     Back to Lesson
                   </button>
                 </div>
+              ) : !quizStarted ? (
+                <div className="text-center py-10 animate-fade-in">
+                  <div className="mb-6 inline-flex p-4 rounded-full bg-white/50 dark:bg-white/5 border border-black/20 dark:border-white/10">
+                    <Clock size={40} className="text-primaryLight" aria-hidden="true" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-textMain mb-2">Ready for the Quiz?</h2>
+                  <p className="text-textMuted max-w-md mx-auto mb-8">
+                    Choose how you'd like to take this quiz. Timed Practice Mode adds a countdown and
+                    automatically submits your answers when time runs out — great for simulating real exam
+                    or interview conditions.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={() => startExam(false)}
+                      className="px-6 py-3 rounded-xl font-bold bg-black/5 dark:bg-white/10 text-textMain hover:bg-black/10 dark:hover:bg-white/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      Untimed Practice
+                    </button>
+                    <button
+                      onClick={() => startExam(true)}
+                      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      <Clock size={18} />
+                      Timed Practice Mode ({formatCooldown(course.quiz.length * EXAM_SECONDS_PER_QUESTION)})
+                    </button>
+                  </div>
+                </div>
               ) : !quizSubmitted ? (
                 <>
                   <div className="flex items-center justify-between mb-8">
@@ -509,8 +622,25 @@ export const CourseView: React.FC = () => {
                       {t('courseView.quiz.question', { current: currentQuestion + 1 })}{' '}
                       <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: course.quiz.length })}</span>
                     </h2>
-                    <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
-                      <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
+                    <div className="flex items-center gap-4">
+                      {examMode && (
+                        <div
+                          role="timer"
+                          aria-live="polite"
+                          aria-atomic="true"
+                          aria-label={`Time remaining: ${formatCooldown(examTimeLeft)}`}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border ${examTimeLeft <= 30
+                              ? 'bg-red-500/10 border-red-500/40 text-red-500 animate-pulse'
+                              : 'bg-primary/10 border-primary/30 text-primaryLight'
+                            }`}
+                        >
+                          <Clock size={14} aria-hidden="true" />
+                          {formatCooldown(examTimeLeft)}
+                        </div>
+                      )}
+                      <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
+                        <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
+                      </div>
                     </div>
                   </div>
 
@@ -594,6 +724,14 @@ export const CourseView: React.FC = () => {
                   </div>
 
                   <h2 className="text-3xl font-bold text-textMain mb-2">{passed ? t('courseView.quiz.result.congratulations') : t('courseView.quiz.result.keepTrying')}</h2>
+
+                  {examAutoSubmitted && (
+                    <p className="flex items-center justify-center gap-2 text-orange-400 text-sm font-medium mb-4">
+                      <Clock size={14} aria-hidden="true" />
+                      Time's up — your quiz was submitted automatically.
+                    </p>
+                  )}
+
                   <p className="text-textMuted mb-8">
                     {t('courseView.quiz.result.scorePrefix')}{' '}
                     <span className={`font-bold ${passed ? 'text-success' : 'text-red-400'}`}>{score}%</span>.

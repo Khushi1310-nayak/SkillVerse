@@ -17,7 +17,7 @@ import {
   increment
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus } from '../types';
 import { COURSES, COMPANIES } from '../constants';
 
 // Helper to structure chapters for initial seed courses
@@ -558,6 +558,46 @@ export const firestoreService = {
       console.error('Error fetching public profile by username:', err);
       return null;
     }
+  },
+
+  // --- CONTENT REPORTING & MODERATION ---
+  flagContent: async (
+    report: Omit<ContentReport, 'id' | 'createdAt' | 'status'>
+  ): Promise<ContentReport> => {
+    const reportId = `${report.contentId}_${report.reporterId}`;
+    const docRef = doc(db, 'reports', reportId);
+
+    const existing = await getDoc(docRef);
+    if (existing.exists()) {
+      return { id: reportId, ...(existing.data() as Omit<ContentReport, 'id'>) };
+    }
+
+    const newReport: ContentReport = {
+      ...report,
+      id: reportId,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    const { id, ...payload } = newReport;
+    await setDoc(docRef, payload);
+    return newReport;
+  },
+
+  getReports: async (): Promise<ContentReport[]> => {
+    const colRef = collection(db, 'reports');
+    const querySnapshot = await getDocs(colRef);
+    const reports: ContentReport[] = [];
+    querySnapshot.forEach((docSnap) => {
+      reports.push({ id: docSnap.id, ...docSnap.data() } as ContentReport);
+    });
+    reports.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return reports;
+  },
+
+  updateReportStatus: async (reportId: string, status: ReportStatus): Promise<void> => {
+    const docRef = doc(db, 'reports', reportId);
+    await updateDoc(docRef, { status });
   },
 
   // --- SOCIAL & ACTIVITY FEED ---

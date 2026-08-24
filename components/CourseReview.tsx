@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Star, Loader2, MessageSquareText, Trash2 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
+import { ReportContentButton } from './ReportContentButton';
 import { useToast } from '../contexts/ToastContext';
 import { User, CourseReview as CourseReviewType } from '../types';
 
@@ -289,6 +290,17 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                             {review.comment && (
                                 <p className="text-sm text-textMain leading-relaxed whitespace-pre-wrap">{review.comment}</p>
                             )}
+                            <div className="flex justify-end mt-2">
+                                <ReportContentButton
+                                    contentId={review.id}
+                                    contentType="review"
+                                    courseId={courseId}
+                                    authorId={review.userId}
+                                    authorUsername={review.username}
+                                    contentSnapshot={review.comment}
+                                    user={user}
+                                />
+                            </div>
                         </div>
                     ))}
                 </div>

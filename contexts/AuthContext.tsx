@@ -16,8 +16,9 @@ import { googleProvider, githubProvider } from '../firebase/providers';
 import { createUserDocument } from '../services/authService';
 import { mapFirebaseError } from '../utils/firebaseErrors';
 import { User as AppUser, UserSettings, DEFAULT_SETTINGS } from '../types';
-import { BADGE_DEFINITIONS } from '../constants';
+import { BADGE_DEFINITIONS, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
+import { firestoreService } from '../services/firestoreService';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -98,6 +99,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 streakUpdate,
                 { merge: true }
               ).catch(err => console.error("Error updating streak:", err));
+
+              const isStreakMilestone = computedStreak > 0 && (
+                computedStreak === 3 ||
+                computedStreak === 7 ||
+                computedStreak === 14 ||
+                computedStreak === 30 ||
+                computedStreak % 30 === 0
+              );
+
+              if (isStreakMilestone) {
+                const userName = data.username || currentUser.displayName || "User";
+                const userAvatar = data.photoURL || currentUser.photoURL || "";
+                firestoreService.publishActivityEvent(
+                  currentUser.uid,
+                  userName,
+                  userAvatar,
+                  'streak',
+                  `Reached a ${computedStreak}-day streak!`
+                ).catch(err => console.error("Error publishing streak activity:", err));
+              }
             }
 
             // --- Weekly & Monthly XP Reset Logic ---
@@ -159,6 +180,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 { badges: allBadges },
                 { merge: true }
               ).catch(err => console.error("Error updating badges:", err));
+
+              const userName = data.username || currentUser.displayName || "User";
+              const userAvatar = data.photoURL || currentUser.photoURL || "";
+              for (const badgeId of newBadges) {
+                const badgeDef = BADGE_DEFINITIONS.find(b => b.id === badgeId);
+                const badgeName = badgeDef ? badgeDef.name : badgeId;
+                firestoreService.publishActivityEvent(
+                  currentUser.uid,
+                  userName,
+                  userAvatar,
+                  'badge',
+                  `Earned the ${badgeName} badge`
+                ).catch(err => console.error("Error publishing badge activity:", err));
+              }
             }
 
             const mappedAppUser: AppUser = {
@@ -352,6 +387,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const completeCourse = async (courseId: string, xpEarned: number) => {
     if (!auth.currentUser) return;
+    const isNewCompletion = !appUser?.courses?.includes(courseId);
     const userRef = doc(db, "users", auth.currentUser.uid);
     try {
       await setDoc(userRef, {
@@ -360,6 +396,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         monthlyXP: increment(xpEarned),   // 👈 Added
         courses: arrayUnion(courseId)
       }, { merge: true });
+
+      if (isNewCompletion) {
+        const courseObj = COURSES.find(c => c.id === courseId);
+        const courseName = courseObj ? courseObj.title : courseId;
+        const userName = appUser?.username || auth.currentUser.displayName || "User";
+        const userAvatar = appUser?.photoURL || auth.currentUser.photoURL || "";
+        firestoreService.publishActivityEvent(
+          auth.currentUser.uid,
+          userName,
+          userAvatar,
+          'course',
+          `Completed ${courseName}`
+        ).catch(err => console.error("Error publishing course completion activity:", err));
+      }
     } catch (error) {
       console.error("Error completing course:", error);
       throw error;

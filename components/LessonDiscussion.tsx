@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MessageSquare, ThumbsUp, Send, ChevronDown, ChevronUp, Reply, CornerDownRight, Loader2, Pencil, Trash2, Check, X, Pin, PinOff, ArrowUpDown } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
+import { ReportContentButton } from './ReportContentButton';
 import { useToast } from '../contexts/ToastContext';
 import { User, LessonComment } from '../types';
 
@@ -402,6 +403,16 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                             <span>{comment.pinned ? 'Unpin' : 'Pin'}</span>
                           </button>
                         )}
+
+                        <ReportContentButton
+                          contentId={comment.id}
+                          contentType="comment"
+                          courseId={courseId}
+                          authorId={comment.userId}
+                          authorUsername={comment.username}
+                          contentSnapshot={comment.content}
+                          user={user}
+                        />
                       </div>
 
                       {/* Reply Input Form */}
@@ -502,6 +513,16 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({ courseId, le
                                       </button>
                                     </>
                                   )}
+                                  <ReportContentButton
+                                    contentId={reply.id}
+                                    contentType="comment"
+                                    courseId={courseId}
+                                    authorId={reply.userId}
+                                    authorUsername={reply.username}
+                                    contentSnapshot={reply.content}
+                                    user={user}
+                                    compact
+                                  />
                                 </div>
                               </div>
                             </div>

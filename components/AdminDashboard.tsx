@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Plus, Edit, Trash2, Save, X, BookOpen, Brain, 
+import {
+  Plus, Edit, Trash2, Save, X, BookOpen, Brain,
   Briefcase, Shield, ChevronRight, PlayCircle, Loader2,
-  Trash, ArrowRight, Eye, CheckCircle, AlertTriangle, RefreshCcw
+  Trash, ArrowRight, Eye, CheckCircle, AlertTriangle, RefreshCcw,
+  Flag, ShieldCheck
 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
-import { Course, Company, QuizQuestion, Chapter, Lesson, Category } from '../types';
+import { Course, Company, QuizQuestion, Chapter, Lesson, Category, ContentReport, ReportStatus } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { CATEGORIES } from '../constants';
 
+const REPORT_REASON_LABELS: Record<string, string> = {
+  spam: 'Spam',
+  harassment: 'Harassment / Abuse',
+  inappropriate: 'Inappropriate',
+  misleading: 'Misleading',
+  other: 'Other',
+};
+
 export const AdminDashboard: React.FC = () => {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'courses' | 'quizzes' | 'prep'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'quizzes' | 'prep' | 'moderation'>('courses');
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+
+  // Moderation queue state
+  const [reports, setReports] = useState<ContentReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [reportsLoaded, setReportsLoaded] = useState(false);
 
   // Data states
   const [courses, setCourses] = useState<Course[]>([]);
@@ -67,13 +81,39 @@ export const AdminDashboard: React.FC = () => {
       const comp = await firestoreService.getCompanies();
       setCourses(c);
       setCompanies(comp);
-      
+
       // Auto select quiz course if empty
       if (c.length > 0 && !selectedQuizCourseId) {
         handleSelectQuizCourse(c[0].id);
       }
     } catch (err) {
       console.error('Error refreshing data:', err);
+    }
+  };
+
+  const loadReports = async () => {
+    setReportsLoading(true);
+    try {
+      const data = await firestoreService.getReports();
+      setReports(data);
+      setReportsLoaded(true);
+    } catch (err) {
+      console.error('Error loading moderation queue:', err);
+      showToast({ message: 'Failed to load moderation queue.', type: 'error' });
+    } finally {
+      setReportsLoading(false);
+    }
+  };
+
+  const handleUpdateReportStatus = async (reportId: string, status: ReportStatus) => {
+    const previous = reports;
+    setReports(prev => prev.map(r => (r.id === reportId ? { ...r, status } : r)));
+    try {
+      await firestoreService.updateReportStatus(reportId, status);
+    } catch (err) {
+      console.error('Error updating report status:', err);
+      setReports(previous);
+      showToast({ message: 'Failed to update report status.', type: 'error' });
     }
   };
 
@@ -166,21 +206,21 @@ export const AdminDashboard: React.FC = () => {
       if (selectedCourse) {
         // Edit Mode
         const compiled = compileContent(courseForm.title, courseForm.chapters || []);
-        const updated: Course = { 
-          ...selectedCourse, 
-          ...courseForm, 
-          content: compiled 
+        const updated: Course = {
+          ...selectedCourse,
+          ...courseForm,
+          content: compiled
         } as Course;
         await firestoreService.updateCourse(selectedCourse.id, updated);
         showToast({ message: 'Course updated successfully.', type: 'success' });
       } else {
         // Create Mode
         const formattedId = courseForm.id.toLowerCase().replace(/\s+/g, '-');
-        const updated: Course = { 
-          ...courseForm, 
-          id: formattedId, 
-          content: compileContent(courseForm.title, []), 
-          chapters: [] 
+        const updated: Course = {
+          ...courseForm,
+          id: formattedId,
+          content: compileContent(courseForm.title, []),
+          chapters: []
         } as Course;
         await firestoreService.createCourse(updated);
         showToast({ message: 'Course created successfully.', type: 'success' });
@@ -225,14 +265,14 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       const compiled = compileContent(selectedCourse.title, updatedChapters);
-      await firestoreService.updateCourse(selectedCourse.id, { 
+      await firestoreService.updateCourse(selectedCourse.id, {
         chapters: updatedChapters,
         content: compiled
       });
       showToast({ message: 'Chapter saved.', type: 'success' });
       setChapterModalOpen(false);
       setSelectedChapter(null);
-      
+
       // Update local states
       const c = await firestoreService.getCourse(selectedCourse.id);
       if (c) setSelectedCourse(c);
@@ -247,7 +287,7 @@ export const AdminDashboard: React.FC = () => {
     const updatedChapters = (selectedCourse.chapters || []).filter(c => c.id !== chapId);
     try {
       const compiled = compileContent(selectedCourse.title, updatedChapters);
-      await firestoreService.updateCourse(selectedCourse.id, { 
+      await firestoreService.updateCourse(selectedCourse.id, {
         chapters: updatedChapters,
         content: compiled
       });
@@ -272,10 +312,10 @@ export const AdminDashboard: React.FC = () => {
 
     if (selectedLesson) {
       // Edit
-      updatedLessons = updatedLessons.map(l => l.id === selectedLesson.id ? { 
-        ...l, 
-        title: lessonForm.title!, 
-        content: lessonForm.content! 
+      updatedLessons = updatedLessons.map(l => l.id === selectedLesson.id ? {
+        ...l,
+        title: lessonForm.title!,
+        content: lessonForm.content!
       } : l);
     } else {
       // Add
@@ -294,14 +334,14 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       const compiled = compileContent(selectedCourse.title, updatedChapters);
-      await firestoreService.updateCourse(selectedCourse.id, { 
+      await firestoreService.updateCourse(selectedCourse.id, {
         chapters: updatedChapters,
         content: compiled
       });
       showToast({ message: 'Lesson saved.', type: 'success' });
       setLessonModalOpen(false);
       setSelectedLesson(null);
-      
+
       const c = await firestoreService.getCourse(selectedCourse.id);
       if (c) {
         setSelectedCourse(c);
@@ -316,7 +356,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleDeleteLesson = async (lesId: string) => {
     if (!selectedCourse || !selectedChapter || !confirm('Delete this lesson?')) return;
-    
+
     let updatedChapters = [...(selectedCourse.chapters || [])];
     const targetChapIndex = updatedChapters.findIndex(c => c.id === selectedChapter.id);
     if (targetChapIndex === -1) return;
@@ -329,7 +369,7 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       const compiled = compileContent(selectedCourse.title, updatedChapters);
-      await firestoreService.updateCourse(selectedCourse.id, { 
+      await firestoreService.updateCourse(selectedCourse.id, {
         chapters: updatedChapters,
         content: compiled
       });
@@ -432,11 +472,11 @@ export const AdminDashboard: React.FC = () => {
       } else {
         const formattedId = companyForm.id.toLowerCase().replace(/\s+/g, '-');
         const defaultLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(companyForm.name)}&background=random&color=fff&rounded=true&bold=true&size=128`;
-        const updated: Company = { 
-          ...companyForm, 
-          id: formattedId, 
+        const updated: Company = {
+          ...companyForm,
+          id: formattedId,
           logo: companyForm.logo || defaultLogo,
-          questions: [] 
+          questions: []
         } as Company;
         await firestoreService.createCompany(updated);
         showToast({ message: 'Company created successfully.', type: 'success' });
@@ -486,13 +526,13 @@ export const AdminDashboard: React.FC = () => {
         </div>
         <button
           onClick={async () => {
-            if(!confirm("Warning: This will overwrite all courses with the default templates. Any custom changes to default courses will be lost! Are you sure?")) return;
+            if (!confirm("Warning: This will overwrite all courses with the default templates. Any custom changes to default courses will be lost! Are you sure?")) return;
             try {
               setSeeding(true);
               await firestoreService.forceReseedDatabase();
               await refreshData();
               alert("Successfully re-seeded the database!");
-            } catch(e) {
+            } catch (e) {
               console.error(e);
               alert("Error re-seeding database.");
             } finally {
@@ -510,33 +550,47 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex border-b border-black/20 dark:border-white/10 gap-6">
         <button
           onClick={() => setActiveTab('courses')}
-          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'courses' 
-              ? 'border-primaryLight text-textMain' 
+          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${activeTab === 'courses'
+              ? 'border-primaryLight text-textMain'
               : 'border-transparent text-textMuted hover:text-textMain'
-          }`}
+            }`}
         >
           <BookOpen size={20} /> Courses
         </button>
         <button
           onClick={() => setActiveTab('quizzes')}
-          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'quizzes' 
-              ? 'border-primaryLight text-textMain' 
+          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${activeTab === 'quizzes'
+              ? 'border-primaryLight text-textMain'
               : 'border-transparent text-textMuted hover:text-textMain'
-          }`}
+            }`}
         >
           <Brain size={20} /> Quizzes
         </button>
         <button
           onClick={() => setActiveTab('prep')}
-          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${
-            activeTab === 'prep' 
-              ? 'border-primaryLight text-textMain' 
+          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${activeTab === 'prep'
+              ? 'border-primaryLight text-textMain'
               : 'border-transparent text-textMuted hover:text-textMain'
-          }`}
+            }`}
         >
           <Briefcase size={20} /> Interview Prep
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('moderation');
+            if (!reportsLoaded) loadReports();
+          }}
+          className={`pb-4 text-lg font-bold flex items-center gap-2 border-b-2 transition-all ${activeTab === 'moderation'
+              ? 'border-primaryLight text-textMain'
+              : 'border-transparent text-textMuted hover:text-textMain'
+            }`}
+        >
+          <Flag size={20} /> Moderation
+          {reportsLoaded && reports.some(r => r.status === 'pending') && (
+            <span className="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+              {reports.filter(r => r.status === 'pending').length}
+            </span>
+          )}
         </button>
       </div>
 
@@ -547,7 +601,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="lg:col-span-1 bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 h-fit">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-textMain">All Courses</h2>
-              <button 
+              <button
                 onClick={openCourseCreate}
                 className="p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg transition-all"
                 title="Create Course"
@@ -557,14 +611,13 @@ export const AdminDashboard: React.FC = () => {
             </div>
             <div className="space-y-3">
               {courses.map(c => (
-                <div 
-                  key={c.id} 
+                <div
+                  key={c.id}
                   onClick={() => { setSelectedCourse(c); setSelectedChapter(null); setSelectedLesson(null); }}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
-                    selectedCourse?.id === c.id 
-                      ? 'bg-primary/20 border-primaryLight text-textMain' 
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${selectedCourse?.id === c.id
+                      ? 'bg-primary/20 border-primaryLight text-textMain'
                       : 'bg-white/5 border-black/20 dark:border-white/5 text-textMuted hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <div>
                     <h3 className="font-bold text-textMain">{c.title}</h3>
@@ -587,13 +640,13 @@ export const AdminDashboard: React.FC = () => {
                     <p className="text-sm text-textMuted mt-1">{selectedCourse.description}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => openCourseEdit(selectedCourse)}
                       className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-black/20 dark:border-white/10 rounded-lg text-sm text-textMain flex items-center gap-1.5 transition-colors"
                     >
                       <Edit size={14} /> Edit Details
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteCourse(selectedCourse.id)}
                       className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-sm text-red-400 flex items-center gap-1.5 transition-colors"
                     >
@@ -695,14 +748,13 @@ export const AdminDashboard: React.FC = () => {
             <h2 className="text-xl font-bold text-textMain mb-6 font-display">Select Course Quiz</h2>
             <div className="space-y-3">
               {courses.map(c => (
-                <div 
-                  key={c.id} 
+                <div
+                  key={c.id}
                   onClick={() => handleSelectQuizCourse(c.id)}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
-                    selectedQuizCourseId === c.id 
-                      ? 'bg-primary/20 border-primaryLight text-textMain' 
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${selectedQuizCourseId === c.id
+                      ? 'bg-primary/20 border-primaryLight text-textMain'
                       : 'bg-white/5 border-black/20 dark:border-white/5 text-textMuted hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <span className="font-bold text-textMain">{c.title} Quiz</span>
                   <ChevronRight size={16} />
@@ -744,7 +796,7 @@ export const AdminDashboard: React.FC = () => {
                           placeholder="e.g., What is the output of console.log(typeof null)?"
                         />
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {(editingQuestion.options || []).map((opt, oIdx) => (
                           <div key={oIdx}>
@@ -807,13 +859,12 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-textMuted">
                           {q.options.map((opt, oIdx) => (
-                            <div 
-                              key={oIdx} 
-                              className={`p-3 rounded-lg border flex items-center gap-2 ${
-                                oIdx === q.correctAnswer 
-                                  ? 'bg-success/15 border-success text-success font-semibold' 
+                            <div
+                              key={oIdx}
+                              className={`p-3 rounded-lg border flex items-center gap-2 ${oIdx === q.correctAnswer
+                                  ? 'bg-success/15 border-success text-success font-semibold'
                                   : 'bg-white/5 border-transparent'
-                              }`}
+                                }`}
                             >
                               <div className={`w-2.5 h-2.5 rounded-full ${oIdx === q.correctAnswer ? 'bg-success' : 'bg-white/20'}`} />
                               <span>{opt}</span>
@@ -845,7 +896,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="lg:col-span-1 bg-glass border border-black/20 dark:border-white/10 rounded-2xl p-6 h-fit">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-textMain font-display">Companies</h2>
-              <button 
+              <button
                 onClick={openCompanyCreate}
                 className="p-2 bg-gradient-main text-white rounded-lg hover:shadow-lg transition-all"
                 title="Create Company"
@@ -855,14 +906,13 @@ export const AdminDashboard: React.FC = () => {
             </div>
             <div className="space-y-3">
               {companies.map(c => (
-                <div 
-                  key={c.id} 
+                <div
+                  key={c.id}
                   onClick={() => { setSelectedCompany(c); setCompanyForm(c); }}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-4 ${
-                    selectedCompany?.id === c.id 
-                      ? 'bg-primary/20 border-primaryLight text-textMain' 
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-4 ${selectedCompany?.id === c.id
+                      ? 'bg-primary/20 border-primaryLight text-textMain'
                       : 'bg-white/5 border-black/20 dark:border-white/5 text-textMuted hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <img src={c.logo} alt={c.name} className="w-10 h-10 object-contain rounded-lg bg-white p-1" />
                   <div className="flex-1 overflow-hidden">
@@ -889,13 +939,13 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => openCompanyEdit(selectedCompany)}
                       className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-black/20 dark:border-white/10 rounded-lg text-sm text-textMain flex items-center gap-1.5 transition-colors"
                     >
                       <Edit size={14} /> Edit Company
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteCompany(selectedCompany.id)}
                       className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-sm text-red-400 flex items-center gap-1.5 transition-colors"
                     >
@@ -938,16 +988,15 @@ export const AdminDashboard: React.FC = () => {
                       <div key={q.id} className="border border-black/20 dark:border-white/10 rounded-xl p-5 bg-white/5">
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border mr-3 ${
-                              q.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border mr-3 ${q.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                                 q.difficulty === 'Medium' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
                                   'bg-red-500/10 text-red-500 border-red-500/20'
-                            }`}>
+                              }`}>
                               {q.difficulty}
                             </span>
                             <span className="font-bold text-textMain text-sm">{q.title || 'Untitled Question'}</span>
                           </div>
-                          
+
                           <div className="flex gap-2">
                             <button
                               onClick={() => {
@@ -1018,6 +1067,96 @@ export const AdminDashboard: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Moderation Queue */}
+      {activeTab === 'moderation' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <h2 className="text-2xl font-bold text-textMain flex items-center gap-2">
+              <Flag size={22} className="text-primaryLight" />
+              Moderation Queue
+            </h2>
+            <button
+              onClick={loadReports}
+              disabled={reportsLoading}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primaryLight border border-primary/20 hover:bg-primary/20 font-bold text-sm transition-colors disabled:opacity-50"
+            >
+              {reportsLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
+              Refresh
+            </button>
+          </div>
+
+          {reportsLoading ? (
+            <div className="h-[300px] flex items-center justify-center text-textMuted gap-2">
+              <Loader2 size={24} className="animate-spin text-primaryLight" />
+              <span>Loading reports...</span>
+            </div>
+          ) : reports.length === 0 ? (
+            <div className="h-[300px] flex flex-col items-center justify-center bg-glass border border-black/20 dark:border-white/10 rounded-2xl text-textMuted gap-2">
+              <ShieldCheck size={32} className="opacity-50" />
+              <p className="font-bold text-textMain">No reports to review</p>
+              <p className="text-sm">Reported comments and reviews will show up here.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reports.map(report => (
+                <div key={report.id} className="p-5 rounded-2xl bg-glass border border-black/20 dark:border-white/10">
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primaryLight border border-primary/20">
+                        {report.contentType}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
+                        {REPORT_REASON_LABELS[report.reason] || report.reason}
+                      </span>
+                      <span className="text-xs text-textMuted">{new Date(report.createdAt).toLocaleString()}</span>
+                    </div>
+
+                    <select
+                      value={report.status}
+                      onChange={e => handleUpdateReportStatus(report.id, e.target.value as ReportStatus)}
+                      aria-label={`Status for report ${report.id}`}
+                      className={`text-xs font-bold uppercase tracking-wider rounded-lg border px-3 py-1.5 bg-transparent focus:outline-none cursor-pointer ${report.status === 'pending' ? 'text-amber-500 border-amber-500/30' :
+                          report.status === 'reviewed' ? 'text-blue-400 border-blue-500/30' :
+                            report.status === 'resolved' ? 'text-emerald-400 border-emerald-500/30' :
+                              'text-textMuted border-black/10 dark:border-white/10'
+                        }`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="reviewed">Reviewed</option>
+                      <option value="resolved">Resolved</option>
+                      <option value="dismissed">Dismissed</option>
+                    </select>
+                  </div>
+
+                  {report.contentSnapshot && (
+                    <p className="text-sm text-textMain bg-black/5 dark:bg-white/5 rounded-xl p-3 mb-3 whitespace-pre-wrap">
+                      "{report.contentSnapshot}"
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-textMuted">
+                    <span>
+                      Reported by <span className="font-mono text-textMain">{report.reporterId}</span>
+                      {report.contentAuthorUsername && (
+                        <> &middot; Author: <span className="font-semibold text-textMain">{report.contentAuthorUsername}</span></>
+                      )}
+                    </span>
+                    <a
+                      href={`#/course/${report.courseId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 font-bold text-primaryLight hover:underline"
+                    >
+                      View Content <ArrowRight size={12} />
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

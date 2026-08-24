@@ -241,3 +241,20 @@ export interface CourseReview {
   createdAt: string;
 }
 
+export type ReportedContentType = 'comment' | 'review';
+export type ReportReason = 'spam' | 'harassment' | 'inappropriate' | 'misleading' | 'other';
+export type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+
+export interface ContentReport {
+  id: string; // deterministic: `${contentId}_${reporterId}`, one report per user per content item
+  reporterId: string; // reporter's Firebase Auth UID
+  contentId: string; // id of the reported comment or review
+  contentType: ReportedContentType;
+  courseId: string;
+  reason: ReportReason;
+  status: ReportStatus;
+  createdAt: string;
+  contentSnapshot?: string;
+  contentAuthorUsername?: string;
+}
+

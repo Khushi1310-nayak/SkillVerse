@@ -233,5 +233,30 @@ service cloud.firestore {
 
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
+
+    // --- CONTENT REPORTS COLLECTION ---
+    match /reports/{reportId} {
+      allow read: if isAdminOrInstructor();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'reporterId', 'contentId', 'contentType', 'courseId', 'reason', 'status', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'reporterId', 'contentId', 'contentType', 'courseId', 'reason', 'status', 'createdAt',
+          'contentSnapshot', 'contentAuthorUsername'
+        ])
+        && request.resource.data.reporterId == request.auth.uid
+        && reportId == request.resource.data.contentId + '_' + request.resource.data.reporterId
+        && request.resource.data.contentType in ['comment', 'review']
+        && request.resource.data.reason in ['spam', 'harassment', 'inappropriate', 'misleading', 'other']
+        && request.resource.data.status == 'pending';
+
+      allow update: if isAdminOrInstructor()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['pending', 'reviewed', 'resolved', 'dismissed'];
+
+      allow delete: if isAdmin();
+    }
   }
 }

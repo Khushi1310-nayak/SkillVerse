@@ -151,6 +151,7 @@ export interface Progress {
   score: number;
   passed: boolean;
   completedDate?: string;
+  missedQuestionIds?: string[]; // IDs of quiz questions answered incorrectly on the most recent attempt
 }
 
 // --- Career Mode Types ---

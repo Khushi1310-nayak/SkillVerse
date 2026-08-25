@@ -93,6 +93,7 @@ export const CourseView: React.FC = () => {
   const [aiExplainLoading, setAiExplainLoading] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState(0);
   const [passed, setPassed] = useState(false);
+  const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -359,8 +360,13 @@ export const CourseView: React.FC = () => {
     examDeadlineRef.current = null;
 
     let correctCount = 0;
+    const missedIds: string[] = [];
     course.quiz.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctAnswer) correctCount++;
+      if (selectedAnswers[idx] === q.correctAnswer) {
+        correctCount++;
+      } else {
+        missedIds.push(q.id.toString());
+      }
     });
 
     const finalScore = Math.round((correctCount / course.quiz.length) * 100);
@@ -368,6 +374,7 @@ export const CourseView: React.FC = () => {
 
     setScore(finalScore);
     setPassed(isPassed);
+    setMissedQuestionIds(missedIds);
     setQuizSubmitted(true);
 
     if (isPassed && settings?.soundEffects !== false) {
@@ -385,7 +392,8 @@ export const CourseView: React.FC = () => {
       completed: true,
       score: finalScore,
       passed: isPassed,
-      completedDate: new Date().toLocaleDateString()
+      completedDate: new Date().toLocaleDateString(),
+      missedQuestionIds: missedIds
     });
 
     if (isPassed && !user?.courses?.includes(course.id)) {
@@ -404,6 +412,7 @@ export const CourseView: React.FC = () => {
     setCurrentQuestion(0);
     setScore(0);
     setPassed(false);
+    setMissedQuestionIds([]);
     setQuizStarted(false);
     setExamMode(false);
     setExamTimeLeft(0);
@@ -631,8 +640,8 @@ export const CourseView: React.FC = () => {
                           aria-atomic="true"
                           aria-label={`Time remaining: ${formatCooldown(examTimeLeft)}`}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border ${examTimeLeft <= 30
-                              ? 'bg-red-500/10 border-red-500/40 text-red-500 animate-pulse'
-                              : 'bg-primary/10 border-primary/30 text-primaryLight'
+                            ? 'bg-red-500/10 border-red-500/40 text-red-500 animate-pulse'
+                            : 'bg-primary/10 border-primary/30 text-primaryLight'
                             }`}
                         >
                           <Clock size={14} aria-hidden="true" />
@@ -780,6 +789,63 @@ export const CourseView: React.FC = () => {
                       ) : (
                         <p className="text-textMuted italic mt-4 w-full">{t('courseView.quiz.result.retryDisabled')}</p>
                       )
+                    )}
+                  </div>
+
+                  {/* Quiz Mistake Review Mode */}
+                  <div className="mt-16 space-y-6 text-left border-t border-black/20 dark:border-white/10 pt-10">
+                    <h3 className="text-2xl font-bold text-textMain text-center mb-8">Review Mistakes</h3>
+
+                    {missedQuestionIds.length === 0 ? (
+                      <div className="flex flex-col items-center text-center py-6">
+                        <div className="mb-4 inline-flex p-4 rounded-full bg-success/10 border border-success/30">
+                          <CheckCircle size={32} className="text-success" />
+                        </div>
+                        <p className="text-textMain font-semibold">Perfect run — no mistakes to review!</p>
+                        <p className="text-textMuted text-sm mt-1">You answered every question correctly.</p>
+                      </div>
+                    ) : (
+                      course.quiz.map((q, qIdx) => {
+                        if (!missedQuestionIds.includes(q.id.toString())) return null;
+
+                        return (
+                          <div key={qIdx} className="bg-red-500/5 p-6 rounded-2xl border border-red-500/20">
+                            <div className="flex items-center gap-2 mb-4">
+                              <XCircle size={18} className="text-red-500 shrink-0" />
+                              <p className="text-lg font-medium text-textMain">{qIdx + 1}. {q.question}</p>
+                            </div>
+
+                            <div className="space-y-2 mb-4">
+                              <p className="text-sm text-red-500">
+                                <span className="font-semibold">Your answer:</span>{' '}
+                                {selectedAnswers[qIdx] !== undefined ? q.options[selectedAnswers[qIdx]] : 'No answer selected'}
+                              </p>
+                              <p className="text-sm text-success">
+                                <span className="font-semibold">Correct answer:</span> {q.options[q.correctAnswer]}
+                              </p>
+                            </div>
+
+                            <button
+                              onClick={() => handleAskAiWhy(qIdx)}
+                              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primaryLight text-sm font-medium hover:bg-primary/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                            >
+                              <Sparkles size={16} /> Ask AI Why
+                            </button>
+
+                            {openAiExplainFor === qIdx && (
+                              <div className="mt-3 p-4 rounded-xl bg-gradient-main/10 border border-primary/20 text-sm text-textMain leading-relaxed animate-fade-in">
+                                {aiExplainLoading[qIdx] ? (
+                                  <span className="flex items-center gap-2 text-textMuted">
+                                    <Loader2 size={14} className="animate-spin" /> Thinking...
+                                  </span>
+                                ) : (
+                                  aiExplanations[qIdx]
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
 

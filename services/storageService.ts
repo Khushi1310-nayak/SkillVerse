@@ -15,8 +15,8 @@ const DAILY_CHALLENGE_KEY = 'skillverse_daily_challenge';
 const DAILY_CHALLENGE_SIZE = 3;
 const DAILY_CHALLENGE_XP_BONUS = 50;
 
-const getLocalDateString = (): string => {
-  const d = new Date();
+export const getLocalDateString = (date: Date = new Date()): string => {
+  const d = date;
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');

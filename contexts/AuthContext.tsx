@@ -17,7 +17,7 @@ import { createUserDocument } from '../services/authService';
 import { mapFirebaseError } from '../utils/firebaseErrors';
 import { User as AppUser, UserSettings, DEFAULT_SETTINGS } from '../types';
 import { BADGE_DEFINITIONS, COURSES } from '../constants';
-import { storageService } from '../services/storageService';
+import { storageService, getLocalDateString } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
 
 interface AuthContextType {
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const data = docSnap.data();
 
             // --- Streak calculation ---
-            const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const todayStr = getLocalDateString(); // YYYY-MM-DD, local calendar date
             const storedStreak: number = data.streak || 0;
             const storedLastActiveDate: string | null = data.lastActiveDate || null;
             const storedStreakFreezes: number = data.streakFreezes || 0;
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const monday = new Date(now);
             monday.setDate(diff);
             monday.setHours(0, 0, 0, 0);
-            const currentWeekStr = monday.toISOString().split('T')[0];
+            const currentWeekStr = getLocalDateString(monday);
 
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 

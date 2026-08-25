@@ -14,7 +14,7 @@ import { auth, db, storage } from '../firebase/firebase';
 import { storageService } from '../services/storageService';
 import { soundManager } from '../utils/soundManager';
 import { useInstallPrompt } from '../contexts/InstallPromptContext';
-import { BADGE_DEFINITIONS, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XP_STORE_CONSUMABLES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
+import { BADGE_DEFINITIONS, COURSES, XP_STORE_THEMES, XP_STORE_CURSORS, XP_STORE_FRAMES, XP_STORE_CONSUMABLES, XPStoreTheme, XPStoreCursor, XPStoreFrame } from '../constants';
 import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
 import { BadgeProgressBar } from './ui/BadgeProgressBar';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
@@ -25,6 +25,8 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { DataPortabilityPanel } from './DataPortabilityPanel';
 import { useNotifications } from '../hooks/useNotifications';
+import { firestoreService } from '../services/firestoreService';
+import { generateProgressReport } from '../utils/pdfGenerator';
 
 
 interface SettingsProps {
@@ -80,6 +82,7 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isExportingReport, setIsExportingReport] = useState(false);
 
   useEffect(() => {
     setFormData(user);
@@ -315,6 +318,73 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     setModal({ type: null });
     // Resetting app state via logout ensures clean slate without hard browser reload
     onLogout();
+  };
+
+  const handleExportReport = async () => {
+    if (isExportingReport) return;
+
+    const allProgress = storageService.getAllProgress();
+    let courses = COURSES;
+    try {
+      const fetchedCourses = await firestoreService.getCourses();
+      if (fetchedCourses.length > 0) courses = fetchedCourses;
+    } catch (error) {
+      console.error('Error fetching courses for progress report:', error);
+    }
+
+    const attemptedCourseIds = new Set(allProgress.map(progress => progress.courseId));
+    const attemptedCourses = courses.filter(course => attemptedCourseIds.has(course.id));
+
+    if (attemptedCourses.length === 0) {
+      showToast({ message: 'Start or complete a course first to generate a progress report.', type: 'info' });
+      return;
+    }
+
+    setIsExportingReport(true);
+    try {
+      const earnedBadges = BADGE_DEFINITIONS
+        .filter(badge => (user.badges || []).includes(badge.id))
+        .map(badge => ({ name: badge.name, description: badge.description }));
+
+      const courseEntries = attemptedCourses.map(course => {
+        const progress = allProgress.find(item => item.courseId === course.id);
+        const totalChapters = course.chapters?.length || 0;
+        const passed = !!progress?.passed;
+
+        return {
+          title: course.title,
+          level: course.level,
+          passed,
+          score: progress?.score ?? 0,
+          completedDate: progress?.completedDate,
+          totalChapters,
+          completedChapters: passed ? totalChapters : 0,
+        };
+      });
+
+      const completedCount = allProgress.filter(progress => progress.passed).length;
+      const completionPercentage = courses.length
+        ? Math.round((completedCount / courses.length) * 100)
+        : 0;
+
+      await generateProgressReport({
+        username: user.username,
+        date: new Date().toLocaleDateString(),
+        xp: user.xp,
+        level: user.level,
+        streak: user.streak,
+        overallCompletionPercent: completionPercentage,
+        courses: courseEntries,
+        earnedBadges,
+      });
+
+      showToast({ message: 'Learning Resume downloaded successfully.', type: 'success' });
+    } catch (error) {
+      console.error('Learning Resume export failed:', error);
+      showToast({ message: 'Failed to generate Learning Resume. Please try again.', type: 'error' });
+    } finally {
+      setIsExportingReport(false);
+    }
   };
 
   const handleLeave = () => {
@@ -1503,6 +1573,22 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                 {/* Export / import before the destructive actions, so there is
                     always a way to take a copy first. */}
                 <DataPortabilityPanel />
+
+                <button
+                  onClick={handleExportReport}
+                  disabled={isExportingReport}
+                  aria-label="Download Learning Resume"
+                  className="w-full flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 border border-black/20 dark:border-white/10 rounded-xl transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-3">
+                    {isExportingReport ? <Loader2 className="text-primaryLight animate-spin" /> : <Download className="text-primaryLight" />}
+                    <div className="text-left">
+                      <div className="font-bold text-textMain">Download Learning Resume</div>
+                      <div className="text-sm text-textMuted">Export your learning progress as a PDF.</div>
+                    </div>
+                  </div>
+                  <span className="text-textMuted group-hover:text-textMain">{isExportingReport ? 'Generating...' : 'Download'}</span>
+                </button>
 
                 <div className="space-y-4">
                   <button

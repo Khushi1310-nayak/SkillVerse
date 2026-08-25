@@ -21,6 +21,7 @@ interface LeaderboardUser {
 
 interface LeaderboardProps {
   currentUserId?: string;
+  currentUsername?: string;
   followingIds?: string[];
   onFollowChange?: (targetUserId: string, isNowFollowing: boolean) => void;
 }
@@ -37,6 +38,7 @@ const EMPTY_FOLLOWING_IDS: string[] = [];
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({
   currentUserId,
+  currentUsername,
   followingIds = EMPTY_FOLLOWING_IDS,
   onFollowChange
 }) => {
@@ -110,7 +112,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
     setActionLoadingId(targetUserId);
 
     try {
-      await firestoreService.toggleFollowUser(currentUserId, targetUserId, isCurrentlyFollowing);
+      await firestoreService.toggleFollowUser(currentUserId, targetUserId, isCurrentlyFollowing, currentUsername);
       setFollowingMap(prev => ({
         ...prev,
         [targetUserId]: !isCurrentlyFollowing
@@ -182,8 +184,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         <button
           onClick={() => setTimeframe('week')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'week'
-              ? 'bg-gradient-main text-white shadow-lg scale-105'
-              : 'bg-white/10 text-textMain hover:bg-white/20'
+            ? 'bg-gradient-main text-white shadow-lg scale-105'
+            : 'bg-white/10 text-textMain hover:bg-white/20'
             }`}
         >
           <Clock size={16} />
@@ -192,8 +194,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         <button
           onClick={() => setTimeframe('month')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'month'
-              ? 'bg-gradient-main text-white shadow-lg scale-105'
-              : 'bg-white/10 text-textMain hover:bg-white/20'
+            ? 'bg-gradient-main text-white shadow-lg scale-105'
+            : 'bg-white/10 text-textMain hover:bg-white/20'
             }`}
         >
           <Calendar size={16} />
@@ -202,8 +204,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         <button
           onClick={() => setTimeframe('all')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${timeframe === 'all'
-              ? 'bg-gradient-main text-white shadow-lg scale-105'
-              : 'bg-white/10 text-textMain hover:bg-white/20'
+            ? 'bg-gradient-main text-white shadow-lg scale-105'
+            : 'bg-white/10 text-textMain hover:bg-white/20'
             }`}
         >
           <Award size={16} />
@@ -283,8 +285,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                       onClick={(e) => handleFollowToggle(e, user.id)}
                       disabled={isLoadingThis}
                       className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${isFollowing
-                          ? 'bg-white/10 text-textMain hover:bg-red-500/20 hover:text-red-400 border border-white/10'
-                          : 'bg-gradient-main text-white hover:opacity-90 shadow-primary/20'
+                        ? 'bg-white/10 text-textMain hover:bg-red-500/20 hover:text-red-400 border border-white/10'
+                        : 'bg-gradient-main text-white hover:opacity-90 shadow-primary/20'
                         }`}
                     >
                       {isLoadingThis ? (

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
+import { NotificationCenter } from './NotificationCenter';
 import { GoldSnow } from './GoldSnow';
 import { ScrollToTop } from './ScrollToTop';
 import { CommandPalette } from './CommandPalette';
@@ -205,6 +206,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
         />
       </div>
 
+      {/* Notification bell - Desktop (fixed corner, outside the sidebar's own overflow-hidden) */}
+      <div className="hidden lg:block fixed top-6 right-6 z-[60]">
+        <NotificationCenter />
+      </div>
+
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex flex-col group w-[88px] hover:w-72 h-screen sticky top-0 border-r border-black/20 dark:border-white/20 dark:border-white/5 bg-background/80 backdrop-blur-xl z-50 py-6 px-4 hover:px-6 shadow-2xl transition-all duration-300 overflow-hidden overflow-y-auto no-scrollbar">
         <Link to="/" className="flex items-center gap-3 mb-12 overflow-hidden px-2 group/logo rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background">
@@ -264,9 +270,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background/90 backdrop-blur-xl border-b border-black/20 dark:border-white/10 flex items-center justify-between px-6 z-50">
         <Link to="/" className="text-xl font-display font-bold text-textMain rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight">SkillVerse</Link>
-        <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
-          <Menu />
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationCenter />
+          <button onClick={() => setMobileMenuOpen(true)} className="text-textMain p-2" title={t('nav.openMenu')} aria-label={t('nav.openMenu')}>
+            <Menu />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}

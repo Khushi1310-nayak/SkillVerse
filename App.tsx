@@ -6,6 +6,7 @@ import { CustomCursor } from './components/CustomCursor';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { InstallPromptProvider } from './contexts/InstallPromptContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { useAuth } from './hooks/useAuth';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { ProtectedRoute } from './guards/ProtectedRoute';
@@ -154,10 +155,12 @@ function App() {
     <InstallPromptProvider>
       <ToastProvider>
         <AuthProvider>
-          <HashRouter>
-            <AppRoutes />
-          </HashRouter>
-          <CustomCursor />
+          <NotificationProvider>
+            <HashRouter>
+              <AppRoutes />
+            </HashRouter>
+            <CustomCursor />
+          </NotificationProvider>
         </AuthProvider>
       </ToastProvider>
     </InstallPromptProvider>

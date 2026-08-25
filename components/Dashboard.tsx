@@ -843,7 +843,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Global Leaderboard */}
       <div id="dash-leaderboard" className="mt-8">
-        <Leaderboard />
+        <Leaderboard currentUserId={user.uid} currentUsername={user.username} followingIds={user.following || []} />
       </div>
 
       {showStreakModal && (

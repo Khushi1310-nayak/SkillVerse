@@ -18,17 +18,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import {
-  Course,
-  Company,
-  QuizQuestion,
-  Chapter,
-  LessonComment,
-  CourseReview,
-  User,
-  ContentReport,
-  ReportStatus,
-} from "../types";
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
@@ -327,6 +317,19 @@ export const firestoreService = {
     const comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
     comments.unshift(newComment);
     safeStorage.writeJSON(key, comments);
+
+    if (newComment.parentId) {
+      const parent = comments.find(c => c.id === newComment.parentId);
+      if (parent?.userId && parent.userId !== newComment.userId) {
+        await firestoreService.createNotification(parent.userId, {
+          type: 'comment_reply',
+          message: `${newComment.username} replied to your comment.`,
+          actorUsername: newComment.username,
+          link: `/course/${newComment.courseId}`,
+        });
+      }
+    }
+
     return newComment;
   },
 
@@ -439,37 +442,32 @@ export const firestoreService = {
     return comments;
   },
 
-  pinComment: async (
-    commentId: string,
-    courseId: string,
-    lessonId: string,
-  ): Promise<LessonComment[]> => {
+  pinComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
     let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
-    comments = comments.map((comment) =>
-      comment.id === commentId ? { ...comment, pinned: true } : comment,
+    comments = comments.map(comment =>
+      comment.id === commentId ? { ...comment, pinned: true } : comment
     );
 
     try {
-      const docRef = doc(
-        db,
-        "courses",
-        courseId,
-        "lessons",
-        lessonId,
-        "comments",
-        commentId,
-      );
+      const docRef = doc(db, 'courses', courseId, 'lessons', lessonId, 'comments', commentId);
       await updateDoc(docRef, { pinned: true });
     } catch (err) {
-      console.warn(
-        "Firestore update failed, comment pinned locally only:",
-        err,
-      );
+      console.warn('Firestore update failed, comment pinned locally only:', err);
     }
 
     safeStorage.writeJSON(key, comments);
+
+    const pinnedComment = comments.find(c => c.id === commentId);
+    if (pinnedComment?.userId) {
+      await firestoreService.createNotification(pinnedComment.userId, {
+        type: 'comment_pinned',
+        message: 'Your comment was pinned to the top of the discussion.',
+        link: `/course/${courseId}`,
+      });
+    }
+
     return comments;
   },
 
@@ -761,10 +759,30 @@ export const firestoreService = {
   },
 
   // --- SOCIAL & ACTIVITY FEED ---
+  createNotification: async (
+    recipientUid: string,
+    notification: Omit<AppNotification, 'id' | 'createdAt' | 'read'>
+  ): Promise<void> => {
+    if (!recipientUid) return;
+    try {
+      const colRef = collection(db, 'users', recipientUid, 'notifications');
+      await addDoc(colRef, {
+        ...notification,
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      // A failed notification write should never block the action that
+      // triggered it (following, replying, pinning).
+      console.warn('Failed to create notification:', err);
+    }
+  },
+
   toggleFollowUser: async (
     currentUserId: string,
     targetUserId: string,
     isFollowing: boolean,
+    currentUsername?: string,
   ): Promise<void> => {
     const userRef = doc(db, "users", currentUserId);
     await updateDoc(userRef, {
@@ -772,6 +790,15 @@ export const firestoreService = {
         ? arrayRemove(targetUserId)
         : arrayUnion(targetUserId),
     });
+
+    if (!isFollowing) {
+      await firestoreService.createNotification(targetUserId, {
+        type: 'follow',
+        message: `${currentUsername || 'Someone'} started following you.`,
+        actorUsername: currentUsername,
+        link: currentUsername ? `/u/${currentUsername}` : undefined,
+      });
+    }
   },
 
   publishActivityEvent: async (

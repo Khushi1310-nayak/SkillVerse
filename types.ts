@@ -258,3 +258,18 @@ export interface ContentReport {
   contentAuthorUsername?: string;
 }
 
+
+export type NotificationType = 'follow' | 'comment_reply' | 'comment_pinned';
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  actorUsername?: string;
+  actorAvatarId?: string;
+  actorPhotoURL?: string;
+  link?: string;
+}
+

@@ -234,7 +234,7 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    // --- CONTENT REPORTS COLLECTION ---
+       // --- CONTENT REPORTS COLLECTION ---
     match /reports/{reportId} {
       allow read: if isAdminOrInstructor();
 
@@ -257,6 +257,45 @@ service cloud.firestore {
         && request.resource.data.status in ['pending', 'reviewed', 'resolved', 'dismissed'];
 
       allow delete: if isAdmin();
+    }
+
+    // --- NOTIFICATIONS SUBCOLLECTION ---
+    // Lives under the recipient's own user doc. Only the owner can read or
+    // mark their notifications as read. Any authenticated user may CREATE a
+    // notification for someone else (that's how follow/reply/pin events reach
+    // their target), but only with this exact validated shape — never
+    // arbitrary fields, and always starting unread.
+    match /users/{userId}/notifications/{notificationId} {
+      allow read: if isOwner(userId);
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'type', 'message', 'read', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'type', 'message', 'read', 'createdAt',
+          'actorUsername', 'actorAvatarId', 'actorPhotoURL', 'link'
+        ])
+        && request.resource.data.type in ['follow', 'comment_reply', 'comment_pinned']
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.read == false
+        && request.resource.data.createdAt is string
+        && (!request.resource.data.keys().hasAny(['actorUsername']) ||
+            request.resource.data.actorUsername is string)
+        && (!request.resource.data.keys().hasAny(['actorAvatarId']) ||
+            request.resource.data.actorAvatarId is string)
+        && (!request.resource.data.keys().hasAny(['actorPhotoURL']) ||
+            request.resource.data.actorPhotoURL is string)
+        && (!request.resource.data.keys().hasAny(['link']) ||
+            request.resource.data.link is string);
+
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        && request.resource.data.read is bool;
+
+      allow delete: if isOwner(userId);
     }
   }
 }

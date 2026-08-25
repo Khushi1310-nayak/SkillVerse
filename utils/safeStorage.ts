@@ -19,7 +19,7 @@
 /** Probes storage once. A failure here means we run entirely from memory. */
 const detectStorage = (): Storage | null => {
   try {
-    if (typeof window === 'undefined' || !window.localStorage) return null;
+    if (typeof window === "undefined" || !window.localStorage) return null;
 
     // Deliberately a *read* probe. Blocked storage (Safari's "Block All
     // Cookies") throws on the property access above, which is the case we need
@@ -27,10 +27,13 @@ const detectStorage = (): Storage | null => {
     // and dropping to memory then would hide all of the user's existing data —
     // far worse than the failing write itself. Quota is handled per-write in
     // setRaw, which reports failure without losing read access.
-    window.localStorage.getItem('__skillverse_probe__');
+    window.localStorage.getItem("__skillverse_probe__");
     return window.localStorage;
   } catch (err) {
-    console.warn('LocalStorage is unavailable; falling back to in-memory storage for this session.', err);
+    console.warn(
+      "LocalStorage is unavailable; falling back to in-memory storage for this session.",
+      err,
+    );
     return null;
   }
 };
@@ -85,7 +88,11 @@ export const safeStorage = {
    * failing `validate`. A key that cannot be parsed is dropped so the user
    * recovers on the next load instead of being stuck permanently.
    */
-  readJSON: <T>(key: string, fallback: T, validate?: (value: unknown) => boolean): T => {
+  readJSON: <T>(
+    key: string,
+    fallback: T,
+    validate?: (value: unknown) => boolean,
+  ): T => {
     const raw = getRaw(key);
     if (raw === null) return fallback;
 
@@ -102,7 +109,9 @@ export const safeStorage = {
     // syntactically valid value flows straight into the caller and blows up
     // later on a `.find` / `.filter` that is much harder to trace.
     if (validate && !validate(parsed)) {
-      console.warn(`Storage entry "${key}" has an unexpected shape; using the default instead.`);
+      console.warn(
+        `Storage entry "${key}" has an unexpected shape; using the default instead.`,
+      );
       return fallback;
     }
 
@@ -141,7 +150,7 @@ export const safeStorage = {
     try {
       backing.clear();
     } catch (err) {
-      console.warn('Could not clear storage:', err);
+      console.warn("Could not clear storage:", err);
     }
   },
 };
@@ -149,7 +158,10 @@ export const safeStorage = {
 // --- Shape guards -----------------------------------------------------------
 // Small, shared predicates so each call site does not re-invent them.
 
-export const isArray = (value: unknown): value is unknown[] => Array.isArray(value);
+export const isArray = (value: unknown): value is unknown[] =>
+  Array.isArray(value);
 
-export const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+export const isPlainObject = (
+  value: unknown,
+): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);

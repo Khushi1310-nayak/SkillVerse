@@ -19,6 +19,7 @@ import {
 import { db } from '../firebase/firebase';
 import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus } from '../types';
 import { COURSES, COMPANIES } from '../constants';
+import { safeStorage, isArray } from '../utils/safeStorage';
 
 // Helper to structure chapters for initial seed courses
 const generateInitialChapters = (topic: string): Chapter[] => {
@@ -232,14 +233,13 @@ export const firestoreService = {
           comments.push({ id: docSnap.id, ...docSnap.data() } as LessonComment);
         });
         comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        localStorage.setItem(key, JSON.stringify(comments));
+        safeStorage.writeJSON(key, comments);
         return comments;
       }
     } catch (err) {
       console.warn('Firestore offline, falling back to local storage for comments:', err);
     }
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : [];
+    return safeStorage.readJSON<LessonComment[]>(key, [], isArray);
   },
 
   postLessonComment: async (commentData: Omit<LessonComment, 'id' | 'createdAt' | 'upvotes' | 'upvotedBy'>): Promise<LessonComment> => {
@@ -257,17 +257,15 @@ export const firestoreService = {
     } catch (err) {
       console.warn('Firestore write failed, saving locally:', err);
     }
-    const saved = localStorage.getItem(key);
-    const comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    const comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
     comments.unshift(newComment);
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return newComment;
   },
 
   upvoteLessonComment: async (commentId: string, userId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
     comments = comments.map(comment => {
       if (comment.id === commentId) {
@@ -290,14 +288,13 @@ export const firestoreService = {
       return comment;
     });
 
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return comments;
   },
 
   editLessonComment: async (commentId: string, courseId: string, lessonId: string, content: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
     comments = comments.map(comment =>
       comment.id === commentId ? { ...comment, content } : comment
@@ -310,14 +307,13 @@ export const firestoreService = {
       console.warn('Firestore update failed, comment edited locally only:', err);
     }
 
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return comments;
   },
 
   deleteLessonComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
     // Deleting a top-level comment also removes its replies, so no reply is
     // ever left pointing at a parentId that no longer exists.
@@ -334,14 +330,13 @@ export const firestoreService = {
       console.warn('Firestore delete failed, comment removed locally only:', err);
     }
 
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return comments;
   },
 
   pinComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
     comments = comments.map(comment =>
       comment.id === commentId ? { ...comment, pinned: true } : comment
@@ -354,14 +349,13 @@ export const firestoreService = {
       console.warn('Firestore update failed, comment pinned locally only:', err);
     }
 
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return comments;
   },
 
   unpinComment: async (commentId: string, courseId: string, lessonId: string): Promise<LessonComment[]> => {
     const key = `lesson_comments_${courseId}_${lessonId}`;
-    const saved = localStorage.getItem(key);
-    let comments: LessonComment[] = saved ? JSON.parse(saved) : [];
+    let comments = safeStorage.readJSON<LessonComment[]>(key, [], isArray);
 
     comments = comments.map(comment =>
       comment.id === commentId ? { ...comment, pinned: false } : comment
@@ -374,7 +368,7 @@ export const firestoreService = {
       console.warn('Firestore update failed, comment unpinned locally only:', err);
     }
 
-    localStorage.setItem(key, JSON.stringify(comments));
+    safeStorage.writeJSON(key, comments);
     return comments;
   },
 
@@ -406,18 +400,13 @@ export const firestoreService = {
       // Cache the remote result even when it is empty. Previously an empty
       // result fell through to the local cache, so a review deleted server-side
       // kept reappearing from this browser's copy.
-      localStorage.setItem(key, JSON.stringify(reviews));
+      safeStorage.writeJSON(key, reviews);
       return reviews;
     } catch (err) {
       console.warn('Firestore offline, falling back to local storage for reviews:', err);
     }
 
-    try {
-      const saved = localStorage.getItem(key);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    return safeStorage.readJSON<CourseReview[]>(key, [], isArray);
   },
 
   /** Average, total and 1–5 star breakdown for a set of reviews. */
@@ -469,21 +458,15 @@ export const firestoreService = {
       // A stale average is much better than a wrong one.
       console.warn('Review saved, but the course rating could not be recomputed:', err);
 
-      let cached: CourseReview[] = [];
-      try {
-        const saved = localStorage.getItem(key);
-        cached = saved ? JSON.parse(saved) : [];
-      } catch {
-        cached = [];
-      }
+      const cached = safeStorage.readJSON<CourseReview[]>(key, [], isArray);
 
       // Dedupe by userId — the review id *is* the user id, one per course.
       const merged = [newReview, ...cached.filter(r => r.userId !== newReview.userId)];
-      localStorage.setItem(key, JSON.stringify(merged));
+      safeStorage.writeJSON(key, merged);
       return merged;
     }
 
-    localStorage.setItem(key, JSON.stringify(reviews));
+    safeStorage.writeJSON(key, reviews);
 
     const { average, count } = firestoreService.summarizeCourseReviews(reviews);
     try {
@@ -509,14 +492,13 @@ export const firestoreService = {
       reviews = await firestoreService.fetchRemoteCourseReviews(courseId);
     } catch (err) {
       console.warn('Review deleted, but the course rating could not be recomputed:', err);
-      const saved = localStorage.getItem(key);
-      const cached: CourseReview[] = saved ? JSON.parse(saved) : [];
+      const cached = safeStorage.readJSON<CourseReview[]>(key, [], isArray);
       const filtered = cached.filter(r => r.userId !== userId);
-      localStorage.setItem(key, JSON.stringify(filtered));
+      safeStorage.writeJSON(key, filtered);
       return filtered;
     }
 
-    localStorage.setItem(key, JSON.stringify(reviews));
+    safeStorage.writeJSON(key, reviews);
 
     const { average, count } = firestoreService.summarizeCourseReviews(reviews);
     try {

@@ -125,7 +125,12 @@
     "timeUnder30": "Under 30 min",
     "time30to60": "30–60 min",
     "time1to2h": "1–2 hours",
-    "time2hPlus": "2+ hours"
+    "time2hPlus": "2+ hours",
+    "emptyFiltered": "No courses match your current filters.",
+    "activeFilters": "{{count}} filter active",
+    "activeFilters_plural": "{{count}} filters active",
+    "copyLink": "Copy link to this view",
+    "linkCopied": "Link copied"
   },
   "savedCourses": {
     "title": "Saved Courses",

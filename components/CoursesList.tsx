@@ -1,30 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X, Lock } from 'lucide-react';
+import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X, Lock, Link2, Check } from 'lucide-react';
 import { isCourseUnlocked, getIncompletePrerequisites } from '../utils/prerequisites';
 import { CATEGORIES, COURSES } from '../constants';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
 import { courseBookmarks } from '../utils/courseBookmarks';
 import { useBookmarks } from '../hooks/useBookmarks';
+import {
+  useCatalogFilters,
+  LevelFilter,
+  SortOption,
+  TimeFilter,
+} from '../hooks/useCatalogFilters';
 import { Course } from '../types';
-
-type SortOption = 'default' | 'rating' | 'reviews' | 'az';
-type LevelFilter = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
-type TimeFilter = 'all' | 'under30' | '30to60' | '1to2h' | '2hplus';
 
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
   const [courses, setCourses] = useState<Course[]>(COURSES);
-  const [search, setSearch] = useState('');
-  const [filterCat, setFilterCat] = useState('all');
-  const [filterLevel, setFilterLevel] = useState<LevelFilter>('all');
-  const [filterTime, setFilterTime] = useState<TimeFilter>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [savedOnly, setSavedOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const bookmarkedIds = useBookmarks();
+
+  // Filter state lives in the query string, so a filtered catalog survives
+  // Back-navigation and a refresh, and can be shared as a link.
+  const categoryIds = useMemo(() => CATEGORIES.map(c => c.id), []);
+  const {
+    filters,
+    searchDraft,
+    setSearchDraft,
+    setFilter,
+    clearFilters,
+    hasActiveFilters,
+    activeFilterCount,
+  } = useCatalogFilters(categoryIds);
+  const { category: filterCat, level: filterLevel, time: filterTime, sort: sortBy, savedOnly } = filters;
+  const search = filters.search;
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -76,6 +87,22 @@ export const CoursesList: React.FC = () => {
     }
   };
 
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  /**
+   * The filter set is fully described by the current URL, so sharing a
+   * filtered catalog is just copying the address bar.
+   */
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('Could not copy the catalog link:', err);
+    }
+  };
+
   const getCategoryLabel = (categoryId: string) => {
     switch (categoryId) {
       case 'programming':
@@ -89,7 +116,7 @@ export const CoursesList: React.FC = () => {
     }
   };
 
-  const filtered = courses
+  const filtered = useMemo(() => courses
     .filter(course => {
       const q = search.toLowerCase();
       const matchesSearch =
@@ -120,19 +147,9 @@ export const CoursesList: React.FC = () => {
         default:
           return 0;
       }
-    });
-
-  const hasActiveFilters =
-    search !== '' || filterCat !== 'all' || filterLevel !== 'all' || filterTime !== 'all' || sortBy !== 'default' || savedOnly;
-
-  const clearFilters = () => {
-    setSearch('');
-    setFilterCat('all');
-    setFilterLevel('all');
-    setFilterTime('all');
-    setSortBy('default');
-    setSavedOnly(false);
-  };
+    }),
+    [courses, search, filterCat, filterLevel, filterTime, sortBy, savedOnly, bookmarkedIds]
+  );
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -149,8 +166,8 @@ export const CoursesList: React.FC = () => {
           <input
             type="text"
             placeholder={t('courses.searchPlaceholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+            value={searchDraft}
+            onChange={e => setSearchDraft(e.target.value)}
             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-11 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
           />
         </div>
@@ -159,7 +176,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterCat}
-              onChange={e => setFilterCat(e.target.value)}
+              onChange={e => setFilter('category', e.target.value)}
               title={t('courses.filterTitle')}
               aria-label={t('courses.filterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -175,7 +192,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterLevel}
-              onChange={e => setFilterLevel(e.target.value as LevelFilter)}
+              onChange={e => setFilter('level', e.target.value as LevelFilter)}
               title={t('courses.difficultyFilterTitle')}
               aria-label={t('courses.difficultyFilterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -191,7 +208,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterTime}
-              onChange={e => setFilterTime(e.target.value as TimeFilter)}
+              onChange={e => setFilter('time', e.target.value as TimeFilter)}
               title={t('courses.timeFilterTitle')}
               aria-label={t('courses.timeFilterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -208,7 +225,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[180px]">
             <select
               value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortOption)}
+              onChange={e => setFilter('sort', e.target.value as SortOption)}
               title={t('courses.sortTitle')}
               aria-label={t('courses.sortTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -222,7 +239,7 @@ export const CoursesList: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setSavedOnly(prev => !prev)}
+            onClick={() => setFilter('savedOnly', !savedOnly)}
             aria-pressed={savedOnly}
             className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold text-sm transition-all ${savedOnly
                 ? 'bg-primary/20 border-primary/40 text-primaryLight'
@@ -235,16 +252,34 @@ export const CoursesList: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-textMuted">
-        <span>{t('courses.resultsCount', { count: filtered.length })}</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-textMuted">
+        <span aria-live="polite">
+          {t('courses.resultsCount', { count: filtered.length })}
+          {activeFilterCount > 0 && (
+            <span className="ml-2 text-xs font-semibold text-primaryLight">
+              {t('courses.activeFilters', { count: activeFilterCount })}
+            </span>
+          )}
+        </span>
+
         {hasActiveFilters && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 text-primaryLight hover:underline font-semibold"
-          >
-            <X size={14} />
-            {t('courses.clearFilters')}
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-1 text-primaryLight hover:underline font-semibold"
+            >
+              {linkCopied ? <Check size={14} /> : <Link2 size={14} />}
+              {linkCopied ? t('courses.linkCopied') : t('courses.copyLink')}
+            </button>
+
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1 text-primaryLight hover:underline font-semibold"
+            >
+              <X size={14} />
+              {t('courses.clearFilters')}
+            </button>
+          </div>
         )}
       </div>
 
@@ -429,7 +464,23 @@ export const CoursesList: React.FC = () => {
 
             {filtered.length === 0 && (
               <div className="col-span-full text-center py-20 text-textMuted">
-                {t('courses.empty')}
+                {/* A shared link can now land on a filtered-but-empty catalog,
+                    where the bare "no courses" copy reads like the catalog is
+                    broken. Name the cause and offer the way out. */}
+                {hasActiveFilters ? (
+                  <>
+                    <p className="mb-4">{t('courses.emptyFiltered')}</p>
+                    <button
+                      onClick={clearFilters}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primaryLight font-semibold hover:bg-primary/20 transition-colors"
+                    >
+                      <X size={16} />
+                      {t('courses.clearFilters')}
+                    </button>
+                  </>
+                ) : (
+                  t('courses.empty')
+                )}
               </div>
             )}
           </>

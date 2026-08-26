@@ -7,14 +7,21 @@
  * and restores it again, validating the payload before it touches storage.
  */
 
-import { Progress, CareerProgress, SavedAINote, LessonNote } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet } from '../types';
 import { StreakData } from '../services/storageService';
+import { safeStorage } from './safeStorage';
+import { notifyBookmarksChanged } from './courseBookmarks';
 
 export const BACKUP_APP_MARKER = 'skillverse';
-export const BACKUP_SCHEMA_VERSION = 1;
+/**
+ * v2 adds saved playground snippets and bookmarked courses. The two are purely
+ * additive — a v1 file simply has no entry for them — so v1 backups still
+ * import cleanly and are still listed as supported.
+ */
+export const BACKUP_SCHEMA_VERSION = 2;
 
 /** Schema versions this build knows how to read. */
-const SUPPORTED_SCHEMA_VERSIONS = [1];
+const SUPPORTED_SCHEMA_VERSIONS = [1, 2];
 
 export interface BackupEnvelope {
   app: typeof BACKUP_APP_MARKER;
@@ -31,6 +38,8 @@ export interface BackupSummary {
   lessonNotes: number;
   trackedDays: number;
   studyDays: number;
+  snippets: number;
+  bookmarks: number;
 }
 
 export interface ValidationResult {
@@ -61,9 +70,16 @@ export const AI_NOTES_KEY = 'skillverse_ai_notes';
 export const LESSON_NOTES_KEY = 'skillverse_lesson_notes';
 export const STREAK_KEY = 'skillverse_streak_data';
 export const STUDY_TIME_KEY = 'skillverse_study_time';
+export const CODE_SNIPPETS_KEY = 'skillverse_code_snippets';
+// Owned by utils/courseBookmarks.ts rather than storageService, but it is the
+// same kind of browser-only learner data, so it belongs in the backup.
+export const BOOKMARKS_KEY = 'skillverse_bookmarks';
 
 const isPlainObject = (value: unknown): value is Record<string, any> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every(entry => typeof entry === 'string');
 
 /**
  * Every key we export, with the shape check used on import. Anything not
@@ -78,27 +94,28 @@ const BACKUP_KEYS: { key: string; validate: (value: unknown) => boolean }[] = [
   { key: STREAK_KEY, validate: isPlainObject },
   { key: STUDY_TIME_KEY, validate: isPlainObject },
   { key: LAST_VISITED_KEY, validate: isPlainObject },
+  { key: CODE_SNIPPETS_KEY, validate: Array.isArray },
+  { key: BOOKMARKS_KEY, validate: isStringArray },
 ];
 
+/**
+ * Reads one key through `safeStorage` rather than touching `localStorage`
+ * directly. A browser that blocks storage entirely (Safari with "Block All
+ * Cookies") throws on the raw property access, which used to leave every key
+ * `undefined` and produce a backup file that looked valid but was empty.
+ *
+ * A sentinel is used instead of `readJSON`'s fallback because `undefined` here
+ * has to mean "not stored", which is what makes `mergeValue` treat the
+ * incoming value as authoritative.
+ */
+const MISSING = Symbol('missing');
+
 const readKey = (key: string): unknown => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw === null ? undefined : JSON.parse(raw);
-  } catch (err) {
-    console.warn(`Skipping "${key}" during export — it is not valid JSON:`, err);
-    return undefined;
-  }
+  const value = safeStorage.readJSON<unknown>(key, MISSING);
+  return value === MISSING ? undefined : value;
 };
 
-const writeKey = (key: string, value: unknown): boolean => {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (err) {
-    console.error(`Could not restore "${key}":`, err);
-    return false;
-  }
-};
+const writeKey = (key: string, value: unknown): boolean => safeStorage.writeJSON(key, value);
 
 // --- Export -----------------------------------------------------------------
 
@@ -132,6 +149,8 @@ export const summarize = (envelope: BackupEnvelope): BackupSummary => {
   const lessonNotes = (data[LESSON_NOTES_KEY] as LessonNote[]) || [];
   const streak = (data[STREAK_KEY] as StreakData) || null;
   const studyTime = (data[STUDY_TIME_KEY] as Record<string, number>) || null;
+  const snippets = (data[CODE_SNIPPETS_KEY] as SavedSnippet[]) || [];
+  const bookmarks = (data[BOOKMARKS_KEY] as string[]) || [];
 
   return {
     courses: progress.length,
@@ -141,6 +160,8 @@ export const summarize = (envelope: BackupEnvelope): BackupSummary => {
     lessonNotes: lessonNotes.length,
     trackedDays: streak?.activities ? Object.keys(streak.activities).length : 0,
     studyDays: studyTime ? Object.keys(studyTime).length : 0,
+    snippets: snippets.length,
+    bookmarks: bookmarks.length,
   };
 };
 
@@ -330,6 +351,38 @@ const mergeNotes = <T extends { id: string; updatedAt?: string; savedAt?: string
   return Array.from(byId.values());
 };
 
+/**
+ * Saved playground snippets, unioned by `id` with the most recently edited
+ * copy winning — the same rule `mergeNotes()` applies to notes. Snippets are
+ * hand-written code, so an import must never silently overwrite a newer local
+ * version of a snippet with a stale one from the file.
+ */
+const mergeSnippets = (current: SavedSnippet[], incoming: SavedSnippet[]): SavedSnippet[] => {
+  const byId = new Map<string, SavedSnippet>();
+  const stamp = (snippet: SavedSnippet) =>
+    Date.parse(snippet?.updatedAt || snippet?.createdAt || '') || 0;
+
+  [...(current || []), ...(incoming || [])].forEach(snippet => {
+    if (!snippet?.id) return;
+    const existing = byId.get(snippet.id);
+    if (!existing || stamp(snippet) >= stamp(existing)) {
+      byId.set(snippet.id, snippet);
+    }
+  });
+
+  return Array.from(byId.values());
+};
+
+/**
+ * Bookmarks are a set, so merging is a union: importing an older backup can
+ * add a course back but must never un-bookmark one. Use Replace to drop
+ * bookmarks that are not in the file.
+ */
+const mergeBookmarks = (current: string[], incoming: string[]): string[] =>
+  Array.from(new Set([...(current || []), ...(incoming || [])])).filter(
+    id => typeof id === 'string' && id.length > 0
+  );
+
 const mergeStreak = (current: StreakData, incoming: StreakData): StreakData => {
   const activities = { ...(current.activities || {}) };
   Object.entries(incoming.activities || {}).forEach(([date, activity]) => {
@@ -386,6 +439,10 @@ const mergeValue = (key: string, current: unknown, incoming: unknown): unknown =
       return mergeStudyTime(current as Record<string, number>, incoming as Record<string, number>);
     case LAST_VISITED_KEY:
       return mergeLastVisited(current, incoming);
+    case CODE_SNIPPETS_KEY:
+      return mergeSnippets(current as SavedSnippet[], incoming as SavedSnippet[]);
+    case BOOKMARKS_KEY:
+      return mergeBookmarks(current as string[], incoming as string[]);
     default:
       return incoming;
   }
@@ -415,6 +472,14 @@ export const restoreBackup = (envelope: BackupEnvelope, mode: ImportMode = 'merg
       errors.push(`Could not write "${key}" — storage may be full or unavailable.`);
     }
   });
+
+  // Bookmarks are the one restored key with live subscribers (`useBookmarks`),
+  // and writing straight to storage bypasses the event `courseBookmarks`
+  // normally dispatches. Announce the change so the sidebar count and the
+  // /saved page reflect the import immediately, not only after the reload.
+  if (restoredKeys.includes(BOOKMARKS_KEY)) {
+    notifyBookmarksChanged();
+  }
 
   return { ok: failedKeys.length === 0, restoredKeys, failedKeys, errors };
 };

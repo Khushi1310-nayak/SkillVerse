@@ -9,9 +9,21 @@ const isStringArray = (value: unknown): value is string[] =>
 const readBookmarks = (): string[] =>
     safeStorage.readJSON<string[]>(BOOKMARKS_KEY, [], isStringArray);
 
+/**
+ * Announces the current bookmark set to same-tab subscribers.
+ *
+ * Exported because the backup importer writes the bookmarks key directly (it
+ * writes every restored key the same way) and would otherwise leave
+ * `useBookmarks` consumers showing the pre-import list — the native `storage`
+ * event only fires in *other* tabs.
+ */
+export const notifyBookmarksChanged = (ids: string[] = readBookmarks()): void => {
+    window.dispatchEvent(new CustomEvent(BOOKMARKS_CHANGED_EVENT, { detail: ids }));
+};
+
 const writeBookmarks = (ids: string[]): string[] => {
     safeStorage.writeJSON(BOOKMARKS_KEY, ids);
-    window.dispatchEvent(new CustomEvent(BOOKMARKS_CHANGED_EVENT, { detail: ids }));
+    notifyBookmarksChanged(ids);
     return ids;
 };
 

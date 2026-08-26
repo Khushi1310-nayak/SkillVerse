@@ -8,6 +8,7 @@ import {
   readBackupFile,
   restoreBackup,
   summarize,
+  BACKUP_SCHEMA_VERSION,
   BackupSummary,
   ImportMode,
   ValidationResult,
@@ -96,11 +97,13 @@ export const DataPortabilityPanel: React.FC = () => {
   };
 
   const SummaryGrid = ({ summary }: { summary: BackupSummary }) => (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
       {[
         { label: 'Courses', value: summary.courses },
         { label: 'Lesson notes', value: summary.lessonNotes },
         { label: 'AI notes', value: summary.aiNotes },
+        { label: 'Saved snippets', value: summary.snippets },
+        { label: 'Saved courses', value: summary.bookmarks },
         { label: 'Practiced Qs', value: summary.practicedQuestions },
         { label: 'Mock interviews', value: summary.mockInterviews },
         { label: 'Streak days', value: summary.trackedDays },
@@ -125,8 +128,9 @@ export const DataPortabilityPanel: React.FC = () => {
           <div className="flex-1">
             <div className="font-bold text-textMain">Data &amp; Backup</div>
             <div className="text-sm text-textMuted">
-              Your progress, notes, streaks and career practice are stored in this browser only.
-              Export a copy before clearing site data or moving to another device.
+              Your progress, notes, saved snippets, saved courses, streaks and career practice are
+              stored in this browser only. Export a copy before clearing site data or moving to
+              another device.
             </div>
             <SummaryGrid summary={localSummary} />
           </div>
@@ -182,7 +186,18 @@ export const DataPortabilityPanel: React.FC = () => {
             </h3>
             <p className="text-textMuted text-center text-sm mb-4">
               Exported {new Date(pending.envelope.exportedAt).toLocaleString()}
+              <span className="block text-xs mt-0.5">Backup format v{pending.envelope.schemaVersion}</span>
             </p>
+
+            {pending.envelope.schemaVersion < BACKUP_SCHEMA_VERSION && (
+              <div className="mb-2 flex items-start gap-2 text-sm text-textMuted">
+                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                <span>
+                  This backup predates saved snippets and saved courses, so those will be left as
+                  they are in this browser rather than restored.
+                </span>
+              </div>
+            )}
 
             <SummaryGrid summary={pending.summary} />
 
@@ -204,7 +219,7 @@ export const DataPortabilityPanel: React.FC = () => {
                   {
                     value: 'merge' as ImportMode,
                     title: 'Merge (recommended)',
-                    body: 'Combines the backup with what is already here. Keeps your best quiz scores and longest streak.',
+                    body: 'Combines the backup with what is already here. Keeps your best quiz scores, longest streak, newest snippets, and every saved course from both.',
                   },
                   {
                     value: 'replace' as ImportMode,

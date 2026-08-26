@@ -2,6 +2,7 @@ import { doc, setDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, Company, InterviewQuestion } from '../types';
 import { safeStorage, isArray, isPlainObject } from '../utils/safeStorage';
+import { getLocalDateString } from '../utils/localDate';
 
 const PROGRESS_KEY = 'skillverse_progress';
 const CAREER_KEY = 'skillverse_career';
@@ -15,13 +16,11 @@ const DAILY_CHALLENGE_KEY = 'skillverse_daily_challenge';
 const DAILY_CHALLENGE_SIZE = 3;
 const DAILY_CHALLENGE_XP_BONUS = 50;
 
-export const getLocalDateString = (date: Date = new Date()): string => {
-  const d = date;
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+// Re-exported so the many existing importers of
+// `getLocalDateString` from this module keep working. The implementation now
+// lives in utils/localDate.ts alongside the rest of the local-date helpers,
+// so the streak calendar and this service cannot drift apart again.
+export { getLocalDateString };
 
 
 // --- STREAK DATA TYPES ---

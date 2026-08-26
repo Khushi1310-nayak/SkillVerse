@@ -1,6 +1,12 @@
 ﻿import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Flame, Trophy, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { storageService, DailyActivity, StreakData } from '../services/storageService';
+import {
+  getLocalDateString,
+  isoToLocalDateString,
+  shiftLocalDateString,
+  daysBetweenLocalDateStrings,
+} from '../utils/localDate';
 import { User } from '../types';
 
 interface LearningStreakTabProps {
@@ -11,7 +17,14 @@ interface LearningStreakTabProps {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const toDateStr = (d: Date): string => d.toISOString().split('T')[0];
+/**
+ * Activity is written by `storageService.recordDayActivity()` / `saveStudyTime()`
+ * under the learner's *local* calendar date, and `buildMonthGrid()` below lays
+ * out local calendar cells. Both ends of this component therefore have to speak
+ * local dates too — reading them back with `toISOString()` (UTC) is what made
+ * today's square stay dark all evening for anyone west of Greenwich.
+ */
+const toDateStr = (d: Date): string => getLocalDateString(d);
 
 /**
  * Seed the activity log from existing progress records stored in localStorage.
@@ -25,8 +38,12 @@ function seedActivitiesFromProgress(existingData: StreakData): StreakData {
   };
 
   for (const prog of allProgress) {
-    if (!prog.completedDate || !prog.passed) continue;
-    const dateStr = prog.completedDate.split('T')[0];
+    if (!prog.passed) continue;
+    // `completedDate` is a UTC ISO timestamp, so slicing it at the 'T' yields
+    // the UTC day. Convert properly instead, or a course finished at 8pm in
+    // New York seeds the calendar a day ahead of where the learner saw it.
+    const dateStr = isoToLocalDateString(prog.completedDate);
+    if (!dateStr) continue;
     const courseId = prog.courseId;
     const existing = updated.activities[dateStr];
 
@@ -64,9 +81,9 @@ function calcLongestStreak(activities: Record<string, DailyActivity>): number {
   let current = 1;
 
   for (let i = 1; i < activeDays.length; i++) {
-    const prev = new Date(activeDays[i - 1]);
-    const curr = new Date(activeDays[i]);
-    const diff = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24));
+    // Compared as local dates so a DST boundary (a 23- or 25-hour "day")
+    // still counts as exactly one day apart.
+    const diff = daysBetweenLocalDateStrings(activeDays[i - 1], activeDays[i]);
     if (diff === 1) {
       current++;
       if (current > longest) longest = current;
@@ -206,13 +223,21 @@ export const LearningStreakTab: React.FC<LearningStreakTabProps> = ({ user }) =>
   // Derived values
   function calcCurrentStreak(activities: Record<string, DailyActivity>, todayStr: string): number {
     let count = 0;
-    let cursor = new Date(todayStr + 'T00:00:00');
+    let cursor = todayStr;
+
+    // A streak that was kept yesterday but not yet today is still alive — the
+    // learner simply hasn't studied yet. Starting the walk strictly at `today`
+    // would show 0 every morning until the first lesson of the day.
+    const todayActivity = activities[todayStr];
+    if (!todayActivity || todayActivity.level === 0) {
+      cursor = shiftLocalDateString(todayStr, -1);
+    }
+
     while (true) {
-      const dateStr = toDateStr(cursor);
-      const activity = activities[dateStr];
+      const activity = activities[cursor];
       if (activity && activity.level > 0) {
         count++;
-        cursor.setDate(cursor.getDate() - 1);
+        cursor = shiftLocalDateString(cursor, -1);
       } else {
         break;
       }

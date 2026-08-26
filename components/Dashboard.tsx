@@ -6,6 +6,8 @@ import { CATEGORIES, COURSES, COMPANIES, BADGE_DEFINITIONS } from '../constants'
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
 import { storageService, DailyChallengeSummary } from '../services/storageService';
+import { getLocalDateString } from '../utils/localDate';
+import { safeStorage } from '../utils/safeStorage';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
@@ -143,11 +145,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   useEffect(() => {
     if (user.streak > 0) {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const hasCelebratedToday = localStorage.getItem(`streak_celebrated_${user.username}_${todayStr}`);
+      // Local date, to match the streak itself: a UTC key rolls over at the
+      // wrong moment, so the celebration either fires twice on one local day
+      // or is suppressed on a day the learner has not yet been congratulated.
+      const todayStr = getLocalDateString();
+      const celebratedKey = `streak_celebrated_${user.username}_${todayStr}`;
+      const hasCelebratedToday = safeStorage.getString(celebratedKey);
       if (!hasCelebratedToday) {
         setShowStreakModal(true);
-        localStorage.setItem(`streak_celebrated_${user.username}_${todayStr}`, 'true');
+        safeStorage.setString(celebratedKey, 'true');
       }
     }
   }, [user.streak, user.username]);

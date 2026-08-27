@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Bookmark, PlayCircle, CheckCircle, Star, BookOpen } from 'lucide-react';
@@ -34,7 +34,7 @@ export const SavedCourses: React.FC = () => {
         loadCourses();
     }, []);
 
-    const progress = storageService.getAllProgress();
+    const progress = useMemo(() => storageService.getAllProgress(), []);
     const bookmarkedCourses = courses.filter(course => bookmarkedIds.includes(course.id));
 
     const getDifficultyLabel = (level: string) => {

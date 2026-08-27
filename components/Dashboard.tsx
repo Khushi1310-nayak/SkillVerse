@@ -185,7 +185,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     }
   }, [user.settings?.reminders, user.settings?.dailyGoal, t]);
 
-  const allProgress = storageService.getAllProgress();
+  const allProgress = useMemo(() => storageService.getAllProgress(), []);
 
   const lastVisited = storageService.getLastVisited();
   const lastVisitedCourse = lastVisited

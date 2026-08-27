@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X, Lock } from 'lucide-react';
@@ -45,7 +45,7 @@ export const CoursesList: React.FC = () => {
     loadCourses();
   }, []);
 
-  const progress = storageService.getAllProgress();
+  const progress = useMemo(() => storageService.getAllProgress(), []);
 
   /**
    * Parse a human-readable duration string such as "8 Hours", "45 Minutes",

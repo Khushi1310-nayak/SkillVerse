@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Award, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export const CertificationsList: React.FC = () => {
     loadCourses();
   }, []);
 
-  const progress = storageService.getAllProgress();
+  const progress = useMemo(() => storageService.getAllProgress(), []);
   const passedCourses = progress.filter(p => p.passed);
 
   if (!user) return null;

@@ -1,7 +1,7 @@
-﻿import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Flame, Trophy, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { storageService, DailyActivity, StreakData } from '../services/storageService';
-import { User } from '../types';
+import { User, Progress } from '../types';
 
 interface LearningStreakTabProps {
   user: User;
@@ -17,8 +17,7 @@ const toDateStr = (d: Date): string => d.toISOString().split('T')[0];
  * Seed the activity log from existing progress records stored in localStorage.
  * This runs once on mount so historical completions appear on the calendar.
  */
-function seedActivitiesFromProgress(existingData: StreakData): StreakData {
-  const allProgress = storageService.getAllProgress();
+function seedActivitiesFromProgress(existingData: StreakData, allProgress: Progress[]): StreakData {
   const updated: StreakData = {
     ...existingData,
     activities: { ...existingData.activities },
@@ -178,6 +177,7 @@ const ActivityTooltip: React.FC<{ data: TooltipData }> = ({ data }) => {
 export const LearningStreakTab: React.FC<LearningStreakTabProps> = ({ user }) => {
   const nowDate = new Date();
   const todayStr = toDateStr(nowDate);
+  const allProgress = useMemo(() => storageService.getAllProgress(), []);
 
   // Month navigation state — initialise to current month
   const [viewYear, setViewYear] = useState(nowDate.getFullYear());
@@ -189,19 +189,19 @@ export const LearningStreakTab: React.FC<LearningStreakTabProps> = ({ user }) =>
   // Streak data — seeded from existing progress on first render
   const [streakData, setStreakData] = useState<StreakData>(() => {
     const stored = storageService.getStreakData();
-    return seedActivitiesFromProgress(stored);
+    return seedActivitiesFromProgress(stored, storageService.getAllProgress());
   });
 
   // On mount: persist seeded data + update longest streak
   useEffect(() => {
-    const refreshed = seedActivitiesFromProgress(storageService.getStreakData());
+    const refreshed = seedActivitiesFromProgress(storageService.getStreakData(), allProgress);
     const longest = Math.max(calcLongestStreak(refreshed.activities), refreshed.longestStreak);
     refreshed.longestStreak = longest;
     storageService.saveStreakData(refreshed);
     setStreakData(refreshed);
     // run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [allProgress]);
 
   // Derived values
   function calcCurrentStreak(activities: Record<string, DailyActivity>, todayStr: string): number {

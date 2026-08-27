@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, Lock } from 'lucide-react';
@@ -309,7 +309,7 @@ export const CourseView: React.FC = () => {
   if (!course) return <NotFound />;
 
   // --- Prerequisite guard (no new storage — reuses existing localStorage progress) ---
-  const allProgress = storageService.getAllProgress();
+  const allProgress = useMemo(() => storageService.getAllProgress(), []);
   const isCourseLocked = !isCourseUnlocked(course, allProgress);
   const incompletePrereqs = isCourseLocked
     ? getIncompletePrerequisites(course, COURSES, allProgress)

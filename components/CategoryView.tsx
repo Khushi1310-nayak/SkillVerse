@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, PlayCircle, Lock, ArrowLeft, Loader2 } from 'lucide-react';
@@ -30,7 +30,7 @@ export const CategoryView: React.FC = () => {
     loadCategoryCourses();
   }, [id]);
 
-  const progress = storageService.getAllProgress();
+  const progress = useMemo(() => storageService.getAllProgress(), []);
 
   const getDifficultyLabel = (level: string) => {
     switch (level) {

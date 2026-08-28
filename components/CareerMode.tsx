@@ -161,6 +161,10 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [showXp, setShowXp] = useState(false);
 
+  const sanitizedAnswer = useMemo(() => {
+    return sanitizeHtml(question.answer);
+  }, [question.answer]);
+
   const handlePractice = () => {
     if (!isPracticed) {
       setShowXp(true);
@@ -239,7 +243,7 @@ const QuestionItemComponent: React.FC<QuestionItemProps> = ({
       <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="p-4 pt-0 border-t border-black/20 dark:border-white/5">
           <div className="mt-4 prose dark:prose-invert prose-sm max-w-none text-textMuted">
-            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(question.answer) }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizedAnswer }} />
           </div>
 
           <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl">

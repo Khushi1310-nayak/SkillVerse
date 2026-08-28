@@ -466,7 +466,14 @@ export const CourseView: React.FC = () => {
   };
 
   // Remove HTML tags for raw context for AI (sanitised + entity-decoded, not a regex strip)
-  const cleanContent = course.content ? htmlToPlainText(course.content) : '';
+  const cleanContent = useMemo(() => {
+    return course.content ? htmlToPlainText(course.content) : '';
+  }, [course.content]);
+
+  // Memoize sanitized HTML content to prevent repeated sanitization on re-renders
+  const sanitizedContent = useMemo(() => {
+    return course.content ? sanitizeHtml(course.content) : '';
+  }, [course.content]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in relative">
@@ -548,7 +555,7 @@ export const CourseView: React.FC = () => {
             <div className="animate-fade-in space-y-8">
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
-                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }} />
+                <div ref={contentRef} dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
               </div>
 
               <div className="border-t border-black/20 dark:border-white/10 pt-8 mt-12">

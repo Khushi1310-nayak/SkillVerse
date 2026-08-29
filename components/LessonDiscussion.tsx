@@ -262,10 +262,26 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({
     }
   };
 
-  // Group top-level comments and replies
-  const rootComments = comments.filter((c) => !c.parentId);
-  const getReplies = (parentId: string) =>
-    comments.filter((c) => c.parentId === parentId);
+  // Group top-level comments and replies using a Map for O(1) reply lookups
+  const { rootComments, repliesByParentId } = useMemo(() => {
+    const root: LessonComment[] = [];
+    const repliesMap = new Map<string, LessonComment[]>();
+
+    for (const comment of comments) {
+      if (!comment.parentId) {
+        root.push(comment);
+      } else {
+        const list = repliesMap.get(comment.parentId);
+        if (list) {
+          list.push(comment);
+        } else {
+          repliesMap.set(comment.parentId, [comment]);
+        }
+      }
+    }
+
+    return { rootComments: root, repliesByParentId: repliesMap };
+  }, [comments]);
 
   // Pinned comments always come first, regardless of the selected sort order.
   const sortedRootComments = useMemo(() => {
@@ -427,7 +443,7 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({
           ) : (
             <div className="space-y-6">
               {sortedRootComments.map((comment) => {
-                const replies = getReplies(comment.id);
+                const replies = repliesByParentId.get(comment.id) || [];
                 const hasUpvoted =
                   user &&
                   ((user.uid && comment.upvotedBy?.includes(user.uid)) ||

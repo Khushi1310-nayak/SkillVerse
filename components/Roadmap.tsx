@@ -60,10 +60,10 @@ export const Roadmap: React.FC<RoadmapProps> = ({ user }) => {
 
     const getCategoryLabel = (categoryId: string) => {
         switch (categoryId) {
-            case 'programming': return t('courses.categories.programming');
-            case 'dsa': return t('courses.categories.dsa');
-            case 'design': return t('courses.categories.design');
-            default: return t('courses.categories.default');
+            case 'programming': return t('courses.categories.programming', 'Programming Languages');
+            case 'dsa': return t('courses.categories.dsa', 'Data Structures & Algorithms');
+            case 'design': return t('courses.categories.design', 'Design');
+            default: return CATEGORIES.find(c => c.id === categoryId)?.title || categoryId;
         }
     };
 

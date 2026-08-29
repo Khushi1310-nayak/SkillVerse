@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Flame, Trophy, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
-import { storageService, DailyActivity, StreakData } from '../services/storageService';
+import { storageService, DailyActivity, StreakData, getLocalDateString } from '../services/storageService';
 import { User, Progress } from '../types';
 
 interface LearningStreakTabProps {
@@ -10,8 +10,6 @@ interface LearningStreakTabProps {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-const toDateStr = (d: Date): string => d.toISOString().split('T')[0];
 
 /**
  * Seed the activity log from existing progress records stored in localStorage.
@@ -25,7 +23,8 @@ function seedActivitiesFromProgress(existingData: StreakData, allProgress: Progr
 
   for (const prog of allProgress) {
     if (!prog.completedDate || !prog.passed) continue;
-    const dateStr = prog.completedDate.split('T')[0];
+    const dateObj = new Date(prog.completedDate);
+    const dateStr = !isNaN(dateObj.getTime()) ? getLocalDateString(dateObj) : prog.completedDate.split('T')[0];
     const courseId = prog.courseId;
     const existing = updated.activities[dateStr];
 
@@ -176,7 +175,7 @@ const ActivityTooltip: React.FC<{ data: TooltipData }> = ({ data }) => {
 // ---------------------------------------------------------------------------
 export const LearningStreakTab: React.FC<LearningStreakTabProps> = ({ user }) => {
   const nowDate = new Date();
-  const todayStr = toDateStr(nowDate);
+  const todayStr = getLocalDateString(nowDate);
   const allProgress = useMemo(() => storageService.getAllProgress(), []);
 
   // Month navigation state — initialise to current month
@@ -208,7 +207,7 @@ export const LearningStreakTab: React.FC<LearningStreakTabProps> = ({ user }) =>
     let count = 0;
     let cursor = new Date(todayStr + 'T00:00:00');
     while (true) {
-      const dateStr = toDateStr(cursor);
+      const dateStr = getLocalDateString(cursor);
       const activity = activities[dateStr];
       if (activity && activity.level > 0) {
         count++;

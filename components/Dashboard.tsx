@@ -5,7 +5,7 @@ import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, P
 import { CATEGORIES, COURSES, COMPANIES, BADGE_DEFINITIONS } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
-import { storageService, DailyChallengeSummary } from '../services/storageService';
+import { storageService, DailyChallengeSummary, getLocalDateString } from '../services/storageService';
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
@@ -143,7 +143,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   useEffect(() => {
     if (user.streak > 0) {
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateString();
       const hasCelebratedToday = localStorage.getItem(`streak_celebrated_${user.username}_${todayStr}`);
       if (!hasCelebratedToday) {
         setShowStreakModal(true);

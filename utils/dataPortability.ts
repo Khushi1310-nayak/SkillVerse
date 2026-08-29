@@ -7,8 +7,9 @@
  * and restores it again, validating the payload before it touches storage.
  */
 
-import { Progress, CareerProgress, SavedAINote, LessonNote } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet } from '../types';
 import { StreakData } from '../services/storageService';
+import { safeStorage } from './safeStorage';
 
 export const BACKUP_APP_MARKER = 'skillverse';
 export const BACKUP_SCHEMA_VERSION = 1;
@@ -29,6 +30,8 @@ export interface BackupSummary {
   mockInterviews: number;
   aiNotes: number;
   lessonNotes: number;
+  codeSnippets: number;
+  bookmarkedCourses: number;
   trackedDays: number;
   studyDays: number;
 }
@@ -52,18 +55,23 @@ export interface ImportResult {
 }
 
 // --- Storage keys -----------------------------------------------------------
-// Kept in sync with services/storageService.ts.
+// Kept in sync with services/storageService.ts and utils/courseBookmarks.ts.
 
 export const PROGRESS_KEY = 'skillverse_progress';
 export const CAREER_KEY = 'skillverse_career';
 export const LAST_VISITED_KEY = 'skillverse_last_visited';
 export const AI_NOTES_KEY = 'skillverse_ai_notes';
 export const LESSON_NOTES_KEY = 'skillverse_lesson_notes';
+export const CODE_SNIPPETS_KEY = 'skillverse_code_snippets';
+export const BOOKMARKS_KEY = 'skillverse_bookmarks';
 export const STREAK_KEY = 'skillverse_streak_data';
 export const STUDY_TIME_KEY = 'skillverse_study_time';
 
 const isPlainObject = (value: unknown): value is Record<string, any> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every(v => typeof v === 'string');
 
 /**
  * Every key we export, with the shape check used on import. Anything not
@@ -75,29 +83,19 @@ const BACKUP_KEYS: { key: string; validate: (value: unknown) => boolean }[] = [
   { key: CAREER_KEY, validate: isPlainObject },
   { key: AI_NOTES_KEY, validate: Array.isArray },
   { key: LESSON_NOTES_KEY, validate: Array.isArray },
+  { key: CODE_SNIPPETS_KEY, validate: Array.isArray },
+  { key: BOOKMARKS_KEY, validate: isStringArray },
   { key: STREAK_KEY, validate: isPlainObject },
   { key: STUDY_TIME_KEY, validate: isPlainObject },
   { key: LAST_VISITED_KEY, validate: isPlainObject },
 ];
 
 const readKey = (key: string): unknown => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw === null ? undefined : JSON.parse(raw);
-  } catch (err) {
-    console.warn(`Skipping "${key}" during export — it is not valid JSON:`, err);
-    return undefined;
-  }
+  return safeStorage.readJSON(key, undefined);
 };
 
 const writeKey = (key: string, value: unknown): boolean => {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (err) {
-    console.error(`Could not restore "${key}":`, err);
-    return false;
-  }
+  return safeStorage.writeJSON(key, value);
 };
 
 // --- Export -----------------------------------------------------------------
@@ -130,6 +128,8 @@ export const summarize = (envelope: BackupEnvelope): BackupSummary => {
   const career = (data[CAREER_KEY] as CareerProgress) || null;
   const aiNotes = (data[AI_NOTES_KEY] as SavedAINote[]) || [];
   const lessonNotes = (data[LESSON_NOTES_KEY] as LessonNote[]) || [];
+  const codeSnippets = (data[CODE_SNIPPETS_KEY] as SavedSnippet[]) || [];
+  const bookmarkedCourses = (data[BOOKMARKS_KEY] as string[]) || [];
   const streak = (data[STREAK_KEY] as StreakData) || null;
   const studyTime = (data[STUDY_TIME_KEY] as Record<string, number>) || null;
 
@@ -139,6 +139,8 @@ export const summarize = (envelope: BackupEnvelope): BackupSummary => {
     mockInterviews: career?.mockInterviewScores?.length || 0,
     aiNotes: aiNotes.length,
     lessonNotes: lessonNotes.length,
+    codeSnippets: codeSnippets.length,
+    bookmarkedCourses: bookmarkedCourses.length,
     trackedDays: streak?.activities ? Object.keys(streak.activities).length : 0,
     studyDays: studyTime ? Object.keys(studyTime).length : 0,
   };
@@ -311,13 +313,13 @@ const mergeCareer = (current: CareerProgress, incoming: CareerProgress): CareerP
   };
 };
 
-/** Union of two note lists by id, keeping whichever copy was edited last. */
-const mergeNotes = <T extends { id: string; updatedAt?: string; savedAt?: string }>(
+/** Union of two item lists by id, keeping whichever copy was edited/created last. */
+const mergeNotes = <T extends { id: string; updatedAt?: string; savedAt?: string; createdAt?: string }>(
   current: T[],
   incoming: T[]
 ): T[] => {
   const byId = new Map<string, T>();
-  const stamp = (note: T) => Date.parse(note.updatedAt || note.savedAt || '') || 0;
+  const stamp = (note: T) => Date.parse(note.updatedAt || note.savedAt || note.createdAt || '') || 0;
 
   [...current, ...incoming].forEach(note => {
     if (!note?.id) return;
@@ -328,6 +330,10 @@ const mergeNotes = <T extends { id: string; updatedAt?: string; savedAt?: string
   });
 
   return Array.from(byId.values());
+};
+
+const mergeBookmarks = (current: string[], incoming: string[]): string[] => {
+  return Array.from(new Set([...(current || []), ...(incoming || [])]));
 };
 
 const mergeStreak = (current: StreakData, incoming: StreakData): StreakData => {
@@ -380,6 +386,10 @@ const mergeValue = (key: string, current: unknown, incoming: unknown): unknown =
       return mergeNotes(current as SavedAINote[], incoming as SavedAINote[]);
     case LESSON_NOTES_KEY:
       return mergeNotes(current as LessonNote[], incoming as LessonNote[]);
+    case CODE_SNIPPETS_KEY:
+      return mergeNotes(current as SavedSnippet[], incoming as SavedSnippet[]);
+    case BOOKMARKS_KEY:
+      return mergeBookmarks(current as string[], incoming as string[]);
     case STREAK_KEY:
       return mergeStreak(current as StreakData, incoming as StreakData);
     case STUDY_TIME_KEY:
@@ -418,3 +428,4 @@ export const restoreBackup = (envelope: BackupEnvelope, mode: ImportMode = 'merg
 
   return { ok: failedKeys.length === 0, restoredKeys, failedKeys, errors };
 };
+

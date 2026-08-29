@@ -101,6 +101,8 @@ export const DataPortabilityPanel: React.FC = () => {
         { label: 'Courses', value: summary.courses },
         { label: 'Lesson notes', value: summary.lessonNotes },
         { label: 'AI notes', value: summary.aiNotes },
+        { label: 'Code snippets', value: summary.codeSnippets },
+        { label: 'Bookmarks', value: summary.bookmarkedCourses },
         { label: 'Practiced Qs', value: summary.practicedQuestions },
         { label: 'Mock interviews', value: summary.mockInterviews },
         { label: 'Streak days', value: summary.trackedDays },

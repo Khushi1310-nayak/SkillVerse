@@ -36,6 +36,7 @@ const DocumentationPage = lazy(() => import('./components/DocumentationPage').th
 const PublicProfilePage = lazy(() => import('./components/PublicProfilePage').then(m => ({ default: m.PublicProfilePage })));
 const NotesPage = lazy(() => import('./components/NotesPage'));
 const AnalyticsDashboard = lazy(() => import('./components/AnalyticsDashboard').then(m => ({ default: m.AnalyticsDashboard })));
+const AchievementGallery = lazy(() => import('./components/AchievementGallery').then(m => ({ default: m.AchievementGallery })));
 
 const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
   <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
@@ -126,6 +127,7 @@ const AppRoutes = () => {
                           <Route path="/saved" element={<SavedCourses />} />
                           <Route path="/notes" element={<NotesPage />} />
                           <Route path="/analytics" element={<AnalyticsDashboard user={appUser} />} />
+                          <Route path="/achievements" element={<AchievementGallery user={appUser} />} />
                           <Route path="/roadmap" element={<Roadmap user={appUser} />} />
                           <Route path="/playground" element={<CodingPracticePlayground />} />
                           <Route path="/career" element={<CareerMode user={appUser} />} />

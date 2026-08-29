@@ -96,7 +96,11 @@ export const CourseView: React.FC = () => {
   const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Top-level unconditional hooks (must remain above all early returns)
   const allProgress = useMemo(() => storageService.getAllProgress(), []);
+  const cleanContent = useMemo(() => (course?.content ? htmlToPlainText(course.content) : ''), [course?.content]);
+  const sanitizedContent = useMemo(() => (course?.content ? sanitizeHtml(course.content) : ''), [course?.content]);
 
   // --- Timed Practice Exam Mode ---
   const EXAM_SECONDS_PER_QUESTION = 60; // 1 minute per question, matching real exam pacing
@@ -464,16 +468,6 @@ export const CourseView: React.FC = () => {
     };
     return wMap[rounded];
   };
-
-  // Remove HTML tags for raw context for AI (sanitised + entity-decoded, not a regex strip)
-  const cleanContent = useMemo(() => {
-    return course.content ? htmlToPlainText(course.content) : '';
-  }, [course.content]);
-
-  // Memoize sanitized HTML content to prevent repeated sanitization on re-renders
-  const sanitizedContent = useMemo(() => {
-    return course.content ? sanitizeHtml(course.content) : '';
-  }, [course.content]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in relative">

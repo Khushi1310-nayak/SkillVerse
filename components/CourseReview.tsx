@@ -77,7 +77,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
         return widths[rounded] || 'w-0';
     };
 
-    const RatingBreakdown = () => (
+    const renderRatingBreakdown = () => (
         <div className="space-y-1.5 max-w-xs w-full">
             {[5, 4, 3, 2, 1].map(star => (
                 <div key={star} className="flex items-center gap-2">
@@ -186,7 +186,7 @@ export const CourseReview: React.FC<CourseReviewProps> = ({ courseId, user }) =>
                             <span className="text-sm font-bold text-textMain">{average.toFixed(1)}</span>
                             <span className="text-xs text-textMuted">({count} {count === 1 ? 'review' : 'reviews'})</span>
                         </div>
-                        <RatingBreakdown />
+                        {renderRatingBreakdown()}
                     </div>
                 )}
             </div>

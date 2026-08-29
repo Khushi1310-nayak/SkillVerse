@@ -39,7 +39,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 setNotifications(items);
             },
             (error) => {
-                console.error('Error loading notifications:', error);
+                // Non-blocking background sync; fail gracefully if permissions not yet deployed
+                console.warn('Notifications background sync deferred:', error?.message || error);
+                setNotifications([]);
             }
         );
 

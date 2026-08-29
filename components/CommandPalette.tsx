@@ -16,6 +16,9 @@ import {
     X,
 } from 'lucide-react';
 import { CATEGORIES, COURSES, COMPANIES } from '../constants';
+import { firestoreService } from '../services/firestoreService';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { Course } from '../types';
 
 interface CommandPaletteProps {
     isOpen: boolean;
@@ -51,13 +54,51 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);
+    const [courses, setCourses] = useState<Course[]>(COURSES);
     const inputRef = useRef<HTMLInputElement>(null);
+    const dialogRef = useRef<HTMLDivElement>(null);
+    const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+    // Traps focus inside the dialog, handles Escape, and restores focus on close
+    useFocusTrap(dialogRef, isOpen, onClose);
+
+    // Lock body scrolling while palette is open
+    useEffect(() => {
+        if (!isOpen) return;
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [isOpen]);
+
+    // Discover courses loaded from Firestore in addition to static COURSES
+    useEffect(() => {
+        if (!isOpen) return;
+        let isMounted = true;
+        firestoreService.getCourses()
+            .then(data => {
+                if (!isMounted) return;
+                if (data && data.length > 0) {
+                    const combinedMap = new Map<string, Course>();
+                    COURSES.forEach(c => combinedMap.set(c.id, c));
+                    data.forEach(c => combinedMap.set(c.id, c));
+                    setCourses(Array.from(combinedMap.values()));
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching Firestore courses in CommandPalette:', err);
+            });
+        return () => {
+            isMounted = false;
+        };
+    }, [isOpen]);
 
     useEffect(() => {
         if (isOpen) {
             setQuery('');
             setActiveIndex(0);
-            // Autofocus once the modal has mounted
+            // Autofocus input once modal has mounted
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     }, [isOpen]);
@@ -95,7 +136,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             onSelect: () => goTo(`/category/${category.id}`),
         }));
 
-        const courseItems: PaletteItem[] = COURSES.map(course => ({
+        const courseItems: PaletteItem[] = courses.map(course => ({
             id: `course-${course.id}`,
             title: course.title,
             subtitle: course.level,
@@ -114,13 +155,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         }));
 
         // Full-content search: course content
-        const courseContentItems: PaletteItem[] = COURSES.map(course => ({
+        const courseContentItems: PaletteItem[] = courses.map(course => ({
             id: `course-content-${course.id}`,
             title: course.title,
             subtitle: 'Course Content',
             group: 'Course Content',
             icon: BookOpen,
-            content: stripHtml(course.content),
+            content: stripHtml(course.content || ''),
             onSelect: () => goTo(`/course/${course.id}`),
         }));
 
@@ -148,7 +189,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
         return [...navItems, ...categoryItems, ...courseItems, ...careerItems, ...courseContentItems, ...interviewAnswerItems, ...settingsItems];
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [courses]);
 
     const results = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -167,6 +208,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     useEffect(() => {
         setActiveIndex(0);
     }, [query]);
+
+    // Keep active option visible in scroll area during ArrowUp/ArrowDown navigation
+    useEffect(() => {
+        if (isOpen && itemRefs.current[activeIndex]) {
+            itemRefs.current[activeIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+    }, [activeIndex, isOpen]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'ArrowDown') {
@@ -198,19 +246,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         bucket.items.push({ item, index });
     });
 
+    const activeItem = results[activeIndex];
+    const activeOptionId = activeItem ? `command-palette-option-${activeItem.id}` : undefined;
+    const liveAnnouncement = results.length === 0
+        ? 'No results found.'
+        : `${results.length} result${results.length === 1 ? '' : 's'} available.`;
+
     return (
         <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-20 sm:pt-28">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
             <div
-                className="relative w-full max-w-xl bg-glass border border-black/20 dark:border-white/10 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden animate-fade-in-up"
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Command Palette"
+                tabIndex={-1}
+                className="relative w-full max-w-xl bg-glass border border-black/20 dark:border-white/10 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden animate-fade-in-up outline-none"
                 onKeyDown={handleKeyDown}
             >
+                {/* Screen reader live region for search results */}
+                <div className="sr-only" aria-live="polite" aria-atomic="true">
+                    {liveAnnouncement}
+                </div>
+
                 <div className="flex items-center gap-3 px-4 py-4 border-b border-black/10 dark:border-white/10">
                     <Search size={20} className="text-textMuted shrink-0" />
                     <input
                         ref={inputRef}
                         type="text"
+                        role="combobox"
+                        aria-expanded={isOpen}
+                        aria-haspopup="listbox"
+                        aria-controls="command-palette-listbox"
+                        aria-activedescendant={activeOptionId}
+                        aria-autocomplete="list"
+                        aria-label="Search command palette"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search courses, career tracks, settings, docs..."
@@ -221,7 +292,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                     </button>
                 </div>
 
-                <div className="max-h-96 overflow-y-auto no-scrollbar py-2">
+                <div
+                    id="command-palette-listbox"
+                    role="listbox"
+                    aria-label="Search results"
+                    className="max-h-96 overflow-y-auto no-scrollbar py-2"
+                >
                     {results.length === 0 ? (
                         <div className="px-4 py-8 text-center text-textMuted">No results found.</div>
                     ) : (
@@ -233,9 +309,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                                 {items.map(({ item, index }) => {
                                     const Icon = item.icon;
                                     const active = index === activeIndex;
+                                    const optionId = `command-palette-option-${item.id}`;
                                     return (
                                         <button
                                             key={item.id}
+                                            id={optionId}
+                                            ref={el => { itemRefs.current[index] = el; }}
+                                            role="option"
+                                            aria-selected={active}
                                             onClick={item.onSelect}
                                             onMouseEnter={() => setActiveIndex(index)}
                                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${active ? 'bg-gradient-main text-white' : 'text-textMain hover:bg-white/5'

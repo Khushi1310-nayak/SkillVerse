@@ -96,6 +96,7 @@ export const CourseView: React.FC = () => {
   const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const allProgress = useMemo(() => storageService.getAllProgress(), []);
 
   // --- Timed Practice Exam Mode ---
   const EXAM_SECONDS_PER_QUESTION = 60; // 1 minute per question, matching real exam pacing
@@ -309,7 +310,6 @@ export const CourseView: React.FC = () => {
   if (!course) return <NotFound />;
 
   // --- Prerequisite guard (no new storage — reuses existing localStorage progress) ---
-  const allProgress = useMemo(() => storageService.getAllProgress(), []);
   const isCourseLocked = !isCourseUnlocked(course, allProgress);
   const incompletePrereqs = isCourseLocked
     ? getIncompletePrerequisites(course, COURSES, allProgress)

@@ -43,6 +43,12 @@ service cloud.firestore {
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
 
       allow delete: if isOwner(userId) || isAdmin();
+
+      // Notifications subcollection
+      match /notifications/{notificationId} {
+        allow read, update, delete: if isOwner(userId);
+        allow create: if isAuthenticated();
+      }
     }
 
     // --- COURSES COLLECTION ---

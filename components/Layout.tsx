@@ -15,7 +15,8 @@ import {
   Code2,
   Bookmark,
   Map,
-  FileText
+  FileText,
+  Brain
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
@@ -232,6 +233,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} id="nav-roadmap" />
           <NavItem to="/playground" icon={Code2} label="Playground" id="nav-playground" />
           <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
+          <NavItem to="/analytics" icon={Brain} label="Analytics" id="nav-analytics" />
           <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
           {showAdminLink && (
             <NavItem to="/admin" icon={Shield} label={t('nav.admin')} id="nav-admin" />
@@ -297,6 +299,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} />
               <NavItem to="/playground" icon={Code2} label="Playground" />
               <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
+              <NavItem to="/analytics" icon={Brain} label="Analytics" />
               <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
               {showAdminLink && (
                 <NavItem to="/admin" icon={Shield} label={t('nav.admin')} />

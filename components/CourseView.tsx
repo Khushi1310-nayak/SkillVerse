@@ -96,6 +96,7 @@ export const CourseView: React.FC = () => {
   const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const allProgress = useMemo(() => storageService.getAllProgress(), []);
 
   // Top-level unconditional hooks (must remain above all early returns)
   const allProgress = useMemo(() => storageService.getAllProgress(), []);

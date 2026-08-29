@@ -35,6 +35,7 @@ const CredentialVerification = lazy(() => import('./components/CredentialVerific
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
 const PublicProfilePage = lazy(() => import('./components/PublicProfilePage').then(m => ({ default: m.PublicProfilePage })));
 const NotesPage = lazy(() => import('./components/NotesPage'));
+const AchievementGallery = lazy(() => import('./components/AchievementGallery').then(m => ({ default: m.AchievementGallery })));
 
 const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
   <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
@@ -128,6 +129,7 @@ const AppRoutes = () => {
                           <Route path="/playground" element={<CodingPracticePlayground />} />
                           <Route path="/career" element={<CareerMode user={appUser} />} />
                           <Route path="/certifications" element={<CertificationsList />} />
+                          <Route path="/achievements" element={<AchievementGallery user={appUser} />} />
                           <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />
                           <Route path="/category/:id" element={<CategoryView />} />
                           <Route path="/course/:id" element={<CourseView />} />

@@ -22,6 +22,14 @@ import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, Us
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
+// --- COURSE CATALOG CACHE (#328) ---
+// A single shared in-memory snapshot of the courses collection.  It is
+// populated on the first getCourses() call and cleared whenever the catalog
+// is mutated (createCourse / updateCourse / deleteCourse / seed functions).
+// This prevents repeated Firestore reads when the user navigates between
+// pages that all display the same catalog data.
+let _coursesCache: Course[] | null = null;
+
 // Helper to structure chapters for initial seed courses
 const generateInitialChapters = (topic: string): Chapter[] => {
   const sections = [
@@ -50,6 +58,7 @@ const generateInitialChapters = (topic: string): Chapter[] => {
 export const firestoreService = {
   // --- DATABASE SEEDING ---
   seedDatabase: async (): Promise<void> => {
+    _coursesCache = null; // invalidate before any seed writes
     try {
       const coursesCol = collection(db, "courses");
       const coursesSnap = await getDocs(coursesCol);
@@ -94,6 +103,7 @@ export const firestoreService = {
   },
 
   forceReseedDatabase: async (): Promise<void> => {
+    _coursesCache = null; // invalidate before any seed writes
     try {
       console.log("Force re-seeding courses to Firestore...");
       for (const course of COURSES) {
@@ -135,11 +145,15 @@ export const firestoreService = {
 
   // --- COURSES CRUD ---
   getCourses: async (): Promise<Course[]> => {
+    if (_coursesCache !== null) {
+      return _coursesCache;
+    }
     const querySnapshot = await getDocs(collection(db, "courses"));
     const courses: Course[] = [];
     querySnapshot.forEach((docSnap) => {
       courses.push({ id: docSnap.id, ...docSnap.data() } as Course);
     });
+    _coursesCache = courses;
     return courses;
   },
 
@@ -153,6 +167,7 @@ export const firestoreService = {
   },
 
   createCourse: async (course: Course): Promise<void> => {
+    _coursesCache = null; // invalidate so the next getCourses() re-reads Firestore
     await setDoc(doc(db, "courses", course.id), {
       categoryId: course.categoryId,
       title: course.title,
@@ -175,11 +190,13 @@ export const firestoreService = {
   },
 
   updateCourse: async (id: string, course: Partial<Course>): Promise<void> => {
+    _coursesCache = null; // invalidate so the next getCourses() re-reads Firestore
     const docRef = doc(db, "courses", id);
     await updateDoc(docRef, course);
   },
 
   deleteCourse: async (id: string): Promise<void> => {
+    _coursesCache = null; // invalidate so the next getCourses() re-reads Firestore
     await deleteDoc(doc(db, "courses", id));
     await deleteDoc(doc(db, "quizzes", id));
   },

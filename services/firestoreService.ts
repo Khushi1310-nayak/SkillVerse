@@ -13,12 +13,13 @@ import {
   where,
   orderBy,
   limit,
+  onSnapshot,
   serverTimestamp,
   increment,
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PairSession, PairSessionParticipant } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
@@ -1059,5 +1060,162 @@ export const firestoreService = {
       kudosCount: increment(1),
       kudosUsers: arrayUnion(currentUserId),
     });
+  },
+
+  // --- PAIR PROGRAMMING SESSIONS ---
+
+  createPairSession: async (
+    hostUserId: string,
+    username: string,
+    code: string,
+    language: string,
+  ): Promise<PairSession> => {
+    try {
+      const now = new Date().toISOString();
+      const hostParticipant: PairSessionParticipant = {
+        userId: hostUserId,
+        username,
+        joinedAt: now,
+        lastActiveAt: now,
+      };
+      const sessionData = {
+        hostUserId,
+        code,
+        language,
+        lastEditedBy: hostUserId,
+        lastEditedAt: now,
+        output: '',
+        outputUpdatedAt: now,
+        participants: [hostParticipant],
+        createdAt: now,
+      };
+      const docRef = await addDoc(collection(db, 'pairSessions'), sessionData);
+      // Write the generated id back into the document so reads include it
+      await updateDoc(docRef, { id: docRef.id });
+      return { id: docRef.id, ...sessionData };
+    } catch (err) {
+      console.error('Error creating pair session:', err);
+      throw err;
+    }
+  },
+
+  joinPairSession: async (
+    sessionId: string,
+    userId: string,
+    username: string,
+    photoURL?: string,
+  ): Promise<void> => {
+    try {
+      const now = new Date().toISOString();
+      const participant: PairSessionParticipant = {
+        userId,
+        username,
+        ...(photoURL ? { photoURL } : {}),
+        joinedAt: now,
+        lastActiveAt: now,
+      };
+      const sessionRef = doc(db, 'pairSessions', sessionId);
+      // arrayUnion prevents duplicate entries if the user joins from two tabs;
+      // objects in Firestore arrayUnion are compared by deep equality, so an
+      // updated lastActiveAt on a second join will not deduplicate — use a
+      // transaction to read first and replace if already present.
+      const sessionSnap = await getDoc(sessionRef);
+      if (!sessionSnap.exists()) throw new Error('Pair session not found.');
+      const existing: PairSessionParticipant[] =
+        sessionSnap.data().participants || [];
+      const alreadyIn = existing.some((p) => p.userId === userId);
+      if (alreadyIn) {
+        // Refresh lastActiveAt for a reconnecting participant
+        const updated = existing.map((p) =>
+          p.userId === userId ? { ...p, lastActiveAt: now } : p,
+        );
+        await updateDoc(sessionRef, { participants: updated });
+      } else {
+        await updateDoc(sessionRef, {
+          participants: arrayUnion(participant),
+        });
+      }
+    } catch (err) {
+      console.error('Error joining pair session:', err);
+      throw err;
+    }
+  },
+
+  leavePairSession: async (
+    sessionId: string,
+    userId: string,
+  ): Promise<void> => {
+    try {
+      const sessionRef = doc(db, 'pairSessions', sessionId);
+      const sessionSnap = await getDoc(sessionRef);
+      if (!sessionSnap.exists()) return; // session may already be gone
+      const existing: PairSessionParticipant[] =
+        sessionSnap.data().participants || [];
+      const participant = existing.find((p) => p.userId === userId);
+      if (!participant) return;
+      // arrayRemove requires the exact object value; since lastActiveAt may
+      // have drifted, filter manually and write the whole array.
+      const updated = existing.filter((p) => p.userId !== userId);
+      await updateDoc(sessionRef, { participants: updated });
+    } catch (err) {
+      console.error('Error leaving pair session:', err);
+      throw err;
+    }
+  },
+
+  updatePairSessionCode: async (
+    sessionId: string,
+    userId: string,
+    code: string,
+  ): Promise<void> => {
+    try {
+      const sessionRef = doc(db, 'pairSessions', sessionId);
+      await updateDoc(sessionRef, {
+        code,
+        lastEditedBy: userId,
+        lastEditedAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Error updating pair session code:', err);
+      throw err;
+    }
+  },
+
+  updatePairSessionOutput: async (
+    sessionId: string,
+    output: string,
+  ): Promise<void> => {
+    try {
+      const sessionRef = doc(db, 'pairSessions', sessionId);
+      await updateDoc(sessionRef, {
+        output,
+        outputUpdatedAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Error updating pair session output:', err);
+      throw err;
+    }
+  },
+
+  subscribeToPairSession: (
+    sessionId: string,
+    callback: (session: PairSession | null) => void,
+  ): (() => void) => {
+    const sessionRef = doc(db, 'pairSessions', sessionId);
+    const unsubscribe = onSnapshot(
+      sessionRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          callback({ id: docSnap.id, ...docSnap.data() } as PairSession);
+        } else {
+          callback(null);
+        }
+      },
+      (error) => {
+        console.error('Pair session subscription error:', error);
+        callback(null);
+      },
+    );
+    return unsubscribe;
   },
 };

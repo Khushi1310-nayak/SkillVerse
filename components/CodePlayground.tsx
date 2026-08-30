@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send } from 'lucide-react';
+import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send, Users } from 'lucide-react';
 import { storageService } from '../services/storageService';
+import { firestoreService } from '../services/firestoreService';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { SavedSnippet } from '../types';
 
 interface CodePlaygroundProps {
@@ -40,6 +44,34 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   const [showSnippetsPanel, setShowSnippetsPanel] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [snippetNameDraft, setSnippetNameDraft] = useState('');
+  const [isStartingPairSession, setIsStartingPairSession] = useState(false);
+
+  const navigate = useNavigate();
+  const { user, appUser } = useAuthContext();
+  const { showToast } = useToast();
+
+  const handleStartPairSession = async () => {
+    if (!user?.uid) {
+      showToast({ message: 'Please log in to start a pair programming session.', type: 'error' });
+      return;
+    }
+    setIsStartingPairSession(true);
+    try {
+      const username = appUser?.username || user.displayName || 'Learner';
+      const session = await firestoreService.createPairSession(
+        user.uid,
+        username,
+        code || initialCode,
+        language || 'javascript'
+      );
+      navigate(`/pair-session/${session.id}`, { state: { autoOpenShare: true } });
+    } catch (err) {
+      console.error('Error starting pair session:', err);
+      showToast({ message: 'Failed to start pair programming session.', type: 'error' });
+    } finally {
+      setIsStartingPairSession(false);
+    }
+  };
 
   useEffect(() => {
     setSavedSnippets(storageService.getSavedSnippets());
@@ -201,6 +233,22 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
           >
             <Save size={12} />
             Save
+          </button>
+
+          <button
+            type="button"
+            onClick={handleStartPairSession}
+            disabled={isStartingPairSession}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-primaryLight bg-primary/10 hover:bg-primary/20 hover:text-white rounded-lg border border-primary/25 font-semibold transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight disabled:opacity-50"
+            title="Start a live collaborative pair programming session"
+            aria-label="Start Pair Session"
+          >
+            {isStartingPairSession ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <Users size={12} />
+            )}
+            Pair Program
           </button>
 
           {onRequestReview && language && (

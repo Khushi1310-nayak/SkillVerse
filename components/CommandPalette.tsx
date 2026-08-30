@@ -58,6 +58,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     const inputRef = useRef<HTMLInputElement>(null);
     const dialogRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+    const lastFetchedCoursesRef = useRef<Course[] | null>(null);
 
     // Traps focus inside the dialog, handles Escape, and restores focus on close
     useFocusTrap(dialogRef, isOpen, onClose);
@@ -80,6 +81,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             .then(data => {
                 if (!isMounted) return;
                 if (data && data.length > 0) {
+                    if (lastFetchedCoursesRef.current === data) return;
+                    lastFetchedCoursesRef.current = data;
                     const combinedMap = new Map<string, Course>();
                     COURSES.forEach(c => combinedMap.set(c.id, c));
                     data.forEach(c => combinedMap.set(c.id, c));

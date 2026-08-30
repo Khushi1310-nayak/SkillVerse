@@ -184,6 +184,7 @@
         "retryReminder": "Take a moment to review the course material before trying again!",
         "retryCountdown": "⏳ You can retry in {{time}}",
         "retry": "Retry Quiz",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "Retrying quizzes is disabled in your settings.",
         "reviewAnswers": "Review Answers"
       }

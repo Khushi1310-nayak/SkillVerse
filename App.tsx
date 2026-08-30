@@ -30,6 +30,7 @@ const Roadmap = lazy(() => import('./components/Roadmap').then(m => ({ default: 
 const CertificationsList = lazy(() => import('./components/CertificationsList').then(m => ({ default: m.CertificationsList })));
 const CareerMode = lazy(() => import('./components/CareerMode').then(m => ({ default: m.CareerMode })));
 const CodingPracticePlayground = lazy(() => import('./components/CodingPracticePlayground').then(m => ({ default: m.CodingPracticePlayground })));
+const CodeReviewQueue = lazy(() => import('./components/CodeReviewQueue').then(m => ({ default: m.CodeReviewQueue })));
 const Onboarding = lazy(() => import('./components/Onboarding').then(m => ({ default: m.Onboarding })));
 const CredentialVerification = lazy(() => import('./components/CredentialVerification').then(m => ({ default: m.CredentialVerification })));
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
@@ -124,6 +125,7 @@ const AppRoutes = () => {
                           <Route path="/saved" element={<SavedCourses />} />
                           <Route path="/roadmap" element={<Roadmap user={appUser} />} />
                           <Route path="/playground" element={<CodingPracticePlayground />} />
+                          <Route path="/code-review" element={<CodeReviewQueue />} />
                           <Route path="/career" element={<CareerMode user={appUser} />} />
                           <Route path="/certifications" element={<CertificationsList />} />
                           <Route path="/settings" element={<Settings user={appUser} onPreviewUpdate={handlePreviewUpdate} onUpdateUser={handleUpdateUser} onLogout={handleLogout} />} />

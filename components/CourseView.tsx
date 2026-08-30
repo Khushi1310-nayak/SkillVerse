@@ -94,6 +94,7 @@ export const CourseView: React.FC = () => {
   const [score, setScore] = useState(0);
   const [passed, setPassed] = useState(false);
   const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
+  const [retakeMode, setRetakeMode] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -101,6 +102,13 @@ export const CourseView: React.FC = () => {
   const allProgress = useMemo(() => storageService.getAllProgress(), []);
   const cleanContent = useMemo(() => (course?.content ? htmlToPlainText(course.content) : ''), [course?.content]);
   const sanitizedContent = useMemo(() => (course?.content ? sanitizeHtml(course.content) : ''), [course?.content]);
+  const activeQuestions = useMemo(() => {
+    if (retakeMode && course?.quiz) {
+      const filtered = course.quiz.filter(q => missedQuestionIds.includes(q.id.toString()));
+      if (filtered.length > 0) return filtered;
+    }
+    return course?.quiz || [];
+  }, [course?.quiz, retakeMode, missedQuestionIds]);
 
   // --- Timed Practice Exam Mode ---
   const EXAM_SECONDS_PER_QUESTION = 60; // 1 minute per question, matching real exam pacing
@@ -193,11 +201,17 @@ export const CourseView: React.FC = () => {
     // Load existing progress
     if (id) {
       const existing = storageService.getProgress(id);
-      if (existing && existing.passed) {
-        setPassed(true);
-        setScore(existing.score);
-        setQuizSubmitted(true);
-      } else if (settings?.autoSave) {
+      if (existing) {
+        if (existing.passed) {
+          setPassed(true);
+          setScore(existing.score);
+          setQuizSubmitted(true);
+        }
+        if (Array.isArray(existing.missedQuestionIds)) {
+          setMissedQuestionIds(existing.missedQuestionIds);
+        }
+      }
+      if ((!existing || !existing.passed) && settings?.autoSave) {
         const parsed = safeStorage.readJSON<{ selectedAnswers?: number[]; currentQuestion?: number } | null>(
           `quizState_${id}`,
           null,
@@ -321,20 +335,35 @@ export const CourseView: React.FC = () => {
 
   // A quiz document with `questions: []` (what createCourse writes for every
   // new course) must never reach the question-indexing / scoring code below.
-  const hasQuiz = !!course.quiz && course.quiz.length > 0;
+  const hasQuiz = activeQuestions.length > 0;
 
   const startExam = (timed: boolean) => {
     setExamMode(timed);
     setExamAutoSubmitted(false);
     setQuizStarted(true);
     if (timed && hasQuiz) {
-      const totalSeconds = course.quiz.length * EXAM_SECONDS_PER_QUESTION;
+      const totalSeconds = activeQuestions.length * EXAM_SECONDS_PER_QUESTION;
       examDeadlineRef.current = Date.now() + totalSeconds * 1000;
       setExamTimeLeft(totalSeconds);
     } else {
       examDeadlineRef.current = null;
       setExamTimeLeft(0);
     }
+  };
+
+  const startRetakeMistakes = () => {
+    if (!course?.quiz) return;
+    const validMissed = course.quiz.filter(q => missedQuestionIds.includes(q.id.toString()));
+    if (validMissed.length === 0) return;
+    setRetakeMode(true);
+    setSelectedAnswers([]);
+    setCurrentQuestion(0);
+    setQuizSubmitted(false);
+    setQuizStarted(true);
+    setExamMode(false);
+    setExamTimeLeft(0);
+    setExamAutoSubmitted(false);
+    examDeadlineRef.current = null;
   };
 
   const handleOptionSelect = (optionIndex: number) => {
@@ -344,8 +373,8 @@ export const CourseView: React.FC = () => {
     newAnswers[currentQuestion] = optionIndex;
     setSelectedAnswers(newAnswers);
 
-    if (settings?.soundEffects !== false) {
-      if (optionIndex === course.quiz[currentQuestion].correctAnswer) {
+    if (settings?.soundEffects !== false && activeQuestions[currentQuestion]) {
+      if (optionIndex === activeQuestions[currentQuestion].correctAnswer) {
         soundManager.playCorrect();
       } else {
         soundManager.playIncorrect();
@@ -362,6 +391,36 @@ export const CourseView: React.FC = () => {
       examIntervalRef.current = null;
     }
     examDeadlineRef.current = null;
+
+    if (retakeMode) {
+      const newMissedIds = missedQuestionIds.filter(id => {
+        const qIndex = activeQuestions.findIndex(q => q.id.toString() === id);
+        if (qIndex === -1) return true; // Keep questions not in this retake batch
+        return selectedAnswers[qIndex] !== activeQuestions[qIndex].correctAnswer;
+      });
+
+      setMissedQuestionIds(newMissedIds);
+      setQuizSubmitted(true);
+      setRetakeMode(false);
+
+      const existingProgress = storageService.getProgress(course.id);
+      if (existingProgress) {
+        storageService.saveProgress({
+          ...existingProgress,
+          missedQuestionIds: newMissedIds
+        });
+      } else {
+        storageService.saveProgress({
+          courseId: course.id,
+          completed: passed,
+          score: score,
+          passed: passed,
+          completedDate: new Date().toLocaleDateString(),
+          missedQuestionIds: newMissedIds
+        });
+      }
+      return;
+    }
 
     let correctCount = 0;
     const missedIds: string[] = [];
@@ -418,6 +477,7 @@ export const CourseView: React.FC = () => {
     setPassed(false);
     setMissedQuestionIds([]);
     setQuizStarted(false);
+    setRetakeMode(false);
     setExamMode(false);
     setExamTimeLeft(0);
     setExamAutoSubmitted(false);
@@ -622,7 +682,7 @@ export const CourseView: React.FC = () => {
                       className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold bg-gradient-main text-white hover:shadow-lg hover:shadow-primary/25 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <Clock size={18} />
-                      Timed Practice Mode ({formatCooldown(course.quiz.length * EXAM_SECONDS_PER_QUESTION)})
+                      Timed Practice Mode ({formatCooldown(activeQuestions.length * EXAM_SECONDS_PER_QUESTION)})
                     </button>
                   </div>
                 </div>
@@ -631,7 +691,7 @@ export const CourseView: React.FC = () => {
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-textMain">
                       {t('courseView.quiz.question', { current: currentQuestion + 1 })}{' '}
-                      <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: course.quiz.length })}</span>
+                      <span className="text-textMuted text-lg">/ {t('courseView.quiz.questionCount', { total: activeQuestions.length })}</span>
                     </h2>
                     <div className="flex items-center gap-4">
                       {examMode && (
@@ -650,21 +710,21 @@ export const CourseView: React.FC = () => {
                         </div>
                       )}
                       <div className="h-2 w-32 bg-black/5 dark:bg-white/10 rounded-full">
-                        <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, course.quiz.length)}`} />
+                        <div className={`h-full bg-primaryLight rounded-full transition-all duration-300 ${getProgressWidthClass(currentQuestion + 1, activeQuestions.length)}`} />
                       </div>
                     </div>
                   </div>
 
                   <div className="mb-8">
                     <p className="text-xl text-textMain font-medium leading-relaxed">
-                      {course.quiz[currentQuestion].question}
+                      {activeQuestions[currentQuestion]?.question}
                     </p>
                   </div>
 
-                  <div className="space-y-4 mb-10" role="radiogroup" aria-label={course.quiz[currentQuestion].question}>
-                    {course.quiz[currentQuestion].options.map((option, idx) => {
+                  <div className="space-y-4 mb-10" role="radiogroup" aria-label={activeQuestions[currentQuestion]?.question}>
+                    {activeQuestions[currentQuestion]?.options.map((option, idx) => {
                       const isSelected = selectedAnswers[currentQuestion] === idx;
-                      const isCorrect = idx === course.quiz[currentQuestion].correctAnswer;
+                      const isCorrect = idx === activeQuestions[currentQuestion].correctAnswer;
                       const showInstant = settings?.instantFeedback && selectedAnswers[currentQuestion] !== undefined;
 
                       let btnClass = isSelected
@@ -710,7 +770,7 @@ export const CourseView: React.FC = () => {
                     >
                       {t('courseView.quiz.previous')}
                     </button>
-                    {currentQuestion < course.quiz.length - 1 ? (
+                    {currentQuestion < activeQuestions.length - 1 ? (
                       <button
                         onClick={() => setCurrentQuestion(currentQuestion + 1)}
                         className="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-textMain px-6 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -720,7 +780,7 @@ export const CourseView: React.FC = () => {
                     ) : (
                       <button
                         onClick={submitQuiz}
-                        disabled={selectedAnswers.length < course.quiz.length}
+                        disabled={selectedAnswers.length < activeQuestions.length}
                         className="bg-gradient-main text-white px-8 py-2 rounded-lg font-bold shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {t('courseView.quiz.submit')}
@@ -790,6 +850,16 @@ export const CourseView: React.FC = () => {
                       ) : (
                         <p className="text-textMuted italic mt-4 w-full">{t('courseView.quiz.result.retryDisabled')}</p>
                       )
+                    )}
+
+                    {settings?.retryQuiz !== false && missedQuestionIds.length > 0 && (
+                      <button
+                        onClick={startRetakeMistakes}
+                        className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold bg-primary/10 text-primaryLight hover:bg-primary/20 border border-primary/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      >
+                        <RefreshCcw size={20} />
+                        {t('courseView.quiz.result.retakeMistakes', 'Retake Mistakes Only')} ({missedQuestionIds.length})
+                      </button>
                     )}
                   </div>
 

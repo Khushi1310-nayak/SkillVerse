@@ -194,6 +194,25 @@
       "body": "Something went wrong while fetching the course. Check your connection and try again.",
       "retry": "Try again",
       "backToCourses": "Back to courses"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {

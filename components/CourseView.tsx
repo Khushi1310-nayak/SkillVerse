@@ -23,6 +23,7 @@ import { LessonNotes } from './LessonNotes';
 import { CourseReview } from './CourseReview';
 import { CourseViewSkeleton } from './CourseViewSkeleton';
 import { CourseLoadError } from './CourseLoadError';
+import { FocusTimer } from './FocusTimer';
 
 export const CourseView: React.FC = () => {
   useActiveTimer();
@@ -607,6 +608,7 @@ export const CourseView: React.FC = () => {
             </div>
           ) : activeTab === 'learn' ? (
             <div className="animate-fade-in space-y-8">
+              <FocusTimer />
               <div className="prose dark:prose-invert prose-lg max-w-none text-textMain">
                 {/* Rendering the compiled HTML containing the beautiful Tailwind layout */}
                 <div ref={contentRef} dangerouslySetInnerHTML={{ __html: sanitizedContent }} />

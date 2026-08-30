@@ -753,9 +753,13 @@ export const firestoreService = {
     return newReport;
   },
 
-  getReports: async (): Promise<ContentReport[]> => {
+  getReports: async (
+    status: ReportStatus = "pending",
+    limitCount: number = 50,
+  ): Promise<ContentReport[]> => {
     const colRef = collection(db, "reports");
-    const querySnapshot = await getDocs(colRef);
+    const q = query(colRef, where("status", "==", status), limit(limitCount));
+    const querySnapshot = await getDocs(q);
     const reports: ContentReport[] = [];
     querySnapshot.forEach((docSnap) => {
       reports.push({ id: docSnap.id, ...docSnap.data() } as ContentReport);

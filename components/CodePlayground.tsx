@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X } from 'lucide-react';
+import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { SavedSnippet } from '../types';
 
 interface CodePlaygroundProps {
   initialCode: string;
+  language?: string;
+  onRequestReview?: (code: string, language: string) => Promise<void>;
+  isReviewSubmitting?: boolean;
 }
 
 interface LogEntry {
@@ -20,7 +23,12 @@ interface RuntimeError {
   stack?: string;
 }
 
-export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) => {
+export const CodePlayground: React.FC<CodePlaygroundProps> = ({
+  initialCode,
+  language,
+  onRequestReview,
+  isReviewSubmitting = false,
+}) => {
   const [code, setCode] = useState(initialCode);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [error, setError] = useState<RuntimeError | null>(null);
@@ -194,6 +202,24 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({ initialCode }) =
             <Save size={12} />
             Save
           </button>
+
+          {onRequestReview && language && (
+            <button
+              type="button"
+              onClick={() => onRequestReview(code, language)}
+              disabled={isReviewSubmitting || !code.trim()}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary/15 hover:bg-primary/25 disabled:opacity-50 text-primaryLight font-bold rounded-lg border border-primary/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight"
+              title="Request peer review for current code"
+              aria-label="Request peer review for current code"
+            >
+              {isReviewSubmitting ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Send size={12} />
+              )}
+              {isReviewSubmitting ? 'Submitting...' : 'Request Review'}
+            </button>
+          )}
 
           <button
             type="button"

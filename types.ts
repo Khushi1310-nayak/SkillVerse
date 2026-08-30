@@ -230,6 +230,30 @@ export interface LessonComment {
   pinned?: boolean;
 }
 
+export interface CodeReviewRequest {
+  id: string;
+  userId: string;
+  username: string;
+  code: string;
+  language: string;
+  problemContext?: string;
+  status: 'open' | 'reviewed';
+  createdAt: string;
+}
+
+export interface CodeReviewComment {
+  id: string;
+  requestId: string;
+  userId: string;
+  username: string;
+  content: string;
+  createdAt: string;
+  upvotes: number;
+  upvotedBy: string[];
+  parentId?: string | null;
+  pinned?: boolean;
+}
+
 export interface CourseReview {
   id: string;
   courseId: string;

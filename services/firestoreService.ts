@@ -18,7 +18,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
@@ -264,6 +264,152 @@ export const firestoreService = {
 
   deleteCompany: async (id: string): Promise<void> => {
     await deleteDoc(doc(db, "companies", id));
+  },
+
+  // --- CODE REVIEW REQUESTS ---
+  getCodeReviewRequests: async (): Promise<CodeReviewRequest[]> => {
+    const requestsQuery = query(
+      collection(db, "codeReviewRequests"),
+      where("status", "==", "open"),
+      orderBy("createdAt", "desc"),
+    );
+    const querySnapshot = await getDocs(requestsQuery);
+    const requests: CodeReviewRequest[] = [];
+
+    querySnapshot.forEach((docSnap) => {
+      requests.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewRequest);
+    });
+
+    return requests;
+  },
+
+  createCodeReviewRequest: async (
+    data: Omit<CodeReviewRequest, "id" | "createdAt" | "status">,
+  ): Promise<CodeReviewRequest> => {
+    const requestData = {
+      ...data,
+      status: "open" as const,
+      createdAt: new Date().toISOString(),
+    };
+    const docRef = await addDoc(collection(db, "codeReviewRequests"), requestData);
+
+    return {
+      id: docRef.id,
+      ...requestData,
+    };
+  },
+
+  markCodeReviewRequestReviewed: async (requestId: string): Promise<void> => {
+    const requestRef = doc(db, "codeReviewRequests", requestId);
+    const requestSnapshot = await getDoc(requestRef);
+    if (!requestSnapshot.exists()) {
+      throw new Error("Code review request not found.");
+    }
+
+    const request = requestSnapshot.data() as CodeReviewRequest;
+    await updateDoc(requestRef, { status: "reviewed" });
+
+    await firestoreService.createNotification(request.userId, {
+      type: "comment_reply",
+      message: "Your code review request has been reviewed.",
+      link: `/code-review/${requestId}`,
+    });
+  },
+
+  getCodeReviewComments: async (requestId: string): Promise<CodeReviewComment[]> => {
+    const commentsSnapshot = await getDocs(
+      collection(db, "codeReviewRequests", requestId, "comments"),
+    );
+    const comments: CodeReviewComment[] = [];
+    commentsSnapshot.forEach((docSnap) => {
+      comments.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewComment);
+    });
+    return comments.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  },
+
+  postCodeReviewComment: async (
+    commentData: Omit<CodeReviewComment, "id" | "createdAt" | "upvotes" | "upvotedBy">,
+  ): Promise<CodeReviewComment> => {
+    const comment: CodeReviewComment = {
+      ...commentData,
+      id: `review-comment-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: new Date().toISOString(),
+      upvotes: 0,
+      upvotedBy: [],
+    };
+    await setDoc(
+      doc(db, "codeReviewRequests", comment.requestId, "comments", comment.id),
+      comment,
+    );
+    return comment;
+  },
+
+  upvoteCodeReviewComment: async (
+    commentId: string,
+    userId: string,
+    requestId: string,
+  ): Promise<{ upvoted: boolean; upvotes: number }> => {
+    const commentRef = doc(db, "codeReviewRequests", requestId, "comments", commentId);
+    return runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(commentRef);
+      if (!snapshot.exists()) throw new Error("Code review comment not found.");
+
+      const data = snapshot.data() as Partial<CodeReviewComment>;
+      const upvotedBy = Array.isArray(data.upvotedBy) ? data.upvotedBy : [];
+      const upvoted = !upvotedBy.includes(userId);
+      const currentUpvotes = typeof data.upvotes === "number" ? data.upvotes : upvotedBy.length;
+      const upvotes = Math.max(0, currentUpvotes + (upvoted ? 1 : -1));
+
+      transaction.update(commentRef, {
+        upvotes: increment(upvoted ? 1 : -1),
+        upvotedBy: upvoted ? arrayUnion(userId) : arrayRemove(userId),
+      });
+      return { upvoted, upvotes };
+    });
+  },
+
+  editCodeReviewComment: async (
+    commentId: string,
+    requestId: string,
+    content: string,
+  ): Promise<void> => {
+    await updateDoc(
+      doc(db, "codeReviewRequests", requestId, "comments", commentId),
+      { content },
+    );
+  },
+
+  deleteCodeReviewComment: async (commentId: string, requestId: string): Promise<void> => {
+    const commentsSnapshot = await getDocs(
+      collection(db, "codeReviewRequests", requestId, "comments"),
+    );
+    const idsToRemove = [
+      commentId,
+      ...commentsSnapshot.docs
+        .filter((comment) => comment.data().parentId === commentId)
+        .map((comment) => comment.id),
+    ];
+    await Promise.all(
+      idsToRemove.map((id) =>
+        deleteDoc(doc(db, "codeReviewRequests", requestId, "comments", id)),
+      ),
+    );
+  },
+
+  pinCodeReviewComment: async (commentId: string, requestId: string): Promise<void> => {
+    await updateDoc(
+      doc(db, "codeReviewRequests", requestId, "comments", commentId),
+      { pinned: true },
+    );
+  },
+
+  unpinCodeReviewComment: async (commentId: string, requestId: string): Promise<void> => {
+    await updateDoc(
+      doc(db, "codeReviewRequests", requestId, "comments", commentId),
+      { pinned: false },
+    );
   },
 
   // --- LESSON DISCUSSIONS & Q&A ---

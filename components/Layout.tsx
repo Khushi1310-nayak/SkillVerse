@@ -13,6 +13,7 @@ import {
   Briefcase,
   Shield,
   Code2,
+  GitPullRequest,
   Bookmark,
   Map,
   FileText
@@ -231,6 +232,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} id="nav-notes" />
           <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} id="nav-roadmap" />
           <NavItem to="/playground" icon={Code2} label="Playground" id="nav-playground" />
+          <NavItem to="/code-review" icon={GitPullRequest} label="Peer Reviews" id="nav-code-review" />
           <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
           <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
           {showAdminLink && (
@@ -296,6 +298,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} />
               <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} />
               <NavItem to="/playground" icon={Code2} label="Playground" />
+              <NavItem to="/code-review" icon={GitPullRequest} label="Peer Reviews" />
               <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
               <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
               {showAdminLink && (

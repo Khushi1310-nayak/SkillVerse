@@ -5,10 +5,15 @@ import { COURSES } from '../constants';
 import { getDailyPlaygroundProblem, getCoursePlaygroundProblems } from '../utils/dailyProblemGenerator';
 import { PracticeProblem } from '../utils/playgroundProblems';
 import { Code2, Sparkles, BookOpen, ChevronRight, Lightbulb, CheckCircle2, Terminal, ArrowLeft, RefreshCw } from 'lucide-react';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { firestoreService } from '../services/firestoreService';
 
 export const CodingPracticePlayground: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, appUser } = useAuthContext();
+  const { showToast } = useToast();
 
   const initialCourseId = searchParams.get('course') || COURSES[0].id;
   const initialModuleParam = parseInt(searchParams.get('module') || '1', 10);
@@ -17,10 +22,37 @@ export const CodingPracticePlayground: React.FC = () => {
   const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId);
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(initialModuleIndex);
   const [showHint, setShowHint] = useState(false);
+  const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
 
   const activeCourse = COURSES.find(c => c.id === selectedCourseId) || COURSES[0];
   const problemsList = getCoursePlaygroundProblems(activeCourse.id);
   const currentProblem: PracticeProblem = problemsList[selectedModuleIndex] || getDailyPlaygroundProblem(activeCourse.id, selectedModuleIndex);
+  const currentLanguage = activeCourse.id;
+
+  const handleRequestReview = async (code: string, language: string) => {
+    if (isReviewSubmitting) return;
+    if (!user?.uid) {
+      showToast({ message: 'Please log in to request a code review.', type: 'error' });
+      return;
+    }
+
+    setIsReviewSubmitting(true);
+    try {
+      await firestoreService.createCodeReviewRequest({
+        userId: user.uid,
+        username: appUser?.username || user.displayName || 'Learner',
+        code,
+        language,
+        problemContext: `${activeCourse.title}: ${currentProblem.title}`,
+      });
+      showToast({ message: 'Code review requested successfully.', type: 'success' });
+    } catch (err) {
+      console.error('Error requesting code review:', err);
+      showToast({ message: 'Failed to request a code review.', type: 'error' });
+    } finally {
+      setIsReviewSubmitting(false);
+    }
+  };
 
   // Sync state with URL params
   useEffect(() => {
@@ -233,7 +265,13 @@ export const CodingPracticePlayground: React.FC = () => {
             </div>
             
             {/* Interactive Code Playground Component with Starter Code */}
-            <CodePlayground key={`${activeCourse.id}-${selectedModuleIndex}`} initialCode={currentProblem.starterCode} />
+            <CodePlayground
+              key={`${activeCourse.id}-${selectedModuleIndex}`}
+              initialCode={currentProblem.starterCode}
+              language={currentLanguage}
+              onRequestReview={handleRequestReview}
+              isReviewSubmitting={isReviewSubmitting}
+            />
           </div>
         </div>
 

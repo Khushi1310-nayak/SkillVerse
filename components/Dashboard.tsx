@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase, Trophy, Circle, Download } from 'lucide-react';
+import { Terminal, Network, Palette, CheckCircle, Clock, ChevronRight, Search, PlayCircle, Map, Flame, Loader2, Bookmark, History, Briefcase, Trophy, Circle, Download, Target } from 'lucide-react';
 import { CATEGORIES, COURSES, COMPANIES, BADGE_DEFINITIONS } from '../constants';
 import { firestoreService } from '../services/firestoreService';
 import { Course } from '../types';
@@ -13,7 +13,7 @@ import { ActivityFeedWidget } from './ActivityFeedWidget'; // 🛠️ Added Acti
 import { DailyMicroChallengeWidget } from './DailyMicroChallengeWidget';
 import { QuestBoard } from './QuestBoard';
 import { CommunityBossCard } from './CommunityBossCard';
-import { getRecommendedCourses } from '../utils/recommendations';
+import { getRecommendedCourses, getWeakTopicRecommendations } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
 import SkillRadarChart from "../components/SkillRadarChart";
@@ -202,6 +202,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const recommendedCourses = useMemo(
     () => getRecommendedCourses(user.settings, allProgress, courses),
     [user.settings, allProgress, courses]
+  );
+
+  const weakTopicRecommendations = useMemo(
+    () => getWeakTopicRecommendations(allProgress, courses),
+    [allProgress, courses]
   );
 
   const savedQuestionsList = useMemo(() => {
@@ -665,6 +670,52 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Strengthen These Skills (#368) */}
+      <div id="dash-strengthen-skills">
+        <h3 className="text-xl font-display font-bold text-textMain mb-6 flex items-center gap-2">
+          <span className="w-2 h-6 rounded-full bg-primaryLight" />
+          {t('dashboard.strengthenSkills.title', 'Strengthen These Skills')}
+        </h3>
+        {weakTopicRecommendations.length > 0 ? (
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {weakTopicRecommendations.map(rec => (
+              <Link
+                key={rec.course.id}
+                to={`/course/${rec.course.id}`}
+                className="group flex-shrink-0 w-72 bg-glass hover:bg-glass-hover border border-white/20 dark:border-white/10 p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-xs font-bold text-primaryLight uppercase tracking-wider">
+                      {getDifficultyLabel(rec.course.level)}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primaryLight border border-primary/30">
+                      Weak Topic
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-textMain leading-snug mb-2">
+                    {rec.course.title}
+                  </h4>
+                </div>
+                <div className="text-xs text-textMuted/90 mt-3 pt-3 border-t border-white/10 flex items-start gap-1.5">
+                  <Target size={14} className="text-primaryLight shrink-0 mt-0.5" />
+                  <span>{rec.explanation}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-glass border border-white/10 rounded-2xl p-6 text-center text-textMuted">
+            <p className="text-sm font-medium">
+              {t(
+                'dashboard.strengthenSkills.empty',
+                'No weak topics identified yet. Keep practicing quizzes to get personalized recommendations.'
+              )}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Recommended For You */}

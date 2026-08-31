@@ -20,6 +20,9 @@ import {
   validateSavedOnly,
 } from '../utils/courseFiltersValidation';
 
+const stripHtml = (html: string): string =>
+  html ? html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -33,6 +36,29 @@ export const CoursesList: React.FC = () => {
   const filterTime = validateTime(searchParams.get('time'));
   const sortBy = validateSort(searchParams.get('sort'));
   const savedOnly = searchParams.get('saved') === '1';
+
+  /**
+   * Memoized full-text search index mapping course ID to normalized plain text content
+   * (includes title, description, course body content, chapter titles, lesson titles & lesson contents).
+   */
+  const searchableTextMap = useMemo(() => {
+    const map = new Map<string, string>();
+    courses.forEach(course => {
+      let fullText = `${course.title || ''} ${course.description || ''} ${stripHtml(course.content || '')}`;
+      if (course.chapters && course.chapters.length > 0) {
+        course.chapters.forEach(chapter => {
+          fullText += ` ${chapter.title || ''}`;
+          if (chapter.lessons && chapter.lessons.length > 0) {
+            chapter.lessons.forEach(lesson => {
+              fullText += ` ${lesson.title || ''} ${stripHtml(lesson.content || '')}`;
+            });
+          }
+        });
+      }
+      map.set(course.id, fullText.toLowerCase());
+    });
+    return map;
+  }, [courses]);
 
   const updateFilter = (key: string, value: string) => {
     const nextParams = new URLSearchParams(searchParams);
@@ -123,9 +149,9 @@ export const CoursesList: React.FC = () => {
 
   const filtered = courses
     .filter(course => {
-      const q = search.toLowerCase();
-      const matchesSearch =
-        course.title.toLowerCase().includes(q) || course.description.toLowerCase().includes(q);
+      const q = search.trim().toLowerCase();
+      const courseSearchText = searchableTextMap.get(course.id) || '';
+      const matchesSearch = !q || courseSearchText.includes(q);
       const matchesCat = filterCat === 'all' || course.categoryId === filterCat;
       const matchesLevel = filterLevel === 'all' || course.level === filterLevel;
       const matchesSaved = !savedOnly || bookmarkedIds.includes(course.id);

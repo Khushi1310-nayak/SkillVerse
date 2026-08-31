@@ -203,7 +203,22 @@ export interface LessonNote {
   text: string;
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
+  visibility?: 'private' | 'public';
 }
+
+export interface PublicLessonNote {
+  id: string;
+  courseId: string;
+  lessonId: string;
+  userId: string;
+  username: string;
+  avatarId?: string;
+  photoURL?: string;
+  text: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+}
+
 
 export interface SavedSnippet {
   id: string;

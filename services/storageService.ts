@@ -463,7 +463,7 @@ export const storageService = {
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   },
 
-  saveLessonNote: (courseId: string, lessonId: string, text: string): LessonNote => {
+  saveLessonNote: (courseId: string, lessonId: string, text: string, visibility: 'private' | 'public' = 'private'): LessonNote => {
     const notes = storageService.getAllLessonNotes();
     const now = new Date().toISOString();
     const note: LessonNote = {
@@ -473,15 +473,23 @@ export const storageService = {
       text,
       createdAt: now,
       updatedAt: now,
+      visibility,
     };
     notes.unshift(note);
     safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return note;
   },
 
-  updateLessonNote: (id: string, text: string): LessonNote[] => {
+  updateLessonNote: (id: string, text: string, visibility?: 'private' | 'public'): LessonNote[] => {
     const notes = storageService.getAllLessonNotes().map(n =>
-      n.id === id ? { ...n, text, updatedAt: new Date().toISOString() } : n
+      n.id === id
+        ? {
+            ...n,
+            text,
+            updatedAt: new Date().toISOString(),
+            ...(visibility ? { visibility } : {}),
+          }
+        : n
     );
     safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
     return notes;

@@ -192,6 +192,48 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.userId);
     }
 
+    // --- PUBLIC LESSON NOTES (#355) ---
+    match /courses/{courseId}/lessons/{lessonId}/publicNotes/{noteId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'courseId', 'lessonId', 'userId', 'username',
+          'text', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'courseId', 'lessonId', 'userId', 'username',
+          'avatarId', 'photoURL', 'text', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.courseId == courseId
+        && request.resource.data.lessonId == lessonId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 5000
+        && request.resource.data.username is string
+        && request.resource.data.createdAt is string
+        && request.resource.data.updatedAt is string
+        && (!request.resource.data.keys().hasAny(['avatarId']) ||
+            request.resource.data.avatarId is string)
+        && (!request.resource.data.keys().hasAny(['photoURL']) ||
+            request.resource.data.photoURL is string);
+
+      allow update: if isOwner(resource.data.userId)
+        && request.resource.data.courseId == resource.data.courseId
+        && request.resource.data.lessonId == resource.data.lessonId
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'text', 'updatedAt', 'username', 'avatarId', 'photoURL'
+        ])
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 5000;
+
+      allow delete: if isOwner(resource.data.userId);
+    }
+
     // --- ACTIVITIES COLLECTION ---
     // Activity documents are authored by the user whose uid is stored in
     // userId. Other authenticated users may read the feed and update only

@@ -203,3 +203,151 @@ export const getCoursesForSkillGaps = (
     .filter(c => gapCategories.has(c.categoryId as SkillCategory) && !completedIds.has(c.id))
     .slice(0, SKILL_GAP_COURSE_LIMIT);
 };
+
+// --- WEAK-TOPIC-AWARE RECOMMENDATIONS (#368) ---
+
+export interface WeakTopic {
+  topicId: string;
+  topicTitle: string;
+  mistakeCount: number;
+}
+
+export interface WeakTopicCourseRecommendation {
+  course: Course;
+  weakTopics: string[];
+  explanation: string;
+  score: number;
+}
+
+/**
+ * Aggregates missed questions from user progress and derives ranked weak topics.
+ */
+export const getWeakTopics = (
+  allProgress: Progress[],
+  coursesList: Course[]
+): WeakTopic[] => {
+  if (!allProgress || !Array.isArray(allProgress)) return [];
+
+  const topicMap = new Map<string, { topicId: string; topicTitle: string; mistakeCount: number }>();
+  const courseMap = new Map<string, Course>();
+
+  (coursesList || []).forEach(c => {
+    if (c && c.id) {
+      courseMap.set(c.id.toLowerCase(), c);
+    }
+  });
+
+  allProgress.forEach(p => {
+    if (!p || !p.courseId || !Array.isArray(p.missedQuestionIds) || p.missedQuestionIds.length === 0) {
+      return;
+    }
+
+    const courseKey = p.courseId.toLowerCase();
+    const course = courseMap.get(courseKey);
+
+    // Skip if course / metadata is missing (graceful handling of missing questions)
+    if (!course) {
+      return;
+    }
+
+    // Deduplicate question IDs per progress record to prevent incorrect score inflation
+    const uniqueMissedIds = Array.from(new Set(p.missedQuestionIds.filter(Boolean)));
+    if (uniqueMissedIds.length === 0) return;
+
+    const topicId = course.id;
+    const topicTitle = course.title || course.id;
+    const key = topicId.toLowerCase();
+
+    const existing = topicMap.get(key);
+    if (existing) {
+      existing.mistakeCount += uniqueMissedIds.length;
+    } else {
+      topicMap.set(key, {
+        topicId,
+        topicTitle,
+        mistakeCount: uniqueMissedIds.length
+      });
+    }
+  });
+
+  const list = Array.from(topicMap.values());
+  list.sort((a, b) => b.mistakeCount - a.mistakeCount);
+  return list;
+};
+
+/**
+ * Recommends courses based on derived weak topics, generating explanations and ranking.
+ * Excludes completed courses and avoids duplicate recommendations.
+ */
+export const getWeakTopicRecommendations = (
+  allProgress: Progress[],
+  coursesList: Course[]
+): WeakTopicCourseRecommendation[] => {
+  if (!allProgress || !Array.isArray(allProgress) || !coursesList || !Array.isArray(coursesList)) {
+    return [];
+  }
+
+  const completedIds = new Set(
+    allProgress.filter(p => p && p.passed).map(p => p.courseId.toLowerCase())
+  );
+
+  const candidates = coursesList.filter(c => c && c.id && !completedIds.has(c.id.toLowerCase()));
+  const weakTopics = getWeakTopics(allProgress, coursesList);
+
+  if (weakTopics.length === 0 || candidates.length === 0) {
+    return [];
+  }
+
+  const scored: WeakTopicCourseRecommendation[] = [];
+
+  candidates.forEach(course => {
+    const courseIdKey = course.id.toLowerCase();
+    const courseTitleKey = (course.title || '').toLowerCase().trim();
+    const matchedWeakTopics: string[] = [];
+    let score = 0;
+
+    weakTopics.forEach(wt => {
+      const wtKey = wt.topicId.toLowerCase();
+      const wtTitleKey = wt.topicTitle.toLowerCase().trim();
+
+      let isMatch = false;
+
+      // 1. Direct course id or title match
+      if (courseIdKey === wtKey || courseTitleKey === wtTitleKey) {
+        score += wt.mistakeCount * 10;
+        isMatch = true;
+      }
+      // 2. Prerequisite match (e.g. candidate course requires a topic user is weak in)
+      else if (
+        Array.isArray(course.prerequisiteCourseIds) &&
+        course.prerequisiteCourseIds.some(pre => pre.toLowerCase() === wtKey)
+      ) {
+        score += wt.mistakeCount * 5;
+        isMatch = true;
+      }
+
+      if (isMatch && !matchedWeakTopics.includes(wt.topicTitle)) {
+        matchedWeakTopics.push(wt.topicTitle);
+      }
+    });
+
+    if (score > 0 && matchedWeakTopics.length > 0) {
+      let explanation = '';
+      if (matchedWeakTopics.length === 1) {
+        explanation = `Recommended because you've struggled with ${matchedWeakTopics[0]}.`;
+      } else {
+        explanation = `Strengthen ${matchedWeakTopics.join(' & ')} — covers topics you've missed repeatedly.`;
+      }
+
+      scored.push({
+        course,
+        weakTopics: matchedWeakTopics,
+        explanation,
+        score,
+      });
+    }
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored;
+};

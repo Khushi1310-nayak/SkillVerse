@@ -24,6 +24,12 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
     problemList = PLAYGROUND_PROBLEMS['cpp'];
   } else if (normalizedId === 'c' || normalizedId === 'c-programming' || normalizedId.startsWith('c-')) {
     problemList = PLAYGROUND_PROBLEMS['c'];
+  } else if (normalizedId.includes('go') || normalizedId.includes('golang')) {
+    problemList = PLAYGROUND_PROBLEMS['go'];
+  } else if (normalizedId.includes('rust')) {
+    problemList = PLAYGROUND_PROBLEMS['rust'];
+  } else if (normalizedId.includes('kotlin') || normalizedId.includes('kt')) {
+    problemList = PLAYGROUND_PROBLEMS['kotlin'];
   } else if (normalizedId.includes('array') || normalizedId.includes('dsa')) {
     problemList = PLAYGROUND_PROBLEMS['arrays'];
   } else if (normalizedId.includes('ui') || normalizedId.includes('design') || normalizedId.includes('ux')) {

@@ -675,6 +675,330 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
     }
   ],
 
+  'go': [
+    {
+      id: 'go-mod-1',
+      title: 'Module 1: Slice Deduplication with Seen Map',
+      difficulty: 'Easy',
+      category: 'Go',
+      description: 'Implement Deduplicate(nums []int) []int that removes duplicate integers from a Go slice while preserving original order in O(n) time using a map[int]bool.',
+      constraints: ['Time Complexity: O(n)', 'Preserve initial appearance order', 'Return allocated slice'],
+      sampleInputs: [
+        { input: '[4, 2, 4, 3, 2, 1, 5, 3]', output: '[4, 2, 3, 1, 5]' }
+      ],
+      starterCode: `package main\n\nimport "fmt"\n\nfunc Deduplicate(nums []int) []int {\n    seen := make(map[int]bool)\n    result := make([]int, 0, len(nums))\n    // TODO: Iterate nums, check seen map, and append unique values\n    \n    return result\n}\n\nfunc main() {\n    data := []int{4, 2, 4, 3, 2, 1, 5, 3};\n    fmt.Println("Deduplicated:", Deduplicate(data));\n}`,
+      solutionHint: 'for _, n := range nums { if !seen[n] { seen[n] = true; result = append(result, n); } } return result;'
+    },
+    {
+      id: 'go-mod-2',
+      title: 'Module 2: Interface Polymorphism & Struct Methods',
+      difficulty: 'Easy',
+      category: 'Go',
+      description: 'Define a Shape interface with Area() float64 and implement it on Rectangle and Circle structs.',
+      constraints: ['Strict Go interface contracts', 'Use math.Pi for circle area'],
+      sampleInputs: [
+        { input: 'Rectangle{10, 5}, Circle{3}', output: 'Total Area = 78.27' }
+      ],
+      starterCode: `package main\n\nimport (\n    "fmt"\n    "math"\n)\n\ntype Shape interface {\n    Area() float64\n}\n\ntype Rectangle struct {\n    Width, Height float64\n}\n\nfunc (r Rectangle) Area() float64 {\n    // TODO: Return width * height\n    return 0.0\n}\n\ntype Circle struct {\n    Radius float64\n}\n\nfunc (c Circle) Area() float64 {\n    // TODO: Return math.Pi * radius^2\n    return 0.0\n}\n\nfunc PrintTotalArea(shapes []Shape) float64 {\n    total := 0.0\n    for _, s := range shapes {\n        total += s.Area()\n    }\n    return total\n}\n\nfunc main() {\n    shapes := []Shape{\n        Rectangle{Width: 10, Height: 5},\n        Circle{Radius: 3},\n    }\n    fmt.Printf("Total Area: %.2f\\n", PrintTotalArea(shapes))\n}`,
+      solutionHint: 'func (r Rectangle) Area() float64 { return r.Width * r.Height } func (c Circle) Area() float64 { return math.Pi * c.Radius * c.Radius }'
+    },
+    {
+      id: 'go-mod-3',
+      title: 'Module 3: Fan-Out Concurrency with sync.WaitGroup and Channels',
+      difficulty: 'Medium',
+      category: 'Go',
+      description: 'Implement ProcessBatch(items []int, workerCount int) []int that processes integer items concurrently using worker goroutines, sync.WaitGroup, and buffered channels.',
+      constraints: ['Prevent deadlocks and race conditions', 'Close channels properly', 'Collect all results safely'],
+      sampleInputs: [
+        { input: 'items = [1, 2, 3, 4, 5, 6], workers = 3', output: 'Processed slice with 6 squared values' }
+      ],
+      starterCode: `package main\n\nimport (\n    "fmt"\n    "sync"\n)\n\nfunc ProcessBatch(items []int, workerCount int) []int {\n    jobs := make(chan int, len(items))\n    results := make(chan int, len(items))\n    var wg sync.WaitGroup\n\n    // TODO: Spawn workerCount worker goroutines\n    \n    // TODO: Send all items into jobs and close channel\n    \n    // TODO: Wait for workers and collect results into slice\n    \n    return nil\n}\n\nfunc main() {\n    numbers := []int{1, 2, 3, 4, 5, 6}\n    res := ProcessBatch(numbers, 3)\n    fmt.Println("Processed results count:", len(res))\n}`,
+      solutionHint: 'for w := 0; w < workerCount; w++ { wg.Add(1); go func() { defer wg.Done(); for j := range jobs { results <- j * j } }() }; for _, item := range items { jobs <- item }; close(jobs); wg.Wait(); close(results);'
+    },
+    {
+      id: 'go-mod-4',
+      title: 'Module 4: Concurrent Cache with sync.RWMutex',
+      difficulty: 'Medium',
+      category: 'Go',
+      description: 'Create a thread-safe ConcurrentCache struct with Get(key string) (string, bool) and Set(key, val string) methods guarded by sync.RWMutex.',
+      constraints: ['Use RLock for Get (multiple concurrent readers)', 'Use Lock for Set (exclusive writer)'],
+      sampleInputs: [
+        { input: 'cache.Set("lang", "Go"); cache.Get("lang")', output: '"Go", true' }
+      ],
+      starterCode: `package main\n\nimport (\n    "fmt"\n    "sync"\n)\n\ntype ConcurrentCache struct {\n    mu    sync.RWMutex\n    store map[string]string\n}\n\nfunc NewCache() *ConcurrentCache {\n    return &ConcurrentCache{store: make(map[string]string)}\n}\n\nfunc (c *ConcurrentCache) Get(key string) (string, bool) {\n    // TODO: Acquire RLock and return value\n    \n    return "", false\n}\n\nfunc (c *ConcurrentCache) Set(key, val string) {\n    // TODO: Acquire Lock and store value\n    \n}\n\nfunc main() {\n    cache := NewCache()\n    cache.Set("framework", "SkillVerse")\n    val, found := cache.Get("framework")\n    fmt.Printf("Found: %v, Value: %s\\n", found, val)\n}`,
+      solutionHint: 'Get: c.mu.RLock(); defer c.mu.RUnlock(); val, ok := c.store[key]; return val, ok. Set: c.mu.Lock(); defer c.mu.Unlock(); c.store[key] = val'
+    },
+    {
+      id: 'go-mod-5',
+      title: 'Module 5: Generator Stream Pipeline (Filter & Square)',
+      difficulty: 'Medium',
+      category: 'Go',
+      description: 'Build a composable channel pipeline: GenerateNumbers(nums ...int) <-chan int and SquareStream(in <-chan int) <-chan int.',
+      constraints: ['Unbuffered channels for lazy streaming', 'Close channels when producers finish'],
+      sampleInputs: [
+        { input: 'SquareStream(GenerateNumbers(2, 3, 4))', output: '4, 9, 16' }
+      ],
+      starterCode: `package main\n\nimport "fmt"\n\nfunc GenerateNumbers(nums ...int) <-chan int {\n    out := make(chan int)\n    go func() {\n        for _, n := range nums {\n            out <- n\n        }\n        close(out)\n    }()\n    return out\n}\n\nfunc SquareStream(in <-chan int) <-chan int {\n    out := make(chan int)\n    // TODO: Read from 'in', square numbers, send to 'out', and close when done\n    \n    return out\n}\n\nfunc main() {\n    stream := SquareStream(GenerateNumbers(2, 3, 4, 5))\n    for val := range stream {\n        fmt.Printf("%d ", val)\n    }\n    fmt.Println()\n}`,
+      solutionHint: 'go func() { for n := range in { out <- n * n }; close(out) }(); return out'
+    },
+    {
+      id: 'go-mod-6',
+      title: 'Module 6: Context Timeout & Worker Cancellation',
+      difficulty: 'Hard',
+      category: 'Go',
+      description: 'Implement FetchWithTimeout(ctx context.Context, url string, timeout time.Duration) (string, error) using context.WithTimeout and select statement.',
+      constraints: ['Return ctx.Err() on cancellation/timeout', 'Never leak worker goroutines'],
+      sampleInputs: [
+        { input: 'FetchWithTimeout(ctx, "https://api...", 50ms)', output: 'Returns context.DeadlineExceeded error on delay' }
+      ],
+      starterCode: `package main\n\nimport (\n    "context"\n    "errors"\n    "fmt"\n    "time"\n)\n\nfunc FetchWithTimeout(ctx context.Context, url string, timeout time.Duration) (string, error) {\n    ctx, cancel := context.WithTimeout(ctx, timeout)\n    defer cancel()\n\n    resultChan := make(chan string, 1)\n\n    go func() {\n        // Simulate work\n        time.Sleep(100 * time.Millisecond)\n        resultChan <- "Payload from " + url\n    }()\n\n    // TODO: Select on resultChan and ctx.Done()\n    \n    return "", errors.New("timeout")\n}\n\nfunc main() {\n    ctx := context.Background()\n    res, err := FetchWithTimeout(ctx, "https://api.skillverse.com", 200*time.Millisecond)\n    fmt.Println("Result:", res, "Err:", err)\n}`,
+      solutionHint: 'select { case res := <-resultChan: return res, nil; case <-ctx.Done(): return "", ctx.Err() }'
+    },
+    {
+      id: 'go-mod-7',
+      title: 'Module 7: Token Bucket Rate Limiter with Ticker',
+      difficulty: 'Hard',
+      category: 'Go',
+      description: 'Design a RateLimiter struct with Allow() bool that refills tokens at a fixed interval using a buffered channel and time.Ticker.',
+      constraints: ['Non-blocking Allow() calls', 'Clean shutdown of background ticker goroutine'],
+      sampleInputs: [
+        { input: 'Allow() called 3 times on capacity=2', output: 'true, true, false' }
+      ],
+      starterCode: `package main\n\nimport (\n    "fmt"\n    "time"\n)\n\ntype RateLimiter struct {\n    tokens chan struct{}\n    ticker *time.Ticker\n    stop   chan struct{}\n}\n\nfunc NewRateLimiter(ratePerSec int, burstCapacity int) *RateLimiter {\n    rl := &RateLimiter{\n        tokens: make(chan struct{}, burstCapacity),\n        ticker: time.NewTicker(time.Second / time.Duration(ratePerSec)),\n        stop:   make(chan struct{}),\n    }\n    for i := 0; i < burstCapacity; i++ {\n        rl.tokens <- struct{}{}\n    }\n    // TODO: Start refill goroutine reading ticker and adding tokens without blocking\n    \n    return rl\n}\n\nfunc (rl *RateLimiter) Allow() bool {\n    select {\n    case <-rl.tokens:\n        return true\n    default:\n        return false\n    }\n}\n\nfunc main() {\n    rl := NewRateLimiter(5, 2)\n    fmt.Println("Req 1 allowed:", rl.Allow())\n    fmt.Println("Req 2 allowed:", rl.Allow())\n    fmt.Println("Req 3 allowed (burst exceeded):", rl.Allow())\n}`,
+      solutionHint: 'go func() { for { select { case <-rl.ticker.C: select { case rl.tokens <- struct{}{}: default: }; case <-rl.stop: return } } }()'
+    },
+    {
+      id: 'go-mod-8',
+      title: 'Module 8: Consistent Hash Ring with Virtual Nodes',
+      difficulty: 'Hard',
+      category: 'Go',
+      description: 'Implement a ConsistentHashRing struct with AddNode(node string) and GetNode(key string) string mapping keys to closest ring position using binary search.',
+      constraints: ['Uniform distribution with virtual node replicates', 'Time Complexity: O(log(N * V)) lookup'],
+      sampleInputs: [
+        { input: 'AddNode("server-A"), GetNode("user-101")', output: '"server-A"' }
+      ],
+      starterCode: `package main\n\nimport (\n    "fmt"\n    "hash/fnv"\n    "sort"\n    "strconv"\n)\n\ntype HashRing struct {\n    vnodes  int\n    ring    []uint32\n    nodeMap map[uint32]string\n}\n\nfunc NewHashRing(vnodes int) *HashRing {\n    return &HashRing{\n        vnodes:  vnodes,\n        nodeMap: make(map[uint32]string),\n    }\n}\n\nfunc hashKey(key string) uint32 {\n    h := fnv.New32a()\n    h.Write([]byte(key))\n    return h.Sum32()\n}\n\nfunc (h *HashRing) AddNode(node string) {\n    // TODO: Hash vnodes for this node and insert into sorted ring\n    \n}\n\nfunc (h *HashRing) GetNode(key string) string {\n    // TODO: Hash key, binary search next largest hash on ring with wraparound\n    \n    return ""\n}\n\nfunc main() {\n    hr := NewHashRing(3)\n    hr.AddNode("server-A")\n    hr.AddNode("server-B")\n    fmt.Println("Node for user-101:", hr.GetNode("user-101"))\n    fmt.Println("Node for session-42:", hr.GetNode("session-42"))\n}`,
+      solutionHint: 'idx := sort.Search(len(h.ring), func(i int) bool { return h.ring[i] >= hash }); if idx == len(h.ring) { idx = 0 }; return h.nodeMap[h.ring[idx]]'
+    }
+  ],
+
+  'rust': [
+    {
+      id: 'rust-mod-1',
+      title: 'Module 1: Ownership & Slicing Vector Sum',
+      difficulty: 'Easy',
+      category: 'Rust',
+      description: 'Implement fn sum_even_numbers(numbers: &[i32]) -> i32 taking a borrowed slice and returning the sum of all even integers using iterators.',
+      constraints: ['Borrow with slice reference &[i32] without taking ownership', 'Use idiomatic iterator chaining'],
+      sampleInputs: [
+        { input: '[1, 2, 3, 4, 5, 6, 7, 8]', output: '20' }
+      ],
+      starterCode: `fn sum_even_numbers(numbers: &[i32]) -> i32 {\n    // TODO: Filter even numbers and sum with iterator\n    \n    0\n}\n\nfn main() {\n    let nums = vec![1, 2, 3, 4, 5, 6, 7, 8];\n    println!("Sum of evens: {}", sum_even_numbers(&nums));\n}`,
+      solutionHint: 'numbers.iter().filter(|&&x| x % 2 == 0).sum()'
+    },
+    {
+      id: 'rust-mod-2',
+      title: 'Module 2: Pattern Matching & Custom Option Reducer',
+      difficulty: 'Easy',
+      category: 'Rust',
+      description: 'Implement fn find_first_greater(slice: &[i32], threshold: i32) -> Option<usize> returning the index of the first element strictly greater than threshold.',
+      constraints: ['Return Option<usize> (Some(idx) or None)', 'Time Complexity: O(n)'],
+      sampleInputs: [
+        { input: 'items = [10, 25, 40, 55, 70], threshold = 30', output: 'Some(2)' }
+      ],
+      starterCode: `fn find_first_greater(slice: &[i32], threshold: i32) -> Option<usize> {\n    // TODO: Find first index where element > threshold\n    \n    None\n}\n\nfn main() {\n    let items = [10, 25, 40, 55, 70];\n    match find_first_greater(&items, 30) {\n        Some(idx) => println!("Found index: {}", idx),\n        None => println!("None found"),\n    }\n}`,
+      solutionHint: 'slice.iter().position(|&x| x > threshold)'
+    },
+    {
+      id: 'rust-mod-3',
+      title: 'Module 3: Trait Implementation & Summary Formatter',
+      difficulty: 'Medium',
+      category: 'Rust',
+      description: 'Define a Summary trait with summarize(&self) -> String and implement it on Article and Tweet structs.',
+      constraints: ['Implement trait contract for multiple distinct structs', 'Return formatted owned String'],
+      sampleInputs: [
+        { input: 'Article { title: "Rust Concurrency", author: "SkillVerse", ... }', output: '"Rust Concurrency by SkillVerse"' }
+      ],
+      starterCode: `pub trait Summary {\n    fn summarize(&self) -> String;\n}\n\npub struct Article {\n    pub title: String,\n    pub author: String,\n    pub content: String,\n}\n\nimpl Summary for Article {\n    fn summarize(&self) -> String {\n        // TODO: Format: "{title} by {author}"\n        format!("")\n    }\n}\n\npub struct Tweet {\n    pub username: String,\n    pub text: String,\n}\n\nimpl Summary for Tweet {\n    fn summarize(&self) -> String {\n        // TODO: Format: "@{username}: {text}"\n        format!("")\n    }\n}\n\nfn main() {\n    let post = Article {\n        title: String::from("Rust Concurrency"),\n        author: String::from("SkillVerse"),\n        content: String::from("..."),\n    };\n    println!("Summary: {}", post.summarize());\n}`,
+      solutionHint: 'format!("{} by {}", self.title, self.author) and format!("@{}: {}", self.username, self.text)'
+    },
+    {
+      id: 'rust-mod-4',
+      title: 'Module 4: Robust Error Propagation with Result and ? Operator',
+      difficulty: 'Medium',
+      category: 'Rust',
+      description: 'Create an AppError enum with EmptyInput and ParseFailed variants and write fn parse_and_validate(raw: &str) -> Result<u32, AppError>.',
+      constraints: ['Return custom Result<u32, AppError>', 'Handle string trimming and boundary checks [1..100]'],
+      sampleInputs: [
+        { input: '"42"', output: 'Ok(42)' },
+        { input: '""', output: 'Err(AppError::EmptyInput)' }
+      ],
+      starterCode: `#[derive(Debug, PartialEq)]\npub enum AppError {\n    EmptyInput,\n    ParseFailed,\n    OutOfRange(u32),\n}\n\npub fn parse_and_validate(raw: &str) -> Result<u32, AppError> {\n    if raw.trim().is_empty() {\n        return Err(AppError::EmptyInput);\n    }\n    // TODO: Parse string to u32, validate between 1 and 100\n    \n    Err(AppError::ParseFailed)\n}\n\nfn main() {\n    println!("Result '42': {:?}", parse_and_validate("42"));\n    println!("Result '': {:?}", parse_and_validate(""));\n    println!("Result '200': {:?}", parse_and_validate("200"));\n}`,
+      solutionHint: 'let val = raw.trim().parse::<u32>().map_err(|_| AppError::ParseFailed)?; if val < 1 || val > 100 { return Err(AppError::OutOfRange(val)); } Ok(val)'
+    },
+    {
+      id: 'rust-mod-5',
+      title: 'Module 5: Thread-Safe State Sharing with Arc and Mutex',
+      difficulty: 'Medium',
+      category: 'Rust',
+      description: 'Implement fn parallel_word_count(chunks: Vec<String>) -> usize using std::sync::Arc, std::sync::Mutex, and std::thread::spawn.',
+      constraints: ['Spawn threads safely with move closures', 'Lock mutex and accumulate total counts'],
+      sampleInputs: [
+        { input: 'chunks = ["Rust is fast", "SkillVerse is awesome"]', output: '6' }
+      ],
+      starterCode: `use std::sync::{Arc, Mutex};\nuse std::thread;\n\npub fn parallel_word_count(chunks: Vec<String>) -> usize {\n    let total = Arc::new(Mutex::new(0));\n    let mut handles = vec![];\n\n    for chunk in chunks {\n        let total_clone = Arc::clone(&total);\n        let handle = thread::spawn(move || {\n            let count = chunk.split_whitespace().count();\n            // TODO: Lock mutex and add count to total\n            \n        });\n        handles.push(handle);\n    }\n\n    for h in handles {\n        h.join().unwrap();\n    }\n\n    let final_count = *total.lock().unwrap();\n    final_count\n}\n\nfn main() {\n    let text_chunks = vec![\n        String::from("Rust is blazingly fast and memory-efficient"),\n        String::from("SkillVerse provides interactive hands-on coding"),\n    ];\n    println!("Total Words: {}", parallel_word_count(text_chunks));\n}`,
+      solutionHint: 'let mut lock = total_clone.lock().unwrap(); *lock += count;'
+    },
+    {
+      id: 'rust-mod-6',
+      title: 'Module 6: Interior Mutability Tree Node with Rc and RefCell',
+      difficulty: 'Hard',
+      category: 'Rust',
+      description: 'Implement a TreeNode struct with val: i32, left: Option<Rc<RefCell<TreeNode>>>, and right: Option<Rc<RefCell<TreeNode>>> with in_order_traversal.',
+      constraints: ['Safely borrow RefCell interior mutability without runtime panic', 'Return ordered Vec<i32>'],
+      sampleInputs: [
+        { input: 'Tree: 2 (left: 1, right: 3)', output: '[1, 2, 3]' }
+      ],
+      starterCode: `use std::rc::Rc;\nuse std::cell::RefCell;\n\npub struct TreeNode {\n    pub val: i32,\n    pub left: Option<Rc<RefCell<TreeNode>>>,\n    pub right: Option<Rc<RefCell<TreeNode>>>,\n}\n\nimpl TreeNode {\n    pub fn new(val: i32) -> Rc<RefCell<Self>> {\n        Rc::new(RefCell::new(TreeNode { val, left: None, right: None }))\n    }\n}\n\npub fn in_order_traversal(root: &Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {\n    let mut result = vec![];\n    // TODO: Traverse left, push val, traverse right\n    \n    result\n}\n\nfn main() {\n    let root = TreeNode::new(2);\n    root.borrow_mut().left = Some(TreeNode::new(1));\n    root.borrow_mut().right = Some(TreeNode::new(3));\n    println!("In-order: {:?}", in_order_traversal(&Some(root)));\n}`,
+      solutionHint: 'if let Some(node) = root { let n = node.borrow(); result.extend(in_order_traversal(&n.left)); result.push(n.val); result.extend(in_order_traversal(&n.right)); }'
+    },
+    {
+      id: 'rust-mod-7',
+      title: 'Module 7: Zero-Copy String Tokenizer with Lifetimes',
+      difficulty: 'Hard',
+      category: 'Rust',
+      description: 'Build a struct Tokenizer<\'a> with next_token(&mut self) -> Option<&\'a str> that yields token string slices directly referencing the underlying buffer with zero heap allocations.',
+      constraints: ['Explicit lifetime parameter <\'a>', 'Zero allocation iterator pattern'],
+      sampleInputs: [
+        { input: '"struct Point { x: i32 }"', output: 'Tokens: "struct", "Point", "{", "x:", "i32", "}"' }
+      ],
+      starterCode: `pub struct Tokenizer<'a> {\n    input: &'a str,\n    pos: usize,\n}\n\nimpl<'a> Tokenizer<'a> {\n    pub fn new(input: &'a str) -> Self {\n        Tokenizer { input, pos: 0 }\n    }\n\n    pub fn next_token(&mut self) -> Option<&'a str> {\n        // TODO: Skip whitespace, find next token boundary, return slice without allocating String\n        \n        None\n    }\n}\n\nfn main() {\n    let source = "struct Point { x: i32, y: i32 }";\n    let mut tokenizer = Tokenizer::new(source);\n    while let Some(tok) = tokenizer.next_token() {\n        println!("Token: '{}'", tok);\n    }\n}`,
+      solutionHint: 'let remaining = &self.input[self.pos..]; let trimmed = remaining.trim_start(); let offset = self.input.len() - remaining.len() + (remaining.len() - trimmed.len()); let end = trimmed.find(char::is_whitespace).unwrap_or(trimmed.len()); self.pos = offset + end; Some(&self.input[offset..offset+end])'
+    },
+    {
+      id: 'rust-mod-8',
+      title: 'Module 8: Atomic SpinLock with std::sync::atomic::AtomicBool',
+      difficulty: 'Hard',
+      category: 'Rust',
+      description: 'Implement a SpinLock struct using AtomicBool with Ordering::Acquire and Ordering::Release for lock and unlock operations.',
+      constraints: ['Correct memory ordering semantics (Acquire/Release)', 'Spin-wait without thread sleeping'],
+      sampleInputs: [
+        { input: 'lock.lock(); critical_section(); lock.unlock();', output: 'Mutual exclusion across 3 concurrent threads' }
+      ],
+      starterCode: `use std::sync::atomic::{AtomicBool, Ordering};\nuse std::sync::Arc;\nuse std::thread;\n\npub struct SpinLock {\n    locked: AtomicBool,\n}\n\nimpl SpinLock {\n    pub fn new() -> Self {\n        SpinLock { locked: AtomicBool::new(false) }\n    }\n\n    pub fn lock(&self) {\n        // TODO: Spin loop while compare_exchange or swap returns true\n        \n    }\n\n    pub fn unlock(&self) {\n        // TODO: Store false with Ordering::Release\n        \n    }\n}\n\nfn main() {\n    let lock = Arc::new(SpinLock::new());\n    let mut handles = vec![];\n    for i in 0..3 {\n        let l = Arc::clone(&lock);\n        handles.push(thread::spawn(move || {\n            l.lock();\n            println!("Thread {} in critical section", i);\n            l.unlock();\n        }));\n    }\n    for h in handles { h.join().unwrap(); }\n}`,
+      solutionHint: 'lock: while self.locked.swap(true, Ordering::Acquire) { std::hint::spin_loop(); } unlock: self.locked.store(false, Ordering::Release);'
+    }
+  ],
+
+  'kotlin': [
+    {
+      id: 'kt-mod-1',
+      title: 'Module 1: Null-Safe String Parser with Elvis Operator',
+      difficulty: 'Easy',
+      category: 'Kotlin',
+      description: 'Implement fun parseDisplayName(fullName: String?, defaultTag: String): String using safe call (?.) and Elvis (?:) operators.',
+      constraints: ['Safe calls (?.) and Elvis operator (?:)', 'Handle null, empty, and whitespace-only strings'],
+      sampleInputs: [
+        { input: '"  alex dev  ", "Anonymous"', output: '"ALEX DEV"' },
+        { input: 'null, "Guest"', output: '"Guest"' }
+      ],
+      starterCode: `fun parseDisplayName(fullName: String?, defaultTag: String): String {\n    // TODO: Return trimmed upper-case name if present and non-blank, else defaultTag\n    \n    return defaultTag\n}\n\nfun main() {\n    println(parseDisplayName("  alex dev  ", "Anonymous")) // "ALEX DEV"\n    println(parseDisplayName(null, "Guest User"))          // "Guest User"\n    println(parseDisplayName("   ", "Guest User"))         // "Guest User"\n}`,
+      solutionHint: 'return fullName?.trim()?.takeIf { it.isNotBlank() }?.uppercase() ?: defaultTag'
+    },
+    {
+      id: 'kt-mod-2',
+      title: 'Module 2: Data Class Transformations & Destructuring',
+      difficulty: 'Easy',
+      category: 'Kotlin',
+      description: 'Define data class UserProfile(id: String, name: String, xp: Int, isPro: Boolean) and implement fun promoteToPro(user: UserProfile, bonusXp: Int): UserProfile using .copy().',
+      constraints: ['Immutable data class', 'Use .copy() method for state update'],
+      sampleInputs: [
+        { input: 'UserProfile("u-1", "Jordan", 450, false), bonusXp = 500', output: 'UserProfile("u-1", "Jordan", 950, true)' }
+      ],
+      starterCode: `data class UserProfile(\n    val id: String,\n    val name: String,\n    val xp: Int,\n    val isPro: Boolean\n)\n\nfun promoteToPro(user: UserProfile, bonusXp: Int): UserProfile {\n    // TODO: Return copied user with isPro = true and xp = user.xp + bonusXp\n    \n    return user\n}\n\nfun main() {\n    val u1 = UserProfile("u-1", "Jordan", 450, false)\n    val proUser = promoteToPro(u1, 500)\n    val (id, name, xp, isPro) = proUser\n    println("Promoted $name ($id): $xp XP, Pro: $isPro")\n}`,
+      solutionHint: 'return user.copy(isPro = true, xp = user.xp + bonusXp)'
+    },
+    {
+      id: 'kt-mod-3',
+      title: 'Module 3: Sealed Class State Machine & Extension Functions',
+      difficulty: 'Medium',
+      category: 'Kotlin',
+      description: 'Create a sealed class NetworkResult<out T> (Success, Error, Loading) and write an extension function <T> NetworkResult<T>.getOrDefault(fallback: T): T.',
+      constraints: ['Exhaustive when expressions without else branch', 'Generic type parameter variance'],
+      sampleInputs: [
+        { input: 'NetworkResult.Success("Certificate").getOrDefault("Default")', output: '"Certificate"' },
+        { input: 'NetworkResult.Error("404", 404).getOrDefault("Default")', output: '"Default"' }
+      ],
+      starterCode: `sealed class NetworkResult<out T> {\n    data class Success<out T>(val data: T) : NetworkResult<T>()\n    data class Error(val message: String, val code: Int) : NetworkResult<Nothing>()\n    object Loading : NetworkResult<Nothing>()\n}\n\nfun <T> NetworkResult<T>.getOrDefault(fallback: T): T {\n    // TODO: Exhaustive when branch returning data for Success and fallback for Error/Loading\n    \n    return fallback\n}\n\nfun main() {\n    val res1: NetworkResult<String> = NetworkResult.Success("SkillVerse Certificate")\n    val res2: NetworkResult<String> = NetworkResult.Error("Not Found", 404)\n    println("Result 1: \${res1.getOrDefault("Default")}")\n    println("Result 2: \${res2.getOrDefault("Default")}")\n}`,
+      solutionHint: 'return when (this) { is NetworkResult.Success -> this.data; is NetworkResult.Error, NetworkResult.Loading -> fallback }'
+    },
+    {
+      id: 'kt-mod-4',
+      title: 'Module 4: Higher-Order Inline Builder Function',
+      difficulty: 'Medium',
+      category: 'Kotlin',
+      description: 'Build a custom HTML/DSL-like builder using lambda with receiver: fun buildReport(block: ReportBuilder.() -> Unit): String.',
+      constraints: ['Lambda with receiver ReportBuilder.() -> Unit', 'String concatenation'],
+      sampleInputs: [
+        { input: 'buildReport { title("Report"); section("A", "Body") }', output: '"# Report\\n\\n## A\\nBody"' }
+      ],
+      starterCode: `class ReportBuilder {\n    private val lines = mutableListOf<String>()\n\n    fun title(text: String) { lines.add("# $text") }\n    fun section(name: String, content: String) { lines.add("## $name\\n$content") }\n    fun build(): String = lines.joinToString("\\n\\n")\n}\n\nfun buildReport(block: ReportBuilder.() -> Unit): String {\n    // TODO: Instantiate ReportBuilder, apply block, and return build() string\n    \n    return ""\n}\n\nfun main() {\n    val report = buildReport {\n        title("SkillVerse Module Completion")\n        section("Kotlin Track", "8/8 modules completed with 100% quiz score.")\n    }\n    println(report)\n}`,
+      solutionHint: 'val builder = ReportBuilder(); builder.block(); return builder.build()'
+    },
+    {
+      id: 'kt-mod-5',
+      title: 'Module 5: Concurrent Async Processing with CoroutineScope',
+      difficulty: 'Medium',
+      category: 'Kotlin',
+      description: 'Implement suspend fun fetchAllMetrics(endpoints: List<String>): List<String> using coroutineScope and async/awaitAll to fetch simulated network calls concurrently.',
+      constraints: ['Structured concurrency with coroutineScope', 'Non-blocking parallel task fan-out'],
+      sampleInputs: [
+        { input: '["api/users", "api/courses", "api/quests"]', output: 'List of 3 fetched response strings' }
+      ],
+      starterCode: `import kotlinx.coroutines.*\n\nsuspend fun simulateFetch(endpoint: String): String {\n    delay(50)\n    return "Data from $endpoint"\n}\n\nsuspend fun fetchAllMetrics(endpoints: List<String>): List<String> = coroutineScope {\n    // TODO: Map endpoints to async deferred tasks and awaitAll\n    \n    emptyList()\n}\n\nfun main() = runBlocking {\n    val targets = listOf("api/users", "api/courses", "api/quests")\n    val results = fetchAllMetrics(targets)\n    println("Fetched \${results.size} endpoints: $results")\n}`,
+      solutionHint: 'endpoints.map { async { simulateFetch(it) } }.awaitAll()'
+    },
+    {
+      id: 'kt-mod-6',
+      title: 'Module 6: Reactive Event Processing with Kotlin Flow',
+      difficulty: 'Hard',
+      category: 'Kotlin',
+      description: 'Implement fun processNumberFlow(numbers: List<Int>): Flow<Int> emitting numbers, filtering odd numbers, and transforming with .map { it * 10 }.',
+      constraints: ['Cold stream Kotlin Flow', 'Declarative flow operator chaining'],
+      sampleInputs: [
+        { input: '[1, 2, 3, 4, 5, 6]', output: 'Emits 20, 40, 60' }
+      ],
+      starterCode: `import kotlinx.coroutines.flow.*\nimport kotlinx.coroutines.runBlocking\n\nfun processNumberFlow(numbers: List<Int>): Flow<Int> = flow {\n    for (n in numbers) {\n        emit(n)\n    }\n}.filter { it % 2 == 0 }\n .map { it * 10 }\n\nfun main() = runBlocking {\n    val input = listOf(1, 2, 3, 4, 5, 6)\n    println("Flow Output:")\n    processNumberFlow(input).collect { value ->\n        print("$value ")\n    }\n    println()\n}`,
+      solutionHint: 'flow { for (n in numbers) emit(n) }.filter { it % 2 == 0 }.map { it * 10 }'
+    },
+    {
+      id: 'kt-mod-7',
+      title: 'Module 7: Custom Property Delegate with Change History',
+      difficulty: 'Hard',
+      category: 'Kotlin',
+      description: 'Create a custom ReadWriteProperty delegate class ObservableHistory<T>(initialValue: T) that logs and tracks all previous values of a property.',
+      constraints: ['Implement ReadWriteProperty<Any?, T>', 'Retain chronological mutation list'],
+      sampleInputs: [
+        { input: 'session.score = 100; session.score = 250;', output: 'session.score is 250' }
+      ],
+      starterCode: `import kotlin.properties.ReadWriteProperty\nimport kotlin.reflect.KProperty\n\nclass ObservableHistory<T>(initialValue: T) : ReadWriteProperty<Any?, T> {\n    private var value: T = initialValue\n    val history = mutableListOf<T>(initialValue)\n\n    override fun getValue(thisRef: Any?, property: KProperty<*>): T = value\n\n    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {\n        // TODO: Append to history and update value\n        \n    }\n}\n\nclass GameSession {\n    var score: Int by ObservableHistory(0)\n}\n\nfun main() {\n    val session = GameSession()\n    session.score = 100\n    session.score = 250\n    println("Current Score: \${session.score}")\n}`,
+      solutionHint: 'this.value = value; history.add(value);'
+    },
+    {
+      id: 'kt-mod-8',
+      title: 'Module 8: Covariant & Contravariant Event Dispatcher',
+      difficulty: 'Hard',
+      category: 'Kotlin',
+      description: 'Design an EventConsumer<in T> interface and EventSource<out T> interface demonstrating declaration-site variance and consumer piping.',
+      constraints: ['Declaration-site variance (in T for consumer, out T for producer)', 'Type safety across subtype hierarchies'],
+      sampleInputs: [
+        { input: 'queue.consume(UserLoginEvent("Alex")); queue.poll()', output: 'Polled event: UserLoginEvent' }
+      ],
+      starterCode: `open class AppEvent(val timestamp: Long = System.currentTimeMillis())\nclass UserLoginEvent(val username: String) : AppEvent()\nclass QuestCompleteEvent(val questId: String, val xp: Int) : AppEvent()\n\ninterface EventConsumer<in T> {\n    fun consume(event: T)\n}\n\ninterface EventSource<out T> {\n    fun poll(): T?\n}\n\nclass GenericEventQueue<T : AppEvent> : EventConsumer<T>, EventSource<T> {\n    private val queue = ArrayDeque<T>()\n\n    override fun consume(event: T) {\n        queue.addLast(event)\n    }\n\n    override fun poll(): T? = if (queue.isNotEmpty()) queue.removeFirst() else null\n}\n\nfun main() {\n    val q = GenericEventQueue<AppEvent>()\n    q.consume(UserLoginEvent("Alex"))\n    q.consume(QuestCompleteEvent("quest-1", 250))\n    println("Polled event 1: \${q.poll()?.javaClass?.simpleName}")\n    println("Polled event 2: \${q.poll()?.javaClass?.simpleName}")\n}`,
+      solutionHint: 'Declaration-site variance in T enables EventConsumer<AppEvent> to accept UserLoginEvent; out T enables safe polymorphic reading.'
+    }
+  ],
+
   // --- DATA STRUCTURES & ALGORITHMS ---
   'arrays': [
     {

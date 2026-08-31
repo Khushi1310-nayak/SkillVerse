@@ -225,6 +225,9 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('typescript') || l === 'ts') return 'typescript';
     if (l.includes('c++') || l.includes('cpp')) return 'cpp';
     if (l === 'c' || l === 'c-programming' || l.startsWith('c-')) return 'c';
+    if (l.includes('go') || l.includes('golang')) return 'go';
+    if (l.includes('rust')) return 'rust';
+    if (l.includes('kotlin') || l === 'kt') return 'kotlin';
     if (l.includes('html')) return 'html';
     if (l.includes('css')) return 'css';
     return 'javascript';
@@ -237,6 +240,9 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('typescript') || l === 'ts') return 'index.ts';
     if (l.includes('c++') || l.includes('cpp')) return 'main.cpp';
     if (l === 'c' || l === 'c-programming' || l.startsWith('c-')) return 'main.c';
+    if (l.includes('go') || l.includes('golang')) return 'main.go';
+    if (l.includes('rust')) return 'main.rs';
+    if (l.includes('kotlin') || l === 'kt') return 'Main.kt';
     if (l.includes('html')) return 'index.html';
     if (l.includes('css')) return 'styles.css';
     return 'sandbox.js';

@@ -15,7 +15,9 @@ export const CodingPracticePlayground: React.FC = () => {
   const { user, appUser } = useAuthContext();
   const { showToast } = useToast();
 
-  const initialCourseId = searchParams.get('course') || COURSES[0].id;
+  const codingCourses = COURSES.filter(c => c.categoryId !== 'design');
+
+  const initialCourseId = searchParams.get('course') || codingCourses[0]?.id || 'javascript';
   const initialModuleParam = parseInt(searchParams.get('module') || '1', 10);
   const initialModuleIndex = Math.max(0, Math.min(7, initialModuleParam - 1));
 
@@ -24,7 +26,7 @@ export const CodingPracticePlayground: React.FC = () => {
   const [showHint, setShowHint] = useState(false);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
 
-  const activeCourse = COURSES.find(c => c.id === selectedCourseId) || COURSES[0];
+  const activeCourse = codingCourses.find(c => c.id === selectedCourseId) || codingCourses[0] || COURSES[0];
   const problemsList = getCoursePlaygroundProblems(activeCourse.id);
   const currentProblem: PracticeProblem = problemsList[selectedModuleIndex] || getDailyPlaygroundProblem(activeCourse.id, selectedModuleIndex);
   const currentLanguage = activeCourse.id;
@@ -59,7 +61,7 @@ export const CodingPracticePlayground: React.FC = () => {
   useEffect(() => {
     const courseParam = searchParams.get('course');
     const moduleParam = parseInt(searchParams.get('module') || '1', 10);
-    if (courseParam && COURSES.some(c => c.id === courseParam)) {
+    if (courseParam && codingCourses.some(c => c.id === courseParam)) {
       setSelectedCourseId(courseParam);
     }
     if (!isNaN(moduleParam)) {
@@ -117,15 +119,15 @@ export const CodingPracticePlayground: React.FC = () => {
             </div>
           </div>
 
-          {/* Course Selector Dropdown */}
+          {/* Course Selector Dropdown (Coding Tracks Only) */}
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-textMuted uppercase tracking-wider hidden sm:inline">Select Course:</span>
+            <span className="text-xs font-bold text-textMuted uppercase tracking-wider hidden sm:inline">Select Track:</span>
             <select
               value={selectedCourseId}
               onChange={(e) => handleCourseChange(e.target.value)}
               className="px-4 py-2.5 rounded-xl bg-[#0f1623] border border-white/10 text-sm font-semibold text-white focus:outline-none focus:border-primaryLight transition-all cursor-pointer shadow-inner min-w-[220px]"
             >
-              {COURSES.map(c => (
+              {codingCourses.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.title} ({c.level})
                 </option>

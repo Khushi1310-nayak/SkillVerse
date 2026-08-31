@@ -36,8 +36,6 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
     problemList = PLAYGROUND_PROBLEMS['strings'];
   } else if (normalizedId.includes('array') || normalizedId.includes('dsa')) {
     problemList = PLAYGROUND_PROBLEMS['arrays'];
-  } else if (normalizedId.includes('ui') || normalizedId.includes('design') || normalizedId.includes('ux')) {
-    problemList = PLAYGROUND_PROBLEMS['ui-design'];
   } else {
     problemList = PLAYGROUND_PROBLEMS[normalizedId];
   }

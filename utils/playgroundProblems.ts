@@ -1368,21 +1368,6 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       starterCode: `function fib(n) {\n  const dp = [0, 1];\n  // TODO: Fill DP array up to n\n  \n  return dp[n];\n}\n\nconsole.log(fib(10));`,
       solutionHint: 'for (let i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2]'
     }
-  ],
-
-  // --- DESIGN ---
-  'ui-design': [
-    {
-      id: 'ui-1',
-      title: '1. WCAG Color Contrast Ratio Calculator',
-      difficulty: 'Easy',
-      category: 'UI Design',
-      description: 'Calculate WCAG contrast ratio (L1 + 0.05) / (L2 + 0.05) and check if >= 4.5:1 AA standard.',
-      constraints: ['l1, l2 between 0 and 1'],
-      sampleInputs: [{ input: 'l1 = 1.0, l2 = 0.0', output: '{ ratio: "21.00", meetsAA: true }' }],
-      starterCode: `function calculateContrastRatio(l1, l2) {\n  const lighter = Math.max(l1, l2);\n  const darker = Math.min(l1, l2);\n  // TODO: Calculate ratio\n  \n}\n\nconsole.log(calculateContrastRatio(1.0, 0.0));`,
-      solutionHint: 'ratio = (lighter + 0.05) / (darker + 0.05); return { ratio: ratio.toFixed(2), meetsAA: ratio >= 4.5 }'
-    }
   ]
 };
 

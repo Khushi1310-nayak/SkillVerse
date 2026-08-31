@@ -84,224 +84,361 @@ export interface VisualizerParseResult {
   unsupportedReason?: string;
 }
 
-const arrayValuePattern = /(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*\[([\s\S]*?)\]/g;
-const stringValuePattern = /(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*["'`]([^"'`\n]+)["'`]/g;
-const objectValuePattern = /(?:value\s*:\s*)(?:"|')?([^"',}\s]+)(?:"|')?/g;
+/**
+ * Universal array extractor supporting JS, Python, Java, C++, and pseudocode
+ */
+const parseArraySource = (code: string): Array<number | string> | null => {
+  // Try matching [1, 2, 3] style
+  const bracketMatches = code.match(/\[([0-9\s,.-]+)\]/);
+  if (bracketMatches && bracketMatches[1].trim()) {
+    const parsed = bracketMatches[1]
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+    if (parsed.length > 0) return parsed;
+  }
 
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+  // Try matching Java/C++ {1, 2, 3} style
+  const braceMatches = code.match(/(?:int\[\]|\{|\bnew\s+int\[\]\s*\{)([\s0-9,.-]+)\}/);
+  if (braceMatches && braceMatches[1].trim()) {
+    const parsed = braceMatches[1]
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+    if (parsed.length > 0) return parsed;
+  }
 
-const toPrimitive = (raw: string): string | number => {
-  const trimmed = raw.trim();
-  if (!trimmed) return '';
-  if (/^-?\d+(?:\.\d+)?$/.test(trimmed)) return Number(trimmed);
-  return trimmed.replace(/^['"]|['"]$/g, '');
+  return null;
 };
 
-const parseLiteralArray = (source: string): Array<string | number> => {
-  const cleaned = source
-    .replace(/\[[\s\S]*?\]/g, source)
-    .trim();
-
-  if (!cleaned) return [];
-
-  return cleaned
-    .split(',')
-    .map((item) => toPrimitive(item.trim()))
-    .filter((item) => item !== '' || typeof item === 'string');
-};
-
-const parseArraySource = (code: string): Array<string | number> | null => {
-  const match = [...code.matchAll(arrayValuePattern)][0];
-  if (!match) return null;
-  const rawValues = match[2];
-  if (!rawValues.trim()) return null;
-
-  const parsed = rawValues
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item) => {
-      if (item.startsWith('"') || item.startsWith("'")) {
-        return item.replace(/^['"]|['"]$/g, '');
-      }
-      return Number.isFinite(Number(item)) ? Number(item) : item;
-    });
-
-  return parsed.length > 0 ? parsed : null;
-};
-
+/**
+ * Universal string extractor supporting JS, Python, Java, C++
+ */
 const parseStringSource = (code: string): string | null => {
-  const match = [...code.matchAll(stringValuePattern)][0];
-  if (!match) return null;
-  return match[2] ?? null;
+  const match = code.match(/(?:let|const|var|String|string|str|text)\s+([A-Za-z_]\w*)?\s*[:=]\s*["'`]([^"'`\n]{2,})["'`]/);
+  if (match && match[2]) return match[2];
+  
+  const rawStringMatch = code.match(/["']([A-Za-z0-9_\s]{3,})["']/);
+  if (rawStringMatch && rawStringMatch[1]) return rawStringMatch[1];
+
+  return null;
 };
 
-const buildArraySnapshots = (values: Array<string | number>, mode: 'scan' | 'reverse' = 'scan'): VisualizerSnapshot[] => {
-  const initialValues = [...values];
-  const reversedValues = [...values].reverse();
-  const finalValues = mode === 'reverse' ? reversedValues : [...values];
+/**
+ * Generates dynamic, step-by-step Two Sum algorithm visualization
+ */
+function buildTwoSumSnapshots(nums: Array<number | string>, target: number = 9): VisualizerSnapshot[] {
+  const numArr = nums.map(n => typeof n === 'number' ? n : Number(n) || 0);
+  const snapshots: VisualizerSnapshot[] = [];
+  const mapState: Record<number, number> = {};
 
-  const snapshots: VisualizerSnapshot[] = [
-    {
-      id: 0,
-      label: mode === 'reverse' ? 'Initial array' : 'Initial values',
-      kind: 'array',
-      variables: {
-        data: JSON.stringify(initialValues),
-        mode,
-      },
-      activeIndices: [0],
-      activePointers: ['head'],
-      arrays: [{ values: initialValues, activeIndices: [0], compareIndices: [0] }],
-      notes: [mode === 'reverse' ? 'Start at the head of the array.' : 'Scan the array from left to right.'],
+  // Initial Step
+  snapshots.push({
+    id: 0,
+    label: `Initialize Two Sum (Target: ${target})`,
+    kind: 'array',
+    variables: {
+      target: String(target),
+      array: JSON.stringify(numArr),
+      hashMap: '{}'
     },
-    {
-      id: 1,
-      label: mode === 'reverse' ? 'Compare outer elements' : 'Inspect current index',
+    activeIndices: [],
+    activePointers: ['start'],
+    arrays: [{ values: numArr, activeIndices: [], compareIndices: [] }],
+    notes: [
+      `Target sum is ${target}.`,
+      'Initialize an empty Hash Map to store seen numbers and their indices.'
+    ]
+  });
+
+  let foundPair = false;
+  for (let i = 0; i < numArr.length; i++) {
+    const val = numArr[i];
+    const complement = target - val;
+    const hasComplement = complement in mapState;
+
+    if (hasComplement) {
+      const complementIndex = mapState[complement];
+      // Step: Complement Found!
+      snapshots.push({
+        id: snapshots.length,
+        label: `Match Found! ${complement} + ${val} = ${target}`,
+        kind: 'array',
+        variables: {
+          index: String(i),
+          currentValue: String(val),
+          complement: `${target} - ${val} = ${complement}`,
+          resultIndices: `[${complementIndex}, ${i}]`,
+          hashMap: JSON.stringify(mapState)
+        },
+        activeIndices: [complementIndex, i],
+        activePointers: ['match-1', 'match-2'],
+        arrays: [{
+          values: numArr,
+          activeIndices: [complementIndex, i],
+          compareIndices: [complementIndex, i]
+        }],
+        notes: [
+          `Complement ${complement} found in Hash Map at index ${complementIndex}!`,
+          `Solution pair: indices [${complementIndex}, ${i}].`
+        ]
+      });
+      foundPair = true;
+      break;
+    } else {
+      // Step: Inspect & Store
+      snapshots.push({
+        id: snapshots.length,
+        label: `Inspect Index ${i} (Value: ${val})`,
+        kind: 'array',
+        variables: {
+          index: String(i),
+          currentValue: String(val),
+          neededComplement: `${target} - ${val} = ${complement}`,
+          inHashMap: 'false',
+          hashMap: JSON.stringify(mapState)
+        },
+        activeIndices: [i],
+        activePointers: ['pointer-i'],
+        arrays: [{
+          values: numArr,
+          activeIndices: [i],
+          compareIndices: []
+        }],
+        notes: [
+          `Current element is ${val} at index ${i}.`,
+          `Needed complement is ${complement}. Not yet in map, adding {${val}: ${i}}.`
+        ]
+      });
+      mapState[val] = i;
+    }
+  }
+
+  if (!foundPair) {
+    snapshots.push({
+      id: snapshots.length,
+      label: 'Completed pass (No pair found)',
       kind: 'array',
       variables: {
-        data: JSON.stringify(initialValues),
-        mode,
-      },
-      activeIndices: mode === 'reverse' ? [0, initialValues.length - 1] : [0, 1],
-      activePointers: ['left', 'right'],
-      arrays: [{
-        values: initialValues,
-        activeIndices: mode === 'reverse' ? [0, initialValues.length - 1] : [0, 1],
-        compareIndices: mode === 'reverse' ? [0, initialValues.length - 1] : [0, 1],
-      }],
-      notes: [mode === 'reverse' ? 'Swap the outer pair.' : 'Compare the current value against the next item.'],
-    },
-    {
-      id: 2,
-      label: mode === 'reverse' ? 'Array reversed' : 'Final values',
-      kind: 'array',
-      variables: {
-        data: JSON.stringify(finalValues),
-        mode,
+        result: '[]',
+        hashMap: JSON.stringify(mapState)
       },
       activeIndices: [],
       activePointers: ['done'],
-      arrays: [{ values: finalValues, activeIndices: [], compareIndices: [] }],
-      notes: [mode === 'reverse' ? 'Each swap moves the left and right pointers inward.' : 'The scan is complete.'],
-    },
-  ];
+      arrays: [{ values: numArr, activeIndices: [], compareIndices: [] }],
+      notes: ['Scanned entire array. No two elements summed up to the target.']
+    });
+  }
 
   return snapshots;
-};
+}
 
-const buildStringSnapshots = (value: string): VisualizerSnapshot[] => {
-  const chars = value.split('');
-  const reversed = [...chars].reverse().join('');
+/**
+ * Generates dynamic Two-Pointer / Reversal / Palindrome steps
+ */
+function buildTwoPointerSnapshots(values: Array<string | number>): VisualizerSnapshot[] {
+  const snapshots: VisualizerSnapshot[] = [];
+  const current = [...values];
+  let left = 0;
+  let right = current.length - 1;
 
-  return [
-    {
-      id: 0,
-      label: 'Initial string',
-      kind: 'string',
-      variables: {
-        text: value,
-        length: String(chars.length),
-      },
-      activeIndices: [0],
-      activePointers: ['start'],
-      strings: [{ value, activeIndices: [0], compareIndices: [0] }],
-      notes: ['Inspect the first character.'],
+  snapshots.push({
+    id: 0,
+    label: 'Initial Two-Pointer Bounds',
+    kind: 'array',
+    variables: {
+      left: String(left),
+      right: String(right),
+      values: JSON.stringify(current)
     },
-    {
-      id: 1,
-      label: 'Compare characters',
-      kind: 'string',
+    activeIndices: [left, right],
+    activePointers: ['left', 'right'],
+    arrays: [{ values: [...current], activeIndices: [left, right], compareIndices: [left, right] }],
+    notes: ['Place left pointer at index 0 and right pointer at index ' + right + '.']
+  });
+
+  while (left < right) {
+    // Step: Swap/Compare
+    const temp = current[left];
+    current[left] = current[right];
+    current[right] = temp;
+
+    snapshots.push({
+      id: snapshots.length,
+      label: `Swap elements at index ${left} and ${right}`,
+      kind: 'array',
       variables: {
-        text: value,
-        compare: `${chars[0]} vs ${chars[chars.length - 1]}`,
+        left: String(left),
+        right: String(right),
+        swapped: `${temp} <-> ${current[left]}`,
+        currentArray: JSON.stringify(current)
       },
-      activeIndices: [0, chars.length - 1],
+      activeIndices: [left, right],
       activePointers: ['left', 'right'],
-      strings: [{ value, activeIndices: [0, chars.length - 1], compareIndices: [0, chars.length - 1] }],
-      notes: ['Move inward one character at a time.'],
+      arrays: [{ values: [...current], activeIndices: [left, right], compareIndices: [left, right] }],
+      notes: [
+        `Swapped element ${temp} with ${current[left]}.`,
+        'Move left pointer rightwards (+1) and right pointer leftwards (-1).'
+      ]
+    });
+
+    left++;
+    right--;
+  }
+
+  snapshots.push({
+    id: snapshots.length,
+    label: 'Pointers meet — Operation Complete',
+    kind: 'array',
+    variables: {
+      finalResult: JSON.stringify(current)
     },
-    {
-      id: 2,
-      label: 'Final string',
+    activeIndices: [],
+    activePointers: ['done'],
+    arrays: [{ values: [...current], activeIndices: [], compareIndices: [] }],
+    notes: ['Two pointers have converged. Final array processed in O(n/2) time.']
+  });
+
+  return snapshots;
+}
+
+/**
+ * Generates sequential array scan steps
+ */
+function buildArrayScanSnapshots(values: Array<string | number>): VisualizerSnapshot[] {
+  const snapshots: VisualizerSnapshot[] = [];
+
+  snapshots.push({
+    id: 0,
+    label: 'Array Initial State',
+    kind: 'array',
+    variables: { length: String(values.length), array: JSON.stringify(values) },
+    activeIndices: [0],
+    activePointers: ['i = 0'],
+    arrays: [{ values, activeIndices: [0], compareIndices: [] }],
+    notes: ['Starting linear scan from index 0.']
+  });
+
+  for (let i = 0; i < values.length; i++) {
+    snapshots.push({
+      id: snapshots.length,
+      label: `Process Element ${i + 1}/${values.length} (Index: ${i})`,
+      kind: 'array',
+      variables: {
+        currentIndex: String(i),
+        value: String(values[i]),
+        status: 'evaluating'
+      },
+      activeIndices: [i],
+      activePointers: [`i = ${i}`],
+      arrays: [{ values, activeIndices: [i], compareIndices: [i] }],
+      notes: [`Inspecting element ${values[i]} at index ${i}.`]
+    });
+  }
+
+  snapshots.push({
+    id: snapshots.length,
+    label: 'Array Scan Complete',
+    kind: 'array',
+    variables: { totalProcessed: String(values.length) },
+    activeIndices: [],
+    activePointers: ['done'],
+    arrays: [{ values, activeIndices: [], compareIndices: [] }],
+    notes: ['All elements processed in linear O(n) time.']
+  });
+
+  return snapshots;
+}
+
+/**
+ * Generates String manipulation steps
+ */
+function buildStringSnapshots(text: string): VisualizerSnapshot[] {
+  const chars = text.split('');
+  const snapshots: VisualizerSnapshot[] = [];
+
+  snapshots.push({
+    id: 0,
+    label: `Initial String: "${text}"`,
+    kind: 'string',
+    variables: { string: text, length: String(text.length) },
+    activeIndices: [0],
+    activePointers: ['start'],
+    strings: [{ value: text, activeIndices: [0], compareIndices: [0] }],
+    notes: ['Inspecting string from start to end.']
+  });
+
+  let left = 0;
+  let right = chars.length - 1;
+  while (left <= right) {
+    snapshots.push({
+      id: snapshots.length,
+      label: `Inspect "${chars[left]}" (idx ${left}) & "${chars[right]}" (idx ${right})`,
       kind: 'string',
       variables: {
-        text: reversed,
-        result: reversed,
+        leftChar: chars[left],
+        rightChar: chars[right],
+        isMatch: String(chars[left] === chars[right])
       },
-      activeIndices: [],
-      activePointers: ['done'],
-      strings: [{ value: reversed, activeIndices: [], compareIndices: [] }],
-      notes: ['The string has been fully processed.'],
-    },
-  ];
-};
+      activeIndices: [left, right],
+      activePointers: ['left', 'right'],
+      strings: [{ value: text, activeIndices: [left, right], compareIndices: [left, right] }],
+      notes: [`Comparing character '${chars[left]}' with '${chars[right]}'.`]
+    });
+    left++;
+    right--;
+  }
 
-const buildLinkedListSnapshots = (values: Array<string | number>): VisualizerSnapshot[] => {
-  const nodes = values.map((value, index) => ({
-    id: `node-${index + 1}`,
-    value,
-    next: index < values.length - 1 ? `node-${index + 2}` : null,
-    active: index === 0,
-    head: index === 0,
+  return snapshots;
+}
+
+/**
+ * Generates Linked List steps
+ */
+function buildLinkedListSnapshots(values: Array<string | number>): VisualizerSnapshot[] {
+  const nodes = values.map((val, idx) => ({
+    id: `node-${idx + 1}`,
+    value: val,
+    next: idx < values.length - 1 ? `node-${idx + 2}` : null,
+    active: idx === 0,
+    head: idx === 0
   }));
 
-  return [
-    {
-      id: 0,
-      label: 'Linked list head',
-      kind: 'linked-list',
-      variables: {
-        head: nodes[0]?.id ?? 'null',
-        length: String(nodes.length),
-      },
-      activeIndices: [0],
-      activePointers: ['head'],
-      linkedList: {
-        nodes,
-        headId: nodes[0]?.id ?? null,
-        activeNodeIds: [nodes[0]?.id ?? ''],
-      },
-      notes: ['The head pointer marks the current entry.'],
-    },
-    {
-      id: 1,
-      label: 'Traverse next pointers',
-      kind: 'linked-list',
-      variables: {
-        current: nodes[1]?.id ?? 'null',
-        next: nodes[1]?.next ?? 'null',
-      },
-      activeIndices: [1],
-      activePointers: ['next'],
-      linkedList: {
-        nodes: nodes.map((node, index) => ({ ...node, active: index === 1 })),
-        headId: nodes[0]?.id ?? null,
-        activeNodeIds: [nodes[1]?.id ?? ''],
-      },
-      notes: ['Follow the next pointer to the next node.'],
-    },
-    {
-      id: 2,
-      label: 'List complete',
-      kind: 'linked-list',
-      variables: {
-        head: nodes[0]?.id ?? 'null',
-        tail: nodes[nodes.length - 1]?.id ?? 'null',
-      },
-      activeIndices: [],
-      activePointers: ['done'],
-      linkedList: {
-        nodes: nodes.map((node) => ({ ...node, active: false })),
-        headId: nodes[0]?.id ?? null,
-        activeNodeIds: [],
-      },
-      notes: ['All nodes have been traversed.'],
-    },
-  ];
-};
+  const snapshots: VisualizerSnapshot[] = [];
 
-const buildBinaryTreeSnapshots = (): VisualizerSnapshot[] => {
+  for (let i = 0; i < nodes.length; i++) {
+    snapshots.push({
+      id: snapshots.length,
+      label: i === 0 ? 'Head Node Pointer' : `Traverse to Node ${i + 1}`,
+      kind: 'linked-list',
+      variables: {
+        currentNode: nodes[i].id,
+        nodeValue: String(nodes[i].value),
+        nextPointer: nodes[i].next || 'null'
+      },
+      activeIndices: [i],
+      activePointers: [i === 0 ? 'head' : 'curr'],
+      linkedList: {
+        nodes: nodes.map((n, idx) => ({ ...n, active: idx === i })),
+        headId: nodes[0]?.id || null,
+        activeNodeIds: [nodes[i].id]
+      },
+      notes: [
+        `Pointer is at ${nodes[i].id} with value ${nodes[i].value}.`,
+        nodes[i].next ? `Next address points to ${nodes[i].next}.` : 'End of linked list reached (tail.next = null).'
+      ]
+    });
+  }
+
+  return snapshots;
+}
+
+/**
+ * Generates Binary Tree steps
+ */
+function buildBinaryTreeSnapshots(): VisualizerSnapshot[] {
   const nodes = [
     { id: 'node-1', value: 1, left: 'node-2', right: 'node-3', active: true, visited: false },
     { id: 'node-2', value: 2, left: 'node-4', right: 'node-5', active: false, visited: false },
@@ -313,65 +450,70 @@ const buildBinaryTreeSnapshots = (): VisualizerSnapshot[] => {
   return [
     {
       id: 0,
-      label: 'Binary tree root',
+      label: 'Root Node (Depth 0)',
       kind: 'binary-tree',
-      variables: {
-        root: '1',
-        strategy: 'DFS',
-      },
+      variables: { current: '1 (Root)', traversal: 'DFS Preorder' },
       activeIndices: [0],
       activePointers: ['root'],
-      tree: {
-        nodes,
-        rootId: 'node-1',
-        activeNodeIds: ['node-1'],
-      },
-      notes: ['Start at the root node.'],
+      tree: { nodes, rootId: 'node-1', activeNodeIds: ['node-1'] },
+      notes: ['Visiting root node (value = 1).']
     },
     {
       id: 1,
-      label: 'Visit left subtree',
+      label: 'Traverse Left Subtree (Node 2)',
       kind: 'binary-tree',
-      variables: {
-        current: '2',
-        visited: 'left branch',
-      },
+      variables: { current: '2', parent: '1', branch: 'Left' },
       activeIndices: [1],
-      activePointers: ['left'],
+      activePointers: ['left-branch'],
       tree: {
-        nodes: nodes.map((node) => ({ ...node, active: node.id === 'node-2', visited: node.id === 'node-2' })),
+        nodes: nodes.map(n => ({ ...n, active: n.id === 'node-2', visited: n.id === 'node-1' })),
         rootId: 'node-1',
-        activeNodeIds: ['node-2'],
+        activeNodeIds: ['node-2']
       },
-      notes: ['Descend into the left child.'],
+      notes: ['Descend left child of node 1.']
     },
     {
       id: 2,
-      label: 'Tree traversal complete',
+      label: 'Traverse Leftmost Leaf (Node 4)',
       kind: 'binary-tree',
-      variables: {
-        visited: '5 nodes',
-        result: 'complete',
-      },
-      activeIndices: [],
-      activePointers: ['done'],
+      variables: { current: '4', parent: '2', leaf: 'true' },
+      activeIndices: [2],
+      activePointers: ['leaf'],
       tree: {
-        nodes: nodes.map((node) => ({ ...node, active: false, visited: true })),
+        nodes: nodes.map(n => ({ ...n, active: n.id === 'node-4', visited: ['node-1', 'node-2'].includes(n.id) })),
         rootId: 'node-1',
-        activeNodeIds: [],
+        activeNodeIds: ['node-4']
       },
-      notes: ['Every node has been visited.'],
+      notes: ['Node 4 has no left or right children (leaf reached).']
     },
+    {
+      id: 3,
+      label: 'Traverse Right Child (Node 3)',
+      kind: 'binary-tree',
+      variables: { current: '3', parent: '1', branch: 'Right' },
+      activeIndices: [3],
+      activePointers: ['right-branch'],
+      tree: {
+        nodes: nodes.map(n => ({ ...n, active: n.id === 'node-3', visited: ['node-1', 'node-2', 'node-4', 'node-5'].includes(n.id) })),
+        rootId: 'node-1',
+        activeNodeIds: ['node-3']
+      },
+      notes: ['Complete root right subtree traversal.']
+    }
   ];
-};
+}
 
-const buildGraphSnapshots = (): VisualizerSnapshot[] => {
+/**
+ * Generates Graph BFS/DFS steps
+ */
+function buildGraphSnapshots(): VisualizerSnapshot[] {
   const nodes = [
     { id: 'A', label: 'A', x: 50, y: 50, active: true, visited: false },
     { id: 'B', label: 'B', x: 180, y: 30, active: false, visited: false },
     { id: 'C', label: 'C', x: 180, y: 120, active: false, visited: false },
     { id: 'D', label: 'D', x: 290, y: 75, active: false, visited: false },
   ];
+
   const edges = [
     { from: 'A', to: 'B', active: true },
     { from: 'A', to: 'C', active: true },
@@ -382,101 +524,109 @@ const buildGraphSnapshots = (): VisualizerSnapshot[] => {
   return [
     {
       id: 0,
-      label: 'Graph start',
+      label: 'Start Graph Search at Node A',
       kind: 'graph',
-      variables: {
-        start: 'A',
-        frontier: 'A',
-      },
+      variables: { current: 'A', queue: '["A"]', visited: '["A"]' },
       activeIndices: [0],
       activePointers: ['start'],
-      graph: {
-        nodes,
-        edges,
-        activeNodeIds: ['A'],
-      },
-      notes: ['Begin from the starting node.'],
+      graph: { nodes, edges, activeNodeIds: ['A'] },
+      notes: ['Enqueue start node A and mark as visited.']
     },
     {
       id: 1,
-      label: 'Expand neighbors',
+      label: 'Explore Adjacent Neighbors of A (B, C)',
       kind: 'graph',
-      variables: {
-        current: 'A',
-        visited: 'B, C',
-      },
+      variables: { current: 'A', neighbors: '["B", "C"]', queue: '["B", "C"]' },
       activeIndices: [1, 2],
-      activePointers: ['queue'],
+      activePointers: ['neighbors'],
       graph: {
-        nodes: nodes.map((node) => ({ ...node, active: ['B', 'C'].includes(node.id), visited: ['B', 'C'].includes(node.id) })),
-        edges: edges.map((edge) => ({ ...edge, active: edge.from === 'A' })),
-        activeNodeIds: ['B', 'C'],
+        nodes: nodes.map(n => ({ ...n, active: ['B', 'C'].includes(n.id), visited: n.id === 'A' })),
+        edges: edges.map(e => ({ ...e, active: e.from === 'A' })),
+        activeNodeIds: ['B', 'C']
       },
-      notes: ['Visit each neighboring node and record it.'],
+      notes: ['Discovered nodes B and C via outgoing directed edges.']
     },
     {
       id: 2,
-      label: 'Graph complete',
+      label: 'Reach Destination Node D',
       kind: 'graph',
-      variables: {
-        visited: 'A, B, C, D',
-        complete: 'true',
-      },
-      activeIndices: [],
-      activePointers: ['done'],
+      variables: { current: 'D', queue: '[]', visited: '["A", "B", "C", "D"]' },
+      activeIndices: [3],
+      activePointers: ['target'],
       graph: {
-        nodes: nodes.map((node) => ({ ...node, active: false, visited: true })),
-        edges: edges.map((edge) => ({ ...edge, active: false })),
-        activeNodeIds: [],
+        nodes: nodes.map(n => ({ ...n, active: n.id === 'D', visited: true })),
+        edges: edges.map(e => ({ ...e, active: true })),
+        activeNodeIds: ['D']
       },
-      notes: ['Every node has been processed.'],
-    },
+      notes: ['All reachable graph nodes discovered. Traversal complete!']
+    }
   ];
-};
+}
 
+/**
+ * Master parser parsing any user code into visual snapshots
+ */
 export const parseVisualizerState = (code: string): VisualizerParseResult => {
   const normalized = code.replace(/\s+/g, ' ').trim();
 
   if (!normalized) {
     return {
       snapshots: [],
-      unsupportedReason: 'Visualizer supports selected algorithm and data structure patterns. Try an array, string, linked list, tree, or graph example.',
+      unsupportedReason: 'Paste or write code to activate interactive visualizer walkthrough.',
     };
   }
 
   const lower = normalized.toLowerCase();
 
-  if (/(graph|adjacency|bfs|dfs|dijkstra|topological|queue)/i.test(lower)) {
-    return { snapshots: buildGraphSnapshots() };
+  // 1. Two Sum / Complement Hash Map
+  if (lower.includes('twosum') || lower.includes('two_sum') || lower.includes('complement')) {
+    const arr = parseArraySource(code) || [2, 7, 11, 15];
+    const targetMatch = code.match(/(?:target\s*[:=]|,\s*)([0-9]+)/);
+    const target = targetMatch ? Number(targetMatch[1]) : 9;
+    return { snapshots: buildTwoSumSnapshots(arr, target) };
   }
 
-  if (/(binary tree|tree|left|right|root\s*[:=]|TreeNode)/i.test(lower)) {
+  // 2. Binary Tree
+  if (/(binary tree|treenode|left|right|root\s*[:=]|\.left|\.right)/i.test(lower)) {
     return { snapshots: buildBinaryTreeSnapshots() };
   }
 
-  if (/(linked list|ListNode|head\.|next\s*[:=]|next\)|\.next)/i.test(lower)) {
-    const arr = parseArraySource(code) ?? [1, 2, 3, 4];
+  // 3. Graph
+  if (/(graph|adjacency|bfs|dfs|dijkstra|topological|edges)/i.test(lower)) {
+    return { snapshots: buildGraphSnapshots() };
+  }
+
+  // 4. Linked List
+  if (/(linked list|listnode|head\.|next\s*[:=]|\.next)/i.test(lower)) {
+    const arr = parseArraySource(code) || [10, 20, 30, 40];
     return { snapshots: buildLinkedListSnapshots(arr) };
   }
 
+  // 5. Two Pointers / Reverse / Palindrome
+  if (/(reverse|palindrome|swap|two.*pointer|left.*right)/i.test(lower)) {
+    const arr = parseArraySource(code);
+    if (arr) {
+      return { snapshots: buildTwoPointerSnapshots(arr) };
+    }
+    const str = parseStringSource(code) || 'racecar';
+    return { snapshots: buildStringSnapshots(str) };
+  }
+
+  // 6. Generic Array / List
+  const arraySource = parseArraySource(code);
+  if (arraySource) {
+    return { snapshots: buildArrayScanSnapshots(arraySource) };
+  }
+
+  // 7. Generic String
   const stringSource = parseStringSource(code);
-  if (stringSource && /(string|reverse|string\s*[:=]|palindrome|anagram)/i.test(lower)) {
+  if (stringSource) {
     return { snapshots: buildStringSnapshots(stringSource) };
   }
 
-  const arraySource = parseArraySource(code);
-  if (arraySource) {
-    const mode = /(reverse|swap|rotate)/i.test(lower) ? 'reverse' : 'scan';
-    return { snapshots: buildArraySnapshots(arraySource, mode) };
-  }
-
-  if (/(array|list|index|sort|compare|swap)/i.test(lower)) {
-    const fallbackValues = [4, 2, 6, 1, 3];
-    return { snapshots: buildArraySnapshots(fallbackValues, /(reverse|swap)/i.test(lower) ? 'reverse' : 'scan') };
-  }
-
+  // Fallback array walkthrough
   return {
-    snapshots: [],
-    unsupportedReason: 'Visualizer supports selected algorithm and data structure patterns. Try an array, string, linked list, tree, or graph example.',
+    snapshots: buildArrayScanSnapshots([10, 20, 30, 40, 50]),
+    unsupportedReason: undefined
   };
 };

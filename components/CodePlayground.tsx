@@ -10,6 +10,7 @@ import { SavedSnippet } from '../types';
 import { AlgorithmCanvas } from './AlgorithmCanvas';
 import { VisualizerToolbar } from './VisualizerToolbar';
 import { parseVisualizerState, type VisualizerSnapshot } from '../utils/visualizerStateParser';
+import { executeCode, type ExecutionLog } from '../utils/codeExecutor';
 
 interface CodePlaygroundProps {
   initialCode: string;
@@ -17,11 +18,6 @@ interface CodePlaygroundProps {
   height?: string;
   onRequestReview?: (code: string, language: string) => Promise<void>;
   isReviewSubmitting?: boolean;
-}
-
-interface LogEntry {
-  type: 'log' | 'error' | 'warn';
-  message: string;
 }
 
 interface RuntimeError {
@@ -33,17 +29,19 @@ interface RuntimeError {
 
 export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   initialCode,
-  language,
+  language = 'javascript',
   height = '360px',
   onRequestReview,
   isReviewSubmitting = false,
 }) => {
   const [code, setCode] = useState(initialCode);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logs, setLogs] = useState<ExecutionLog[]>([]);
   const [error, setError] = useState<RuntimeError | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [srcDoc, setSrcDoc] = useState('');
+  const [executionTime, setExecutionTime] = useState<number | null>(null);
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+
+  // Visualizer states
   const [visualizerMode, setVisualizerMode] = useState(false);
   const [visualizerSnapshots, setVisualizerSnapshots] = useState<VisualizerSnapshot[]>([]);
   const [visualizerStep, setVisualizerStep] = useState(0);
@@ -109,7 +107,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   const handleSaveSnippet = () => {
     const name = snippetNameDraft.trim();
     if (!name) return;
-    storageService.saveSnippet(name, 'javascript', code);
+    storageService.saveSnippet(name, language || 'javascript', code);
     setSavedSnippets(storageService.getSavedSnippets());
     setSnippetNameDraft('');
     setShowSaveDialog(false);
@@ -124,8 +122,6 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     setSavedSnippets(storageService.deleteSnippet(id));
   };
 
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const terminalContainerRef = useRef<HTMLDivElement>(null);
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
@@ -136,84 +132,23 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     }
   }, [logs, error]);
 
-  const handleExecute = () => {
+  const handleExecute = async () => {
     setLogs([]);
     setError(null);
     setIsExecuting(true);
+    setExecutionTime(null);
 
-    // Build standard sandboxed html context
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <script>
-            // Overwrite console methods to forward to parent window
-            window.console = {
-              log: function(...args) {
-                const formatted = args.map(arg => {
-                  if (arg === null) return 'null';
-                  if (arg === undefined) return 'undefined';
-                  if (typeof arg === 'object') {
-                    try {
-                      return JSON.stringify(arg, null, 2);
-                    } catch (e) {
-                      return String(arg);
-                    }
-                  }
-                  return String(arg);
-                }).join(' ');
-                window.parent.postMessage({ type: 'console-log', message: formatted }, '*');
-              },
-              error: function(...args) {
-                const formatted = args.join(' ');
-                window.parent.postMessage({ type: 'console-error', message: formatted }, '*');
-              },
-              warn: function(...args) {
-                const formatted = args.join(' ');
-                window.parent.postMessage({ type: 'console-warn', message: formatted }, '*');
-              }
-            };
-
-            // Catch any compilation/uncaught exceptions
-            window.onerror = function(message, source, lineno, colno, errorObj) {
-              window.parent.postMessage({
-                type: 'runtime-error',
-                message: errorObj ? errorObj.message : message,
-                line: lineno,
-                col: colno,
-                stack: errorObj ? errorObj.stack : ''
-              }, '*');
-              return true;
-            };
-          </script>
-        </head>
-        <body>
-          <script>
-            try {
-              // Execute user code
-              ${code}
-              // Signal success
-              window.parent.postMessage({ type: 'execution-success' }, '*');
-            } catch (err) {
-              window.parent.postMessage({
-                type: 'runtime-error',
-                message: err.message,
-                stack: err.stack
-              }, '*');
-            }
-          </script>
-        </body>
-      </html>
-    `;
-
-    setSrcDoc(htmlContent);
-
-    // Guard against infinite loop scenarios with a 4-second timeout limit
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
+    try {
+      const result = await executeCode(code, language);
+      setLogs(result.logs);
+      setError(result.error || null);
+      setExecutionTime(result.durationMs);
+    } catch (err: any) {
+      setError({ message: err?.message || 'Execution error' });
+      setLogs([{ type: 'error', message: `Execution failed: ${err?.message || 'Unknown error'}` }]);
+    } finally {
       setIsExecuting(false);
-      setLogs(prev => [...prev, { type: 'error', message: 'Execution timed out (possible infinite loop detected).' }]);
-    }, 4000);
+    }
   };
 
   const handleReset = () => {
@@ -221,11 +156,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     setLogs([]);
     setError(null);
     setIsExecuting(false);
-    setSrcDoc('');
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    setExecutionTime(null);
   };
 
   const clampStep = (value: number, total: number) => {
@@ -492,23 +423,29 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
         </div>
       )}
 
-      {/* Sandbox IFrame */}
-      {isExecuting && srcDoc && (
-        <iframe
-          ref={iframeRef}
-          style={{ display: 'none' }}
-          sandbox="allow-scripts"
-          srcDoc={srcDoc}
-          title="Sandbox Execution Environment"
-        />
-      )}
-
       {/* Output Terminal */}
       <div className="bg-[#050911] p-5 font-mono text-xs text-[#a9b2c3] border-t border-black/25 dark:border-white/5 shadow-inner">
         {/* Terminal Header */}
-        <div className="flex items-center gap-2 mb-3 text-textMuted select-none border-b border-white/5 pb-2">
-          <Terminal size={14} className="text-primaryLight" />
-          <span className="font-bold uppercase tracking-wider text-[10px]">Console Output</span>
+        <div className="flex items-center justify-between gap-2 mb-3 text-textMuted select-none border-b border-white/5 pb-2">
+          <div className="flex items-center gap-2">
+            <Terminal size={14} className="text-primaryLight" />
+            <span className="font-bold uppercase tracking-wider text-[10px]">Console Output</span>
+            {executionTime !== null && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-sans font-bold border border-emerald-500/20">
+                ⚡ {executionTime}ms
+              </span>
+            )}
+          </div>
+          {logs.length > 0 && (
+            <button
+              type="button"
+              onClick={() => { setLogs([]); setError(null); }}
+              className="text-[10px] text-textMuted hover:text-textMain transition-colors flex items-center gap-1 font-sans"
+              title="Clear terminal output"
+            >
+              <Trash2 size={11} /> Clear
+            </button>
+          )}
         </div>
 
         {/* Terminal logs list with ref */}
@@ -530,7 +467,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
                 <div className="font-bold text-sm">Runtime Error: {error.message}</div>
                 {error.line !== undefined && (
                   <div className="text-[11px] opacity-75 font-semibold">
-                    at line {error.line - 17} {/* Adjust line offset inside HTML template */}
+                    at line {error.line}
                   </div>
                 )}
                 {error.stack && (

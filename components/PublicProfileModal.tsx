@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { X, Trophy, Flame, BookOpen, Award, Shield, Calendar, Lock, Footprints, Briefcase, Loader2 } from 'lucide-react';
+import { X, Trophy, Flame, BookOpen, Award, Shield, Calendar, Lock, Footprints, Briefcase, Loader2, EyeOff } from 'lucide-react';
 import { db } from '../firebase/firebase';
 import { BADGE_DEFINITIONS, XP_STORE_FRAMES } from '../constants';
 import { User } from '../types';
 import { getBadgeProgress, BadgeMetrics } from '../utils/badgeProgress';
 import { BadgeProgressBar } from './ui/BadgeProgressBar';
+import { useAuth } from '../hooks/useAuth';
 
 interface PublicProfileModalProps {
   userId: string | null;
@@ -26,6 +27,7 @@ const BADGE_ICONS: Record<string, any> = {
 };
 
 export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, rankIndex, onClose }) => {
+  const { user, appUser } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,6 +69,12 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
 
   if (!userId) return null;
 
+  const isOwner = Boolean(
+    user && (user.uid === userId || (appUser?.username && profile?.username && appUser.username.toLowerCase() === profile.username.toLowerCase()))
+  );
+  const isProfilePrivate = profile?.settings?.publicProfileEnabled === false;
+  const hiddenBadges = profile?.settings?.publicProfileHiddenBadges || [];
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div
@@ -88,8 +96,32 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
             <Loader2 size={32} className="animate-spin text-primaryLight" />
             <p className="text-sm font-medium">Loading Public Profile...</p>
           </div>
+        ) : profile && isProfilePrivate && !isOwner ? (
+          <div className="py-12 flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-xl">
+              <Lock size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-textMain">This Profile is Private</h2>
+            <p className="text-textMuted text-sm max-w-sm">
+              {profile.username} has set their SkillVerse profile to private. Their achievements and stats are not publicly viewable.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-2 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-black/20 dark:border-white/10 text-textMain font-medium text-sm transition-colors"
+            >
+              Close
+            </button>
+          </div>
         ) : profile ? (
           <div className="space-y-8">
+            {/* Private preview warning for owner */}
+            {isOwner && isProfilePrivate && (
+              <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                <EyeOff size={16} className="shrink-0" />
+                <span>Your profile is currently set to <strong>Private</strong>. Only you can view this preview.</span>
+              </div>
+            )}
+
             {/* Header / Avatar & Info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
               <div className="relative">
@@ -178,8 +210,14 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
                     mockInterviews: 0,
                   };
 
-                  return BADGE_DEFINITIONS.map(badge => {
+                  return BADGE_DEFINITIONS.filter(badge => {
+                    if (!isOwner && hiddenBadges.includes(badge.id)) {
+                      return false;
+                    }
+                    return true;
+                  }).map(badge => {
                     const earned = (profile.badges || []).includes(badge.id);
+                    const isHiddenFromPublic = hiddenBadges.includes(badge.id);
                     const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
                     const progress = !earned ? getBadgeProgress(badge, badgeMetrics) : null;
 
@@ -196,7 +234,14 @@ export const PublicProfileModal: React.FC<PublicProfileModalProps> = ({ userId, 
                           {earned ? <BadgeIcon size={20} /> : <Lock size={18} />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-bold text-sm text-textMain">{badge.name}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm text-textMain">{badge.name}</span>
+                            {isOwner && isHiddenFromPublic && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                Hidden
+                              </span>
+                            )}
+                          </div>
                           <div className="text-xs text-textMuted">{badge.description}</div>
                           {progress && (
                             <BadgeProgressBar current={progress.current} target={progress.target} label={progress.label} />

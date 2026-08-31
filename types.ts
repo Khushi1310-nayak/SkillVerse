@@ -14,6 +14,8 @@ export interface UserSettings {
   fontSize?: 'sm' | 'md' | 'lg';
   dyslexiaFont?: boolean;
   hideFromLeaderboard?: boolean;
+  publicProfileEnabled?: boolean;
+  publicProfileHiddenBadges?: string[];
   certificateName: string;
   avatarId: string;
   // Onboarding Fields
@@ -48,6 +50,9 @@ export const DEFAULT_SETTINGS: UserSettings = {
   reminderTime: '18:00',
   fontSize: 'md',
   dyslexiaFont: false,
+  hideFromLeaderboard: false,
+  publicProfileEnabled: true,
+  publicProfileHiddenBadges: [],
   certificateName: '',
   avatarId: '1',
   onboardingCompleted: false,

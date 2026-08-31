@@ -5,13 +5,14 @@ import {
   PlayCircle, BookOpen, Lock, X, Trophy, Briefcase, 
   Bot, FileCheck, Fingerprint, Download, Sparkles, Check,
   ChevronDown, HelpCircle, Mail, FileText, Globe, Server, 
-  HardDrive, Users, Eye, Heart, Layout
+  HardDrive, Users, Eye, Heart, Layout, Star, Flame, Terminal, MessageSquare, Mic
 } from 'lucide-react';
 import { GoldSnow } from './GoldSnow';
 import { AIAssistant } from './AIAssistant';
 import { FeatureCard } from './ui/FeatureCard';
 import { FAQSection } from './FAQSection';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { COURSES, COMPANIES, CATEGORIES, BADGE_DEFINITIONS } from '../constants';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -680,45 +681,110 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             {/* DOCUMENTATION MODAL */}
             {activeModal === 'documentation' && (
-              <div className="max-w-5xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-8 md:p-12">
-                  <div className="text-center mb-10">
-                      <div className="inline-block p-3 rounded-xl bg-blue-500/10 text-blue-500 mb-4">
+              <div className="max-w-5xl mx-auto bg-background border border-black/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up p-6 md:p-12 space-y-8">
+                  <div className="text-center pt-2">
+                      <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primaryLight mb-4 ring-1 ring-primary/20">
                           <BookOpen size={32} />
                       </div>
-                      <h2 className="text-3xl md:text-5xl font-display font-bold text-textMain mb-4">Documentation</h2>
-                      <p className="text-textMuted text-lg max-w-2xl mx-auto">
-                        Explore the complete architecture, features, and algorithms powering SkillVerse's E-learning experience.
+                      <h2 className="text-3xl md:text-5xl font-display font-bold text-textMain mb-3">SkillVerse Documentation</h2>
+                      <p className="text-textMuted text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                        Comprehensive architecture guide, interactive course engines, real-time collaboration protocols, and AI tutor integration.
                       </p>
                   </div>
+
+                  {/* Live Real Metrics Bar */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center">
+                          <div className="text-2xl md:text-3xl font-bold text-primaryLight">{COURSES.length}</div>
+                          <div className="text-[11px] font-medium text-textMuted uppercase tracking-wider mt-1">Full Courses</div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center">
+                          <div className="text-2xl md:text-3xl font-bold text-emerald-400">{COMPANIES.length}</div>
+                          <div className="text-[11px] font-medium text-textMuted uppercase tracking-wider mt-1">Tech Tracks</div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center">
+                          <div className="text-2xl md:text-3xl font-bold text-amber-400">{CATEGORIES.length}</div>
+                          <div className="text-[11px] font-medium text-textMuted uppercase tracking-wider mt-1">Learning Paths</div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center">
+                          <div className="text-2xl md:text-3xl font-bold text-cyan-400">{BADGE_DEFINITIONS.length}</div>
+                          <div className="text-[11px] font-medium text-textMuted uppercase tracking-wider mt-1">Badges & XP</div>
+                      </div>
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
-                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Layout className="text-primaryLight" size={20}/> Tech Stack</h3>
-                          <p className="text-sm text-textMuted leading-relaxed">Built with React 19, TypeScript, Vite, and Tailwind CSS. Utilizes client-side architecture and localStorage for a seamless offline-capable experience without server dependency.</p>
+                  {/* 6 Dynamic Feature Pillars */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-primaryLight">
+                              <Users size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">Pair Programming</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            Multiplayer Monaco code collaboration at <code className="text-primaryLight font-mono">/pair-session/:roomId</code> with real-time peer cursors and live sandboxed output.
+                          </p>
                       </div>
-                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
-                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Briefcase className="text-primaryLight" size={20}/> Career Mode</h3>
-                          <p className="text-sm text-textMuted leading-relaxed">Simulated interview engine featuring real questions from 20 top tech companies (Google, Meta, Uber, etc.), complete with difficulty tags and a proprietary Readiness Score.</p>
+
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-cyan-400">
+                              <MessageSquare size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">Peer Code Reviews</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            Community queue at <code className="text-cyan-400 font-mono">/code-review</code> with threaded line comments, upvoting, and resolution status.
+                          </p>
                       </div>
-                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
-                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Bot className="text-primaryLight" size={20}/> AI Integration</h3>
-                          <p className="text-sm text-textMuted leading-relaxed">Powered by Google's GenAI SDK (Gemini). The assistant maintains context-awareness of your current course and provides on-demand explanations and code snippets.</p>
+
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-orange-400">
+                              <Flame size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">Micro-Challenge Streak Saver</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            30-day curated algorithmic question bank for 1-minute daily problem solving to maintain streaks and earn +25 XP.
+                          </p>
                       </div>
-                      <div className="bg-glass border border-black/20 dark:border-white/10 p-6 rounded-2xl hover:bg-glass-hover transition-colors">
-                          <h3 className="font-bold text-textMain text-xl mb-2 flex items-center gap-2"><Trophy className="text-primaryLight" size={20}/> Gamification</h3>
-                          <p className="text-sm text-textMuted leading-relaxed">An immersive XP system that calculates points based on quiz performance and streak multipliers. Users can unlock levels and badges to stay motivated.</p>
+
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-amber-400">
+                              <Star size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">Starred Flashcard Decks</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            Star quiz questions during active lessons with instant reactive storage and dedicated <code className="text-amber-400 font-mono">/starred</code> flashcard testing.
+                          </p>
+                      </div>
+
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-emerald-400">
+                              <FileText size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">Learner Notes & PDF Export</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            Private lesson notes, public community notes, and automated 1-click formatted PDF study guide downloads.
+                          </p>
+                      </div>
+
+                      <div className="p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primaryLight/40 transition-all group">
+                          <div className="flex items-center gap-2 mb-2 text-purple-400">
+                              <Mic size={20} className="group-hover:scale-110 transition-transform" />
+                              <h3 className="font-bold text-textMain text-base">AI Voice Mock Interviews</h3>
+                          </div>
+                          <p className="text-xs text-textMuted leading-relaxed">
+                            10-turn real-time spoken interviews using Web Speech API with selectable AI recruiters Robin & Elisa and Leitner 5-box SRS.
+                          </p>
                       </div>
                   </div>
 
-                  <div className="text-center pt-6 border-t border-black/20 dark:border-white/10">
+                  <div className="text-center pt-4 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-center gap-4">
                       <button 
                           onClick={() => {
                               closeModal();
                               navigate('/docs');
                           }}
-                          className="px-8 py-4 rounded-xl bg-gradient-main text-white font-bold text-lg hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all inline-flex items-center gap-2"
+                          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-main text-white font-bold text-base hover:shadow-xl hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all inline-flex items-center justify-center gap-2"
                       >
-                          View Full Documentation <ArrowRight size={20}/>
+                          <span>Explore Full Interactive Documentation</span>
+                          <ArrowRight size={18}/>
                       </button>
                   </div>
               </div>

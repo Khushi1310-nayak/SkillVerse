@@ -36,6 +36,7 @@ const CredentialVerification = lazy(() => import('./components/CredentialVerific
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
 const PublicProfilePage = lazy(() => import('./components/PublicProfilePage').then(m => ({ default: m.PublicProfilePage })));
 const NotesPage = lazy(() => import('./components/NotesPage'));
+const StarredQuestions = lazy(() => import('./components/StarredQuestions').then(m => ({ default: m.StarredQuestions })));
 const CollaborativePlayground = lazy(() => import('./components/playground/CollaborativePlayground').then(m => ({ default: m.CollaborativePlayground })));
 
 const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
@@ -125,6 +126,7 @@ const AppRoutes = () => {
                           <Route path="/" element={<Dashboard user={appUser} />} />
                           <Route path="/courses" element={<CoursesList />} />
                           <Route path="/saved" element={<SavedCourses />} />
+                          <Route path="/starred" element={<StarredQuestions />} />
                           <Route path="/notes" element={<NotesPage />} />
                           <Route path="/roadmap" element={<Roadmap user={appUser} />} />
                           <Route path="/playground" element={<CodingPracticePlayground />} />

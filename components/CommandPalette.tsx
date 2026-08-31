@@ -16,6 +16,7 @@ import {
     X,
     Code2,
     GitPullRequest,
+    Star,
 } from 'lucide-react';
 import { CATEGORIES, COURSES, COMPANIES } from '../constants';
 import { firestoreService } from '../services/firestoreService';
@@ -124,6 +125,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             { id: 'nav-dashboard', title: 'Dashboard', group: 'Navigation', icon: LayoutDashboard, onSelect: () => goTo('/') },
             { id: 'nav-courses', title: 'Courses', group: 'Navigation', icon: BookOpen, onSelect: () => goTo('/courses') },
             { id: 'nav-saved', title: 'Saved Courses', group: 'Navigation', icon: BookOpen, onSelect: () => goTo('/saved') },
+            { id: 'nav-starred', title: 'Starred Quiz Questions', group: 'Navigation', icon: Star, onSelect: () => goTo('/starred') },
             { id: 'nav-notes', title: 'My Notes', group: 'Navigation', icon: FileText, onSelect: () => goTo('/notes') },
             { id: 'nav-roadmap', title: 'Learning Roadmap', group: 'Navigation', icon: Folder, onSelect: () => goTo('/roadmap') },
             { id: 'nav-playground', title: 'Code Playground', group: 'Navigation', icon: Code2, onSelect: () => goTo('/playground') },

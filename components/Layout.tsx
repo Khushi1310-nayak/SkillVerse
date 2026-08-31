@@ -16,7 +16,8 @@ import {
   GitPullRequest,
   Bookmark,
   Map,
-  FileText
+  FileText,
+  Star
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { User } from '../types';
@@ -229,6 +230,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} id="nav-dashboard" />
           <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} id="nav-courses" />
           <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} id="nav-saved" />
+          <NavItem to="/starred" icon={Star} label={t('nav.starred', 'Starred Questions')} id="nav-starred" />
           <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} id="nav-notes" />
           <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} id="nav-roadmap" />
           <NavItem to="/playground" icon={Code2} label={t('nav.playground', 'Playground')} id="nav-playground" />
@@ -295,6 +297,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <NavItem to="/" icon={LayoutDashboard} label={t('nav.dashboard')} />
               <NavItem to="/courses" icon={BookOpen} label={t('nav.courses')} />
               <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} />
+              <NavItem to="/starred" icon={Star} label={t('nav.starred', 'Starred Questions')} />
               <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} />
               <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} />
               <NavItem to="/playground" icon={Code2} label={t('nav.playground', 'Playground')} />

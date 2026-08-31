@@ -1,6 +1,6 @@
 import { doc, setDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, Company, InterviewQuestion, MicroChallenge, MicroChallengeState } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, StarredQuestion, Company, InterviewQuestion, MicroChallenge, MicroChallengeState } from '../types';
 import { safeStorage, isArray, isPlainObject } from '../utils/safeStorage';
 
 const PROGRESS_KEY = 'skillverse_progress';
@@ -9,6 +9,7 @@ const LAST_VISITED_KEY = 'skillverse_last_visited';
 const AI_NOTES_KEY = 'skillverse_ai_notes';
 const LESSON_NOTES_KEY = 'skillverse_lesson_notes';
 const CODE_SNIPPETS_KEY = 'skillverse_code_snippets';
+const STARRED_QUESTIONS_KEY = 'skillverse_starred_questions';
 const STREAK_KEY = 'skillverse_streak_data';
 const STUDY_TIME_KEY = 'skillverse_study_time';
 const DAILY_CHALLENGE_KEY = 'skillverse_daily_challenge';
@@ -485,11 +486,11 @@ export const storageService = {
     const notes = storageService.getAllLessonNotes().map(n =>
       n.id === id
         ? {
-            ...n,
-            text,
-            updatedAt: new Date().toISOString(),
-            ...(visibility ? { visibility } : {}),
-          }
+          ...n,
+          text,
+          updatedAt: new Date().toISOString(),
+          ...(visibility ? { visibility } : {}),
+        }
         : n
     );
     safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
@@ -536,6 +537,36 @@ export const storageService = {
     const snippets = storageService.getSavedSnippets().filter(s => s.id !== id);
     safeStorage.writeJSON(CODE_SNIPPETS_KEY, snippets);
     return snippets;
+  },
+
+  // --- STARRED QUIZ QUESTIONS ---
+
+  getStarredQuestions: (): StarredQuestion[] =>
+    safeStorage.readJSON<StarredQuestion[]>(STARRED_QUESTIONS_KEY, [], isArray),
+
+  toggleStarQuestion: (courseId: string, questionId: number): StarredQuestion[] => {
+    const starred = storageService.getStarredQuestions();
+    const existingIndex = starred.findIndex(
+      sq => sq.courseId === courseId && sq.questionId === questionId
+    );
+
+    if (existingIndex >= 0) {
+      starred.splice(existingIndex, 1);
+    } else {
+      starred.push({
+        courseId,
+        questionId,
+        starredAt: new Date().toISOString(),
+      });
+    }
+
+    safeStorage.writeJSON(STARRED_QUESTIONS_KEY, starred);
+    return starred;
+  },
+
+  isQuestionStarred: (courseId: string, questionId: number): boolean => {
+    const starred = storageService.getStarredQuestions();
+    return starred.some(sq => sq.courseId === courseId && sq.questionId === questionId);
   },
 
   // --- STREAK CALENDAR ---

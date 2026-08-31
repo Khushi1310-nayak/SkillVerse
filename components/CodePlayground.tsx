@@ -228,6 +228,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('go') || l.includes('golang')) return 'go';
     if (l.includes('rust')) return 'rust';
     if (l.includes('kotlin') || l === 'kt') return 'kotlin';
+    if (l.includes('php')) return 'php';
     if (l.includes('html')) return 'html';
     if (l.includes('css')) return 'css';
     return 'javascript';
@@ -243,6 +244,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('go') || l.includes('golang')) return 'main.go';
     if (l.includes('rust')) return 'main.rs';
     if (l.includes('kotlin') || l === 'kt') return 'Main.kt';
+    if (l.includes('php')) return 'index.php';
     if (l.includes('html')) return 'index.html';
     if (l.includes('css')) return 'styles.css';
     return 'sandbox.js';

@@ -999,29 +999,332 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
     }
   ],
 
+  'php': [
+    {
+      id: 'php-mod-1',
+      title: 'Module 1: Associative Array Filtering & Value Mapping',
+      difficulty: 'Easy',
+      category: 'PHP',
+      description: 'Implement filterAndDoubleEvens(array $nums): array using array_filter and array_map with arrow functions (fn) in modern PHP 8.',
+      constraints: ['Filter out odd values and multiply even numbers by 2', 'Re-index returned array with array_values'],
+      sampleInputs: [
+        { input: '[1, 2, 3, 4, 5, 6]', output: '[4, 8, 12]' }
+      ],
+      starterCode: `<?php\n\nfunction filterAndDoubleEvens(array $nums): array {\n    // TODO: Filter even numbers and map each to value * 2\n    \n    return [];\n}\n\n$sample = [1, 2, 3, 4, 5, 6];\nprint_r(filterAndDoubleEvens($sample));`,
+      solutionHint: 'return array_values(array_map(fn($n) => $n * 2, array_filter($nums, fn($n) => $n % 2 === 0)));'
+    },
+    {
+      id: 'php-mod-2',
+      title: 'Module 2: Strict Typed JSON API Envelope Formatter',
+      difficulty: 'Easy',
+      category: 'PHP',
+      description: 'Implement formatApiResponse(bool $success, mixed $data, ?string $error = null): string returning a valid JSON string envelope with timestamp.',
+      constraints: ['Strict typing with declare(strict_types=1)', 'Return valid JSON via json_encode'],
+      sampleInputs: [
+        { input: 'formatApiResponse(true, ["user" => "Alex", "xp" => 450])', output: 'JSON envelope with success, data, error, timestamp' }
+      ],
+      starterCode: `<?php\ndeclare(strict_types=1);\n\nfunction formatApiResponse(bool $success, mixed $data, ?string $error = null): string {\n    $payload = [\n        'success' => $success,\n        'data' => $data,\n        'error' => $error,\n        'timestamp' => time()\n    ];\n    // TODO: Encode $payload as JSON and return string\n    \n    return json_encode($payload);\n}\n\necho formatApiResponse(true, ['user' => 'Alex', 'xp' => 450]);`,
+      solutionHint: 'return json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);'
+    },
+    {
+      id: 'php-mod-3',
+      title: 'Module 3: PHP 8 Match Expression & Order State Machine',
+      difficulty: 'Medium',
+      category: 'PHP',
+      description: 'Write getNextOrderStatus(string $currentStatus, string $action): string using modern PHP 8 match expressions to transition between pending, processing, completed, and cancelled.',
+      constraints: ['Use PHP 8 match ($action) construct', 'Throw InvalidArgumentException on illegal transitions'],
+      sampleInputs: [
+        { input: '"pending", "PAY"', output: '"processing"' },
+        { input: '"processing", "SHIP"', output: '"completed"' }
+      ],
+      starterCode: `<?php\ndeclare(strict_types=1);\n\nfunction getNextOrderStatus(string $currentStatus, string $action): string {\n    // TODO: Use match expression to transition status safely\n    \n    return $currentStatus;\n}\n\necho "Next: " . getNextOrderStatus("pending", "PAY") . "\\n";       // "processing"\necho "Next: " . getNextOrderStatus("processing", "SHIP") . "\\n";   // "completed"`,
+      solutionHint: 'return match ($action) { "PAY" => $currentStatus === "pending" ? "processing" : throw new InvalidArgumentException(), "SHIP" => $currentStatus === "processing" ? "completed" : throw new InvalidArgumentException(), "CANCEL" => "cancelled", default => $currentStatus };'
+    },
+    {
+      id: 'php-mod-4',
+      title: 'Module 4: PSR Middleware Request Pipeline',
+      difficulty: 'Medium',
+      category: 'PHP',
+      description: 'Implement a MiddlewarePipeline class where handle(array $request, callable $coreHandler) passes request through an array of callable middlewares in onion architecture.',
+      constraints: ['Support chaining arbitrary middleware callables', 'Preserve mutated request payload'],
+      sampleInputs: [
+        { input: '$pipeline->add(authMiddleware)->handle($req, $coreHandler)', output: 'Request processed through all layers' }
+      ],
+      starterCode: `<?php\n\nclass MiddlewarePipeline {\n    private array $middlewares = [];\n\n    public function add(callable $middleware): self {\n        $this->middlewares[] = $middleware;\n        return $this;\n    }\n\n    public function handle(array $request, callable $destination): array {\n        // TODO: Wrap $destination in reverse through $middlewares\n        \n        return $destination($request);\n    }\n}\n\n$pipeline = new MiddlewarePipeline();\n$pipeline->add(function($req, $next) {\n    $req['authenticated'] = true;\n    return $next($req);\n});\n\n$result = $pipeline->handle(['ip' => '127.0.0.1'], fn($r) => array_merge($r, ['status' => 'OK']));\nprint_r($result);`,
+      solutionHint: 'let runner = array_reduce(array_reverse($this->middlewares), fn($next, $mw) => fn($req) => $mw($req, $next), $destination); return $runner($request);'
+    },
+    {
+      id: 'php-mod-5',
+      title: 'Module 5: Generator Stream for Batch Processing (Yield)',
+      difficulty: 'Medium',
+      category: 'PHP',
+      description: 'Implement function chunkGenerator(iterable $items, int $chunkSize): Generator that yields arrays of $chunkSize in O(1) memory without creating full nested lists in memory.',
+      constraints: ['Memory Complexity: O(1)', 'Yield array batches lazily'],
+      sampleInputs: [
+        { input: 'range(1, 10), chunkSize = 3', output: '[1,2,3], [4,5,6], [7,8,9], [10]' }
+      ],
+      starterCode: `<?php\n\nfunction chunkGenerator(iterable $items, int $chunkSize): Generator {\n    $chunk = [];\n    // TODO: Iterate items, accumulate in $chunk, and yield when count reaches $chunkSize\n    \n}\n\n$numbers = range(1, 10);\nforeach (chunkGenerator($numbers, 3) as $batch) {\n    echo "Batch: " . implode(", ", $batch) . "\\n";\n}`,
+      solutionHint: 'foreach ($items as $item) { $chunk[] = $item; if (count($chunk) === $chunkSize) { yield $chunk; $chunk = []; } } if (!empty($chunk)) { yield $chunk; }'
+    },
+    {
+      id: 'php-mod-6',
+      title: 'Module 6: Auto-Wiring Dependency Injection Container (Reflection)',
+      difficulty: 'Hard',
+      category: 'PHP',
+      description: 'Implement a Container class with get(string $class) that inspects constructor parameters via ReflectionClass and automatically resolves and instantiates dependencies recursively.',
+      constraints: ['Use ReflectionClass and ReflectionParameter types', 'Handle classes without constructors'],
+      sampleInputs: [
+        { input: '$container->get(UserService::class)', output: 'Instantiates UserService with injected Database and Logger dependencies' }
+      ],
+      starterCode: `<?php\n\nclass Container {\n    private array $instances = [];\n\n    public function get(string $className): object {\n        if (isset($this->instances[$className])) {\n            return $this->instances[$className];\n        }\n\n        $reflector = new ReflectionClass($className);\n        $constructor = $reflector->getConstructor();\n        if (!$constructor) {\n            return new $className();\n        }\n\n        // TODO: Inspect constructor parameters, recursively resolve each type, and newInstanceArgs\n        \n        return $reflector->newInstance();\n    }\n}\n\nclass Logger {}\nclass Database { public function __construct(public Logger $logger) {} }\nclass UserService { public function __construct(public Database $db) {} }\n\n$c = new Container();\n$service = $c->get(UserService::class);\necho "Instantiated: " . get_class($service) . "\\n";`,
+      solutionHint: '$dependencies = array_map(fn($param) => $this->get($param->getType()->getName()), $constructor->getParameters()); return $this->instances[$className] = $reflector->newInstanceArgs($dependencies);'
+    },
+    {
+      id: 'php-mod-7',
+      title: 'Module 7: PHP 8.1 Fiber Coroutine Task Scheduler',
+      difficulty: 'Hard',
+      category: 'PHP',
+      description: 'Implement an AsyncScheduler class with enqueue(callable $task) and run() using PHP 8.1 Fiber to concurrently execute and resume cooperative tasks.',
+      constraints: ['Use PHP 8.1 Fiber class', 'Cooperative multitasking with Fiber::suspend() and ->resume()'],
+      sampleInputs: [
+        { input: 'Enqueue two cooperative fibers', output: 'Interleaved execution across tasks' }
+      ],
+      starterCode: `<?php\n\nclass AsyncScheduler {\n    private SplQueue $queue;\n\n    public function __construct() {\n        $this->queue = new SplQueue();\n    }\n\n    public function enqueue(callable $task): void {\n        $fiber = new Fiber($task);\n        $this->queue->enqueue($fiber);\n    }\n\n    public function run(): void {\n        // TODO: While queue not empty, dequeue Fiber, start or resume it if not terminated, and re-enqueue if suspended\n        \n    }\n}\n\n$scheduler = new AsyncScheduler();\n$scheduler->enqueue(function() {\n    echo "Task 1: Step 1\\n";\n    Fiber::suspend();\n    echo "Task 1: Step 2 (Finished)\\n";\n});\n$scheduler->enqueue(function() {\n    echo "Task 2: Instant Run\\n";\n});\n$scheduler->run();`,
+      solutionHint: 'while (!$this->queue->isEmpty()) { $fiber = $this->queue->dequeue(); if (!$fiber->isStarted()) { $fiber->start(); } elseif ($fiber->isSuspended()) { $fiber->resume(); } if ($fiber->isSuspended()) { $this->queue->enqueue($fiber); } }'
+    },
+    {
+      id: 'php-mod-8',
+      title: 'Module 8: Token Bucket Sliding Window Rate Limiter',
+      difficulty: 'Hard',
+      category: 'PHP',
+      description: 'Build a SlidingWindowRateLimiter class with isAllowed(string $key, int $limit, int $windowSeconds): bool calculating request timestamps within the sliding window.',
+      constraints: ['Sub-second accuracy using microtime(true)', 'Memory cleanup of expired timestamps'],
+      sampleInputs: [
+        { input: 'isAllowed("user-1", 2, 1) called 3 times', output: 'true, true, false' }
+      ],
+      starterCode: `<?php\n\nclass SlidingWindowRateLimiter {\n    private array $requests = [];\n\n    public function isAllowed(string $key, int $limit, int $windowSeconds): bool {\n        $now = microtime(true);\n        $cutoff = $now - $windowSeconds;\n\n        // TODO: Filter out timestamps older than $cutoff, check if count < $limit, add $now and return bool\n        \n        return true;\n    }\n}\n\n$limiter = new SlidingWindowRateLimiter();\necho "Req 1: " . ($limiter->isAllowed("user-1", 2, 1) ? "Allowed" : "Blocked") . "\\n";\necho "Req 2: " . ($limiter->isAllowed("user-1", 2, 1) ? "Allowed" : "Blocked") . "\\n";\necho "Req 3: " . ($limiter->isAllowed("user-1", 2, 1) ? "Allowed" : "Blocked") . "\\n";`,
+      solutionHint: '$this->requests[$key] = array_values(array_filter($this->requests[$key] ?? [], fn($t) => $t > $cutoff)); if (count($this->requests[$key]) >= $limit) return false; $this->requests[$key][] = $now; return true;'
+    }
+  ],
+
   // --- DATA STRUCTURES & ALGORITHMS ---
   'arrays': [
     {
-      id: 'arr-1',
-      title: '1. Two Sum Target Index',
+      id: 'arr-mod-1',
+      title: 'Module 1: Two Sum Hash Map Lookup',
       difficulty: 'Easy',
       category: 'Arrays',
-      description: 'Given an array of integers `nums` and a `target`, return indices of two numbers that add up to target.',
-      constraints: ['Time complexity O(n)'],
-      sampleInputs: [{ input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]' }],
-      starterCode: `function twoSum(nums, target) {\n  const map = new Map();\n  // TODO: Find complement target - nums[i]\n  \n}\n\nconsole.log(twoSum([2, 7, 11, 15], 9));`,
-      solutionHint: 'const diff = target - nums[i]; if (map.has(diff)) return [map.get(diff), i]'
+      description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target in O(n) linear time.',
+      constraints: ['Time Complexity: O(n)', 'Exactly one valid answer exists', 'Do not use same element twice'],
+      sampleInputs: [
+        { input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]' }
+      ],
+      starterCode: `function twoSum(nums, target) {\n  const map = new Map();\n  // TODO: Iterate nums, compute complement target - num, and return [map.get(comp), i]\n  \n  return [];\n}\n\nconsole.log("Indices:", twoSum([2, 7, 11, 15], 9));`,
+      solutionHint: 'for (let i = 0; i < nums.length; i++) { const diff = target - nums[i]; if (map.has(diff)) return [map.get(diff), i]; map.set(nums[i], i); }'
     },
     {
-      id: 'arr-2',
-      title: '2. Maximum Subarray Sum (Kadane)',
+      id: 'arr-mod-2',
+      title: 'Module 2: In-Place Duplicate Removal (Two Pointers)',
+      difficulty: 'Easy',
+      category: 'Arrays',
+      description: 'Given an integer array nums sorted in non-decreasing order, remove duplicates in-place such that each unique element appears only once. Return number of unique elements.',
+      constraints: ['Modify array in-place with O(1) extra memory', 'Preserve sorted order'],
+      sampleInputs: [
+        { input: 'nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]', output: 'k = 5, nums prefix = [0, 1, 2, 3, 4]' }
+      ],
+      starterCode: `function removeDuplicates(nums) {\n  if (nums.length === 0) return 0;\n  let writeIdx = 1;\n  // TODO: Iterate readIdx from 1 to nums.length and write distinct values\n  \n  return writeIdx;\n}\n\nconst arr = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];\nconst k = removeDuplicates(arr);\nconsole.log("Unique count:", k, "Prefix:", arr.slice(0, k));`,
+      solutionHint: 'for (let i = 1; i < nums.length; i++) { if (nums[i] !== nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;'
+    },
+    {
+      id: 'arr-mod-3',
+      title: 'Module 3: Maximum Subarray Sum (Kadane Algorithm)',
       difficulty: 'Medium',
       category: 'Arrays',
-      description: 'Find contiguous subarray with largest sum and return sum.',
-      constraints: ['O(n) time complexity'],
-      sampleInputs: [{ input: '[-2, 1, -3, 4, -1, 2, 1]', output: '6' }],
-      starterCode: `function maxSubArray(nums) {\n  let maxSum = nums[0];\n  let currSum = nums[0];\n  // TODO: Kadane algorithm loop\n  \n  return maxSum;\n}\n\nconsole.log(maxSubArray([-2, 1, -3, 4, -1, 2, 1]));`,
-      solutionHint: 'currSum = Math.max(nums[i], currSum + nums[i]); maxSum = Math.max(maxSum, currSum)'
+      description: 'Given an integer array nums, find the contiguous subarray with the largest sum, and return its sum in O(n) linear time.',
+      constraints: ['Time Complexity: O(n)', 'Handle all-negative number arrays correctly'],
+      sampleInputs: [
+        { input: 'nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]', output: '6 ([4, -1, 2, 1])' }
+      ],
+      starterCode: `function maxSubArray(nums) {\n  let maxSoFar = nums[0];\n  let currentMax = nums[0];\n  // TODO: Loop from index 1 to nums.length, updating currentMax and maxSoFar\n  \n  return maxSoFar;\n}\n\nconsole.log("Max Subarray:", maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4]));`,
+      solutionHint: 'for (let i = 1; i < nums.length; i++) { currentMax = Math.max(nums[i], currentMax + nums[i]); maxSoFar = Math.max(maxSoFar, currentMax); } return maxSoFar;'
+    },
+    {
+      id: 'arr-mod-4',
+      title: 'Module 4: Container With Most Water (Two-Pointer)',
+      difficulty: 'Medium',
+      category: 'Arrays',
+      description: 'Given n non-negative integers height where each point represents a vertical line, find two lines that together with the x-axis form a container holding the maximum water.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'height = [1, 8, 6, 2, 5, 4, 8, 3, 7]', output: '49' }
+      ],
+      starterCode: `function maxArea(height) {\n  let left = 0, right = height.length - 1;\n  let maxWater = 0;\n  // TODO: Calculate area = min(height[left], height[right]) * (right - left), move smaller pointer\n  \n  return maxWater;\n}\n\nconsole.log("Max Water:", maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));`,
+      solutionHint: 'while (left < right) { const w = right - left; const h = Math.min(height[left], height[right]); maxWater = Math.max(maxWater, w * h); if (height[left] < height[right]) left++; else right--; }'
+    },
+    {
+      id: 'arr-mod-5',
+      title: 'Module 5: Merge Overlapping Intervals',
+      difficulty: 'Medium',
+      category: 'Arrays',
+      description: 'Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals.',
+      constraints: ['Sort intervals by start time in O(n log n)', 'Time Complexity: O(n log n)'],
+      sampleInputs: [
+        { input: '[[1,3],[2,6],[8,10],[15,18]]', output: '[[1,6],[8,10],[15,18]]' }
+      ],
+      starterCode: `function mergeIntervals(intervals) {\n  if (intervals.length <= 1) return intervals;\n  intervals.sort((a, b) => a[0] - b[0]);\n  const merged = [intervals[0]];\n\n  // TODO: Iterate remaining intervals and merge if current start <= previous end\n  \n  return merged;\n}\n\nconsole.log("Merged:", mergeIntervals([[1,3],[2,6],[8,10],[15,18]]));`,
+      solutionHint: 'for (let i = 1; i < intervals.length; i++) { const curr = intervals[i]; const last = merged[merged.length - 1]; if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]); else merged.push(curr); }'
+    },
+    {
+      id: 'arr-mod-6',
+      title: 'Module 6: Trapping Rain Water (Two Pointers)',
+      difficulty: 'Hard',
+      category: 'Arrays',
+      description: 'Given n non-negative integers representing an elevation map where width of each bar is 1, compute how much water it can trap after raining in O(n) time and O(1) space.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1) using two pointers'],
+      sampleInputs: [
+        { input: '[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]', output: '6' }
+      ],
+      starterCode: `function trap(height) {\n  let left = 0, right = height.length - 1;\n  let leftMax = 0, rightMax = 0;\n  let totalWater = 0;\n\n  // TODO: Process two pointers tracking leftMax and rightMax\n  \n  return totalWater;\n}\n\nconsole.log("Trapped Water:", trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]));`,
+      solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else totalWater += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else totalWater += rightMax - height[right]; right--; } }'
+    },
+    {
+      id: 'arr-mod-7',
+      title: 'Module 7: Sliding Window Maximum (Monotonic Deque)',
+      difficulty: 'Hard',
+      category: 'Arrays',
+      description: 'Given an integer array nums and sliding window size k, return the max value in each window position in O(n) amortized time using a monotonic deque.',
+      constraints: ['Time Complexity: O(n)', 'Maintain monotonic decreasing index queue'],
+      sampleInputs: [
+        { input: 'nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3', output: '[3, 3, 5, 5, 6, 7]' }
+      ],
+      starterCode: `function maxSlidingWindow(nums, k) {\n  const deque = [];\n  const result = [];\n\n  for (let i = 0; i < nums.length; i++) {\n    // TODO: 1. Remove indices outside current window (i - k)\n    // TODO: 2. Remove indices with values smaller than nums[i] from back\n    // TODO: 3. Push i, and record deque[0] once i >= k - 1\n    \n  }\n\n  return result;\n}\n\nconsole.log("Sliding Max:", maxSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3));`,
+      solutionHint: 'while (deque.length && deque[0] <= i - k) deque.shift(); while (deque.length && nums[deque[deque.length - 1]] < nums[i]) deque.pop(); deque.push(i); if (i >= k - 1) result.push(nums[deque[0]]);'
+    },
+    {
+      id: 'arr-mod-8',
+      title: 'Module 8: First Missing Positive (Index Cycle Sort)',
+      difficulty: 'Hard',
+      category: 'Arrays',
+      description: 'Given an unsorted integer array nums, return the smallest positive integer that is not present in nums in O(n) time and O(1) auxiliary space.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1) in-place'],
+      sampleInputs: [
+        { input: '[3, 4, -1, 1]', output: '2' },
+        { input: '[7, 8, 9, 11, 12]', output: '1' }
+      ],
+      starterCode: `function firstMissingPositive(nums) {\n  const n = nums.length;\n  // TODO: Place each number x in index x - 1 if 1 <= x <= n\n  \n  // TODO: Find first index i where nums[i] !== i + 1\n  \n  return n + 1;\n}\n\nconsole.log("Missing:", firstMissingPositive([3, 4, -1, 1]));\nconsole.log("Missing:", firstMissingPositive([7, 8, 9, 11, 12]));`,
+      solutionHint: 'for (let i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) { const temp = nums[nums[i] - 1]; nums[nums[i] - 1] = nums[i]; nums[i] = temp; } } for (let i = 0; i < n; i++) { if (nums[i] !== i + 1) return i + 1; } return n + 1;'
+    }
+  ],
+
+  'strings': [
+    {
+      id: 'str-mod-1',
+      title: 'Module 1: Valid Palindrome with Two Pointers',
+      difficulty: 'Easy',
+      category: 'Strings',
+      description: 'Given a string s, return true if it is a palindrome after converting all uppercase letters to lowercase and removing all non-alphanumeric characters.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: '"A man, a plan, a canal: Panama"', output: 'true' },
+        { input: '"race a car"', output: 'false' }
+      ],
+      starterCode: `function isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let left = 0, right = clean.length - 1;\n  // TODO: Compare characters from outside inwards\n  \n  return true;\n}\n\nconsole.log("Is Palindrome:", isPalindrome("A man, a plan, a canal: Panama"));\nconsole.log("Is Palindrome:", isPalindrome("race a car"));`,
+      solutionHint: 'while (left < right) { if (clean[left++] !== clean[right--]) return false; } return true;'
+    },
+    {
+      id: 'str-mod-2',
+      title: 'Module 2: Longest Common Prefix (Vertical Scanning)',
+      difficulty: 'Easy',
+      category: 'Strings',
+      description: 'Write a function to find the longest common prefix string amongst an array of strings. If there is no common prefix, return an empty string "".',
+      constraints: ['Input contains lowercase English letters', 'Time Complexity: O(S) where S is sum of all characters'],
+      sampleInputs: [
+        { input: '["flower", "flow", "flight"]', output: '"fl"' }
+      ],
+      starterCode: `function longestCommonPrefix(strs) {\n  if (!strs || strs.length === 0) return "";\n  let prefix = strs[0];\n  // TODO: Iterate remaining strings and truncate prefix until it matches\n  \n  return prefix;\n}\n\nconsole.log("Prefix:", longestCommonPrefix(["flower", "flow", "flight"]));`,
+      solutionHint: 'for (let i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) !== 0) { prefix = prefix.substring(0, prefix.length - 1); if (!prefix) return ""; } } return prefix;'
+    },
+    {
+      id: 'str-mod-3',
+      title: 'Module 3: Longest Substring Without Repeating Characters',
+      difficulty: 'Medium',
+      category: 'Strings',
+      description: 'Given a string s, find the length of the longest substring without repeating characters in O(n) time using a sliding window and Map.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(min(m, n))'],
+      sampleInputs: [
+        { input: '"abcabcbb"', output: '3 ("abc")' },
+        { input: '"bbbbb"', output: '1 ("b")' }
+      ],
+      starterCode: `function lengthOfLongestSubstring(s) {\n  const charIndexMap = new Map();\n  let maxLength = 0;\n  let windowStart = 0;\n\n  // TODO: Expand windowEnd, adjust windowStart on collision, compute maxLength\n  \n  return maxLength;\n}\n\nconsole.log("Longest Unique Substring:", lengthOfLongestSubstring("abcabcbb"));`,
+      solutionHint: 'for (let windowEnd = 0; windowEnd < s.length; windowEnd++) { const rightChar = s[windowEnd]; if (charIndexMap.has(rightChar)) { windowStart = Math.max(windowStart, charIndexMap.get(rightChar) + 1); } charIndexMap.set(rightChar, windowEnd); maxLength = Math.max(maxLength, windowEnd - windowStart + 1); } return maxLength;'
+    },
+    {
+      id: 'str-mod-4',
+      title: 'Module 4: String to Integer Parser (atoi)',
+      difficulty: 'Medium',
+      category: 'Strings',
+      description: 'Implement myAtoi(s) that converts a string to a 32-bit signed integer handling leading whitespace, +/- signs, digits, and 32-bit integer clamping [-2^31, 2^31 - 1].',
+      constraints: ['Clamp overflow to [-2147483648, 2147483647]', 'Ignore subsequent non-digit characters'],
+      sampleInputs: [
+        { input: '"   -42"', output: '-42' },
+        { input: '"4193 with words"', output: '4193' }
+      ],
+      starterCode: `function myAtoi(s) {\n  let i = 0, sign = 1, total = 0;\n  const INT_MAX = 2147483647, INT_MIN = -2147483648;\n  // TODO: Skip whitespace, parse sign, parse digits, clamp to [INT_MIN, INT_MAX]\n  \n  return total * sign;\n}\n\nconsole.log("Atoi \'   -42\':", myAtoi("   -42"));\nconsole.log("Atoi \'4193 with words\':", myAtoi("4193 with words"));`,
+      solutionHint: 'while (s[i] === " ") i++; if (s[i] === "+" || s[i] === "-") { sign = s[i] === "-" ? -1 : 1; i++; } while (i < s.length && s[i] >= "0" && s[i] <= "9") { total = total * 10 + (s.charCodeAt(i) - 48); if (total * sign >= INT_MAX) return INT_MAX; if (total * sign <= INT_MIN) return INT_MIN; i++; }'
+    },
+    {
+      id: 'str-mod-5',
+      title: 'Module 5: Longest Palindromic Substring',
+      difficulty: 'Medium',
+      category: 'Strings',
+      description: 'Given a string s, return the longest palindromic substring in s in O(n^2) time and O(1) extra space using expand around center.',
+      constraints: ['Time Complexity: O(n^2)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: '"babad"', output: '"bab" or "aba"' },
+        { input: '"cbbd"', output: '"bb"' }
+      ],
+      starterCode: `function longestPalindrome(s) {\n  if (!s || s.length < 1) return "";\n  let start = 0, end = 0;\n\n  const expand = (left, right) => {\n    while (left >= 0 && right < s.length && s[left] === s[right]) {\n      left--;\n      right++;\n    }\n    return right - left - 1;\n  };\n\n  // TODO: Expand around i (odd length) and i, i+1 (even length), update start/end\n  \n  return s.substring(start, end + 1);\n}\n\nconsole.log("Longest Palindrome:", longestPalindrome("babad"));`,
+      solutionHint: 'for (let i = 0; i < s.length; i++) { const len1 = expand(i, i); const len2 = expand(i, i + 1); const len = Math.max(len1, len2); if (len > end - start) { start = i - Math.floor((len - 1) / 2); end = i + Math.floor(len / 2); } }'
+    },
+    {
+      id: 'str-mod-6',
+      title: 'Module 6: Minimum Window Substring',
+      difficulty: 'Hard',
+      category: 'Strings',
+      description: 'Given two strings s and t, return the minimum window substring of s such that every character in t (including duplicates) is included in the window in O(m + n) time.',
+      constraints: ['Time Complexity: O(|s| + |t|)', 'Space Complexity: O(|s| + |t|)'],
+      sampleInputs: [
+        { input: 's = "ADOBECODEBANC", t = "ABC"', output: '"BANC"' }
+      ],
+      starterCode: `function minWindow(s, t) {\n  if (s.length === 0 || t.length === 0) return "";\n  const targetMap = {};\n  for (const c of t) targetMap[c] = (targetMap[c] || 0) + 1;\n\n  let required = Object.keys(targetMap).length;\n  let l = 0, r = 0, formed = 0;\n  const windowCounts = {};\n  let minLen = Infinity, minStart = 0;\n\n  // TODO: Expand r, check matched counts, contract l while window is valid\n  \n  return minLen === Infinity ? "" : s.substring(minStart, minStart + minLen);\n}\n\nconsole.log("Min Window:", minWindow("ADOBECODEBANC", "ABC"));`,
+      solutionHint: 'while (r < s.length) { const c = s[r]; windowCounts[c] = (windowCounts[c] || 0) + 1; if (targetMap[c] && windowCounts[c] === targetMap[c]) formed++; while (l <= r && formed === required) { if (r - l + 1 < minLen) { minLen = r - l + 1; minStart = l; } windowCounts[s[l]]--; if (targetMap[s[l]] && windowCounts[s[l]] < targetMap[s[l]]) formed--; l++; } r++; }'
+    },
+    {
+      id: 'str-mod-7',
+      title: 'Module 7: KMP Pattern Matcher with LPS Prefix Table',
+      difficulty: 'Hard',
+      category: 'Strings',
+      description: 'Implement strStrKMP(haystack, needle) returning the index of the first occurrence of needle in haystack using the Knuth-Morris-Pratt O(N + M) algorithm with Longest Prefix Suffix (LPS) table.',
+      constraints: ['Time Complexity: O(N + M)', 'Space Complexity: O(M) LPS table'],
+      sampleInputs: [
+        { input: 'haystack = "ABABDABACDABABCABAB", needle = "ABABCABAB"', output: '10' }
+      ],
+      starterCode: `function strStrKMP(haystack, needle) {\n  if (needle.length === 0) return 0;\n  const lps = new Array(needle.length).fill(0);\n  let prevLPS = 0, i = 1;\n  while (i < needle.length) {\n    if (needle[i] === needle[prevLPS]) {\n      lps[i++] = ++prevLPS;\n    } else if (prevLPS === 0) {\n      lps[i++] = 0;\n    } else {\n      prevLPS = lps[prevLPS - 1];\n    }\n  }\n\n  // TODO: Search haystack using LPS table without backtracking haystack pointer\n  \n  return -1;\n}\n\nconsole.log("KMP Match Index:", strStrKMP("ABABDABACDABABCABAB", "ABABCABAB"));`,
+      solutionHint: 'let h = 0, n = 0; while (h < haystack.length) { if (haystack[h] === needle[n]) { h++; n++; } if (n === needle.length) return h - n; if (h < haystack.length && haystack[h] !== needle[n]) { if (n !== 0) n = lps[n - 1]; else h++; } } return -1;'
+    },
+    {
+      id: 'str-mod-8',
+      title: 'Module 8: Regular Expression Dynamic Programming Matching',
+      difficulty: 'Hard',
+      category: 'Strings',
+      description: 'Implement isMatch(s, p) with support for . (matches any single character) and * (matches zero or more of preceding element) using a 2D boolean dynamic programming table.',
+      constraints: ['Time Complexity: O(s.length * p.length)', 'Space Complexity: O(s.length * p.length)'],
+      sampleInputs: [
+        { input: 's = "aab", p = "c*a*b"', output: 'true' },
+        { input: 's = "mississippi", p = "mis*is*p*."', output: 'false' }
+      ],
+      starterCode: `function isMatch(s, p) {\n  const dp = Array.from({ length: s.length + 1 }, () => new Array(p.length + 1).fill(false));\n  dp[0][0] = true;\n\n  for (let j = 1; j <= p.length; j++) {\n    if (p[j - 1] === '*') dp[0][j] = dp[0][j - 2];\n  }\n\n  // TODO: Fill DP table for characters, \'.\', and \'*\'\n  \n  return dp[s.length][p.length];\n}\n\nconsole.log("Match \'aab\' against \'c*a*b\':", isMatch("aab", "c*a*b"));`,
+      solutionHint: 'for (let i = 1; i <= s.length; i++) { for (let j = 1; j <= p.length; j++) { if (p[j - 1] === s[i - 1] || p[j - 1] === ".") { dp[i][j] = dp[i - 1][j - 1]; } else if (p[j - 1] === "*") { dp[i][j] = dp[i][j - 2]; if (p[j - 2] === s[i - 1] || p[j - 2] === ".") dp[i][j] = dp[i][j] || dp[i - 1][j]; } } } return dp[s.length][p.length];'
     }
   ],
 

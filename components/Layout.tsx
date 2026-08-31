@@ -231,8 +231,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
           <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} id="nav-saved" />
           <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} id="nav-notes" />
           <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} id="nav-roadmap" />
-          <NavItem to="/playground" icon={Code2} label="Playground" id="nav-playground" />
-          <NavItem to="/code-review" icon={GitPullRequest} label="Peer Reviews" id="nav-code-review" />
+          <NavItem to="/playground" icon={Code2} label={t('nav.playground', 'Playground')} id="nav-playground" />
+          <NavItem to="/code-review" icon={GitPullRequest} label={t('nav.codeReview', 'Peer Reviews')} id="nav-code-review" />
           <NavItem to="/career" icon={Briefcase} label={t('nav.career')} id="nav-career" />
           <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} id="nav-certs" />
           {showAdminLink && (
@@ -297,8 +297,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, fallba
               <NavItem to="/saved" icon={Bookmark} label={t('nav.saved')} />
               <NavItem to="/notes" icon={FileText} label={t('nav.notes', 'Notes')} />
               <NavItem to="/roadmap" icon={Map} label={t('nav.roadmap')} />
-              <NavItem to="/playground" icon={Code2} label="Playground" />
-              <NavItem to="/code-review" icon={GitPullRequest} label="Peer Reviews" />
+              <NavItem to="/playground" icon={Code2} label={t('nav.playground', 'Playground')} />
+              <NavItem to="/code-review" icon={GitPullRequest} label={t('nav.codeReview', 'Peer Reviews')} />
               <NavItem to="/career" icon={Briefcase} label={t('nav.career')} />
               <NavItem to="/certifications" icon={Award} label={t('nav.certifications')} />
               {showAdminLink && (

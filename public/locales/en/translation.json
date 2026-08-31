@@ -12,7 +12,9 @@
     "closeMenu": "Close Menu",
     "saved": "Saved",
     "notes": "Notes",
-    "roadmap": "Roadmap"
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "Cancel",

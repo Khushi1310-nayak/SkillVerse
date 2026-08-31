@@ -19,8 +19,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PublicLessonNote } from '../types';
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PairSession, PairSessionParticipant } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PublicLessonNote, PairSession, PairSessionParticipant } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
@@ -1161,6 +1160,8 @@ export const firestoreService = {
       noteId,
     );
     await deleteDoc(docRef);
+  },
+
   // --- PAIR PROGRAMMING SESSIONS ---
 
   createPairSession: async (

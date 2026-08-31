@@ -19,7 +19,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PairSession, PairSessionParticipant } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PublicLessonNote, PairSession, PairSessionParticipant } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
 
@@ -1060,6 +1060,106 @@ export const firestoreService = {
       kudosCount: increment(1),
       kudosUsers: arrayUnion(currentUserId),
     });
+  },
+
+  // --- PUBLIC LESSON NOTES (#355) ---
+  getPublicLessonNotes: async (
+    courseId: string,
+    lessonId: string,
+  ): Promise<PublicLessonNote[]> => {
+    const colRef = collection(
+      db,
+      "courses",
+      courseId,
+      "lessons",
+      lessonId,
+      "publicNotes",
+    );
+    const querySnapshot = await getDocs(colRef);
+    const notes: PublicLessonNote[] = [];
+    querySnapshot.forEach((docSnap) => {
+      notes.push({ id: docSnap.id, ...docSnap.data() } as PublicLessonNote);
+    });
+    return notes.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  },
+
+  createPublicLessonNote: async (
+    noteData: Omit<PublicLessonNote, "createdAt" | "updatedAt"> & {
+      id?: string;
+      createdAt?: string;
+      updatedAt?: string;
+    },
+  ): Promise<PublicLessonNote> => {
+    const now = new Date().toISOString();
+    const noteId =
+      noteData.id ||
+      `pub_note_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+    const newPublicNote: PublicLessonNote = {
+      id: noteId,
+      courseId: noteData.courseId,
+      lessonId: noteData.lessonId,
+      userId: noteData.userId,
+      username: noteData.username,
+      avatarId: noteData.avatarId || "1",
+      photoURL: noteData.photoURL,
+      text: noteData.text,
+      createdAt: noteData.createdAt || now,
+      updatedAt: noteData.updatedAt || now,
+    };
+
+    const docRef = doc(
+      db,
+      "courses",
+      noteData.courseId,
+      "lessons",
+      noteData.lessonId,
+      "publicNotes",
+      noteId,
+    );
+    await setDoc(docRef, newPublicNote);
+    return newPublicNote;
+  },
+
+  updatePublicLessonNote: async (
+    courseId: string,
+    lessonId: string,
+    noteId: string,
+    text: string,
+  ): Promise<void> => {
+    const docRef = doc(
+      db,
+      "courses",
+      courseId,
+      "lessons",
+      lessonId,
+      "publicNotes",
+      noteId,
+    );
+    await updateDoc(docRef, {
+      text,
+      updatedAt: new Date().toISOString(),
+    });
+  },
+
+  deletePublicLessonNote: async (
+    courseId: string,
+    lessonId: string,
+    noteId: string,
+  ): Promise<void> => {
+    const docRef = doc(
+      db,
+      "courses",
+      courseId,
+      "lessons",
+      lessonId,
+      "publicNotes",
+      noteId,
+    );
+    await deleteDoc(docRef);
   },
 
   // --- PAIR PROGRAMMING SESSIONS ---

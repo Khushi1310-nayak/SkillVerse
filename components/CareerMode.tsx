@@ -1234,11 +1234,11 @@ ${transcriptText}`;
             value={targetRoleId}
             onChange={(e) => setTargetRoleId(e.target.value)}
             aria-label="Select a target role"
-            className="bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-2.5 px-4 text-black focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all w-full sm:w-64"
+            className="bg-white/70 dark:bg-[#0f1623]/80 border border-primary/20 dark:border-white/15 rounded-2xl py-2.5 px-4 text-sm font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 backdrop-blur-md shadow-md cursor-pointer transition-all duration-300 hover:border-primaryLight/50 w-full sm:w-64"
           >
-            <option value="">Select a target role...</option>
+            <option value="" className="bg-[#0B1220] text-white">Select a target role...</option>
             {companiesList.map(company => (
-              <option key={company.id} value={company.id}>{company.name}</option>
+              <option key={company.id} value={company.id} className="bg-[#0B1220] text-white">{company.name}</option>
             ))}
           </select>
         </div>
@@ -1499,13 +1499,13 @@ ${transcriptText}`;
                           <select
                             value={editorLanguage}
                             onChange={(e) => setEditorLanguage(e.target.value)}
-                            className="bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-lg text-xs md:text-sm font-bold text-textMain px-4 py-2 focus:ring-2 focus:ring-primaryLight outline-none cursor-pointer backdrop-blur-sm shadow-sm appearance-none hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                            className="bg-black/5 dark:bg-[#0f1623]/90 border border-black/20 dark:border-white/20 rounded-2xl text-xs md:text-sm font-bold text-textMain px-4 py-2 focus:ring-2 focus:ring-primaryLight outline-none cursor-pointer backdrop-blur-md shadow-md appearance-none hover:border-primaryLight/50 transition-all duration-300"
                           >
-                            <option value="javascript" className="bg-background text-textMain">{t('careerMode.editor.languages.javascript')}</option>
-                            <option value="python" className="bg-background text-textMain">{t('careerMode.editor.languages.python')}</option>
-                            <option value="java" className="bg-background text-textMain">{t('careerMode.editor.languages.java')}</option>
-                            <option value="cpp" className="bg-background text-textMain">{t('careerMode.editor.languages.cpp')}</option>
-                            <option value="typescript" className="bg-background text-textMain">{t('careerMode.editor.languages.typescript')}</option>
+                            <option value="javascript" className="bg-[#0B1220] text-white">{t('careerMode.editor.languages.javascript')}</option>
+                            <option value="python" className="bg-[#0B1220] text-white">{t('careerMode.editor.languages.python')}</option>
+                            <option value="java" className="bg-[#0B1220] text-white">{t('careerMode.editor.languages.java')}</option>
+                            <option value="cpp" className="bg-[#0B1220] text-white">{t('careerMode.editor.languages.cpp')}</option>
+                            <option value="typescript" className="bg-[#0B1220] text-white">{t('careerMode.editor.languages.typescript')}</option>
                           </select>
                         </div>
                         <div className="flex-1 w-full rounded-xl overflow-hidden border border-black/20 dark:border-white/5">

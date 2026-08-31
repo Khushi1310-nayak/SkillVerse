@@ -1627,15 +1627,764 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
 
   'linked-lists': [
     {
-      id: 'll-1',
-      title: '1. Reverse Singly Linked List',
+      id: 'll-mod-1',
+      title: 'Module 1: Reverse Singly Linked List',
+      difficulty: 'Easy',
+      category: 'Linked Lists',
+      description: 'Given the head of a singly linked list, reverse the list in-place and return the reversed list head in O(n) time and O(1) space.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1) in-place pointers'],
+      sampleInputs: [
+        { input: '[1, 2, 3, 4, 5]', output: '[5, 4, 3, 2, 1]' }
+      ],
+      starterCode: `class ListNode {\n  constructor(val = 0, next = null) {\n    this.val = val;\n    this.next = next;\n  }\n}\n\nfunction reverseList(head) {\n  let prev = null, curr = head;\n  // TODO: Iteratively reverse next pointers\n  \n  return prev;\n}\n\n// Test helper\nconst list = new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5)))));\nlet rev = reverseList(list);\nconst res = []; while (rev) { res.push(rev.val); rev = rev.next; }\nconsole.log("Reversed:", res);`,
+      solutionHint: 'while (curr) { const nxt = curr.next; curr.next = prev; prev = curr; curr = nxt; } return prev;',
+      languageVariants: {
+        javascript: {
+          starterCode: `class ListNode {\n  constructor(val = 0, next = null) {\n    this.val = val;\n    this.next = next;\n  }\n}\n\nfunction reverseList(head) {\n  let prev = null, curr = head;\n  // TODO: Reverse next pointers\n  \n  return prev;\n}\n\nconst list = new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5)))));\nlet rev = reverseList(list);\nconst res = []; while (rev) { res.push(rev.val); rev = rev.next; }\nconsole.log("Reversed:", res);`,
+          solutionHint: 'while (curr) { const nxt = curr.next; curr.next = prev; prev = curr; curr = nxt; } return prev;'
+        },
+        python: {
+          starterCode: `class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef reverse_list(head: ListNode | None) -> ListNode | None:\n    prev, curr = None, head\n    # TODO: Reverse next pointers\n    \n    return prev\n\nhead = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))\nrev = reverse_list(head)\nres = []\nwhile rev:\n    res.append(rev.val)\n    rev = rev.next\nprint("Reversed:", res)`,
+          solutionHint: 'while curr: nxt = curr.next; curr.next = prev; prev = curr; curr = nxt; return prev'
+        },
+        java: {
+          starterCode: `class ListNode {\n    int val;\n    ListNode next;\n    ListNode(int val) { this.val = val; }\n    ListNode(int val, ListNode next) { this.val = val; this.next = next; }\n}\n\npublic class Solution {\n    public static ListNode reverseList(ListNode head) {\n        ListNode prev = null, curr = head;\n        // TODO: Reverse next pointers\n        \n        return prev;\n    }\n    public static void main(String[] args) {\n        ListNode head = new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5)))));\n        ListNode rev = reverseList(head);\n        while (rev != null) { System.out.print(rev.val + " "); rev = rev.next; }\n        System.out.println();\n    }\n}`,
+          solutionHint: 'while (curr != null) { ListNode nxt = curr.next; curr.next = prev; prev = curr; curr = nxt; } return prev;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nstruct ListNode {\n    int val;\n    ListNode* next;\n    ListNode(int x, ListNode* n = nullptr) : val(x), next(n) {}\n};\n\nListNode* reverseList(ListNode* head) {\n    ListNode *prev = nullptr, *curr = head;\n    // TODO: Reverse next pointers\n    \n    return prev;\n}\n\nint main() {\n    ListNode* head = new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5)))));\n    ListNode* rev = reverseList(head);\n    while (rev) { std::cout << rev->val << " "; rev = rev->next; }\n    std::cout << "\\n";\n    return 0;\n}`,
+          solutionHint: 'while (curr) { ListNode* nxt = curr->next; curr->next = prev; prev = curr; curr = nxt; } return prev;'
+        }
+      }
+    },
+    {
+      id: 'll-mod-2',
+      title: 'Module 2: Linked List Cycle Detection (Floyd Algorithm)',
+      difficulty: 'Easy',
+      category: 'Linked Lists',
+      description: 'Given head, the head of a linked list, determine if the linked list has a cycle in it using Floyd’s Tortoise and Hare algorithm in O(1) memory.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'head = [3,2,0,-4], pos = 1 (tail connects to node index 1)', output: 'true' }
+      ],
+      starterCode: `function hasCycle(head) {\n  let slow = head, fast = head;\n  // TODO: Move slow by 1, fast by 2, check collision\n  \n  return false;\n}\n\nconsole.log("Has cycle:", hasCycle(null));`,
+      solutionHint: 'while (fast && fast.next) { slow = slow.next; fast = fast.next.next; if (slow === fast) return true; } return false;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function hasCycle(head) {\n  let slow = head, fast = head;\n  // TODO: Fast & slow pointer collision check\n  \n  return false;\n}\n\nconsole.log("Has cycle:", hasCycle(null));`,
+          solutionHint: 'while (fast && fast.next) { slow = slow.next; fast = fast.next.next; if (slow === fast) return true; } return false;'
+        },
+        python: {
+          starterCode: `def has_cycle(head: ListNode | None) -> bool:\n    slow = fast = head\n    # TODO: Floyd cycle detection\n    \n    return False\n\nprint("Has cycle:", has_cycle(None))`,
+          solutionHint: 'while fast and fast.next: slow = slow.next; fast = fast.next.next; if slow == fast: return True; return False'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean hasCycle(ListNode head) {\n        ListNode slow = head, fast = head;\n        // TODO: Floyd cycle check\n        \n        return false;\n    }\n    public static void main(String[] args) {\n        System.out.println("Has cycle: " + hasCycle(null));\n    }\n}`,
+          solutionHint: 'while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; if (slow == fast) return true; } return false;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nbool hasCycle(ListNode* head) {\n    ListNode *slow = head, *fast = head;\n    // TODO: Floyd cycle check\n    \n    return false;\n}\n\nint main() {\n    std::cout << "Has cycle: " << (hasCycle(nullptr) ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'while (fast && fast->next) { slow = slow->next; fast = fast->next->next; if (slow == fast) return true; } return false;'
+        }
+      }
+    },
+    {
+      id: 'll-mod-3',
+      title: 'Module 3: Merge Two Sorted Linked Lists',
+      difficulty: 'Easy',
+      category: 'Linked Lists',
+      description: 'Merge two sorted linked lists list1 and list2 and return the head of the new, sorted linked list by splicing together existing nodes in O(m + n) time.',
+      constraints: ['Time Complexity: O(m + n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'list1 = [1,2,4], list2 = [1,3,4]', output: '[1,1,2,3,4,4]' }
+      ],
+      starterCode: `function mergeTwoLists(list1, list2) {\n  const dummy = new ListNode(-1);\n  let tail = dummy;\n  // TODO: Splice smaller node until one list exhausted\n  \n  return dummy.next;\n}\n\nconsole.log("Merged:", mergeTwoLists(null, null));`,
+      solutionHint: 'while (list1 && list2) { if (list1.val <= list2.val) { tail.next = list1; list1 = list1.next; } else { tail.next = list2; list2 = list2.next; } tail = tail.next; } tail.next = list1 || list2; return dummy.next;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function mergeTwoLists(list1, list2) {\n  const dummy = new ListNode(-1);\n  let tail = dummy;\n  // TODO: Splice smaller node\n  \n  return dummy.next;\n}`,
+          solutionHint: 'while (list1 && list2) { if (list1.val <= list2.val) { tail.next = list1; list1 = list1.next; } else { tail.next = list2; list2 = list2.next; } tail = tail.next; } tail.next = list1 || list2; return dummy.next;'
+        },
+        python: {
+          starterCode: `def merge_two_lists(list1: ListNode | None, list2: ListNode | None) -> ListNode | None:\n    dummy = ListNode(-1)\n    tail = dummy\n    # TODO: Merge two lists\n    \n    return dummy.next`,
+          solutionHint: 'while list1 and list2: if list1.val <= list2.val: tail.next = list1; list1 = list1.next; else: tail.next = list2; list2 = list2.next; tail = tail.next; tail.next = list1 or list2; return dummy.next'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static ListNode mergeTwoLists(ListNode list1, ListNode list2) {\n        ListNode dummy = new ListNode(-1), tail = dummy;\n        // TODO: Merge two lists\n        \n        return dummy.next;\n    }\n}`,
+          solutionHint: 'while (list1 != null && list2 != null) { if (list1.val <= list2.val) { tail.next = list1; list1 = list1.next; } else { tail.next = list2; list2 = list2.next; } tail = tail.next; } tail.next = (list1 != null) ? list1 : list2; return dummy.next;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {\n    ListNode dummy(-1);\n    ListNode* tail = &dummy;\n    // TODO: Merge two lists\n    \n    return dummy.next;\n}`,
+          solutionHint: 'while (list1 && list2) { if (list1->val <= list2->val) { tail->next = list1; list1 = list1->next; } else { tail->next = list2; list2 = list2->next; } tail = tail->next; } tail->next = list1 ? list1 : list2; return dummy.next;'
+        }
+      }
+    },
+    {
+      id: 'll-mod-4',
+      title: 'Module 4: Remove Nth Node From End of List',
       difficulty: 'Medium',
       category: 'Linked Lists',
-      description: 'Reverse a singly linked list represented as an array of values.',
-      constraints: ['Input array length 0-100'],
-      sampleInputs: [{ input: '[1, 2, 3, 4, 5]', output: '[5, 4, 3, 2, 1]' }],
-      starterCode: `function reverseLinkedList(headArr) {\n  // TODO: Reverse linked list values\n  \n}\n\nconsole.log(reverseLinkedList([1, 2, 3, 4, 5]));`,
-      solutionHint: 'Use headArr.reverse() or two pointers'
+      description: 'Given the head of a linked list, remove the nth node from the end of the list and return its head in a single pass.',
+      constraints: ['Time Complexity: O(n) single pass', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'head = [1,2,3,4,5], n = 2', output: '[1,2,3,5]' }
+      ],
+      starterCode: `function removeNthFromEnd(head, n) {\n  const dummy = new ListNode(0, head);\n  let fast = dummy, slow = dummy;\n  // TODO: Advance fast by n+1, then move both until fast is null\n  \n  return dummy.next;\n}`,
+      solutionHint: 'for (let i = 0; i <= n; i++) fast = fast.next; while (fast) { slow = slow.next; fast = fast.next; } slow.next = slow.next.next; return dummy.next;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function removeNthFromEnd(head, n) {\n  const dummy = new ListNode(0, head);\n  let fast = dummy, slow = dummy;\n  // TODO: Fast gap pointer\n  \n  return dummy.next;\n}`,
+          solutionHint: 'for (let i = 0; i <= n; i++) fast = fast.next; while (fast) { slow = slow.next; fast = fast.next; } slow.next = slow.next.next; return dummy.next;'
+        },
+        python: {
+          starterCode: `def remove_nth_from_end(head: ListNode | None, n: int) -> ListNode | None:\n    dummy = ListNode(0, head)\n    fast = slow = dummy\n    # TODO: Remove Nth node\n    \n    return dummy.next`,
+          solutionHint: 'for _ in range(n + 1): fast = fast.next; while fast: slow = slow.next; fast = fast.next; slow.next = slow.next.next; return dummy.next'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static ListNode removeNthFromEnd(ListNode head, int n) {\n        ListNode dummy = new ListNode(0, head), fast = dummy, slow = dummy;\n        // TODO: Remove Nth node\n        \n        return dummy.next;\n    }\n}`,
+          solutionHint: 'for (int i = 0; i <= n; i++) fast = fast.next; while (fast != null) { slow = slow.next; fast = fast.next; } slow.next = slow.next.next; return dummy.next;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nListNode* removeNthFromEnd(ListNode* head, int n) {\n    ListNode dummy(0, head);\n    ListNode *fast = &dummy, *slow = &dummy;\n    // TODO: Remove Nth node\n    \n    return dummy.next;\n}`,
+          solutionHint: 'for (int i = 0; i <= n; i++) fast = fast->next; while (fast) { slow = slow->next; fast = fast->next; } slow->next = slow->next->next; return dummy.next;'
+        }
+      }
+    },
+    {
+      id: 'll-mod-5',
+      title: 'Module 5: Middle of the Linked List',
+      difficulty: 'Easy',
+      category: 'Linked Lists',
+      description: 'Given the head of a singly linked list, return the middle node. If there are two middle nodes, return the second middle node.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: '[1, 2, 3, 4, 5]', output: 'Node with value 3' },
+        { input: '[1, 2, 3, 4, 5, 6]', output: 'Node with value 4' }
+      ],
+      starterCode: `function middleNode(head) {\n  let slow = head, fast = head;\n  // TODO: Advance slow by 1, fast by 2\n  \n  return slow;\n}`,
+      solutionHint: 'while (fast && fast.next) { slow = slow.next; fast = fast.next.next; } return slow;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function middleNode(head) {\n  let slow = head, fast = head;\n  // TODO: Fast/slow pointers\n  \n  return slow;\n}`,
+          solutionHint: 'while (fast && fast.next) { slow = slow.next; fast = fast.next.next; } return slow;'
+        },
+        python: {
+          starterCode: `def middle_node(head: ListNode | None) -> ListNode | None:\n    slow = fast = head\n    # TODO: Find middle\n    \n    return slow`,
+          solutionHint: 'while fast and fast.next: slow = slow.next; fast = fast.next.next; return slow'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static ListNode middleNode(ListNode head) {\n        ListNode slow = head, fast = head;\n        // TODO: Find middle\n        \n        return slow;\n    }\n}`,
+          solutionHint: 'while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; } return slow;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nListNode* middleNode(ListNode* head) {\n    ListNode *slow = head, *fast = head;\n    // TODO: Find middle\n    \n    return slow;\n}`,
+          solutionHint: 'while (fast && fast->next) { slow = slow->next; fast = fast->next->next; } return slow;'
+        }
+      }
+    },
+    {
+      id: 'll-mod-6',
+      title: 'Module 6: Palindrome Linked List Verification',
+      difficulty: 'Medium',
+      category: 'Linked Lists',
+      description: 'Given the head of a singly linked list, return true if it is a palindrome in O(n) time and O(1) space by reversing the second half in-place.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: '[1, 2, 2, 1]', output: 'true' },
+        { input: '[1, 2]', output: 'false' }
+      ],
+      starterCode: `function isPalindrome(head) {\n  // TODO: 1. Find middle, 2. Reverse second half, 3. Compare values\n  \n  return true;\n}`,
+      solutionHint: 'Find middle with slow/fast pointers, reverse from slow onwards, and compare nodes from head and reversed second half.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isPalindrome(head) {\n  let slow = head, fast = head;\n  while (fast && fast.next) { slow = slow.next; fast = fast.next.next; }\n  let prev = null;\n  while (slow) { const nxt = slow.next; slow.next = prev; prev = slow; slow = nxt; }\n  while (prev) { if (head.val !== prev.val) return false; head = head.next; prev = prev.next; }\n  return true;\n}`,
+          solutionHint: 'Reverse second half and compare node values step by step.'
+        },
+        python: {
+          starterCode: `def is_palindrome(head: ListNode | None) -> bool:\n    slow = fast = head\n    while fast and fast.next: slow = slow.next; fast = fast.next.next\n    prev = None\n    while slow:\n        nxt = slow.next; slow.next = prev; prev = slow; slow = nxt\n    while prev:\n        if head.val != prev.val: return False\n        head, prev = head.next, prev.next\n    return True`,
+          solutionHint: 'Reverse second half from middle in-place and compare values.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isPalindrome(ListNode head) {\n        ListNode slow = head, fast = head;\n        while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; }\n        ListNode prev = null;\n        while (slow != null) { ListNode nxt = slow.next; slow.next = prev; prev = slow; slow = nxt; }\n        while (prev != null) { if (head.val != prev.val) return false; head = head.next; prev = prev.next; }\n        return true;\n    }\n}`,
+          solutionHint: 'Reverse second half in-place and compare with first half.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nbool isPalindrome(ListNode* head) {\n    ListNode *slow = head, *fast = head;\n    while (fast && fast->next) { slow = slow->next; fast = fast->next->next; }\n    ListNode *prev = nullptr;\n    while (slow) { ListNode* nxt = slow->next; slow->next = prev; prev = slow; slow = nxt; }\n    while (prev) { if (head->val != prev->val) return false; head = head->next; prev = prev->next; }\n    return true;\n}`,
+          solutionHint: 'Reverse second half and compare corresponding elements.'
+        }
+      }
+    },
+    {
+      id: 'll-mod-7',
+      title: 'Module 7: Reverse Nodes in k-Group',
+      difficulty: 'Hard',
+      category: 'Linked Lists',
+      description: 'Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list in O(n) time and O(1) extra space.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'head = [1,2,3,4,5], k = 2', output: '[2,1,4,3,5]' },
+        { input: 'head = [1,2,3,4,5], k = 3', output: '[3,2,1,4,5]' }
+      ],
+      starterCode: `function reverseKGroup(head, k) {\n  let count = 0, ptr = head;\n  while (count < k && ptr) { ptr = ptr.next; count++; }\n  if (count === k) {\n    let reversedHead = reverseKGroup(ptr, k);\n    while (count > 0) {\n      const nxt = head.next;\n      head.next = reversedHead;\n      reversedHead = head;\n      head = nxt;\n      count--;\n    }\n    head = reversedHead;\n  }\n  return head;\n}`,
+      solutionHint: 'Check if at least k nodes remain; recursively reverse k nodes and hook tail to subsequent group.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function reverseKGroup(head, k) {\n  let count = 0, ptr = head;\n  while (count < k && ptr) { ptr = ptr.next; count++; }\n  if (count === k) {\n    let reversedHead = reverseKGroup(ptr, k);\n    while (count > 0) {\n      const nxt = head.next; head.next = reversedHead; reversedHead = head; head = nxt; count--;\n    }\n    head = reversedHead;\n  }\n  return head;\n}`,
+          solutionHint: 'Reverse k elements in current group and connect to recursively reversed rest.'
+        },
+        python: {
+          starterCode: `def reverse_k_group(head: ListNode | None, k: int) -> ListNode | None:\n    count, ptr = 0, head\n    while count < k and ptr: ptr = ptr.next; count += 1\n    if count == k:\n        reversed_head = reverse_k_group(ptr, k)\n        while count > 0:\n            nxt = head.next; head.next = reversed_head; reversed_head = head; head = nxt; count -= 1\n        head = reversed_head\n    return head`,
+          solutionHint: 'Count k nodes, reverse subgroup, and hook to recursive call on remaining list.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static ListNode reverseKGroup(ListNode head, int k) {\n        int count = 0;\n        ListNode ptr = head;\n        while (count < k && ptr != null) { ptr = ptr.next; count++; }\n        if (count == k) {\n            ListNode reversedHead = reverseKGroup(ptr, k);\n            while (count > 0) {\n                ListNode nxt = head.next; head.next = reversedHead; reversedHead = head; head = nxt; count--;\n            }\n            head = reversedHead;\n        }\n        return head;\n    }\n}`,
+          solutionHint: 'Reverse k nodes and recursively recurse for the remainder.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nListNode* reverseKGroup(ListNode* head, int k) {\n    int count = 0;\n    ListNode* ptr = head;\n    while (count < k && ptr) { ptr = ptr->next; count++; }\n    if (count == k) {\n        ListNode* reversedHead = reverseKGroup(ptr, k);\n        while (count > 0) {\n            ListNode* nxt = head->next; head->next = reversedHead; reversedHead = head; head = nxt; count--;\n        }\n        head = reversedHead;\n    }\n    return head;\n}`,
+          solutionHint: 'Iterate k steps, reverse group pointers, and splice into recursive result.'
+        }
+      }
+    },
+    {
+      id: 'll-mod-8',
+      title: 'Module 8: LRU Cache (Doubly Linked List + Hash Map)',
+      difficulty: 'Hard',
+      category: 'Linked Lists',
+      description: 'Design a data structure that follows the constraints of a Least Recently Used (LRU) cache with O(1) get and put operations using a doubly linked list and Map.',
+      constraints: ['get and put must each run in O(1) average time', 'Capacity: 1 to 3000'],
+      sampleInputs: [
+        { input: 'LRUCache(2), put(1,1), put(2,2), get(1), put(3,3), get(2)', output: 'returns 1, -1 (evicted 2)' }
+      ],
+      starterCode: `class LRUCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map();\n  }\n  get(key) {\n    if (!this.map.has(key)) return -1;\n    const val = this.map.get(key);\n    this.map.delete(key);\n    this.map.set(key, val);\n    return val;\n  }\n  put(key, value) {\n    if (this.map.has(key)) this.map.delete(key);\n    else if (this.map.size >= this.capacity) {\n      const oldestKey = this.map.keys().next().value;\n      this.map.delete(oldestKey);\n    }\n    this.map.set(key, value);\n  }\n}\n\nconst cache = new LRUCache(2);\ncache.put(1, 1); cache.put(2, 2);\nconsole.log("Get 1:", cache.get(1));\ncache.put(3, 3);\nconsole.log("Get 2 (evicted):", cache.get(2));`,
+      solutionHint: 'Maintain node access order using doubly linked list with head/tail sentinels and HashMap for O(1) lookups.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class LRUCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map();\n  }\n  get(key) {\n    if (!this.map.has(key)) return -1;\n    const val = this.map.get(key);\n    this.map.delete(key);\n    this.map.set(key, val);\n    return val;\n  }\n  put(key, value) {\n    if (this.map.has(key)) this.map.delete(key);\n    else if (this.map.size >= this.capacity) {\n      const oldest = this.map.keys().next().value;\n      this.map.delete(oldest);\n    }\n    this.map.set(key, value);\n  }\n}`,
+          solutionHint: 'Re-insert keys in Map to maintain access order or maintain DLL node references.'
+        },
+        python: {
+          starterCode: `from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.cap = capacity\n        self.cache = OrderedDict()\n    def get(self, key: int) -> int:\n        if key not in self.cache: return -1\n        self.cache.move_to_end(key)\n        return self.cache[key]\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache: self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.cap:\n            self.cache.popitem(last=False)`,
+          solutionHint: 'Use OrderedDict move_to_end and popitem(last=False) for O(1) operations.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass LRUCache extends LinkedHashMap<Integer, Integer> {\n    private final int capacity;\n    public LRUCache(int capacity) {\n        super(capacity, 0.75f, true);\n        this.capacity = capacity;\n    }\n    public int get(int key) { return super.getOrDefault(key, -1); }\n    public void put(int key, int value) { super.put(key, value); }\n    @Override\n    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) { return size() > capacity; }\n}`,
+          solutionHint: 'Extend LinkedHashMap with access-order mode and override removeEldestEntry.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <unordered_map>\n#include <list>\n\nclass LRUCache {\n    int cap;\n    std::list<std::pair<int, int>> dll;\n    std::unordered_map<int, std::list<std::pair<int, int>>::iterator> map;\npublic:\n    LRUCache(int capacity) : cap(capacity) {}\n    int get(int key) {\n        if (!map.count(key)) return -1;\n        dll.splice(dll.begin(), dll, map[key]);\n        return map[key]->second;\n    }\n    void put(int key, int value) {\n        if (map.count(key)) {\n            dll.splice(dll.begin(), dll, map[key]);\n            map[key]->second = value;\n            return;\n        }\n        if (dll.size() >= cap) {\n            map.erase(dll.back().first);\n            dll.pop_back();\n        }\n        dll.emplace_front(key, value);\n        map[key] = dll.begin();\n    }\n};`,
+          solutionHint: 'Combine std::list doubly linked list with std::unordered_map storing iterators.'
+        }
+      }
+    }
+  ],
+
+  'stacks': [
+    {
+      id: 'stk-mod-1',
+      title: 'Module 1: Valid Parentheses Matching',
+      difficulty: 'Easy',
+      category: 'Stacks',
+      description: 'Given a string s containing just the characters (, ), {, }, [ and ], determine if the input string is valid using a LIFO stack in O(n) linear time.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(n)'],
+      sampleInputs: [
+        { input: '"()[]{}"', output: 'true' },
+        { input: '"(]"', output: 'false' }
+      ],
+      starterCode: `function isValid(s) {\n  const stack = [];\n  const map = { ')': '(', '}': '{', ']': '[' };\n  // TODO: Push opening brackets, match closing against stack.pop()\n  \n  return stack.length === 0;\n}\n\nconsole.log("Is valid \'()[]{}\':", isValid("()[]{}"));`,
+      solutionHint: 'for (const c of s) { if (map[c]) { if (stack.pop() !== map[c]) return false; } else stack.push(c); } return stack.length === 0;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isValid(s) {\n  const stack = [];\n  const map = { ')': '(', '}': '{', ']': '[' };\n  for (const c of s) {\n    if (map[c]) { if (stack.pop() !== map[c]) return false; }\n    else stack.push(c);\n  }\n  return stack.length === 0;\n}`,
+          solutionHint: 'Use stack to match corresponding bracket pairs.'
+        },
+        python: {
+          starterCode: `def is_valid(s: str) -> bool:\n    stack = []\n    pairs = {')': '(', '}': '{', ']': '['}\n    for c in s:\n        if c in pairs:\n            if not stack or stack.pop() != pairs[c]: return False\n        else: stack.append(c)\n    return len(stack) == 0\n\nprint("Is valid:", is_valid("()[]{}"))`,
+          solutionHint: 'Push opening brackets and pop matching pairs on closing brackets.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static boolean isValid(String s) {\n        Deque<Character> stack = new ArrayDeque<>();\n        for (char c : s.toCharArray()) {\n            if (c == '(') stack.push(')');\n            else if (c == '{') stack.push('}');\n            else if (c == '[') stack.push(']');\n            else if (stack.isEmpty() || stack.pop() != c) return false;\n        }\n        return stack.isEmpty();\n    }\n}`,
+          solutionHint: 'Push expected closing brackets onto stack and pop to verify matches.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <stack>\n\nbool isValid(const std::string& s) {\n    std::stack<char> st;\n    for (char c : s) {\n        if (c == '(') st.push(')');\n        else if (c == '{') st.push('}');\n        else if (c == '[') st.push(']');\n        else if (st.empty() || st.top() != c) return false;\n        else st.pop();\n    }\n    return st.empty();\n}`,
+          solutionHint: 'Push complementary brackets onto std::stack.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-2',
+      title: 'Module 2: Min Stack with O(1) Retrieval',
+      difficulty: 'Medium',
+      category: 'Stacks',
+      description: 'Design a stack that supports push, pop, top, and retrieving the minimum element in O(1) constant time.',
+      constraints: ['Methods push, pop, top, and getMin must operate in O(1) time'],
+      sampleInputs: [
+        { input: 'push(-2), push(0), push(-3), getMin() -> -3, pop(), top() -> 0, getMin() -> -2', output: 'Correct O(1) min values' }
+      ],
+      starterCode: `class MinStack {\n  constructor() {\n    this.stack = [];\n    this.minStack = [];\n  }\n  push(val) {\n    this.stack.push(val);\n    const min = this.minStack.length ? Math.min(val, this.minStack[this.minStack.length - 1]) : val;\n    this.minStack.push(min);\n  }\n  pop() {\n    this.stack.pop();\n    this.minStack.pop();\n  }\n  top() { return this.stack[this.stack.length - 1]; }\n  getMin() { return this.minStack[this.minStack.length - 1]; }\n}`,
+      solutionHint: 'Track cumulative minimums in parallel minStack array.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class MinStack {\n  constructor() {\n    this.stack = [];\n    this.minStack = [];\n  }\n  push(val) {\n    this.stack.push(val);\n    const m = this.minStack.length ? Math.min(val, this.minStack[this.minStack.length - 1]) : val;\n    this.minStack.push(m);\n  }\n  pop() { this.stack.pop(); this.minStack.pop(); }\n  top() { return this.stack[this.stack.length - 1]; }\n  getMin() { return this.minStack[this.minStack.length - 1]; }\n}`,
+          solutionHint: 'Push current minimum onto parallel minStack on every push.'
+        },
+        python: {
+          starterCode: `class MinStack:\n    def __init__(self):\n        self.stack = []\n        self.min_stack = []\n    def push(self, val: int) -> None:\n        self.stack.append(val)\n        m = min(val, self.min_stack[-1]) if self.min_stack else val\n        self.min_stack.append(m)\n    def pop(self) -> None:\n        self.stack.pop()\n        self.min_stack.pop()\n    def top(self) -> int:\n        return self.stack[-1]\n    def get_min(self) -> int:\n        return self.min_stack[-1]`,
+          solutionHint: 'Maintain dual stacks where min_stack holds prefix minimums.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass MinStack {\n    private Deque<Integer> stack = new ArrayDeque<>();\n    private Deque<Integer> minStack = new ArrayDeque<>();\n    public void push(int val) {\n        stack.push(val);\n        int m = minStack.isEmpty() ? val : Math.min(val, minStack.peek());\n        minStack.push(m);\n    }\n    public void pop() { stack.pop(); minStack.pop(); }\n    public int top() { return stack.peek(); }\n    public int getMin() { return minStack.peek(); }\n}`,
+          solutionHint: 'Use two ArrayDeque instances to maintain values and cumulative minimums.'
+        },
+        cpp: {
+          starterCode: `#include <stack>\n#include <algorithm>\n\nclass MinStack {\n    std::stack<int> st, minSt;\npublic:\n    void push(int val) {\n        st.push(val);\n        int m = minSt.empty() ? val : std::min(val, minSt.top());\n        minSt.push(m);\n    }\n    void pop() { st.pop(); minSt.pop(); }\n    int top() { return st.top(); }\n    int getMin() { return minSt.top(); }\n};`,
+          solutionHint: 'Keep minSt in sync with st so getMin() runs in O(1).'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-3',
+      title: 'Module 3: Evaluate Reverse Polish Notation',
+      difficulty: 'Medium',
+      category: 'Stacks',
+      description: 'Evaluate the value of an arithmetic expression in Reverse Polish Notation (Postfix Notation) supporting +, -, *, / with truncation towards zero.',
+      constraints: ['Valid RPN expression guaranteed', 'Division truncates towards zero'],
+      sampleInputs: [
+        { input: '["2", "1", "+", "3", "*"]', output: '9 ((2 + 1) * 3)' },
+        { input: '["4", "13", "5", "/", "+"]', output: '6 (4 + (13 / 5))' }
+      ],
+      starterCode: `function evalRPN(tokens) {\n  const stack = [];\n  // TODO: Push numbers, pop two operands on operators\n  \n  return stack.pop();\n}\n\nconsole.log("RPN Result:", evalRPN(["2", "1", "+", "3", "*"]));`,
+      solutionHint: 'for (const t of tokens) { if (!isNaN(t)) stack.push(Number(t)); else { const b = stack.pop(), a = stack.pop(); if (t === "+") stack.push(a + b); else if (t === "-") stack.push(a - b); else if (t === "*") stack.push(a * b); else stack.push(Math.trunc(a / b)); } } return stack.pop();',
+      languageVariants: {
+        javascript: {
+          starterCode: `function evalRPN(tokens) {\n  const stack = [];\n  for (const t of tokens) {\n    if (["+", "-", "*", "/"].includes(t)) {\n      const b = stack.pop(), a = stack.pop();\n      if (t === "+") stack.push(a + b);\n      else if (t === "-") stack.push(a - b);\n      else if (t === "*") stack.push(a * b);\n      else stack.push(Math.trunc(a / b));\n    } else stack.push(Number(t));\n  }\n  return stack.pop();\n}`,
+          solutionHint: 'Use Math.trunc(a / b) for zero-truncated division.'
+        },
+        python: {
+          starterCode: `def eval_rpn(tokens: list[str]) -> int:\n    stack = []\n    for t in tokens:\n        if t in {"+", "-", "*", "/"}:\n            b, a = stack.pop(), stack.pop()\n            if t == "+": stack.append(a + b)\n            elif t == "-": stack.append(a - b)\n            elif t == "*": stack.append(a * b)\n            else: stack.append(int(a / b))\n        else: stack.append(int(t))\n    return stack.pop()`,
+          solutionHint: 'int(a / b) in Python truncates towards zero.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int evalRPN(String[] tokens) {\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (String t : tokens) {\n            if (t.equals("+")) stack.push(stack.pop() + stack.pop());\n            else if (t.equals("*")) stack.push(stack.pop() * stack.pop());\n            else if (t.equals("-")) { int b = stack.pop(), a = stack.pop(); stack.push(a - b); }\n            else if (t.equals("/")) { int b = stack.pop(), a = stack.pop(); stack.push(a / b); }\n            else stack.push(Integer.parseInt(t));\n        }\n        return stack.pop();\n    }\n}`,
+          solutionHint: 'Pop operands b then a and apply operators.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <stack>\n\nint evalRPN(const std::vector<std::string>& tokens) {\n    std::stack<int> st;\n    for (const auto& t : tokens) {\n        if (t == "+" || t == "-" || t == "*" || t == "/") {\n            int b = st.top(); st.pop();\n            int a = st.top(); st.pop();\n            if (t == "+") st.push(a + b);\n            else if (t == "-") st.push(a - b);\n            else if (t == "*") st.push(a * b);\n            else st.push(a / b);\n        } else st.push(std::stoi(t));\n    }\n    return st.top();\n}`,
+          solutionHint: 'Evaluate binary expressions using integer stack.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-4',
+      title: 'Module 4: Daily Temperatures (Monotonic Decreasing Stack)',
+      difficulty: 'Medium',
+      category: 'Stacks',
+      description: 'Given an array of integers temperatures, return an array answer such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(n)'],
+      sampleInputs: [
+        { input: 'temperatures = [73,74,75,71,69,72,76,73]', output: '[1,1,4,2,1,1,0,0]' }
+      ],
+      starterCode: `function dailyTemperatures(temperatures) {\n  const n = temperatures.length;\n  const result = new Array(n).fill(0);\n  const stack = []; // stores indices\n  // TODO: Monotonic decreasing stack\n  \n  return result;\n}`,
+      solutionHint: 'for (let i = 0; i < n; i++) { while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) { const prevIdx = stack.pop(); result[prevIdx] = i - prevIdx; } stack.push(i); } return result;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function dailyTemperatures(temperatures) {\n  const n = temperatures.length;\n  const res = new Array(n).fill(0), stack = [];\n  for (let i = 0; i < n; i++) {\n    while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n      const prev = stack.pop(); res[prev] = i - prev;\n    }\n    stack.push(i);\n  }\n  return res;\n}`,
+          solutionHint: 'Maintain monotonic decreasing index stack.'
+        },
+        python: {
+          starterCode: `def daily_temperatures(temperatures: list[int]) -> list[int]:\n    res = [0] * len(temperatures)\n    stack = [] # indices\n    for i, t in enumerate(temperatures):\n        while stack and t > temperatures[stack[-1]]:\n            prev = stack.pop()\n            res[prev] = i - prev\n        stack.append(i)\n    return res`,
+          solutionHint: 'Pop colder previous days whenever a warmer day is encountered.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int[] dailyTemperatures(int[] temperatures) {\n        int n = temperatures.length;\n        int[] res = new int[n];\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (int i = 0; i < n; i++) {\n            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {\n                int prev = stack.pop();\n                res[prev] = i - prev;\n            }\n            stack.push(i);\n        }\n        return res;\n    }\n}`,
+          solutionHint: 'Monotonic stack storing indices of days.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <stack>\n\nstd::vector<int> dailyTemperatures(const std::vector<int>& temperatures) {\n    int n = temperatures.size();\n    std::vector<int> res(n, 0);\n    std::stack<int> st;\n    for (int i = 0; i < n; i++) {\n        while (!st.empty() && temperatures[i] > temperatures[st.top()]) {\n            int prev = st.top(); st.pop();\n            res[prev] = i - prev;\n        }\n        st.push(i);\n    }\n    return res;\n}`,
+          solutionHint: 'Monotonic decreasing stack for next greater element.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-5',
+      title: 'Module 5: Simplify Unix Canonical Path',
+      difficulty: 'Medium',
+      category: 'Stacks',
+      description: 'Given an absolute path for a Unix-style file system, convert it to the simplified canonical path by resolving . (current dir), .. (parent dir), and duplicate slashes.',
+      constraints: ['Path begins with single slash /', 'Components separated by /'],
+      sampleInputs: [
+        { input: '"/home//foo/"', output: '"/home/foo"' },
+        { input: '"/../"', output: '"/"' },
+        { input: '"/a/./b/../../c/"', output: '"/c"' }
+      ],
+      starterCode: `function simplifyPath(path) {\n  const parts = path.split('/');\n  const stack = [];\n  // TODO: Push valid dir names, pop on \'..\', ignore \'.\' and empty\n  \n  return '/' + stack.join('/');\n}`,
+      solutionHint: 'for (const part of parts) { if (part === "" || part === ".") continue; if (part === "..") stack.pop(); else stack.push(part); } return "/" + stack.join("/");',
+      languageVariants: {
+        javascript: {
+          starterCode: `function simplifyPath(path) {\n  const parts = path.split('/');\n  const stack = [];\n  for (const p of parts) {\n    if (p === '' || p === '.') continue;\n    if (p === '..') stack.pop();\n    else stack.push(p);\n  }\n  return '/' + stack.join('/');\n}`,
+          solutionHint: 'Filter tokens with stack to eliminate relative paths.'
+        },
+        python: {
+          starterCode: `def simplify_path(path: str) -> str:\n    stack = []\n    for part in path.split('/'):\n        if part == '' or part == '.': continue\n        if part == '..':\n            if stack: stack.pop()\n        else: stack.append(part)\n    return '/' + '/'.join(stack)`,
+          solutionHint: 'Split by slash and manage directory hierarchy with stack.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static String simplifyPath(String path) {\n        Deque<String> stack = new ArrayDeque<>();\n        for (String p : path.split("/")) {\n            if (p.isEmpty() || p.equals(".")) continue;\n            if (p.equals("..")) { if (!stack.isEmpty()) stack.pop(); }\n            else stack.push(p);\n        }\n        List<String> list = new ArrayList<>(stack);\n        Collections.reverse(list);\n        return "/" + String.join("/", list);\n    }\n}`,
+          solutionHint: 'Split path by / and pop on ".." elements.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n#include <sstream>\n\nstd::string simplifyPath(const std::string& path) {\n    std::stringstream ss(path);\n    std::string token;\n    std::vector<std::string> stack;\n    while (std::getline(ss, token, '/')) {\n        if (token == "" || token == ".") continue;\n        if (token == "..") { if (!stack.empty()) stack.pop_back(); }\n        else stack.push_back(token);\n    }\n    std::string res = "";\n    for (const auto& s : stack) res += "/" + s;\n    return res.empty() ? "/" : res;\n}`,
+          solutionHint: 'Use stringstream to tokenize by slash delimiter.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-6',
+      title: 'Module 6: Decode String with Nested Counts',
+      difficulty: 'Medium',
+      category: 'Stacks',
+      description: 'Given an encoded string such as 3[a2[c]], return its decoded string accaccacc using dual count & string stacks.',
+      constraints: ['Digits k are positive integers', 'Brackets are well-formed'],
+      sampleInputs: [
+        { input: '"3[a]2[bc]"', output: '"aaabcbc"' },
+        { input: '"3[a2[c]]"', output: '"accaccacc"' }
+      ],
+      starterCode: `function decodeString(s) {\n  const countStack = [], strStack = [];\n  let currStr = '', currNum = 0;\n  // TODO: Parse digits, handle \'[\' by pushing context, handle \']\' by repeating\n  \n  return currStr;\n}`,
+      solutionHint: 'for (const c of s) { if (!isNaN(c)) currNum = currNum * 10 + Number(c); else if (c === "[") { countStack.push(currNum); strStack.push(currStr); currStr = ""; currNum = 0; } else if (c === "]") { currStr = strStack.pop() + currStr.repeat(countStack.pop()); } else currStr += c; } return currStr;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function decodeString(s) {\n  const countStack = [], strStack = [];\n  let currStr = '', currNum = 0;\n  for (const c of s) {\n    if (c >= '0' && c <= '9') currNum = currNum * 10 + Number(c);\n    else if (c === '[') { countStack.push(currNum); strStack.push(currStr); currStr = ''; currNum = 0; }\n    else if (c === ']') { currStr = strStack.pop() + currStr.repeat(countStack.pop()); }\n    else currStr += c;\n  }\n  return currStr;\n}`,
+          solutionHint: 'Push previous string context on [ and repeat popped count on ].'
+        },
+        python: {
+          starterCode: `def decode_string(s: str) -> str:\n    count_stack, str_stack = [], []\n    curr_str, curr_num = "", 0\n    for c in s:\n        if c.isdigit(): curr_num = curr_num * 10 + int(c)\n        elif c == '[':\n            count_stack.append(curr_num); str_stack.append(curr_str)\n            curr_str, curr_num = "", 0\n        elif c == ']':\n            curr_str = str_stack.pop() + curr_str * count_stack.pop()\n        else: curr_str += c\n    return curr_str`,
+          solutionHint: 'Use counts and string stacks to handle nested repetitions.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static String decodeString(String s) {\n        Deque<Integer> countStack = new ArrayDeque<>();\n        Deque<StringBuilder> strStack = new ArrayDeque<>();\n        StringBuilder curr = new StringBuilder();\n        int k = 0;\n        for (char c : s.toCharArray()) {\n            if (Character.isDigit(c)) k = k * 10 + (c - '0');\n            else if (c == '[') {\n                countStack.push(k); strStack.push(curr);\n                curr = new StringBuilder(); k = 0;\n            } else if (c == ']') {\n                StringBuilder prev = strStack.pop();\n                int repeat = countStack.pop();\n                for (int i = 0; i < repeat; i++) prev.append(curr);\n                curr = prev;\n            } else curr.append(c);\n        }\n        return curr.toString();\n    }\n}`,
+          solutionHint: 'Use StringBuilder with stacks to reconstruct nested sequences.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <stack>\n\nstd::string decodeString(const std::string& s) {\n    std::stack<int> countStack;\n    std::stack<std::string> strStack;\n    std::string curr = "";\n    int k = 0;\n    for (char c : s) {\n        if (isdigit(c)) k = k * 10 + (c - '0');\n        else if (c == '[') {\n            countStack.push(k); strStack.push(curr);\n            curr = ""; k = 0;\n        } else if (c == ']') {\n            std::string prev = strStack.top(); strStack.pop();\n            int repeat = countStack.top(); countStack.pop();\n            while (repeat--) prev += curr;\n            curr = prev;\n        } else curr += c;\n    }\n    return curr;\n}`,
+          solutionHint: 'Accumulate multiplier k and push string state onto stacks.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-7',
+      title: 'Module 7: Largest Rectangle in Histogram',
+      difficulty: 'Hard',
+      category: 'Stacks',
+      description: 'Given an array of integers heights representing the histogram bar height where the width of each bar is 1, return the area of the largest rectangle in O(n) linear time.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(n)'],
+      sampleInputs: [
+        { input: 'heights = [2,1,5,6,2,3]', output: '10' }
+      ],
+      starterCode: `function largestRectangleArea(heights) {\n  const stack = [];\n  let maxArea = 0;\n  // TODO: Monotonic increasing stack tracking index & height boundaries\n  \n  return maxArea;\n}`,
+      solutionHint: 'for (let i = 0; i <= heights.length; i++) { const h = i === heights.length ? 0 : heights[i]; while (stack.length && h < heights[stack[stack.length - 1]]) { const height = heights[stack.pop()]; const width = stack.length === 0 ? i : i - stack[stack.length - 1] - 1; maxArea = Math.max(maxArea, height * width); } stack.push(i); } return maxArea;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function largestRectangleArea(heights) {\n  const stack = [];\n  let maxArea = 0;\n  for (let i = 0; i <= heights.length; i++) {\n    const h = i === heights.length ? 0 : heights[i];\n    while (stack.length && h < heights[stack[stack.length - 1]]) {\n      const height = heights[stack.pop()];\n      const width = stack.length === 0 ? i : i - stack[stack.length - 1] - 1;\n      maxArea = Math.max(maxArea, height * width);\n    }\n    stack.push(i);\n  }\n  return maxArea;\n}`,
+          solutionHint: 'Append dummy 0 height to flush all remaining elements in monotonic stack.'
+        },
+        python: {
+          starterCode: `def largest_rectangle_area(heights: list[int]) -> int:\n    stack = []\n    max_area = 0\n    for i in range(len(heights) + 1):\n        h = 0 if i == len(heights) else heights[i]\n        while stack and h < heights[stack[-1]]:\n            height = heights[stack.pop()]\n            width = i if not stack else i - stack[-1] - 1\n            max_area = max(max_area, height * width)\n        stack.append(i)\n    return max_area`,
+          solutionHint: 'Monotonic stack calculates width bounded by previous smaller and current bar.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int largestRectangleArea(int[] heights) {\n        Deque<Integer> stack = new ArrayDeque<>();\n        int maxArea = 0, n = heights.length;\n        for (int i = 0; i <= n; i++) {\n            int h = (i == n) ? 0 : heights[i];\n            while (!stack.isEmpty() && h < heights[stack.peek()]) {\n                int height = heights[stack.pop()];\n                int width = stack.isEmpty() ? i : i - stack.peek() - 1;\n                maxArea = Math.max(maxArea, height * width);\n            }\n            stack.push(i);\n        }\n        return maxArea;\n    }\n}`,
+          solutionHint: 'Calculate rectangle area at boundary drop in O(n) total pops.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <stack>\n#include <algorithm>\n\nint largestRectangleArea(const std::vector<int>& heights) {\n    std::stack<int> st;\n    int maxArea = 0, n = heights.size();\n    for (int i = 0; i <= n; i++) {\n        int h = (i == n) ? 0 : heights[i];\n        while (!st.empty() && h < heights[st.top()]) {\n            int height = heights[st.top()]; st.pop();\n            int width = st.empty() ? i : i - st.top() - 1;\n            maxArea = std::max(maxArea, height * width);\n        }\n        st.push(i);\n    }\n    return maxArea;\n}`,
+          solutionHint: 'Monotonic increasing stack evaluating maximal area.'
+        }
+      }
+    },
+    {
+      id: 'stk-mod-8',
+      title: 'Module 8: Basic Calculator with Parentheses & Signs',
+      difficulty: 'Hard',
+      category: 'Stacks',
+      description: 'Implement a basic calculator to evaluate a simple expression string containing digits, +, -, (, ) and empty spaces in O(n) time.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(n)'],
+      sampleInputs: [
+        { input: '"(1+(4+5+2)-3)+(6+8)"', output: '23' },
+        { input: '" 2-1 + 2 "', output: '3' }
+      ],
+      starterCode: `function calculate(s) {\n  let total = 0, curr = 0, sign = 1;\n  const stack = [];\n  // TODO: Parse numbers, handle signs, push state on \'(\', pop & combine on \')\'\n  \n  return total + sign * curr;\n}`,
+      solutionHint: 'for (const c of s) { if (!isNaN(c) && c !== " ") curr = curr * 10 + Number(c); else if (c === "+") { total += sign * curr; curr = 0; sign = 1; } else if (c === "-") { total += sign * curr; curr = 0; sign = -1; } else if (c === "(") { stack.push(total); stack.push(sign); total = 0; sign = 1; } else if (c === ")") { total += sign * curr; curr = 0; total *= stack.pop(); total += stack.pop(); } } return total + sign * curr;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function calculate(s) {\n  let total = 0, curr = 0, sign = 1;\n  const stack = [];\n  for (const c of s) {\n    if (c >= '0' && c <= '9') curr = curr * 10 + Number(c);\n    else if (c === '+') { total += sign * curr; curr = 0; sign = 1; }\n    else if (c === '-') { total += sign * curr; curr = 0; sign = -1; }\n    else if (c === '(') { stack.push(total); stack.push(sign); total = 0; sign = 1; }\n    else if (c === ')') { total += sign * curr; curr = 0; total *= stack.pop(); total += stack.pop(); }\n  }\n  return total + sign * curr;\n}`,
+          solutionHint: 'Push accumulator and preceding sign onto stack on ( and fold upon ).'
+        },
+        python: {
+          starterCode: `def calculate(s: str) -> int:\n    total, curr, sign = 0, 0, 1\n    stack = []\n    for c in s:\n        if c.isdigit(): curr = curr * 10 + int(c)\n        elif c == '+': total += sign * curr; curr = 0; sign = 1\n        elif c == '-': total += sign * curr; curr = 0; sign = -1\n        elif c == '(':\n            stack.append(total); stack.append(sign)\n            total, sign = 0, 1\n        elif c == ')':\n            total += sign * curr; curr = 0\n            total *= stack.pop(); total += stack.pop()\n    return total + sign * curr`,
+          solutionHint: 'Preserve accumulator and active sign in stack on parentheses entry.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int calculate(String s) {\n        Deque<Integer> stack = new ArrayDeque<>();\n        int total = 0, curr = 0, sign = 1;\n        for (char c : s.toCharArray()) {\n            if (Character.isDigit(c)) curr = curr * 10 + (c - '0');\n            else if (c == '+') { total += sign * curr; curr = 0; sign = 1; }\n            else if (c == '-') { total += sign * curr; curr = 0; sign = -1; }\n            else if (c == '(') { stack.push(total); stack.push(sign); total = 0; sign = 1; }\n            else if (c == ')') { total += sign * curr; curr = 0; total *= stack.pop(); total += stack.pop(); }\n        }\n        return total + sign * curr;\n    }\n}`,
+          solutionHint: 'Stack preserves arithmetic context across nested parentheses.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <stack>\n\nint calculate(const std::string& s) {\n    std::stack<int> st;\n    long long total = 0, curr = 0, sign = 1;\n    for (char c : s) {\n        if (isdigit(c)) curr = curr * 10 + (c - '0');\n        else if (c == '+') { total += sign * curr; curr = 0; sign = 1; }\n        else if (c == '-') { total += sign * curr; curr = 0; sign = -1; }\n        else if (c == '(') { st.push(total); st.push(sign); total = 0; sign = 1; }\n        else if (c == ')') { total += sign * curr; curr = 0; total *= st.top(); st.pop(); total += st.top(); st.pop(); }\n    }\n    return total + sign * curr;\n}`,
+          solutionHint: 'Push total and sign on ( and resolve on ).'
+        }
+      }
+    }
+  ],
+
+  'queues': [
+    {
+      id: 'que-mod-1',
+      title: 'Module 1: Implement Queue using Two Stacks',
+      difficulty: 'Easy',
+      category: 'Queues',
+      description: 'Implement a first in first out (FIFO) queue using only two standard stacks supporting push, pop, peek, and empty with amortized O(1) time complexity.',
+      constraints: ['Amortized O(1) time per operation', 'Only standard stack operations allowed'],
+      sampleInputs: [
+        { input: 'push(1), push(2), peek() -> 1, pop() -> 1, empty() -> false', output: 'Correct FIFO sequence' }
+      ],
+      starterCode: `class MyQueue {\n  constructor() {\n    this.inStack = [];\n    this.outStack = [];\n  }\n  push(x) { this.inStack.push(x); }\n  pop() {\n    this.peek();\n    return this.outStack.pop();\n  }\n  peek() {\n    if (this.outStack.length === 0) {\n      while (this.inStack.length) this.outStack.push(this.inStack.pop());\n    }\n    return this.outStack[this.outStack.length - 1];\n  }\n  empty() { return this.inStack.length === 0 && this.outStack.length === 0; }\n}`,
+      solutionHint: 'Transfer elements from inStack to outStack only when outStack is empty.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class MyQueue {\n  constructor() {\n    this.inStack = [];\n    this.outStack = [];\n  }\n  push(x) { this.inStack.push(x); }\n  pop() {\n    this.peek();\n    return this.outStack.pop();\n  }\n  peek() {\n    if (this.outStack.length === 0) {\n      while (this.inStack.length) this.outStack.push(this.inStack.pop());\n    }\n    return this.outStack[this.outStack.length - 1];\n  }\n  empty() { return this.inStack.length === 0 && this.outStack.length === 0; }\n}`,
+          solutionHint: 'Amortized O(1) FIFO transfer.'
+        },
+        python: {
+          starterCode: `class MyQueue:\n    def __init__(self):\n        self.in_stack = []\n        self.out_stack = []\n    def push(self, x: int) -> None:\n        self.in_stack.append(x)\n    def pop(self) -> int:\n        self.peek()\n        return self.out_stack.pop()\n    def peek(self) -> int:\n        if not self.out_stack:\n            while self.in_stack: self.out_stack.append(self.in_stack.pop())\n        return self.out_stack[-1]\n    def empty(self) -> bool:\n        return len(self.in_stack) == 0 and len(self.out_stack) == 0`,
+          solutionHint: 'Transfer from in_stack to out_stack on peek/pop when out_stack is empty.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass MyQueue {\n    private Deque<Integer> inStack = new ArrayDeque<>();\n    private Deque<Integer> outStack = new ArrayDeque<>();\n    public void push(int x) { inStack.push(x); }\n    public int pop() { peek(); return outStack.pop(); }\n    public int peek() {\n        if (outStack.isEmpty()) {\n            while (!inStack.isEmpty()) outStack.push(inStack.pop());\n        }\n        return outStack.peek();\n    }\n    public boolean empty() { return inStack.isEmpty() && outStack.isEmpty(); }\n}`,
+          solutionHint: 'Amortized O(1) transfer between two ArrayDeque stacks.'
+        },
+        cpp: {
+          starterCode: `#include <stack>\n\nclass MyQueue {\n    std::stack<int> inSt, outSt;\npublic:\n    void push(int x) { inSt.push(x); }\n    int pop() { int val = peek(); outSt.pop(); return val; }\n    int peek() {\n        if (outSt.empty()) {\n            while (!inSt.empty()) { outSt.push(inSt.top()); inSt.pop(); }\n        }\n        return outSt.top();\n    }\n    bool empty() { return inSt.empty() && outSt.empty(); }\n};`,
+          solutionHint: 'Two std::stack objects providing FIFO guarantees.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-2',
+      title: 'Module 2: Design Circular Queue (Ring Buffer)',
+      difficulty: 'Medium',
+      category: 'Queues',
+      description: 'Design a circular queue data structure using a fixed-size array supporting enQueue, deQueue, Front, Rear, isEmpty, and isFull in O(1) time without dynamic resizing.',
+      constraints: ['O(1) time per method', 'Capacity fixed at initialization'],
+      sampleInputs: [
+        { input: 'MyCircularQueue(3), enQueue(1), enQueue(2), enQueue(3), enQueue(4) -> false, Rear() -> 3', output: 'Ring buffer wrap around' }
+      ],
+      starterCode: `class MyCircularQueue {\n  constructor(k) {\n    this.buffer = new Array(k);\n    this.capacity = k;\n    this.head = 0;\n    this.tail = 0;\n    this.size = 0;\n  }\n  enQueue(value) {\n    if (this.isFull()) return false;\n    this.buffer[this.tail] = value;\n    this.tail = (this.tail + 1) % this.capacity;\n    this.size++;\n    return true;\n  }\n  deQueue() {\n    if (this.isEmpty()) return false;\n    this.head = (this.head + 1) % this.capacity;\n    this.size--;\n    return true;\n  }\n  Front() { return this.isEmpty() ? -1 : this.buffer[this.head]; }\n  Rear() { return this.isEmpty() ? -1 : this.buffer[(this.tail - 1 + this.capacity) % this.capacity]; }\n  isEmpty() { return this.size === 0; }\n  isFull() { return this.size === this.capacity; }\n}`,
+      solutionHint: 'Advance pointers with modulo arithmetic: (ptr + 1) % capacity.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class MyCircularQueue {\n  constructor(k) {\n    this.buffer = new Array(k);\n    this.capacity = k;\n    this.head = 0; this.tail = 0; this.size = 0;\n  }\n  enQueue(value) {\n    if (this.isFull()) return false;\n    this.buffer[this.tail] = value;\n    this.tail = (this.tail + 1) % this.capacity;\n    this.size++;\n    return true;\n  }\n  deQueue() {\n    if (this.isEmpty()) return false;\n    this.head = (this.head + 1) % this.capacity;\n    this.size--;\n    return true;\n  }\n  Front() { return this.isEmpty() ? -1 : this.buffer[this.head]; }\n  Rear() { return this.isEmpty() ? -1 : this.buffer[(this.tail - 1 + this.capacity) % this.capacity]; }\n  isEmpty() { return this.size === 0; }\n  isFull() { return this.size === this.capacity; }\n}`,
+          solutionHint: 'Use modulo wrapping for head and tail indexes.'
+        },
+        python: {
+          starterCode: `class MyCircularQueue:\n    def __init__(self, k: int):\n        self.buffer = [0] * k\n        self.cap = k\n        self.head = self.tail = self.size = 0\n    def en_queue(self, value: int) -> bool:\n        if self.is_full(): return False\n        self.buffer[self.tail] = value\n        self.tail = (self.tail + 1) % self.cap\n        self.size += 1\n        return True\n    def de_queue(self) -> bool:\n        if self.is_empty(): return False\n        self.head = (self.head + 1) % self.cap\n        self.size -= 1\n        return True\n    def front(self) -> int: return -1 if self.is_empty() else self.buffer[self.head]\n    def rear(self) -> int: return -1 if self.is_empty() else self.buffer[(self.tail - 1 + self.cap) % self.cap]\n    def is_empty(self) -> bool: return self.size == 0\n    def is_full(self) -> bool: return self.size == self.cap`,
+          solutionHint: 'Maintain size count and modular pointer arithmetic.'
+        },
+        java: {
+          starterCode: `class MyCircularQueue {\n    private int[] buffer;\n    private int head = 0, tail = 0, size = 0, cap;\n    public MyCircularQueue(int k) { this.buffer = new int[k]; this.cap = k; }\n    public boolean enQueue(int value) {\n        if (isFull()) return false;\n        buffer[tail] = value;\n        tail = (tail + 1) % cap;\n        size++;\n        return true;\n    }\n    public boolean deQueue() {\n        if (isEmpty()) return false;\n        head = (head + 1) % cap;\n        size--;\n        return true;\n    }\n    public int Front() { return isEmpty() ? -1 : buffer[head]; }\n    public int Rear() { return isEmpty() ? -1 : buffer[(tail - 1 + cap) % cap]; }\n    public boolean isEmpty() { return size == 0; }\n    public boolean isFull() { return size == cap; }\n}`,
+          solutionHint: 'Array indexing with modular arithmetic.'
+        },
+        cpp: {
+          starterCode: `#include <vector>\n\nclass MyCircularQueue {\n    std::vector<int> buffer;\n    int head = 0, tail = 0, size = 0, cap;\npublic:\n    MyCircularQueue(int k) : buffer(k, 0), cap(k) {}\n    bool enQueue(int value) {\n        if (isFull()) return false;\n        buffer[tail] = value;\n        tail = (tail + 1) % cap;\n        size++;\n        return true;\n    }\n    bool deQueue() {\n        if (isEmpty()) return false;\n        head = (head + 1) % cap;\n        size--;\n        return true;\n    }\n    int Front() { return isEmpty() ? -1 : buffer[head]; }\n    int Rear() { return isEmpty() ? -1 : buffer[(tail - 1 + cap) % cap]; }\n    bool isEmpty() { return size == 0; }\n    bool isFull() { return size == cap; }\n};`,
+          solutionHint: 'Wrap head and tail with (ptr + 1) % cap.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-3',
+      title: 'Module 3: First Unique Character in Data Stream',
+      difficulty: 'Medium',
+      category: 'Queues',
+      description: 'Design a stream processor that accepts characters one by one and returns the first unique (non-repeating) character in the stream in O(1) amortized time using a queue and frequency array.',
+      constraints: ['Lowercase English characters', 'O(1) amortized lookup per query'],
+      sampleInputs: [
+        { input: 'add("a"), add("a"), add("b"), add("c"), getFirstUnique() -> "b"', output: 'Correct first non-repeating character' }
+      ],
+      starterCode: `class FirstUniqueStream {\n  constructor() {\n    this.queue = [];\n    this.counts = {};\n  }\n  add(char) {\n    this.counts[char] = (this.counts[char] || 0) + 1;\n    this.queue.push(char);\n  }\n  getFirstUnique() {\n    while (this.queue.length && this.counts[this.queue[0]] > 1) {\n      this.queue.shift();\n    }\n    return this.queue.length ? this.queue[0] : null;\n  }\n}`,
+      solutionHint: 'Pop front elements from queue as soon as their frequency exceeds 1.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class FirstUniqueStream {\n  constructor() {\n    this.queue = [];\n    this.counts = {};\n  }\n  add(char) {\n    this.counts[char] = (this.counts[char] || 0) + 1;\n    this.queue.push(char);\n  }\n  getFirstUnique() {\n    while (this.queue.length && this.counts[this.queue[0]] > 1) this.queue.shift();\n    return this.queue.length ? this.queue[0] : null;\n  }\n}`,
+          solutionHint: 'Shift duplicate characters off the queue lazily.'
+        },
+        python: {
+          starterCode: `from collections import deque, Counter\n\nclass FirstUniqueStream:\n    def __init__(self):\n        self.queue = deque()\n        self.counts = Counter()\n    def add(self, char: str) -> None:\n        self.counts[char] += 1\n        self.queue.append(char)\n    def get_first_unique(self) -> str | None:\n        while self.queue and self.counts[self.queue[0]] > 1:\n            self.queue.popleft()\n        return self.queue[0] if self.queue else None`,
+          solutionHint: 'Maintain FIFO queue and popleft while front element is duplicated.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass FirstUniqueStream {\n    private Deque<Character> queue = new ArrayDeque<>();\n    private int[] counts = new int[26];\n    public void add(char c) {\n        counts[c - 'a']++;\n        queue.offer(c);\n    }\n    public Character getFirstUnique() {\n        while (!queue.isEmpty() && counts[queue.peek() - 'a'] > 1) queue.poll();\n        return queue.isEmpty() ? null : queue.peek();\n    }\n}`,
+          solutionHint: 'ArrayDeque queue with 26-slot alphabet frequency array.'
+        },
+        cpp: {
+          starterCode: `#include <queue>\n#include <vector>\n\nclass FirstUniqueStream {\n    std::queue<char> q;\n    std::vector<int> counts = std::vector<int>(26, 0);\npublic:\n    void add(char c) {\n        counts[c - 'a']++;\n        q.push(c);\n    }\n    char getFirstUnique() {\n        while (!q.empty() && counts[q.front() - 'a'] > 1) q.pop();\n        return q.empty() ? '#' : q.front();\n    }\n};`,
+          solutionHint: 'Use std::queue combined with ASCII counts.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-4',
+      title: 'Module 4: Binary Tree Level Order Traversal (BFS)',
+      difficulty: 'Medium',
+      category: 'Queues',
+      description: 'Given the root of a binary tree, return the level order traversal of its nodes values (i.e., from left to right, level by level) using a FIFO queue in O(n) time.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(n)'],
+      sampleInputs: [
+        { input: 'root = [3,9,20,null,null,15,7]', output: '[[3],[9,20],[15,7]]' }
+      ],
+      starterCode: `function levelOrder(root) {\n  if (!root) return [];\n  const result = [];\n  const queue = [root];\n  // TODO: Level by level BFS\n  \n  return result;\n}`,
+      solutionHint: 'while (queue.length) { const levelSize = queue.length, level = []; for (let i = 0; i < levelSize; i++) { const node = queue.shift(); level.push(node.val); if (node.left) queue.push(node.left); if (node.right) queue.push(node.right); } result.push(level); } return result;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function levelOrder(root) {\n  if (!root) return [];\n  const res = [], queue = [root];\n  while (queue.length) {\n    const size = queue.length, level = [];\n    for (let i = 0; i < size; i++) {\n      const node = queue.shift(); level.push(node.val);\n      if (node.left) queue.push(node.left);\n      if (node.right) queue.push(node.right);\n    }\n    res.push(level);\n  }\n  return res;\n}`,
+          solutionHint: 'Loop level by level by freezing queue.length at start of each iteration.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef level_order(root) -> list[list[int]]:\n    if not root: return []\n    res, q = [], deque([root])\n    while q:\n        level = []\n        for _ in range(len(q)):\n            node = q.popleft()\n            level.append(node.val)\n            if node.left: q.append(node.left)\n            if node.right: q.append(node.right)\n        res.append(level)\n    return res`,
+          solutionHint: 'Queue BFS tracking nodes per level with deque.popleft().'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<List<Integer>> levelOrder(TreeNode root) {\n        List<List<Integer>> res = new ArrayList<>();\n        if (root == null) return res;\n        Deque<TreeNode> q = new ArrayDeque<>();\n        q.offer(root);\n        while (!q.isEmpty()) {\n            int size = q.size();\n            List<Integer> level = new ArrayList<>();\n            for (int i = 0; i < size; i++) {\n                TreeNode node = q.poll();\n                level.add(node.val);\n                if (node.left != null) q.offer(node.left);\n                if (node.right != null) q.offer(node.right);\n            }\n            res.add(level);\n        }\n        return res;\n    }\n}`,
+          solutionHint: 'Level-by-level breadth first search.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n\nstd::vector<std::vector<int>> levelOrder(TreeNode* root) {\n    std::vector<std::vector<int>> res;\n    if (!root) return res;\n    std::queue<TreeNode*> q;\n    q.push(root);\n    while (!q.empty()) {\n        int size = q.size();\n        std::vector<int> level;\n        for (int i = 0; i < size; i++) {\n            TreeNode* node = q.front(); q.pop();\n            level.push_back(node->val);\n            if (node->left) q.push(node->left);\n            if (node->right) q.push(node->right);\n        }\n        res.push_back(level);\n    }\n    return res;\n}`,
+          solutionHint: 'BFS queue level traversal.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-5',
+      title: 'Module 5: Rotting Oranges (Multi-Source BFS)',
+      difficulty: 'Medium',
+      category: 'Queues',
+      description: 'Given an m x n grid where 0 is empty, 1 is fresh orange, and 2 is rotten orange, return the minimum number of minutes until no fresh orange remains using multi-source BFS queue.',
+      constraints: ['Time Complexity: O(m * n)', 'Space Complexity: O(m * n)'],
+      sampleInputs: [
+        { input: '[[2,1,1],[1,1,0],[0,1,1]]', output: '4' }
+      ],
+      starterCode: `function orangesRotting(grid) {\n  const m = grid.length, n = grid[0].length;\n  const queue = [];\n  let fresh = 0, minutes = 0;\n  // TODO: Enqueue all rotten (2), count fresh (1), multi-source BFS step by step\n  \n  return fresh === 0 ? minutes : -1;\n}`,
+      solutionHint: 'Enqueue all starting rotten oranges with timestamp; decrement fresh on 4-directional spread.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function orangesRotting(grid) {\n  const m = grid.length, n = grid[0].length, queue = [];\n  let fresh = 0, minutes = 0;\n  for (let r = 0; r < m; r++) {\n    for (let c = 0; c < n; c++) {\n      if (grid[r][c] === 2) queue.push([r, c]);\n      else if (grid[r][c] === 1) fresh++;\n    }\n  }\n  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];\n  while (queue.length && fresh > 0) {\n    const size = queue.length;\n    for (let i = 0; i < size; i++) {\n      const [r, c] = queue.shift();\n      for (const [dr, dc] of dirs) {\n        const nr = r + dr, nc = c + dc;\n        if (nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] === 1) {\n          grid[nr][nc] = 2; fresh--; queue.push([nr, nc]);\n        }\n      }\n    }\n    minutes++;\n  }\n  return fresh === 0 ? minutes : -1;\n}`,
+          solutionHint: 'Multi-source BFS spreading rot layer by layer.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef oranges_rotting(grid: list[list[int]]) -> int:\n    m, n = len(grid), len(grid[0])\n    q = deque()\n    fresh = 0\n    for r in range(m):\n        for c in range(n):\n            if grid[r][c] == 2: q.append((r, c))\n            elif grid[r][c] == 1: fresh += 1\n    minutes = 0\n    dirs = [(1,0),(-1,0),(0,1),(0,-1)]\n    while q and fresh > 0:\n        for _ in range(len(q)):\n            r, c = q.popleft()\n            for dr, dc in dirs:\n                nr, nc = r + dr, c + dc\n                if 0 <= nr < m and 0 <= nc < n and grid[nr][nc] == 1:\n                    grid[nr][nc] = 2; fresh -= 1; q.append((nr, nc))\n        minutes += 1\n    return minutes if fresh == 0 else -1`,
+          solutionHint: 'Enqueue all starting rotten oranges and run simultaneous BFS.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int orangesRotting(int[][] grid) {\n        int m = grid.length, n = grid[0].length, fresh = 0, minutes = 0;\n        Deque<int[]> q = new ArrayDeque<>();\n        for (int r = 0; r < m; r++)\n            for (int c = 0; c < n; c++) {\n                if (grid[r][c] == 2) q.offer(new int[]{r, c});\n                else if (grid[r][c] == 1) fresh++;\n            }\n        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};\n        while (!q.isEmpty() && fresh > 0) {\n            int size = q.size();\n            for (int i = 0; i < size; i++) {\n                int[] curr = q.poll();\n                for (int[] d : dirs) {\n                    int nr = curr[0] + d[0], nc = curr[1] + d[1];\n                    if (nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] == 1) {\n                        grid[nr][nc] = 2; fresh--; q.offer(new int[]{nr, nc});\n                    }\n                }\n            }\n            minutes++;\n        }\n        return fresh == 0 ? minutes : -1;\n    }\n}`,
+          solutionHint: 'Multi-source queue BFS.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n\nint orangesRotting(std::vector<std::vector<int>>& grid) {\n    int m = grid.size(), n = grid[0].size(), fresh = 0, minutes = 0;\n    std::queue<std::pair<int, int>> q;\n    for (int r = 0; r < m; r++)\n        for (int c = 0; c < n; c++) {\n            if (grid[r][c] == 2) q.push({r, c});\n            else if (grid[r][c] == 1) fresh++;\n        }\n    int dirs[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};\n    while (!q.empty() && fresh > 0) {\n        int size = q.size();\n        for (int i = 0; i < size; i++) {\n            auto [r, c] = q.front(); q.pop();\n            for (auto& d : dirs) {\n                int nr = r + d[0], nc = c + d[1];\n                if (nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] == 1) {\n                    grid[nr][nc] = 2; fresh--; q.push({nr, nc});\n                }\n            }\n        }\n        minutes++;\n    }\n    return fresh == 0 ? minutes : -1;\n}`,
+          solutionHint: 'BFS queue spreads infection layer by layer.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-6',
+      title: 'Module 6: Sliding Window Moving Average',
+      difficulty: 'Easy',
+      category: 'Queues',
+      description: 'Given a stream of integers and a window size size, calculate the moving average of all integers in the sliding window in O(1) time using a queue.',
+      constraints: ['O(1) time per next() call', 'Space: O(size)'],
+      sampleInputs: [
+        { input: 'MovingAverage(3), next(1) -> 1.0, next(10) -> 5.5, next(3) -> 4.67, next(5) -> 6.0', output: 'Sliding averages' }
+      ],
+      starterCode: `class MovingAverage {\n  constructor(size) {\n    this.size = size;\n    this.queue = [];\n    this.sum = 0;\n  }\n  next(val) {\n    this.sum += val;\n    this.queue.push(val);\n    if (this.queue.length > this.size) this.sum -= this.queue.shift();\n    return this.sum / this.queue.length;\n  }\n}`,
+      solutionHint: 'Add new val to sum and subtract shifted oldest element when window size exceeds capacity.',
+      languageVariants: {
+        javascript: {
+          starterCode: `class MovingAverage {\n  constructor(size) {\n    this.size = size;\n    this.queue = [];\n    this.sum = 0;\n  }\n  next(val) {\n    this.sum += val;\n    this.queue.push(val);\n    if (this.queue.length > this.size) this.sum -= this.queue.shift();\n    return this.sum / this.queue.length;\n  }\n}`,
+          solutionHint: 'Maintain running sum and sliding window queue.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\nclass MovingAverage:\n    def __init__(self, size: int):\n        self.size = size\n        self.queue = deque()\n        self.total = 0.0\n    def next(self, val: int) -> float:\n        self.total += val\n        self.queue.append(val)\n        if len(self.queue) > self.size:\n            self.total -= self.queue.popleft()\n        return self.total / len(self.queue)`,
+          solutionHint: 'deque popleft maintains window size.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass MovingAverage {\n    private Deque<Integer> queue = new ArrayDeque<>();\n    private int size;\n    private double sum = 0;\n    public MovingAverage(int size) { this.size = size; }\n    public double next(int val) {\n        sum += val;\n        queue.offer(val);\n        if (queue.size() > size) sum -= queue.poll();\n        return sum / queue.size();\n    }\n}`,
+          solutionHint: 'ArrayDeque with running sum.'
+        },
+        cpp: {
+          starterCode: `#include <queue>\n\nclass MovingAverage {\n    std::queue<int> q;\n    int cap;\n    double sum = 0;\npublic:\n    MovingAverage(int size) : cap(size) {}\n    double next(int val) {\n        sum += val;\n        q.push(val);\n        if (q.size() > cap) { sum -= q.front(); q.pop(); }\n        return sum / q.size();\n    }\n};`,
+          solutionHint: 'std::queue sliding window running sum.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-7',
+      title: 'Module 7: Task Scheduler with Cooldown',
+      difficulty: 'Medium',
+      category: 'Queues',
+      description: 'Given a characters array tasks representing CPU tasks (A through Z) and cooling time n, return the least number of CPU intervals required to finish all tasks.',
+      constraints: ['Time Complexity: O(tasks.length)', 'Space Complexity: O(1) fixed alphabet'],
+      sampleInputs: [
+        { input: 'tasks = ["A","A","A","B","B","B"], n = 2', output: '8 (A -> B -> idle -> A -> B -> idle -> A -> B)' }
+      ],
+      starterCode: `function leastInterval(tasks, n) {\n  const freq = {};\n  for (const t of tasks) freq[t] = (freq[t] || 0) + 1;\n  const maxFreq = Math.max(...Object.values(freq));\n  let maxCount = 0;\n  for (const f of Object.values(freq)) if (f === maxFreq) maxCount++;\n  return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n}`,
+      solutionHint: 'Formula: (maxFreq - 1) * (n + 1) + count of tasks with max frequency, bounded below by total tasks.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function leastInterval(tasks, n) {\n  const freq = {};\n  for (const t of tasks) freq[t] = (freq[t] || 0) + 1;\n  const maxFreq = Math.max(...Object.values(freq));\n  let maxCount = 0;\n  for (const f of Object.values(freq)) if (f === maxFreq) maxCount++;\n  return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n}`,
+          solutionHint: 'Calculate idle slots required by most frequent task.'
+        },
+        python: {
+          starterCode: `from collections import Counter\n\ndef least_interval(tasks: list[str], n: int) -> int:\n    counts = Counter(tasks)\n    max_freq = max(counts.values())\n    max_count = sum(1 for v in counts.values() if v == max_freq)\n    return max(len(tasks), (max_freq - 1) * (n + 1) + max_count)`,
+          solutionHint: 'Greedy scheduling formula with cooldown interval math.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int leastInterval(char[] tasks, int n) {\n        int[] counts = new int[26];\n        for (char c : tasks) counts[c - 'A']++;\n        int maxFreq = 0, maxCount = 0;\n        for (int c : counts) maxFreq = Math.max(maxFreq, c);\n        for (int c : counts) if (c == maxFreq) maxCount++;\n        return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n    }\n}`,
+          solutionHint: 'Use 26-slot frequency table to find highest frequency count.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint leastInterval(const std::vector<char>& tasks, int n) {\n    std::vector<int> counts(26, 0);\n    for (char c : tasks) counts[c - 'A']++;\n    int maxFreq = *std::max_element(counts.begin(), counts.end());\n    int maxCount = std::count(counts.begin(), counts.end(), maxFreq);\n    return std::max((int)tasks.size(), (maxFreq - 1) * (n + 1) + maxCount);\n}`,
+          solutionHint: 'Count maximum occurrences and apply cooling slot formula.'
+        }
+      }
+    },
+    {
+      id: 'que-mod-8',
+      title: 'Module 8: Shortest Path in Binary Matrix (8-Directional BFS)',
+      difficulty: 'Hard',
+      category: 'Queues',
+      description: 'Given an n x n binary matrix grid, return the length of the shortest clear path from top-left (0, 0) to bottom-right (n - 1, n - 1) moving in 8 directions using BFS queue.',
+      constraints: ['Path exists only through 0 cells', 'Time Complexity: O(n^2)'],
+      sampleInputs: [
+        { input: 'grid = [[0,0,0],[1,1,0],[1,1,0]]', output: '4' },
+        { input: 'grid = [[1,0,0],[1,1,0],[1,1,0]]', output: '-1' }
+      ],
+      starterCode: `function shortestPathBinaryMatrix(grid) {\n  const n = grid.length;\n  if (grid[0][0] !== 0 || grid[n - 1][n - 1] !== 0) return -1;\n  const queue = [[0, 0, 1]]; // r, c, dist\n  grid[0][0] = 1; // visited\n  const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];\n  while (queue.length) {\n    const [r, c, dist] = queue.shift();\n    if (r === n - 1 && c === n - 1) return dist;\n    for (const [dr, dc] of dirs) {\n      const nr = r + dr, nc = c + dc;\n      if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] === 0) {\n        grid[nr][nc] = 1;\n        queue.push([nr, nc, dist + 1]);\n      }\n    }\n  }\n  return -1;\n}`,
+      solutionHint: '8-directional BFS marks visited immediately on enqueue for optimal O(V+E) performance.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function shortestPathBinaryMatrix(grid) {\n  const n = grid.length;\n  if (grid[0][0] !== 0 || grid[n - 1][n - 1] !== 0) return -1;\n  const queue = [[0, 0, 1]];\n  grid[0][0] = 1;\n  const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];\n  while (queue.length) {\n    const [r, c, dist] = queue.shift();\n    if (r === n - 1 && c === n - 1) return dist;\n    for (const [dr, dc] of dirs) {\n      const nr = r + dr, nc = c + dc;\n      if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] === 0) {\n        grid[nr][nc] = 1; queue.push([nr, nc, dist + 1]);\n      }\n    }\n  }\n  return -1;\n}`,
+          solutionHint: '8-directional queue BFS finding shortest distance.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef shortest_path_binary_matrix(grid: list[list[int]]) -> int:\n    n = len(grid)\n    if grid[0][0] != 0 or grid[n - 1][n - 1] != 0: return -1\n    q = deque([(0, 0, 1)])\n    grid[0][0] = 1\n    dirs = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]\n    while q:\n        r, c, dist = q.popleft()\n        if r == n - 1 and c == n - 1: return dist\n        for dr, dc in dirs:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 0:\n                grid[nr][nc] = 1\n                q.append((nr, nc, dist + 1))\n    return -1`,
+          solutionHint: '8-directional BFS with immediate visited mark.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int shortestPathBinaryMatrix(int[][] grid) {\n        int n = grid.length;\n        if (grid[0][0] != 0 || grid[n - 1][n - 1] != 0) return -1;\n        Deque<int[]> q = new ArrayDeque<>();\n        q.offer(new int[]{0, 0, 1});\n        grid[0][0] = 1;\n        int[][] dirs = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};\n        while (!q.isEmpty()) {\n            int[] curr = q.poll();\n            int r = curr[0], c = curr[1], dist = curr[2];\n            if (r == n - 1 && c == n - 1) return dist;\n            for (int[] d : dirs) {\n                int nr = r + d[0], nc = c + d[1];\n                if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] == 0) {\n                    grid[nr][nc] = 1;\n                    q.offer(new int[]{nr, nc, dist + 1});\n                }\n            }\n        }\n        return -1;\n    }\n}`,
+          solutionHint: '8-neighbor BFS using ArrayDeque.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n\nint shortestPathBinaryMatrix(std::vector<std::vector<int>>& grid) {\n    int n = grid.size();\n    if (grid[0][0] != 0 || grid[n - 1][n - 1] != 0) return -1;\n    std::queue<std::tuple<int, int, int>> q;\n    q.push({0, 0, 1});\n    grid[0][0] = 1;\n    int dirs[8][2] = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};\n    while (!q.empty()) {\n        auto [r, c, dist] = q.front(); q.pop();\n        if (r == n - 1 && c == n - 1) return dist;\n        for (auto& d : dirs) {\n            int nr = r + d[0], nc = c + d[1];\n            if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] == 0) {\n                grid[nr][nc] = 1;\n                q.push({nr, nc, dist + 1});\n            }\n        }\n    }\n    return -1;\n}`,
+          solutionHint: '8-directional grid search with std::queue.'
+        }
+      }
     }
   ],
 

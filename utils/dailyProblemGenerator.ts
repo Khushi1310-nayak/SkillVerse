@@ -34,8 +34,14 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
     problemList = PLAYGROUND_PROBLEMS['php'];
   } else if (normalizedId.includes('string')) {
     problemList = PLAYGROUND_PROBLEMS['strings'];
-  } else if (normalizedId.includes('array') || normalizedId.includes('dsa')) {
+  } else if (normalizedId.includes('array')) {
     problemList = PLAYGROUND_PROBLEMS['arrays'];
+  } else if (normalizedId.includes('linked') || normalizedId.includes('list')) {
+    problemList = PLAYGROUND_PROBLEMS['linked-lists'];
+  } else if (normalizedId.includes('stack')) {
+    problemList = PLAYGROUND_PROBLEMS['stacks'];
+  } else if (normalizedId.includes('queue')) {
+    problemList = PLAYGROUND_PROBLEMS['queues'];
   } else {
     problemList = PLAYGROUND_PROBLEMS[normalizedId];
   }

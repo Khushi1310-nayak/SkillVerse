@@ -130,20 +130,25 @@ export const CodingPracticePlayground: React.FC = () => {
             </div>
           </div>
 
-          {/* Course Selector Dropdown (Coding Tracks Only) */}
+          {/* Track Selector Dropdown (Coding & DSA Tracks) */}
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-textMuted uppercase tracking-wider hidden sm:inline">Select Track:</span>
-            <select
-              value={selectedCourseId}
-              onChange={(e) => handleCourseChange(e.target.value)}
-              className="px-4 py-2.5 rounded-xl bg-[#0f1623] border border-white/10 text-sm font-semibold text-white focus:outline-none focus:border-primaryLight transition-all cursor-pointer shadow-inner min-w-[220px]"
-            >
-              {codingCourses.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.title} ({c.level})
-                </option>
-              ))}
-            </select>
+            <div className="relative group min-w-[240px]">
+              <select
+                value={selectedCourseId}
+                onChange={(e) => handleCourseChange(e.target.value)}
+                className="w-full pl-4 pr-10 py-2.5 rounded-2xl bg-[#0f1623]/90 border border-white/15 text-sm font-semibold text-white focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primary/40 transition-all duration-300 cursor-pointer shadow-lg shadow-black/30 hover:border-white/30 backdrop-blur-md appearance-none"
+              >
+                {codingCourses.map(c => (
+                  <option key={c.id} value={c.id} className="bg-[#0b1220] text-white py-2">
+                    {c.title} ({c.level})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-textMuted group-hover:text-primaryLight transition-colors">
+                <ChevronRight size={16} className="rotate-90" />
+              </div>
+            </div>
           </div>
         </div>
 

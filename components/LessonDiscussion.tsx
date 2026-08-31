@@ -401,10 +401,10 @@ export const LessonDiscussion: React.FC<LessonDiscussionProps> = ({
                   }
                   aria-label="Sort comments"
                   title="Sort comments"
-                  className="appearance-none bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-1.5 pl-8 pr-8 text-xs font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all cursor-pointer"
+                  className="appearance-none bg-black/5 dark:bg-[#0f1623]/80 border border-black/15 dark:border-white/15 rounded-2xl py-1.5 pl-8 pr-8 text-xs font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 backdrop-blur-md shadow-sm transition-all duration-300 cursor-pointer hover:border-primaryLight/50"
                 >
-                  <option value="newest">Newest</option>
-                  <option value="top">Top / Most Upvoted</option>
+                  <option value="newest" className="bg-[#0B1220] text-white">Newest</option>
+                  <option value="top" className="bg-[#0B1220] text-white">Top / Most Upvoted</option>
                 </select>
                 <ArrowUpDown
                   size={12}

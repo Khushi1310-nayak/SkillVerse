@@ -822,10 +822,10 @@ export const AdminDashboard: React.FC = () => {
                           value={editingQuestion.correctAnswer || 0}
                           onChange={e => setEditingQuestion({ ...editingQuestion, correctAnswer: parseInt(e.target.value, 10) })}
                           title="Correct option index"
-                          className="w-full bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight transition-all"
+                          className="w-full bg-primary/10 border border-primary/20 rounded-2xl py-3 px-4 text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 backdrop-blur-md transition-all duration-300"
                         >
                           {(editingQuestion.options || []).map((_, oIdx) => (
-                            <option key={oIdx} value={oIdx} className="bg-background text-textMain">Option {oIdx + 1}</option>
+                            <option key={oIdx} value={oIdx} className="bg-[#0B1220] text-white">Option {oIdx + 1}</option>
                           ))}
                         </select>
                       </div>
@@ -1107,7 +1107,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primaryLight border border-primary/20">
                         {report.contentType}
-                      </span>
+                    </span>
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
                         {REPORT_REASON_LABELS[report.reason] || report.reason}
                       </span>
@@ -1118,16 +1118,16 @@ export const AdminDashboard: React.FC = () => {
                       value={report.status}
                       onChange={e => handleUpdateReportStatus(report.id, e.target.value as ReportStatus)}
                       aria-label={`Status for report ${report.id}`}
-                      className={`text-xs font-bold uppercase tracking-wider rounded-lg border px-3 py-1.5 bg-transparent focus:outline-none cursor-pointer ${report.status === 'pending' ? 'text-amber-500 border-amber-500/30' :
+                      className={`text-xs font-bold uppercase tracking-wider rounded-2xl border px-3.5 py-2 bg-transparent focus:outline-none cursor-pointer transition-all duration-300 ${report.status === 'pending' ? 'text-amber-500 border-amber-500/30' :
                           report.status === 'reviewed' ? 'text-blue-400 border-blue-500/30' :
                             report.status === 'resolved' ? 'text-emerald-400 border-emerald-500/30' :
                               'text-textMuted border-black/10 dark:border-white/10'
                         }`}
                     >
-                      <option value="pending">Pending</option>
-                      <option value="reviewed">Reviewed</option>
-                      <option value="resolved">Resolved</option>
-                      <option value="dismissed">Dismissed</option>
+                      <option value="pending" className="bg-[#0B1220] text-white">Pending</option>
+                      <option value="reviewed" className="bg-[#0B1220] text-white">Reviewed</option>
+                      <option value="resolved" className="bg-[#0B1220] text-white">Resolved</option>
+                      <option value="dismissed" className="bg-[#0B1220] text-white">Dismissed</option>
                     </select>
                   </div>
 
@@ -1196,10 +1196,10 @@ export const AdminDashboard: React.FC = () => {
                     value={courseForm.categoryId || 'programming'}
                     onChange={e => setCourseForm({ ...courseForm, categoryId: e.target.value })}
                     title="Course category"
-                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-2xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
                   >
                     {CATEGORIES.map(c => (
-                      <option key={c.id} value={c.id} className="bg-background text-textMain">{c.title}</option>
+                      <option key={c.id} value={c.id} className="bg-[#0B1220] text-white">{c.title}</option>
                     ))}
                   </select>
                 </div>
@@ -1209,7 +1209,7 @@ export const AdminDashboard: React.FC = () => {
                     value={courseForm.level || 'Beginner'}
                     onChange={e => setCourseForm({ ...courseForm, level: e.target.value as any })}
                     title="Course level"
-                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-2xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
                   >
                     <option value="Beginner" className="bg-background text-textMain">Beginner</option>
                     <option value="Intermediate" className="bg-background text-textMain">Intermediate</option>
@@ -1351,11 +1351,11 @@ export const AdminDashboard: React.FC = () => {
                     value={companyForm.difficulty || 'Moderate'}
                     onChange={e => setCompanyForm({ ...companyForm, difficulty: e.target.value as any })}
                     title="Company difficulty"
-                    className="w-full bg-primary/5 border border-primary/20 rounded-xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-1 focus:ring-primary transition-all"
+                    className="w-full bg-primary/5 border border-primary/20 rounded-2xl py-3 px-4 text-textMain focus:outline-none focus:border-primary focus:bg-primary/10 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
                   >
-                    <option value="Moderate" className="bg-background text-textMain">Moderate</option>
-                    <option value="Hard" className="bg-background text-textMain">Hard</option>
-                    <option value="Very Hard" className="bg-background text-textMain">Very Hard</option>
+                    <option value="Moderate" className="bg-[#0B1220] text-white">Moderate</option>
+                    <option value="Hard" className="bg-[#0B1220] text-white">Hard</option>
+                    <option value="Very Hard" className="bg-[#0B1220] text-white">Very Hard</option>
                   </select>
                 </div>
                 <div>

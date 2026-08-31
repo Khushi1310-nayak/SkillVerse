@@ -205,21 +205,88 @@
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
     }
 
     ::-webkit-scrollbar-track {
       background: var(--bg-background);
+      border-radius: 9999px;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #6968A6;
-      border-radius: 4px;
+      background: linear-gradient(180deg, #6968A6 0%, #CF9893 100%);
+      border-radius: 9999px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
       background: #CF9893;
+    }
+
+    /* Long Content Dropdown & Menu Scrollbar */
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #6968A6 transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #6968A6 0%, #CF9893 100%);
+      border-radius: 9999px;
+    }
+
+    /* Global Beautiful Dropdowns & Selects with Smooth Circular Edges */
+    select {
+      border-radius: 1rem !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      background-position: right 0.85rem center !important;
+      background-repeat: no-repeat !important;
+      background-size: 1.1em !important;
+      box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    select:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 8px 20px -3px rgba(105, 104, 166, 0.25);
+    }
+
+    select:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(105, 104, 166, 0.4), 0 10px 24px -4px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Styled Options for native dropdown popouts */
+    select option {
+      background-color: #0b1220 !important;
+      color: #EDEBFF !important;
+      padding: 10px 14px !important;
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
+      border-radius: 0.75rem !important;
+    }
+
+    /* Dropdown Animation Class */
+    .dropdown-menu-anim {
+      animation: dropdownPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform-origin: top center;
+    }
+
+    @keyframes dropdownPop {
+      0% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     /* Certificate Print Styles */

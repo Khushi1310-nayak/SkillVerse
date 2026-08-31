@@ -253,7 +253,7 @@ export const NotesPage: React.FC = () => {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as any)}
-              className="bg-black/20 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-primaryLight transition"
+              className="bg-black/30 dark:bg-[#0f1623]/90 border border-white/15 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 backdrop-blur-md shadow-md cursor-pointer transition-all duration-300 hover:border-primaryLight/50"
             >
               <option value="All" className="bg-[#0B1220] text-white">All Types</option>
               <option value="Lesson" className="bg-[#0B1220] text-white">Lesson Notes</option>
@@ -264,7 +264,7 @@ export const NotesPage: React.FC = () => {
               <select
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
-                className="bg-black/20 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-primaryLight transition max-w-[180px]"
+                className="bg-black/30 dark:bg-[#0f1623]/90 border border-white/15 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 backdrop-blur-md shadow-md cursor-pointer transition-all duration-300 hover:border-primaryLight/50 max-w-[200px]"
               >
                 <option value="All" className="bg-[#0B1220] text-white">All Courses</option>
                 {uniqueCourses.map(c => (

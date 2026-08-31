@@ -213,13 +213,13 @@ export const CoursesList: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="relative group min-w-[160px]">
+          <div className="relative group min-w-[170px]">
             <select
               value={filterCat}
               onChange={e => updateFilter('category', e.target.value)}
               title={t('courses.filterTitle')}
               aria-label={t('courses.filterTitle')}
-              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+              className="w-full bg-white/70 dark:bg-[#0f1623]/80 border border-primary/20 dark:border-white/10 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 appearance-none cursor-pointer transition-all duration-300 shadow-md hover:border-primaryLight/50 backdrop-blur-md"
             >
               <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allCategories')}</option>
               {CATEGORIES.map(c => (
@@ -235,7 +235,7 @@ export const CoursesList: React.FC = () => {
               onChange={e => updateFilter('level', e.target.value)}
               title={t('courses.difficultyFilterTitle')}
               aria-label={t('courses.difficultyFilterTitle')}
-              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+              className="w-full bg-white/70 dark:bg-[#0f1623]/80 border border-primary/20 dark:border-white/10 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 appearance-none cursor-pointer transition-all duration-300 shadow-md hover:border-primaryLight/50 backdrop-blur-md"
             >
               <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allLevels')}</option>
               <option value="Beginner" className="bg-white dark:bg-[#0B1220] text-textMain">{t('common.difficulty.beginner')}</option>
@@ -251,7 +251,7 @@ export const CoursesList: React.FC = () => {
               onChange={e => updateFilter('time', e.target.value)}
               title={t('courses.timeFilterTitle')}
               aria-label={t('courses.timeFilterTitle')}
-              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+              className="w-full bg-white/70 dark:bg-[#0f1623]/80 border border-primary/20 dark:border-white/10 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 appearance-none cursor-pointer transition-all duration-300 shadow-md hover:border-primaryLight/50 backdrop-blur-md"
             >
               <option value="all" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.allDurations')}</option>
               <option value="under30" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.timeUnder30')}</option>
@@ -268,7 +268,7 @@ export const CoursesList: React.FC = () => {
               onChange={e => updateFilter('sort', e.target.value)}
               title={t('courses.sortTitle')}
               aria-label={t('courses.sortTitle')}
-              className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
+              className="w-full bg-white/70 dark:bg-[#0f1623]/80 border border-primary/20 dark:border-white/10 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-textMain focus:outline-none focus:border-primaryLight focus:ring-2 focus:ring-primaryLight/30 appearance-none cursor-pointer transition-all duration-300 shadow-md hover:border-primaryLight/50 backdrop-blur-md"
             >
               <option value="default" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.sortDefault')}</option>
               <option value="rating" className="bg-white dark:bg-[#0B1220] text-textMain">{t('courses.sortRating')}</option>

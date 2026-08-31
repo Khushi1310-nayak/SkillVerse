@@ -1,6 +1,6 @@
 import { doc, setDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, StarredQuestion, Company, InterviewQuestion } from '../types';
+import { Progress, CareerProgress, SavedAINote, LessonNote, SavedSnippet, StarredQuestion, Company, InterviewQuestion, MicroChallenge, MicroChallengeState } from '../types';
 import { safeStorage, isArray, isPlainObject } from '../utils/safeStorage';
 
 const PROGRESS_KEY = 'skillverse_progress';
@@ -13,6 +13,7 @@ const STARRED_QUESTIONS_KEY = 'skillverse_starred_questions';
 const STREAK_KEY = 'skillverse_streak_data';
 const STUDY_TIME_KEY = 'skillverse_study_time';
 const DAILY_CHALLENGE_KEY = 'skillverse_daily_challenge';
+const MICRO_CHALLENGE_KEY = 'skillverse_micro_challenge';
 const DAILY_CHALLENGE_SIZE = 3;
 const DAILY_CHALLENGE_XP_BONUS = 50;
 
@@ -485,11 +486,11 @@ export const storageService = {
     const notes = storageService.getAllLessonNotes().map(n =>
       n.id === id
         ? {
-            ...n,
-            text,
-            updatedAt: new Date().toISOString(),
-            ...(visibility ? { visibility } : {}),
-          }
+          ...n,
+          text,
+          updatedAt: new Date().toISOString(),
+          ...(visibility ? { visibility } : {}),
+        }
         : n
     );
     safeStorage.writeJSON(LESSON_NOTES_KEY, notes);
@@ -648,4 +649,79 @@ export const storageService = {
       dailyMinutes
     };
   },
+
+  // --- DAILY MICRO-CHALLENGE & STREAK SAVER ---
+
+  getMicroChallengeState: (date: string = getLocalDateString()): MicroChallengeState | null => {
+    const stored = safeStorage.readJSON<MicroChallengeState | null>(
+      MICRO_CHALLENGE_KEY,
+      null,
+      isPlainObject
+    );
+    if (!stored || stored.date !== date) return null;
+    return stored;
+  },
+
+  completeMicroChallenge: async (
+    challenge: MicroChallenge,
+    selectedAnswer: number
+  ): Promise<{ awarded: boolean; xp: number; isCorrect: boolean }> => {
+    const today = getLocalDateString();
+    const isCorrect = selectedAnswer === challenge.correctAnswer;
+    const existing = storageService.getMicroChallengeState(today);
+
+    // If already correctly answered and claimed today, do not award again
+    if (existing?.completed && existing?.rewardClaimed) {
+      return { awarded: false, xp: 0, isCorrect: existing.isCorrect };
+    }
+
+    if (!isCorrect) {
+      const state: MicroChallengeState = {
+        date: today,
+        challengeId: challenge.id,
+        completed: false,
+        selectedAnswer,
+        isCorrect: false,
+        rewardClaimed: false,
+      };
+      safeStorage.writeJSON(MICRO_CHALLENGE_KEY, state);
+      return { awarded: false, xp: 0, isCorrect: false };
+    }
+
+    // Save successful completion state
+    const state: MicroChallengeState = {
+      date: today,
+      challengeId: challenge.id,
+      completed: true,
+      selectedAnswer,
+      isCorrect: true,
+      rewardClaimed: true,
+    };
+    safeStorage.writeJSON(MICRO_CHALLENGE_KEY, state);
+
+    // Record activity for local streak calendar
+    storageService.recordDayActivity(today, challenge.xpReward, ['micro-challenge']);
+
+    // Persist XP to Firestore user document if signed in
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        const userRef = doc(db, 'users', currentUser.uid);
+        await setDoc(
+          userRef,
+          {
+            xp: increment(challenge.xpReward),
+            weeklyXP: increment(challenge.xpReward),
+            monthlyXP: increment(challenge.xpReward),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error('Error updating user XP for micro challenge:', err);
+      }
+    }
+
+    return { awarded: true, xp: challenge.xpReward, isCorrect: true };
+  },
 };
+

@@ -240,7 +240,8 @@
       "example": "Give an example"
     },
     "toggle": {
-      "open": "Open AI Assistant"
+      "open": "Open AI Assistant",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "Sorry, I'm having trouble connecting right now. Please check your connection or API key.",

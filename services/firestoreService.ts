@@ -343,19 +343,24 @@ export const firestoreService = {
 
   // --- CODE REVIEW REQUESTS ---
   getCodeReviewRequests: async (): Promise<CodeReviewRequest[]> => {
-    const requestsQuery = query(
-      collection(db, "codeReviewRequests"),
-      where("status", "==", "open"),
-      orderBy("createdAt", "desc"),
-    );
-    const querySnapshot = await getDocs(requestsQuery);
-    const requests: CodeReviewRequest[] = [];
+    try {
+      const requestsQuery = query(
+        collection(db, "codeReviewRequests"),
+        where("status", "==", "open"),
+        orderBy("createdAt", "desc"),
+      );
+      const querySnapshot = await getDocs(requestsQuery);
+      const requests: CodeReviewRequest[] = [];
 
-    querySnapshot.forEach((docSnap) => {
-      requests.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewRequest);
-    });
+      querySnapshot.forEach((docSnap) => {
+        requests.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewRequest);
+      });
 
-    return requests;
+      return requests;
+    } catch (err: any) {
+      console.warn("Could not fetch code review requests from Firestore:", err?.message || err);
+      return [];
+    }
   },
 
   createCodeReviewRequest: async (
@@ -408,16 +413,21 @@ export const firestoreService = {
   },
 
   getCodeReviewComments: async (requestId: string): Promise<CodeReviewComment[]> => {
-    const commentsSnapshot = await getDocs(
-      collection(db, "codeReviewRequests", requestId, "comments"),
-    );
-    const comments: CodeReviewComment[] = [];
-    commentsSnapshot.forEach((docSnap) => {
-      comments.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewComment);
-    });
-    return comments.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    try {
+      const commentsSnapshot = await getDocs(
+        collection(db, "codeReviewRequests", requestId, "comments"),
+      );
+      const comments: CodeReviewComment[] = [];
+      commentsSnapshot.forEach((docSnap) => {
+        comments.push({ id: docSnap.id, ...docSnap.data() } as CodeReviewComment);
+      });
+      return comments.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    } catch (err: any) {
+      console.warn(`Could not fetch comments for request ${requestId}:`, err?.message || err);
+      return [];
+    }
   },
 
   postCodeReviewComment: async (
@@ -1530,8 +1540,6 @@ export const firestoreService = {
         createdAt: now,
       };
       const docRef = await addDoc(collection(db, 'pairSessions'), sessionData);
-      // Write the generated id back into the document so reads include it
-      await updateDoc(docRef, { id: docRef.id });
       return { id: docRef.id, ...sessionData };
     } catch (err) {
       console.error('Error creating pair session:', err);

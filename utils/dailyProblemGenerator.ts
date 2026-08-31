@@ -23,7 +23,11 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
   }
 
   if (problemList && problemList.length > 0) {
-    // Rotate index deterministically based on dayHash and moduleIndex
+    // If exact module problem exists in list (0 to 7), use that module's problem
+    if (problemList[moduleIndex]) {
+      return problemList[moduleIndex];
+    }
+    // Fallback rotation for smaller lists
     const rotatedIndex = (moduleIndex + (dayHash % problemList.length)) % problemList.length;
     return problemList[rotatedIndex];
   }

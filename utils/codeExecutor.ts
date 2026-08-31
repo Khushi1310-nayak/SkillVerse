@@ -32,12 +32,12 @@ export async function executeCode(code: string, language: string = 'javascript')
     return executePython(code, startTime);
   }
 
-  // Java execution simulation
+  // Java execution simulation & transpilation
   if (normalizedLang.includes('java') && !normalizedLang.includes('script')) {
     return executeJava(code, startTime);
   }
 
-  // C++ / C execution simulation
+  // C++ / C execution simulation & transpilation
   if (normalizedLang.includes('c++') || normalizedLang === 'cpp' || normalizedLang === 'c') {
     return executeCpp(code, startTime);
   }
@@ -178,11 +178,9 @@ function executePython(code: string, startTime: number): ExecutionResult {
   logs.push({ type: 'log', message: '🐍 Python 3.11.8 Environment Initialized' });
 
   try {
-    // Extract print statements
-    const printMatches = code.matchAll(/print\s*\(([\s\S]*?)\)/g);
     let hasPrinted = false;
 
-    // Transpile simple Python helper logic to JS for accurate execution
+    // Transpile Python code to JS
     const jsEquivalent = transpilePythonToJs(code);
     if (jsEquivalent) {
       const capturedLogs: string[] = [];
@@ -198,21 +196,21 @@ function executePython(code: string, startTime: number): ExecutionResult {
           hasPrinted = true;
         });
       } catch (err: any) {
-        // Fallback to static extraction
+        // Fall back to pattern matching
       }
     }
 
     if (!hasPrinted) {
+      const printMatches = code.matchAll(/print\s*\(([\s\S]*?)\)/g);
       for (const match of printMatches) {
         const expr = match[1].trim();
-        const evaluated = evaluateSimpleExpression(expr);
-        logs.push({ type: 'log', message: evaluated });
+        logs.push({ type: 'log', message: cleanOutputString(expr) });
         hasPrinted = true;
       }
     }
 
     if (!hasPrinted) {
-      logs.push({ type: 'log', message: '✓ Script executed successfully (0 exit status, no output produced).' });
+      logs.push({ type: 'log', message: '✓ Script executed successfully (exit code 0).' });
     }
 
     const durationMs = Math.round(performance.now() - startTime);
@@ -228,16 +226,14 @@ function executeJava(code: string, startTime: number): ExecutionResult {
   logs.push({ type: 'log', message: '☕ OpenJDK 21.0.2 compiler & JVM Initialized' });
 
   try {
-    // Check basic Java class / syntax structure
+    // Check basic Java class declaration
     if (!code.includes('class')) {
       throw new Error('Missing class declaration in Java source.');
     }
 
-    // Extract System.out.println / print statements
-    const printMatches = code.matchAll(/System\.out\.print(?:ln)?\s*\(([\s\S]*?)\);/g);
     let hasPrinted = false;
 
-    // Try executing algorithm logic if main method calls it
+    // Transpile Java solution to executable JS
     const jsCode = transpileJavaToJs(code);
     if (jsCode) {
       const capturedLogs: string[] = [];
@@ -251,16 +247,16 @@ function executeJava(code: string, startTime: number): ExecutionResult {
           logs.push({ type: 'log', message: msg });
           hasPrinted = true;
         });
-      } catch (err) {
-        // Fall back to static print parsing
+      } catch (err: any) {
+        // Fall back to pattern extraction
       }
     }
 
     if (!hasPrinted) {
+      const printMatches = code.matchAll(/System\.out\.print(?:ln)?\s*\(([\s\S]*?)\);/g);
       for (const match of printMatches) {
         const expr = match[1].trim();
-        const evaluated = evaluateSimpleExpression(expr);
-        logs.push({ type: 'log', message: evaluated });
+        logs.push({ type: 'log', message: cleanOutputString(expr) });
         hasPrinted = true;
       }
     }
@@ -282,7 +278,6 @@ function executeCpp(code: string, startTime: number): ExecutionResult {
   logs.push({ type: 'log', message: '🚀 GCC 13.2.0 (C++20) compiled successfully' });
 
   try {
-    const coutMatches = code.matchAll(/std::cout\s*<<\s*([\s\S]*?);/g);
     let hasPrinted = false;
 
     // Transpile C++ logic to JS
@@ -305,9 +300,10 @@ function executeCpp(code: string, startTime: number): ExecutionResult {
     }
 
     if (!hasPrinted) {
+      const coutMatches = code.matchAll(/std::cout\s*<<\s*([\s\S]*?);/g);
       for (const match of coutMatches) {
         const raw = match[1].replace(/<<\s*(?:std::endl|["']\\n["'])/g, '').trim();
-        const parts = raw.split('<<').map(p => evaluateSimpleExpression(p.trim())).join('');
+        const parts = raw.split('<<').map(p => cleanOutputString(p.trim())).join('');
         logs.push({ type: 'log', message: parts });
         hasPrinted = true;
       }
@@ -331,7 +327,7 @@ function executeRust(code: string, startTime: number): ExecutionResult {
   const printMatches = code.matchAll(/println!\s*\(([\s\S]*?)\);/g);
   let hasPrinted = false;
   for (const match of printMatches) {
-    logs.push({ type: 'log', message: evaluateSimpleExpression(match[1].trim()) });
+    logs.push({ type: 'log', message: cleanOutputString(match[1].trim()) });
     hasPrinted = true;
   }
   if (!hasPrinted) logs.push({ type: 'log', message: '✓ Finished dev target(s) in 0.08s' });
@@ -346,7 +342,7 @@ function executeKotlin(code: string, startTime: number): ExecutionResult {
   const printMatches = code.matchAll(/println\s*\(([\s\S]*?)\);?/g);
   let hasPrinted = false;
   for (const match of printMatches) {
-    logs.push({ type: 'log', message: evaluateSimpleExpression(match[1].trim()) });
+    logs.push({ type: 'log', message: cleanOutputString(match[1].trim()) });
     hasPrinted = true;
   }
   if (!hasPrinted) logs.push({ type: 'log', message: '✓ Process finished with exit code 0' });
@@ -361,7 +357,7 @@ function executeGo(code: string, startTime: number): ExecutionResult {
   const printMatches = code.matchAll(/fmt\.Print(?:ln)?\s*\(([\s\S]*?)\)/g);
   let hasPrinted = false;
   for (const match of printMatches) {
-    logs.push({ type: 'log', message: evaluateSimpleExpression(match[1].trim()) });
+    logs.push({ type: 'log', message: cleanOutputString(match[1].trim()) });
     hasPrinted = true;
   }
   if (!hasPrinted) logs.push({ type: 'log', message: '✓ Exit status 0' });
@@ -369,7 +365,7 @@ function executeGo(code: string, startTime: number): ExecutionResult {
   return { logs, error: null, durationMs: Math.round(performance.now() - startTime) };
 }
 
-function evaluateSimpleExpression(expr: string): string {
+function cleanOutputString(expr: string): string {
   // Strip string quotes if raw string
   if (/^["'].*["']$/.test(expr)) {
     return expr.slice(1, -1);
@@ -378,7 +374,7 @@ function evaluateSimpleExpression(expr: string): string {
   // Handle Java Arrays.toString(...)
   if (expr.includes('Arrays.toString')) {
     const inner = expr.match(/Arrays\.toString\(([\s\S]*?)\)/);
-    if (inner) return evaluateSimpleExpression(inner[1]);
+    if (inner) return cleanOutputString(inner[1]);
   }
 
   // Handle new int[]{...}
@@ -402,7 +398,11 @@ function transpilePythonToJs(pyCode: string): string | null {
   try {
     let js = pyCode
       .replace(/print\((.*?)\)/g, 'console.log($1)')
-      .replace(/def\s+(\w+)\s*\((.*?)\)\s*(?:->.*?)?:/g, 'function $1($2) {')
+      .replace(/def\s+(\w+)\s*\((.*?)\)\s*(?:->.*?)?:/g, (match, fnName, params) => {
+        // Strip type annotations from params
+        const cleanParams = params.split(',').map((p: string) => p.split(':')[0].trim()).filter(Boolean).join(', ');
+        return `function ${fnName}(${cleanParams}) {`;
+      })
       .replace(/True/g, 'true')
       .replace(/False/g, 'false')
       .replace(/None/g, 'null')
@@ -410,7 +410,7 @@ function transpilePythonToJs(pyCode: string): string | null {
       .replace(/float\(['"]inf['"]\)/g, 'Infinity')
       .replace(/(\w+)\.append\((.*?)\)/g, '$1.push($2)');
 
-    // Add closing braces based on indentation or end of block
+    // Add closing braces if needed
     if (js.includes('function ') && !js.includes('}')) {
       js += '\n}';
     }
@@ -421,29 +421,71 @@ function transpilePythonToJs(pyCode: string): string | null {
   }
 }
 
+const JAVA_CONTROL_KEYWORDS = new Set(['for', 'if', 'while', 'catch', 'switch', 'synchronized', 'else', 'do']);
+
 /**
  * Transpiles Java solution class methods into JavaScript for client-side evaluation
  */
 function transpileJavaToJs(javaCode: string): string | null {
   try {
-    // Extract method body and main execution
-    let js = javaCode
-      .replace(/import\s+[\w\.\*]+;/g, '')
-      .replace(/public\s+class\s+\w+\s*\{/g, '')
-      .replace(/public\s+static\s+[\w\[\]<>]+\s+(\w+)\s*\(([\s\S]*?)\)\s*\{/g, 'function $1($2) {')
-      .replace(/public\s+static\s+void\s+main\s*\(String\[\]\s*args\)\s*\{/g, '(function main() {')
-      .replace(/System\.out\.println\s*\(([\s\S]*?)\);/g, 'console.log($1);')
-      .replace(/System\.out\.print\s*\(([\s\S]*?)\);/g, 'console.log($1);')
-      .replace(/Arrays\.toString\(([\s\S]*?)\)/g, 'JSON.stringify($1)')
-      .replace(/new\s+int\[\]\s*\{([\s\S]*?)\}/g, '[$1]')
-      .replace(/new\s+int\[\]\s*\[(.*?)\]/g, 'new Array($1).fill(0)')
-      .replace(/int\[\]|int|String|boolean|void/g, 'let')
-      .replace(/Map<[\w,\s]+>\s+(\w+)\s*=\s*new\s+HashMap<.*?>\(\);/g, 'const $1 = new Map();')
-      .replace(/(\w+)\.containsKey\((.*?)\)/g, '$1.has($2)')
-      .replace(/(\w+)\.put\((.*?),\s*(.*?)\)/g, '$1.set($2, $3)')
-      .replace(/(\w+)\.get\((.*?)\)/g, '$1.get($2)')
-      .replace(/Math\.max/g, 'Math.max')
-      .replace(/Math\.min/g, 'Math.min');
+    // 1. Remove comments
+    let js = javaCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+
+    // 2. Remove package and imports
+    js = js.replace(/package\s+[\w\.]+;/g, '');
+    js = js.replace(/import\s+[\w\.\*]+;/g, '');
+
+    // 3. Extract contents inside the class
+    const classMatch = js.match(/(?:public\s+)?class\s+\w+[\s\S]*?\{([\s\S]*)\}/);
+    if (classMatch) {
+      js = classMatch[1];
+    }
+
+    // 4. Extract and convert methods, ignoring control keywords like for/if/while
+    js = js.replace(/(?:public|private|protected)?\s*(?:static)?\s*[\w\[\]<>]+\s+([A-Za-z_]\w*)\s*\(([\s\S]*?)\)\s*(?:throws\s+[\w,\s]+)?\s*\{/g, (match, fnName, params) => {
+      if (JAVA_CONTROL_KEYWORDS.has(fnName)) {
+        return match;
+      }
+      if (fnName === 'main') {
+        return 'function main() {';
+      }
+      // Strip types from params: e.g. "int[] nums, int target" -> "nums, target"
+      const cleanParams = params.split(',').map((p: string) => {
+        const parts = p.trim().split(/\s+/);
+        return parts[parts.length - 1];
+      }).filter(Boolean).join(', ');
+
+      return `function ${fnName}(${cleanParams}) {`;
+    });
+
+    // 5. Replace System.out.println / print
+    js = js.replace(/System\.out\.println\s*\(([\s\S]*?)\);/g, 'console.log($1);');
+    js = js.replace(/System\.out\.print\s*\(([\s\S]*?)\);/g, 'console.log($1);');
+
+    // 6. Replace Java standard library calls
+    js = js.replace(/Arrays\.toString\(([\s\S]*?)\)/g, 'JSON.stringify($1)');
+    js = js.replace(/new\s+int\[\]\s*\{([\s\S]*?)\}/g, '[$1]');
+    js = js.replace(/new\s+int\[\]\s*\[(.*?)\]/g, 'new Array($1).fill(0)');
+    js = js.replace(/new\s+int\[(.*?)\]/g, 'new Array($1).fill(0)');
+    js = js.replace(/new\s+int\[\]\s*\{\s*\}/g, '[]');
+
+    // 7. Replace Java Map / Set methods
+    js = js.replace(/Map<[\w,\s]+>\s+(\w+)\s*=\s*new\s+HashMap<.*?>\(\);/g, 'const $1 = new Map();');
+    js = js.replace(/Set<[\w\s]+>\s+(\w+)\s*=\s*new\s+HashSet<.*?>\(\);/g, 'const $1 = new Set();');
+    js = js.replace(/(\w+)\.containsKey\((.*?)\)/g, '$1.has($2)');
+    js = js.replace(/(\w+)\.contains\((.*?)\)/g, '$1.has($2)');
+    js = js.replace(/(\w+)\.put\((.*?),\s*(.*?)\)/g, '$1.set($2, $3)');
+    js = js.replace(/(\w+)\.add\((.*?)\)/g, '$1.add($2)');
+    js = js.replace(/(\w+)\.get\((.*?)\)/g, '$1.get($2)');
+
+    // 8. Replace variable declarations inside function body
+    js = js.replace(/\b(?:int\[\]|int|String|boolean|double|float|long|char|auto)\s+(\w+)\s*=/g, 'let $1 =');
+    js = js.replace(/\b(?:int\[\]|int|String|boolean|double|float|long|char|auto)\s+(\w+);/g, 'let $1;');
+
+    // 9. If main() exists, invoke main(); at the end
+    if (js.includes('function main()')) {
+      js += '\nmain();';
+    }
 
     return js;
   } catch {
@@ -457,6 +499,7 @@ function transpileJavaToJs(javaCode: string): string | null {
 function transpileCppToJs(cppCode: string): string | null {
   try {
     let js = cppCode
+      .replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
       .replace(/#include\s*<.*?>/g, '')
       .replace(/using\s+namespace\s+std;/g, '')
       .replace(/std::vector<[\w\s]+>|vector<[\w\s]+>/g, 'let')
@@ -465,7 +508,11 @@ function transpileCppToJs(cppCode: string): string | null {
       .replace(/<<\s*std::endl|<<\s*"\\n"/g, '')
       .replace(/(\w+)\.push_back\((.*?)\)/g, '$1.push($2)')
       .replace(/(\w+)\.size\(\)/g, '$1.length')
-      .replace(/int\s+main\(\)\s*\{/g, '(function main() {');
+      .replace(/int\s+main\(\)\s*\{/g, 'function main() {');
+
+    if (js.includes('function main()')) {
+      js += '\nmain();';
+    }
 
     return js;
   } catch {

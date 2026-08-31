@@ -88,29 +88,65 @@ export interface VisualizerParseResult {
  * Universal array extractor supporting JS, Python, Java, C++, and pseudocode
  */
 const parseArraySource = (code: string): Array<number | string> | null => {
-  // Try matching [1, 2, 3] style
-  const bracketMatches = code.match(/\[([0-9\s,.-]+)\]/);
-  if (bracketMatches && bracketMatches[1].trim()) {
-    const parsed = bracketMatches[1]
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean)
-      .map(s => Number.isFinite(Number(s)) ? Number(s) : s);
-    if (parsed.length > 0) return parsed;
+  // 1. Priority: Extract array passed into function calls, e.g. twoSum(new int[]{2, 7, 11, 15}, 9) or twoSum([2, 7, 11, 15], 9)
+  const fnArgMatch = code.match(/\w+\s*\(\s*(?:new\s+[\w\[\]]+\s*)?[\[\{]([0-9\s,.-]+)[\]\}]/);
+  if (fnArgMatch && fnArgMatch[1].trim()) {
+    const items = fnArgMatch[1].split(',').map(s => s.trim()).filter(Boolean).map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+    if (items.length > 1) return items;
   }
 
-  // Try matching Java/C++ {1, 2, 3} style
-  const braceMatches = code.match(/(?:int\[\]|\{|\bnew\s+int\[\]\s*\{)([\s0-9,.-]+)\}/);
-  if (braceMatches && braceMatches[1].trim()) {
-    const parsed = braceMatches[1]
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean)
-      .map(s => Number.isFinite(Number(s)) ? Number(s) : s);
-    if (parsed.length > 0) return parsed;
+  // 2. Priority: Named array declaration e.g. int[] nums = {2, 7, 11, 15} or nums = [2, 7, 11, 15]
+  const namedMatches = code.matchAll(/(?:let|const|var|int\[\]|vector<[\w\s]+>|auto)?\s*(?:nums|arr|data|items|list|values|array)\s*[:=]\s*(?:new\s+[\w\[\]]+\s*)?[\[\{]([0-9\s,.-]+)[\]\}]/gi);
+  for (const m of namedMatches) {
+    const raw = m[1].trim();
+    if (raw) {
+      const items = raw.split(',').map(s => s.trim()).filter(Boolean).map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+      if (items.length > 1) return items;
+    }
+  }
+
+  // 3. Fallback: Collect all candidates and choose the most comprehensive one (length >= 3)
+  const candidates: Array<Array<number | string>> = [];
+
+  const braceMatches = code.matchAll(/(?:\{|new\s+int\[\]\s*\{)([0-9\s,.-]+)\}/g);
+  for (const m of braceMatches) {
+    const raw = m[1].trim();
+    if (raw) {
+      const items = raw.split(',').map(s => s.trim()).filter(Boolean).map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+      if (items.length > 0) candidates.push(items);
+    }
+  }
+
+  const bracketMatches = code.matchAll(/\[([0-9\s,.-]+)\]/g);
+  for (const m of bracketMatches) {
+    const raw = m[1].trim();
+    if (raw) {
+      const items = raw.split(',').map(s => s.trim()).filter(Boolean).map(s => Number.isFinite(Number(s)) ? Number(s) : s);
+      if (items.length > 0) candidates.push(items);
+    }
+  }
+
+  if (candidates.length > 0) {
+    candidates.sort((a, b) => b.length - a.length);
+    return candidates[0];
   }
 
   return null;
+};
+
+/**
+ * Universal target extractor for Two Sum / Search algorithms
+ */
+const parseTargetNumber = (code: string): number => {
+  // 1. Match twoSum(..., 9) or search(..., 9)
+  const fnCallTargetMatch = code.match(/\w+\s*\(\s*(?:new\s+[\w\[\]]+\s*)?[\[\{][\s0-9,.-]+[\]\}]\s*,\s*([0-9]+)\s*\)/);
+  if (fnCallTargetMatch) return Number(fnCallTargetMatch[1]);
+
+  // 2. Match explicit target variable: target = 9 or int target = 9
+  const explicitTargetMatch = code.match(/\b(?:target|t|sum|val)\s*[:=]\s*([0-9]+)\b/i);
+  if (explicitTargetMatch) return Number(explicitTargetMatch[1]);
+
+  return 9;
 };
 
 /**
@@ -260,7 +296,6 @@ function buildTwoPointerSnapshots(values: Array<string | number>): VisualizerSna
   });
 
   while (left < right) {
-    // Step: Swap/Compare
     const temp = current[left];
     current[left] = current[right];
     current[right] = temp;
@@ -581,8 +616,7 @@ export const parseVisualizerState = (code: string): VisualizerParseResult => {
   // 1. Two Sum / Complement Hash Map
   if (lower.includes('twosum') || lower.includes('two_sum') || lower.includes('complement')) {
     const arr = parseArraySource(code) || [2, 7, 11, 15];
-    const targetMatch = code.match(/(?:target\s*[:=]|,\s*)([0-9]+)/);
-    const target = targetMatch ? Number(targetMatch[1]) : 9;
+    const target = parseTargetNumber(code);
     return { snapshots: buildTwoSumSnapshots(arr, target) };
   }
 

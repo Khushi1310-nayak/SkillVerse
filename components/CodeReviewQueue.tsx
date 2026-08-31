@@ -111,7 +111,11 @@ export const CodeReviewQueue: React.FC = () => {
 
   const handlePostComment = async (event: React.FormEvent, parentId: string | null = null) => {
     event.preventDefault();
-    if (!selectedRequest || !getUserId() || submittingComment) return;
+    if (!getUserId()) {
+      showToast({ message: 'Please sign in to post comments or replies.', type: 'info' });
+      return;
+    }
+    if (!selectedRequest || submittingComment) return;
     const content = (parentId ? replyText : newComment).trim();
     if (!content) return;
 
@@ -149,7 +153,11 @@ export const CodeReviewQueue: React.FC = () => {
 
   const handleUpvote = async (comment: CodeReviewComment) => {
     const userId = getUserId();
-    if (!userId || !selectedRequest) return;
+    if (!userId) {
+      showToast({ message: 'Please sign in to upvote comments.', type: 'info' });
+      return;
+    }
+    if (!selectedRequest) return;
     try {
       const result = await firestoreService.upvoteCodeReviewComment(comment.id, userId, selectedRequest.id);
       setComments((current) => current.map((item) => item.id === comment.id ? {
@@ -166,6 +174,10 @@ export const CodeReviewQueue: React.FC = () => {
   };
 
   const handleSaveEdit = async (commentId: string) => {
+    if (!getUserId()) {
+      showToast({ message: 'Please sign in to edit comments.', type: 'info' });
+      return;
+    }
     if (!selectedRequest || !editText.trim()) return;
     try {
       await firestoreService.editCodeReviewComment(commentId, selectedRequest.id, editText.trim());
@@ -179,6 +191,10 @@ export const CodeReviewQueue: React.FC = () => {
   };
 
   const handleDelete = async (commentId: string) => {
+    if (!getUserId()) {
+      showToast({ message: 'Please sign in to manage comments.', type: 'info' });
+      return;
+    }
     if (!selectedRequest || !window.confirm('Delete this comment? This cannot be undone.')) return;
     try {
       await firestoreService.deleteCodeReviewComment(commentId, selectedRequest.id);
@@ -190,6 +206,10 @@ export const CodeReviewQueue: React.FC = () => {
   };
 
   const handleTogglePin = async (comment: CodeReviewComment) => {
+    if (!isModerator) {
+      showToast({ message: 'Only instructors and admins can pin comments.', type: 'error' });
+      return;
+    }
     if (!selectedRequest) return;
     try {
       if (comment.pinned) {

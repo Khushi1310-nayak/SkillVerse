@@ -401,7 +401,7 @@ service cloud.firestore {
 
     // --- CODE REVIEW REQUESTS COLLECTION ---
     match /codeReviewRequests/{requestId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
 
       allow create: if isAuthenticated()
         && request.resource.data.keys().hasAll([
@@ -424,7 +424,7 @@ service cloud.firestore {
 
       // Code review comments subcollection
       match /comments/{commentId} {
-        allow read: if isAuthenticated();
+        allow read: if true;
 
         allow create: if isAuthenticated()
           && request.resource.data.keys().hasAll([

@@ -42,6 +42,12 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
     problemList = PLAYGROUND_PROBLEMS['stacks'];
   } else if (normalizedId.includes('queue')) {
     problemList = PLAYGROUND_PROBLEMS['queues'];
+  } else if (normalizedId.includes('tree')) {
+    problemList = PLAYGROUND_PROBLEMS['trees'];
+  } else if (normalizedId.includes('graph')) {
+    problemList = PLAYGROUND_PROBLEMS['graphs'];
+  } else if (normalizedId.includes('recur')) {
+    problemList = PLAYGROUND_PROBLEMS['recursion'];
   } else {
     problemList = PLAYGROUND_PROBLEMS[normalizedId];
   }

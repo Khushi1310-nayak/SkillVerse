@@ -2390,15 +2390,765 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
 
   'trees': [
     {
-      id: 'tree-1',
-      title: '1. Binary Tree Maximum Depth',
+      id: 'tree-mod-1',
+      title: 'Module 1: Maximum Depth of Binary Tree',
       difficulty: 'Easy',
       category: 'Trees',
-      description: 'Calculate maximum depth of a binary tree represented by node object `{ val, left, right }`.',
-      constraints: ['Tree node count 0-1000'],
-      sampleInputs: [{ input: 'root = { val: 3, left: { val: 9 }, right: { val: 20 } }', output: '2' }],
-      starterCode: `function maxDepth(root) {\n  if (!root) return 0;\n  // TODO: Recursively calculate 1 + Math.max(leftDepth, rightDepth)\n  \n}\n\nconst tree = { val: 3, left: { val: 9 }, right: { val: 20 } };\nconsole.log(maxDepth(tree));`,
-      solutionHint: 'return 1 + Math.max(maxDepth(root.left), maxDepth(root.right))'
+      description: 'Given the root of a binary tree, return its maximum depth (the number of nodes along the longest path from root to farthest leaf).',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h) recursion stack'],
+      sampleInputs: [
+        { input: 'root = [3,9,20,null,null,15,7]', output: '3' }
+      ],
+      starterCode: `class TreeNode {\n  constructor(val = 0, left = null, right = null) {\n    this.val = val;\n    this.left = left;\n    this.right = right;\n  }\n}\n\nfunction maxDepth(root) {\n  if (!root) return 0;\n  // TODO: Recursively calculate 1 + max(leftDepth, rightDepth)\n  \n  return 0;\n}\n\nconst root = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\nconsole.log("Max Depth:", maxDepth(root));`,
+      solutionHint: 'return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));',
+      languageVariants: {
+        javascript: {
+          starterCode: `class TreeNode {\n  constructor(val = 0, left = null, right = null) {\n    this.val = val;\n    this.left = left;\n    this.right = right;\n  }\n}\n\nfunction maxDepth(root) {\n  if (!root) return 0;\n  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n}\n\nconst root = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\nconsole.log("Max Depth:", maxDepth(root));`,
+          solutionHint: 'Recursively return 1 + Math.max of left and right subtrees.'
+        },
+        python: {
+          starterCode: `class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef max_depth(root: TreeNode | None) -> int:\n    if not root: return 0\n    # TODO: Calculate depth\n    return 1 + max(max_depth(root.left), max_depth(root.right))\n\nroot = TreeNode(3, TreeNode(9), TreeNode(20, TreeNode(15), TreeNode(7)))\nprint("Max Depth:", max_depth(root))`,
+          solutionHint: 'return 1 + max(max_depth(root.left), max_depth(root.right))'
+        },
+        java: {
+          starterCode: `class TreeNode {\n    int val;\n    TreeNode left, right;\n    TreeNode(int val) { this.val = val; }\n    TreeNode(int val, TreeNode left, TreeNode right) { this.val = val; this.left = left; this.right = right; }\n}\n\npublic class Solution {\n    public static int maxDepth(TreeNode root) {\n        if (root == null) return 0;\n        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n    }\n    public static void main(String[] args) {\n        TreeNode root = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\n        System.out.println("Max Depth: " + maxDepth(root));\n    }\n}`,
+          solutionHint: 'Recursive depth sum 1 + Math.max(maxDepth(left), maxDepth(right)).'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <algorithm>\n\nstruct TreeNode {\n    int val;\n    TreeNode *left, *right;\n    TreeNode(int x, TreeNode* l = nullptr, TreeNode* r = nullptr) : val(x), left(l), right(r) {}\n};\n\nint maxDepth(TreeNode* root) {\n    if (!root) return 0;\n    return 1 + std::max(maxDepth(root->left), maxDepth(root->right));\n}\n\nint main() {\n    TreeNode* root = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\n    std::cout << "Max Depth: " << maxDepth(root) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'return 1 + std::max(maxDepth(root->left), maxDepth(root->right));'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-2',
+      title: 'Module 2: Invert Binary Tree',
+      difficulty: 'Easy',
+      category: 'Trees',
+      description: 'Given the root of a binary tree, invert the tree (swap left and right child pointers recursively for all subtrees) and return its root.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h)'],
+      sampleInputs: [
+        { input: 'root = [4,2,7,1,3,6,9]', output: '[4,7,2,9,6,3,1]' }
+      ],
+      starterCode: `function invertTree(root) {\n  if (!root) return null;\n  // TODO: Swap left and right subtrees recursively\n  \n  return root;\n}`,
+      solutionHint: 'const tmp = root.left; root.left = invertTree(root.right); root.right = invertTree(tmp); return root;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function invertTree(root) {\n  if (!root) return null;\n  const tmp = root.left;\n  root.left = invertTree(root.right);\n  root.right = invertTree(tmp);\n  return root;\n}`,
+          solutionHint: 'Swap left and right children recursively.'
+        },
+        python: {
+          starterCode: `def invert_tree(root: TreeNode | None) -> TreeNode | None:\n    if not root: return None\n    root.left, root.right = invert_tree(root.right), invert_tree(root.left)\n    return root`,
+          solutionHint: 'Simultaneous tuple assignment inverts subtrees cleanly.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static TreeNode invertTree(TreeNode root) {\n        if (root == null) return null;\n        TreeNode left = invertTree(root.right);\n        TreeNode right = invertTree(root.left);\n        root.left = left;\n        root.right = right;\n        return root;\n    }\n}`,
+          solutionHint: 'Invert subtrees and assign them swapped to root.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nTreeNode* invertTree(TreeNode* root) {\n    if (!root) return nullptr;\n    TreeNode* tmp = root->left;\n    root->left = invertTree(root->right);\n    root->right = invertTree(tmp);\n    return root;\n}`,
+          solutionHint: 'Swap left and right pointers after recursive calls.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-3',
+      title: 'Module 3: Same Tree Verification',
+      difficulty: 'Easy',
+      category: 'Trees',
+      description: 'Given the roots of two binary trees p and q, write a function to check if they are the same (structurally identical with identical node values).',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h)'],
+      sampleInputs: [
+        { input: 'p = [1,2,3], q = [1,2,3]', output: 'true' },
+        { input: 'p = [1,2], q = [1,null,2]', output: 'false' }
+      ],
+      starterCode: `function isSameTree(p, q) {\n  if (!p && !q) return true;\n  if (!p || !q || p.val !== q.val) return false;\n  // TODO: Check left and right subtrees\n  \n  return true;\n}`,
+      solutionHint: 'return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isSameTree(p, q) {\n  if (!p && !q) return true;\n  if (!p || !q || p.val !== q.val) return false;\n  return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);\n}`,
+          solutionHint: 'Check base null cases, compare value, and recurse on both children.'
+        },
+        python: {
+          starterCode: `def is_same_tree(p: TreeNode | None, q: TreeNode | None) -> bool:\n    if not p and not q: return True\n    if not p or not q or p.val != q.val: return False\n    return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)`,
+          solutionHint: 'Verify equality of values and structural match on both branches.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isSameTree(TreeNode p, TreeNode q) {\n        if (p == null && q == null) return true;\n        if (p == null || q == null || p.val != q.val) return false;\n        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);\n    }\n}`,
+          solutionHint: 'Recurse down both trees simultaneously.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nbool isSameTree(TreeNode* p, TreeNode* q) {\n    if (!p && !q) return true;\n    if (!p || !q || p->val != q->val) return false;\n    return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);\n}`,
+          solutionHint: 'Structural equality recursion.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-4',
+      title: 'Module 4: Symmetric Tree (Mirror Image)',
+      difficulty: 'Easy',
+      category: 'Trees',
+      description: 'Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h)'],
+      sampleInputs: [
+        { input: 'root = [1,2,2,3,4,4,3]', output: 'true' },
+        { input: 'root = [1,2,2,null,3,null,3]', output: 'false' }
+      ],
+      starterCode: `function isSymmetric(root) {\n  function isMirror(t1, t2) {\n    if (!t1 && !t2) return true;\n    if (!t1 || !t2 || t1.val !== t2.val) return false;\n    // TODO: Compare outer pair and inner pair\n    \n    return true;\n  }\n  return !root || isMirror(root.left, root.right);\n}`,
+      solutionHint: 'return isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isSymmetric(root) {\n  function isMirror(t1, t2) {\n    if (!t1 && !t2) return true;\n    if (!t1 || !t2 || t1.val !== t2.val) return false;\n    return isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);\n  }\n  return !root || isMirror(root.left, root.right);\n}`,
+          solutionHint: 'Compare t1.left with t2.right and t1.right with t2.left.'
+        },
+        python: {
+          starterCode: `def is_symmetric(root: TreeNode | None) -> bool:\n    def is_mirror(t1, t2):\n        if not t1 and not t2: return True\n        if not t1 or not t2 or t1.val != t2.val: return False\n        return is_mirror(t1.left, t2.right) and is_mirror(t1.right, t2.left)\n    return not root or is_mirror(root.left, root.right)`,
+          solutionHint: 'Mirror check compares opposite child branches recursively.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isSymmetric(TreeNode root) {\n        return root == null || isMirror(root.left, root.right);\n    }\n    private static boolean isMirror(TreeNode t1, TreeNode t2) {\n        if (t1 == null && t2 == null) return true;\n        if (t1 == null || t2 == null || t1.val != t2.val) return false;\n        return isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);\n    }\n}`,
+          solutionHint: 'Helper method matching mirror branches.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nbool isMirror(TreeNode* t1, TreeNode* t2) {\n    if (!t1 && !t2) return true;\n    if (!t1 || !t2 || t1->val != t2->val) return false;\n    return isMirror(t1->left, t2->right) && isMirror(t1->right, t2->left);\n}\nbool isSymmetric(TreeNode* root) {\n    return !root || isMirror(root->left, root->right);\n}`,
+          solutionHint: 'Recursively verify symmetry of left and right child pointers.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-5',
+      title: 'Module 5: Validate Binary Search Tree (BST)',
+      difficulty: 'Medium',
+      category: 'Trees',
+      description: 'Given the root of a binary tree, determine if it is a valid binary search tree (BST) where all left descendants are strictly less than node value and all right descendants are strictly greater.',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h)'],
+      sampleInputs: [
+        { input: 'root = [2,1,3]', output: 'true' },
+        { input: 'root = [5,1,4,null,null,3,6]', output: 'false (4 is in right subtree of 5)' }
+      ],
+      starterCode: `function isValidBST(root, min = null, max = null) {\n  if (!root) return true;\n  if ((min !== null && root.val <= min) || (max !== null && root.val >= max)) return false;\n  // TODO: Validate left branch with max = root.val, right with min = root.val\n  \n  return true;\n}`,
+      solutionHint: 'return isValidBST(root.left, min, root.val) && isValidBST(root.right, root.val, max);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isValidBST(root, min = null, max = null) {\n  if (!root) return true;\n  if ((min !== null && root.val <= min) || (max !== null && root.val >= max)) return false;\n  return isValidBST(root.left, min, root.val) && isValidBST(root.right, root.val, max);\n}`,
+          solutionHint: 'Propagate min and max bounds downwards.'
+        },
+        python: {
+          starterCode: `def is_valid_bst(root: TreeNode | None, min_val=float('-inf'), max_val=float('inf')) -> bool:\n    if not root: return True\n    if not (min_val < root.val < max_val): return False\n    return is_valid_bst(root.left, min_val, root.val) and is_valid_bst(root.right, root.val, max_val)`,
+          solutionHint: 'Pass strict interval bounds (min_val, max_val).'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isValidBST(TreeNode root) {\n        return validate(root, null, null);\n    }\n    private static boolean validate(TreeNode node, Integer min, Integer max) {\n        if (node == null) return true;\n        if ((min != null && node.val <= min) || (max != null && node.val >= max)) return false;\n        return validate(node.left, min, node.val) && validate(node.right, node.val, max);\n    }\n}`,
+          solutionHint: 'Validate recursive intervals with Integer object references.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <climits>\n\nbool validate(TreeNode* node, long long minVal, long long maxVal) {\n    if (!node) return true;\n    if (node->val <= minVal || node->val >= maxVal) return false;\n    return validate(node->left, minVal, node->val) && validate(node->right, node->val, maxVal);\n}\nbool isValidBST(TreeNode* root) {\n    return validate(root, LLONG_MIN, LLONG_MAX);\n}`,
+          solutionHint: 'Use long long bounds to prevent integer overflow.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-6',
+      title: 'Module 6: Lowest Common Ancestor in BST',
+      difficulty: 'Medium',
+      category: 'Trees',
+      description: 'Given a binary search tree (BST) and two nodes p and q, find their Lowest Common Ancestor (LCA) in O(h) time leveraging the BST ordering property.',
+      constraints: ['All node values are unique', 'p and q exist in BST'],
+      sampleInputs: [
+        { input: 'root = [6,2,8,0,4,7,9], p = 2, q = 8', output: 'Node 6' },
+        { input: 'root = [6,2,8,0,4,7,9], p = 2, q = 4', output: 'Node 2' }
+      ],
+      starterCode: `function lowestCommonAncestor(root, p, q) {\n  let curr = root;\n  // TODO: Move left if both values smaller, move right if both greater, else return curr\n  \n  return curr;\n}`,
+      solutionHint: 'while (curr) { if (p.val < curr.val && q.val < curr.val) curr = curr.left; else if (p.val > curr.val && q.val > curr.val) curr = curr.right; else return curr; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function lowestCommonAncestor(root, p, q) {\n  let curr = root;\n  while (curr) {\n    if (p.val < curr.val && q.val < curr.val) curr = curr.left;\n    else if (p.val > curr.val && q.val > curr.val) curr = curr.right;\n    else return curr;\n  }\n  return null;\n}`,
+          solutionHint: 'Traverse down BST until values split on opposite sides of current node.'
+        },
+        python: {
+          starterCode: `def lowest_common_ancestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:\n    curr = root\n    while curr:\n        if p.val < curr.val and q.val < curr.val: curr = curr.left\n        elif p.val > curr.val and q.val > curr.val: curr = curr.right\n        else: return curr`,
+          solutionHint: 'Step down BST until p and q diverge.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {\n        TreeNode curr = root;\n        while (curr != null) {\n            if (p.val < curr.val && q.val < curr.val) curr = curr.left;\n            else if (p.val > curr.val && q.val > curr.val) curr = curr.right;\n            else return curr;\n        }\n        return null;\n    }\n}`,
+          solutionHint: 'Traverse left or right based on value comparison in O(h) time.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nTreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {\n    TreeNode* curr = root;\n    while (curr) {\n        if (p->val < curr->val && q->val < curr->val) curr = curr->left;\n        else if (p->val > curr->val && q->val > curr->val) curr = curr->right;\n        else return curr;\n    }\n    return nullptr;\n}`,
+          solutionHint: 'Iterative BST search for lowest split ancestor.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-7',
+      title: 'Module 7: Binary Tree Maximum Path Sum',
+      difficulty: 'Hard',
+      category: 'Trees',
+      description: 'Given the root of a binary tree, return the maximum path sum of any non-empty path (a sequence of nodes connected by edges where no node appears more than once).',
+      constraints: ['Time Complexity: O(n)', 'Space Complexity: O(h)'],
+      sampleInputs: [
+        { input: '[-10,9,20,null,null,15,7]', output: '42 (15 + 20 + 7)' }
+      ],
+      starterCode: `function maxPathSum(root) {\n  let maxSum = -Infinity;\n  function maxGain(node) {\n    if (!node) return 0;\n    // TODO: Gain from left & right (max with 0)\n    \n    return 0;\n  }\n  maxGain(root);\n  return maxSum;\n}`,
+      solutionHint: 'const left = Math.max(0, maxGain(node.left)); const right = Math.max(0, maxGain(node.right)); maxSum = Math.max(maxSum, node.val + left + right); return node.val + Math.max(left, right);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function maxPathSum(root) {\n  let maxSum = -Infinity;\n  function maxGain(node) {\n    if (!node) return 0;\n    const left = Math.max(0, maxGain(node.left));\n    const right = Math.max(0, maxGain(node.right));\n    maxSum = Math.max(maxSum, node.val + left + right);\n    return node.val + Math.max(left, right);\n  }\n  maxGain(root);\n  return maxSum;\n}`,
+          solutionHint: 'Post-order DFS computing max gain passing through each node.'
+        },
+        python: {
+          starterCode: `def max_path_sum(root: TreeNode | None) -> int:\n    max_sum = float('-inf')\n    def max_gain(node):\n        nonlocal max_sum\n        if not node: return 0\n        left = max(0, max_gain(node.left))\n        right = max(0, max_gain(node.right))\n        max_sum = max(max_sum, node.val + left + right)\n        return node.val + max(left, right)\n    max_gain(root)\n    return int(max_sum)`,
+          solutionHint: 'Post-order DFS tracking global max path through node.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    private static int maxSum;\n    public static int maxPathSum(TreeNode root) {\n        maxSum = Integer.MIN_VALUE;\n        maxGain(root);\n        return maxSum;\n    }\n    private static int maxGain(TreeNode node) {\n        if (node == null) return 0;\n        int left = Math.max(0, maxGain(node.left));\n        int right = Math.max(0, maxGain(node.right));\n        maxSum = Math.max(maxSum, node.val + left + right);\n        return node.val + Math.max(left, right);\n    }\n}`,
+          solutionHint: 'Recursively prune negative branch gains with Math.max(0, ...).'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <algorithm>\n#include <climits>\n\nint maxSum = INT_MIN;\nint maxGain(TreeNode* node) {\n    if (!node) return 0;\n    int left = std::max(0, maxGain(node->left));\n    int right = std::max(0, maxGain(node->right));\n    maxSum = std::max(maxSum, node->val + left + right);\n    return node->val + std::max(left, right);\n}\nint maxPathSum(TreeNode* root) {\n    maxSum = INT_MIN;\n    maxGain(root);\n    return maxSum;\n}`,
+          solutionHint: 'Calculate path sum across node and return single branch max gain.'
+        }
+      }
+    },
+    {
+      id: 'tree-mod-8',
+      title: 'Module 8: Serialize and Deserialize Binary Tree',
+      difficulty: 'Hard',
+      category: 'Trees',
+      description: 'Design an algorithm to serialize a binary tree into a string and deserialize that string back into the original tree structure using preorder traversal.',
+      constraints: ['Preserves complete binary tree structure and values', 'O(n) time serialization and deserialization'],
+      sampleInputs: [
+        { input: '[1,2,3,null,null,4,5]', output: 'Serialized string & reconstructed matching tree' }
+      ],
+      starterCode: `function serialize(root) {\n  if (!root) return '#';\n  return \`\${root.val},\${serialize(root.left)},\${serialize(root.right)}\`;\n}\n\nfunction deserialize(data) {\n  const queue = data.split(',');\n  function build() {\n    const val = queue.shift();\n    if (val === '#' || val === undefined) return null;\n    const node = new TreeNode(Number(val));\n    node.left = build();\n    node.right = build();\n    return node;\n  }\n  return build();\n}`,
+      solutionHint: 'Use preorder serialization with "#" for null markers, and reconstruct using a queue.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function serialize(root) {\n  if (!root) return '#';\n  return \`\${root.val},\${serialize(root.left)},\${serialize(root.right)}\`;\n}\n\nfunction deserialize(data) {\n  const queue = data.split(',');\n  function build() {\n    const val = queue.shift();\n    if (val === '#' || val === undefined) return null;\n    const node = new TreeNode(Number(val));\n    node.left = build();\n    node.right = build();\n    return node;\n  }\n  return build();\n}`,
+          solutionHint: 'Serialize preorder with delimiter and rebuild recursively from shift queue.'
+        },
+        python: {
+          starterCode: `def serialize(root: TreeNode | None) -> str:\n    if not root: return '#'\n    return f"{root.val},{serialize(root.left)},{serialize(root.right)}"\n\ndef deserialize(data: str) -> TreeNode | None:\n    vals = iter(data.split(','))\n    def build():\n        val = next(vals)\n        if val == '#': return None\n        node = TreeNode(int(val))\n        node.left = build()\n        node.right = build()\n        return node\n    return build()`,
+          solutionHint: 'Use Python iter() to build nodes preorder.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static String serialize(TreeNode root) {\n        if (root == null) return "#";\n        return root.val + "," + serialize(root.left) + "," + serialize(root.right);\n    }\n    public static TreeNode deserialize(String data) {\n        Deque<String> nodes = new LinkedList<>(Arrays.asList(data.split(",")));\n        return build(nodes);\n    }\n    private static TreeNode build(Deque<String> nodes) {\n        String val = nodes.poll();\n        if (val == null || val.equals("#")) return null;\n        TreeNode node = new TreeNode(Integer.parseInt(val));\n        node.left = build(nodes);\n        node.right = build(nodes);\n        return node;\n    }\n}`,
+          solutionHint: 'LinkedList queue poll for deserialization.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <sstream>\n#include <queue>\n\nstd::string serialize(TreeNode* root) {\n    if (!root) return "#";\n    return std::to_string(root->val) + "," + serialize(root->left) + "," + serialize(root->right);\n}\nTreeNode* build(std::stringstream& ss) {\n    std::string item;\n    if (!std::getline(ss, item, ',')) return nullptr;\n    if (item == "#") return nullptr;\n    TreeNode* node = new TreeNode(std::stoi(item));\n    node->left = build(ss);\n    node->right = build(ss);\n    return node;\n}\nTreeNode* deserialize(const std::string& data) {\n    std::stringstream ss(data);\n    return build(ss);\n}`,
+          solutionHint: 'Use std::stringstream to parse comma tokens preorder.'
+        }
+      }
+    }
+  ],
+
+  'graphs': [
+    {
+      id: 'grp-mod-1',
+      title: 'Module 1: Number of Connected Components',
+      difficulty: 'Medium',
+      category: 'Graphs',
+      description: 'Given n vertices labeled from 0 to n - 1 and an array of undirected edges, return the total number of connected components in the graph in O(V + E) time.',
+      constraints: ['Time Complexity: O(V + E)', 'Space Complexity: O(V + E)'],
+      sampleInputs: [
+        { input: 'n = 5, edges = [[0,1],[1,2],[3,4]]', output: '2' },
+        { input: 'n = 5, edges = [[0,1],[1,2],[2,3],[3,4]]', output: '1' }
+      ],
+      starterCode: `function countComponents(n, edges) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [u, v] of edges) { adj[u].push(v); adj[v].push(u); }\n  const visited = new Set();\n  let count = 0;\n  // TODO: DFS to visit all reachable nodes for each component\n  \n  return count;\n}\n\nconsole.log("Components:", countComponents(5, [[0,1],[1,2],[3,4]]));`,
+      solutionHint: 'function dfs(node) { visited.add(node); for (const neighbor of adj[node]) if (!visited.has(neighbor)) dfs(neighbor); } for (let i = 0; i < n; i++) if (!visited.has(i)) { dfs(i); count++; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function countComponents(n, edges) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [u, v] of edges) { adj[u].push(v); adj[v].push(u); }\n  const visited = new Set();\n  let count = 0;\n  function dfs(u) {\n    visited.add(u);\n    for (const v of adj[u]) if (!visited.has(v)) dfs(v);\n  }\n  for (let i = 0; i < n; i++) {\n    if (!visited.has(i)) { dfs(i); count++; }\n  }\n  return count;\n}`,
+          solutionHint: 'Run DFS for every unvisited node and increment component count.'
+        },
+        python: {
+          starterCode: `def count_components(n: int, edges: list[list[int]]) -> int:\n    adj = [[] for _ in range(n)]\n    for u, v in edges: adj[u].append(v); adj[v].append(u)\n    visited = set()\n    def dfs(u):\n        visited.add(u)\n        for v in adj[u]:\n            if v not in visited: dfs(v)\n    count = 0\n    for i in range(n):\n        if i not in visited:\n            dfs(i); count += 1\n    return count`,
+          solutionHint: 'Build adjacency list and count DFS traversals.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int countComponents(int n, int[][] edges) {\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int[] e : edges) { adj.get(e[0]).add(e[1]); adj.get(e[1]).add(e[0]); }\n        boolean[] visited = new boolean[n];\n        int count = 0;\n        for (int i = 0; i < n; i++) {\n            if (!visited[i]) { dfs(i, adj, visited); count++; }\n        }\n        return count;\n    }\n    private static void dfs(int u, List<List<Integer>> adj, boolean[] visited) {\n        visited[u] = true;\n        for (int v : adj.get(u)) if (!visited[v]) dfs(v, adj, visited);\n    }\n}`,
+          solutionHint: 'DFS component counting with boolean visited array.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nvoid dfs(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {\n    visited[u] = true;\n    for (int v : adj[u]) if (!visited[v]) dfs(v, adj, visited);\n}\nint countComponents(int n, const std::vector<std::vector<int>>& edges) {\n    std::vector<std::vector<int>> adj(n);\n    for (const auto& e : edges) { adj[e[0]].push_back(e[1]); adj[e[1]].push_back(e[0]); }\n    std::vector<bool> visited(n, false);\n    int count = 0;\n    for (int i = 0; i < n; i++) {\n        if (!visited[i]) { dfs(i, adj, visited); count++; }\n    }\n    return count;\n}`,
+          solutionHint: 'Adjacency list DFS counting connected subgraphs.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-2',
+      title: 'Module 2: Number of Islands (2D Grid DFS / BFS)',
+      difficulty: 'Medium',
+      category: 'Graphs',
+      description: 'Given an m x n 2D binary grid grid which represents a map of 1s (land) and 0s (water), return the number of islands in O(m * n) time.',
+      constraints: ['Time Complexity: O(m * n)', 'Space Complexity: O(m * n)'],
+      sampleInputs: [
+        { input: 'grid = [["1","1","0"],["1","1","0"],["0","0","1"]]', output: '2' }
+      ],
+      starterCode: `function numIslands(grid) {\n  const m = grid.length, n = grid[0].length;\n  let islands = 0;\n  function sink(r, c) {\n    if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] !== '1') return;\n    grid[r][c] = '0'; // sink land\n    // TODO: Sink in 4 directions\n  }\n  // TODO: Scan grid and sink islands\n  return islands;\n}`,
+      solutionHint: 'sink(r+1,c); sink(r-1,c); sink(r,c+1); sink(r,c-1); Scan grid: if (grid[r][c] === "1") { islands++; sink(r, c); } return islands;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function numIslands(grid) {\n  const m = grid.length, n = grid[0].length;\n  let islands = 0;\n  function sink(r, c) {\n    if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] !== '1') return;\n    grid[r][c] = '0';\n    sink(r + 1, c); sink(r - 1, c); sink(r, c + 1); sink(r, c - 1);\n  }\n  for (let r = 0; r < m; r++)\n    for (let c = 0; c < n; c++)\n      if (grid[r][c] === '1') { islands++; sink(r, c); }\n  return islands;\n}`,
+          solutionHint: 'Sink contiguous land cells in-place with DFS.'
+        },
+        python: {
+          starterCode: `def num_islands(grid: list[list[str]]) -> int:\n    m, n = len(grid), len(grid[0])\n    def sink(r, c):\n        if r < 0 or r >= m or c < 0 or c >= n or grid[r][c] != '1': return\n        grid[r][c] = '0'\n        sink(r + 1, c); sink(r - 1, c); sink(r, c + 1); sink(r, c - 1)\n    islands = 0\n    for r in range(m):\n        for c in range(n):\n            if grid[r][c] == '1': islands += 1; sink(r, c)\n    return islands`,
+          solutionHint: 'Flood-fill DFS converting visited 1 to 0.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int numIslands(char[][] grid) {\n        int m = grid.length, n = grid[0].length, islands = 0;\n        for (int r = 0; r < m; r++)\n            for (int c = 0; c < n; c++)\n                if (grid[r][c] == '1') { islands++; sink(grid, r, c, m, n); }\n        return islands;\n    }\n    private static void sink(char[][] grid, int r, int c, int m, int n) {\n        if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] != '1') return;\n        grid[r][c] = '0';\n        sink(grid, r + 1, c, m, n); sink(grid, r - 1, c, m, n);\n        sink(grid, r, c + 1, m, n); sink(grid, r, c - 1, m, n);\n    }\n}`,
+          solutionHint: 'DFS sink method in-place.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nvoid sink(std::vector<std::vector<char>>& grid, int r, int c, int m, int n) {\n    if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] != '1') return;\n    grid[r][c] = '0';\n    sink(grid, r + 1, c, m, n); sink(grid, r - 1, c, m, n);\n    sink(grid, r, c + 1, m, n); sink(grid, r, c - 1, m, n);\n}\nint numIslands(std::vector<std::vector<char>>& grid) {\n    int m = grid.size(), n = grid[0].size(), count = 0;\n    for (int r = 0; r < m; r++)\n        for (int c = 0; c < n; c++)\n            if (grid[r][c] == '1') { count++; sink(grid, r, c, m, n); }\n    return count;\n}`,
+          solutionHint: '2D grid DFS component sink.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-3',
+      title: 'Module 3: Clone Graph (Deep Copy)',
+      difficulty: 'Medium',
+      category: 'Graphs',
+      description: 'Given a reference of a node in a connected undirected graph, return a deep copy (clone) of the graph using a visited HashMap to avoid cycles.',
+      constraints: ['Time Complexity: O(V + E)', 'Space Complexity: O(V)'],
+      sampleInputs: [
+        { input: 'adjList = [[2,4],[1,3],[2,4],[1,3]]', output: 'Deep cloned graph with identical topology' }
+      ],
+      starterCode: `class Node {\n  constructor(val = 0, neighbors = []) {\n    this.val = val;\n    this.neighbors = neighbors;\n  }\n}\n\nfunction cloneGraph(node, visited = new Map()) {\n  if (!node) return null;\n  if (visited.has(node)) return visited.get(node);\n  const clone = new Node(node.val);\n  visited.set(node, clone);\n  // TODO: Clone all neighbors\n  \n  return clone;\n}`,
+      solutionHint: 'for (const n of node.neighbors) clone.neighbors.push(cloneGraph(n, visited)); return clone;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function cloneGraph(node, visited = new Map()) {\n  if (!node) return null;\n  if (visited.has(node)) return visited.get(node);\n  const clone = new Node(node.val);\n  visited.set(node, clone);\n  for (const n of node.neighbors) clone.neighbors.push(cloneGraph(n, visited));\n  return clone;\n}`,
+          solutionHint: 'Maintain original-to-clone node mapping in Map.'
+        },
+        python: {
+          starterCode: `class Node:\n    def __init__(self, val=0, neighbors=None):\n        self.val = val\n        self.neighbors = neighbors if neighbors is not None else []\n\ndef clone_graph(node: Node | None, visited=None) -> Node | None:\n    if not node: return None\n    if visited is None: visited = {}\n    if node in visited: return visited[node]\n    clone = Node(node.val)\n    visited[node] = clone\n    for n in node.neighbors:\n        clone.neighbors.append(clone_graph(n, visited))\n    return clone`,
+          solutionHint: 'Store cloned instances in dictionary to handle cycles.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\nclass Node {\n    public int val;\n    public List<Node> neighbors;\n    public Node(int _val) { val = _val; neighbors = new ArrayList<>(); }\n}\n\npublic class Solution {\n    private static Map<Node, Node> visited = new HashMap<>();\n    public static Node cloneGraph(Node node) {\n        if (node == null) return null;\n        if (visited.containsKey(node)) return visited.get(node);\n        Node clone = new Node(node.val);\n        visited.put(node, clone);\n        for (Node n : node.neighbors) clone.neighbors.add(cloneGraph(n));\n        return clone;\n    }\n}`,
+          solutionHint: 'Map<Node, Node> stores visited copies.'
+        },
+        cpp: {
+          starterCode: `#include <vector>\n#include <unordered_map>\n\nclass Node {\npublic:\n    int val;\n    std::vector<Node*> neighbors;\n    Node(int _val) : val(_val) {}\n};\n\nstd::unordered_map<Node*, Node*> visited;\nNode* cloneGraph(Node* node) {\n    if (!node) return nullptr;\n    if (visited.count(node)) return visited[node];\n    Node* clone = new Node(node->val);\n    visited[node] = clone;\n    for (Node* n : node->neighbors) clone->neighbors.push_back(cloneGraph(n));\n    return clone;\n}`,
+          solutionHint: 'Recursive DFS deep copy with unordered_map.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-4',
+      title: 'Module 4: Course Schedule (Topological Sort / Cycle Detection)',
+      difficulty: 'Medium',
+      category: 'Graphs',
+      description: 'There are a total of numCourses you have to take, labeled from 0 to numCourses - 1. Determine if it is possible to finish all courses given prerequisite pairs using Kahn’s Algorithm.',
+      constraints: ['Time Complexity: O(V + E)', 'Space Complexity: O(V + E)'],
+      sampleInputs: [
+        { input: 'numCourses = 2, prerequisites = [[1,0]]', output: 'true' },
+        { input: 'numCourses = 2, prerequisites = [[1,0],[0,1]]', output: 'false' }
+      ],
+      starterCode: `function canFinish(numCourses, prerequisites) {\n  const inDegree = new Array(numCourses).fill(0);\n  const adj = Array.from({ length: numCourses }, () => []);\n  for (const [course, pre] of prerequisites) {\n    adj[pre].push(course);\n    inDegree[course]++;\n  }\n  const queue = [];\n  // TODO: Enqueue 0-indegree courses and run Kahn BFS\n  \n  return false;\n}`,
+      solutionHint: 'for (let i = 0; i < numCourses; i++) if (inDegree[i] === 0) queue.push(i); let taken = 0; while (queue.length) { const u = queue.shift(); taken++; for (const v of adj[u]) { if (--inDegree[v] === 0) queue.push(v); } } return taken === numCourses;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function canFinish(numCourses, prerequisites) {\n  const inDegree = new Array(numCourses).fill(0), adj = Array.from({ length: numCourses }, () => []);\n  for (const [c, pre] of prerequisites) { adj[pre].push(c); inDegree[c]++; }\n  const queue = [];\n  for (let i = 0; i < numCourses; i++) if (inDegree[i] === 0) queue.push(i);\n  let taken = 0;\n  while (queue.length) {\n    const u = queue.shift(); taken++;\n    for (const v of adj[u]) if (--inDegree[v] === 0) queue.push(v);\n  }\n  return taken === numCourses;\n}`,
+          solutionHint: 'Kahn algorithm for topological sorting in directed graph.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef can_finish(num_courses: int, prerequisites: list[list[int]]) -> bool:\n    in_degree = [0] * num_courses\n    adj = [[] for _ in range(num_courses)]\n    for c, pre in prerequisites: adj[pre].append(c); in_degree[c] += 1\n    q = deque([i for i in range(num_courses) if in_degree[i] == 0])\n    taken = 0\n    while q:\n        u = q.popleft(); taken += 1\n        for v in adj[u]:\n            in_degree[v] -= 1\n            if in_degree[v] == 0: q.append(v)\n    return taken == num_courses`,
+          solutionHint: 'BFS queue starting from zero in-degree nodes.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static boolean canFinish(int numCourses, int[][] prerequisites) {\n        int[] inDegree = new int[numCourses];\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < numCourses; i++) adj.add(new ArrayList<>());\n        for (int[] p : prerequisites) { adj.get(p[1]).add(p[0]); inDegree[p[0]]++; }\n        Deque<Integer> q = new ArrayDeque<>();\n        for (int i = 0; i < numCourses; i++) if (inDegree[i] == 0) q.offer(i);\n        int taken = 0;\n        while (!q.isEmpty()) {\n            int u = q.poll(); taken++;\n            for (int v : adj.get(u)) if (--inDegree[v] == 0) q.offer(v);\n        }\n        return taken == numCourses;\n    }\n}`,
+          solutionHint: 'Topological sort cycle check.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n\nbool canFinish(int numCourses, const std::vector<std::vector<int>>& prerequisites) {\n    std::vector<int> inDegree(numCourses, 0);\n    std::vector<std::vector<int>> adj(numCourses);\n    for (const auto& p : prerequisites) { adj[p[1]].push_back(p[0]); inDegree[p[0]]++; }\n    std::queue<int> q;\n    for (int i = 0; i < numCourses; i++) if (inDegree[i] == 0) q.push(i);\n    int taken = 0;\n    while (!q.empty()) {\n        int u = q.front(); q.pop(); taken++;\n        for (int v : adj[u]) if (--inDegree[v] == 0) q.push(v);\n    }\n    return taken == numCourses;\n}`,
+          solutionHint: 'Kahn algorithm with queue.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-5',
+      title: 'Module 5: Word Ladder (Shortest Transformation BFS)',
+      difficulty: 'Hard',
+      category: 'Graphs',
+      description: 'Given beginWord, endWord, and wordList, return the number of words in the shortest transformation sequence from beginWord to endWord where adjacent words differ by exactly 1 character.',
+      constraints: ['All words same length', 'All lowercase English letters'],
+      sampleInputs: [
+        { input: 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]', output: '5 ("hit" -> "hot" -> "dot" -> "dog" -> "cog")' }
+      ],
+      starterCode: `function ladderLength(beginWord, endWord, wordList) {\n  const wordSet = new Set(wordList);\n  if (!wordSet.has(endWord)) return 0;\n  const queue = [[beginWord, 1]];\n  // TODO: Level BFS mutating 1 character at a time\n  \n  return 0;\n}`,
+      solutionHint: 'while (queue.length) { const [word, len] = queue.shift(); if (word === endWord) return len; for (let i = 0; i < word.length; i++) { for (let c = 97; c <= 122; c++) { const next = word.slice(0, i) + String.fromCharCode(c) + word.slice(i + 1); if (wordSet.has(next)) { wordSet.delete(next); queue.push([next, len + 1]); } } } } return 0;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function ladderLength(beginWord, endWord, wordList) {\n  const wordSet = new Set(wordList);\n  if (!wordSet.has(endWord)) return 0;\n  const queue = [[beginWord, 1]];\n  while (queue.length) {\n    const [w, len] = queue.shift();\n    if (w === endWord) return len;\n    for (let i = 0; i < w.length; i++) {\n      for (let c = 97; c <= 122; c++) {\n        const nxt = w.slice(0, i) + String.fromCharCode(c) + w.slice(i + 1);\n        if (wordSet.has(nxt)) { wordSet.delete(nxt); queue.push([nxt, len + 1]); }\n      }\n    }\n  }\n  return 0;\n}`,
+          solutionHint: 'BFS queue transforming 1 letter per step.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef ladder_length(begin_word: str, end_word: str, word_list: list[str]) -> int:\n    word_set = set(word_list)\n    if end_word not in word_set: return 0\n    q = deque([(begin_word, 1)])\n    while q:\n        w, length = q.popleft()\n        if w == end_word: return length\n        for i in range(len(w)):\n            for c in 'abcdefghijklmnopqrstuvwxyz':\n                nxt = w[:i] + c + w[i+1:]\n                if nxt in word_set:\n                    word_set.remove(nxt)\n                    q.append((nxt, length + 1))\n    return 0`,
+          solutionHint: 'Mutate each letter a-z and traverse via BFS.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int ladderLength(String beginWord, String endWord, List<String> wordList) {\n        Set<String> wordSet = new HashSet<>(wordList);\n        if (!wordSet.contains(endWord)) return 0;\n        Deque<String> q = new ArrayDeque<>();\n        q.offer(beginWord);\n        int steps = 1;\n        while (!q.isEmpty()) {\n            int size = q.size();\n            for (int k = 0; k < size; k++) {\n                String w = q.poll();\n                if (w.equals(endWord)) return steps;\n                char[] chs = w.toCharArray();\n                for (int i = 0; i < chs.length; i++) {\n                    char orig = chs[i];\n                    for (char c = 'a'; c <= 'z'; c++) {\n                        chs[i] = c;\n                        String nxt = new String(chs);\n                        if (wordSet.remove(nxt)) q.offer(nxt);\n                    }\n                    chs[i] = orig;\n                }\n            }\n            steps++;\n        }\n        return 0;\n    }\n}`,
+          solutionHint: 'Level-order BFS mutating character array.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n#include <unordered_set>\n#include <queue>\n\nint ladderLength(const std::string& beginWord, const std::string& endWord, const std::vector<std::string>& wordList) {\n    std::unordered_set<std::string> wordSet(wordList.begin(), wordList.end());\n    if (!wordSet.count(endWord)) return 0;\n    std::queue<std::pair<std::string, int>> q;\n    q.push({beginWord, 1});\n    while (!q.empty()) {\n        auto [w, len] = q.front(); q.pop();\n        if (w == endWord) return len;\n        for (int i = 0; i < w.size(); i++) {\n            char orig = w[i];\n            for (char c = 'a'; c <= 'z'; c++) {\n                w[i] = c;\n                if (wordSet.count(w)) {\n                    wordSet.erase(w);\n                    q.push({w, len + 1});\n                }\n            }\n            w[i] = orig;\n        }\n    }\n    return 0;\n}`,
+          solutionHint: 'BFS queue searching shortest word transformation.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-6',
+      title: 'Module 6: Network Delay Time (Dijkstra\'s Algorithm)',
+      difficulty: 'Medium',
+      category: 'Graphs',
+      description: 'You are given a network of n nodes labeled 1 to n, and times where times[i] = (u, v, w). Compute the minimum time it takes for all n nodes to receive a signal from source k using Dijkstra\'s Algorithm.',
+      constraints: ['Time Complexity: O(E log V)', 'Weights w >= 0'],
+      sampleInputs: [
+        { input: 'times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2', output: '2' },
+        { input: 'times = [[1,2,1]], n = 2, k = 2', output: '-1' }
+      ],
+      starterCode: `function networkDelayTime(times, n, k) {\n  const adj = Array.from({ length: n + 1 }, () => []);\n  for (const [u, v, w] of times) adj[u].push([v, w]);\n  const dist = new Array(n + 1).fill(Infinity);\n  dist[k] = 0;\n  const queue = [[0, k]]; // dist, node\n  while (queue.length) {\n    queue.sort((a, b) => a[0] - b[0]);\n    const [d, u] = queue.shift();\n    if (d > dist[u]) continue;\n    for (const [v, w] of adj[u]) {\n      if (d + w < dist[v]) { dist[v] = d + w; queue.push([dist[v], v]); }\n    }\n  }\n  const maxTime = Math.max(...dist.slice(1));\n  return maxTime === Infinity ? -1 : maxTime;\n}`,
+      solutionHint: 'Dijkstra shortest path algorithm with distance updates.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function networkDelayTime(times, n, k) {\n  const adj = Array.from({ length: n + 1 }, () => []);\n  for (const [u, v, w] of times) adj[u].push([v, w]);\n  const dist = new Array(n + 1).fill(Infinity);\n  dist[k] = 0;\n  const queue = [[0, k]];\n  while (queue.length) {\n    queue.sort((a, b) => a[0] - b[0]);\n    const [d, u] = queue.shift();\n    if (d > dist[u]) continue;\n    for (const [v, w] of adj[u]) {\n      if (d + w < dist[v]) { dist[v] = d + w; queue.push([dist[v], v]); }\n    }\n  }\n  const maxT = Math.max(...dist.slice(1));\n  return maxT === Infinity ? -1 : maxT;\n}`,
+          solutionHint: 'Dijkstra priority queue shortest path.'
+        },
+        python: {
+          starterCode: `import heapq\n\ndef network_delay_time(times: list[list[int]], n: int, k: int) -> int:\n    adj = [[] for _ in range(n + 1)]\n    for u, v, w in times: adj[u].append((v, w))\n    dist = {i: float('inf') for i in range(1, n + 1)}\n    dist[k] = 0\n    pq = [(0, k)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]: continue\n        for v, w in adj[u]:\n            if d + w < dist[v]:\n                dist[v] = d + w\n                heapq.heappush(pq, (d + w, v))\n    res = max(dist.values())\n    return -1 if res == float('inf') else res`,
+          solutionHint: 'Use heapq for Dijkstra O(E log V) shortest path search.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int networkDelayTime(int[][] times, int n, int k) {\n        List<List<int[]>> adj = new ArrayList<>();\n        for (int i = 0; i <= n; i++) adj.add(new ArrayList<>());\n        for (int[] t : times) adj.get(t[0]).add(new int[]{t[1], t[2]});\n        int[] dist = new int[n + 1];\n        Arrays.fill(dist, Integer.MAX_VALUE);\n        dist[k] = 0;\n        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));\n        pq.offer(new int[]{0, k});\n        while (!pq.isEmpty()) {\n            int[] curr = pq.poll();\n            int d = curr[0], u = curr[1];\n            if (d > dist[u]) continue;\n            for (int[] edge : adj.get(u)) {\n                int v = edge[0], w = edge[1];\n                if (d + w < dist[v]) { dist[v] = d + w; pq.offer(new int[]{dist[v], v}); }\n            }\n        }\n        int maxTime = 0;\n        for (int i = 1; i <= n; i++) {\n            if (dist[i] == Integer.MAX_VALUE) return -1;\n            maxTime = Math.max(maxTime, dist[i]);\n        }\n        return maxTime;\n    }\n}`,
+          solutionHint: 'PriorityQueue Dijkstra min-heap.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n#include <algorithm>\n\nint networkDelayTime(const std::vector<std::vector<int>>& times, int n, int k) {\n    std::vector<std::vector<std::pair<int, int>>> adj(n + 1);\n    for (const auto& t : times) adj[t[0]].emplace_back(t[1], t[2]);\n    std::vector<int> dist(n + 1, 1e9);\n    dist[k] = 0;\n    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;\n    pq.push({0, k});\n    while (!pq.empty()) {\n        auto [d, u] = pq.top(); pq.pop();\n        if (d > dist[u]) continue;\n        for (auto [v, w] : adj[u]) {\n            if (d + w < dist[v]) { dist[v] = d + w; pq.push({dist[v], v}); }\n        }\n    }\n    int res = *std::max_element(dist.begin() + 1, dist.end());\n    return res >= 1e9 ? -1 : res;\n}`,
+          solutionHint: 'Min-heap priority queue Dijkstra.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-7',
+      title: 'Module 7: Alien Dictionary (Topological Sort)',
+      difficulty: 'Hard',
+      category: 'Graphs',
+      description: 'Given a sorted list of words in an alien language, deduce the unique lexicographical order of characters using topological sorting.',
+      constraints: ['Unique ordering if valid', 'Detect invalid prefixes and cycles'],
+      sampleInputs: [
+        { input: 'words = ["wrt","wrf","er","ett","rftt"]', output: '"wertf"' },
+        { input: 'words = ["z","x","z"]', output: '"" (invalid cycle)' }
+      ],
+      starterCode: `function alienOrder(words) {\n  const adj = {}, inDegree = {};\n  for (const w of words) for (const c of w) { adj[c] = new Set(); inDegree[c] = 0; }\n  // TODO: Build graph from first differing character in adjacent words\n  \n  return "";\n}`,
+      solutionHint: 'Compare adjacent words w1, w2. If w1.length > w2.length && w1.startsWith(w2) return ""; on first differing char, add edge and increment inDegree.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function alienOrder(words) {\n  const adj = {}, inDegree = {};\n  for (const w of words) for (const c of w) { adj[c] = new Set(); inDegree[c] = 0; }\n  for (let i = 0; i < words.length - 1; i++) {\n    const w1 = words[i], w2 = words[i + 1];\n    if (w1.length > w2.length && w1.startsWith(w2)) return '';\n    for (let j = 0; j < Math.min(w1.length, w2.length); j++) {\n      if (w1[j] !== w2[j]) {\n        if (!adj[w1[j]].has(w2[j])) { adj[w1[j]].add(w2[j]); inDegree[w2[j]]++; }\n        break;\n      }\n    }\n  }\n  const queue = Object.keys(inDegree).filter(c => inDegree[c] === 0);\n  let res = '';\n  while (queue.length) {\n    const c = queue.shift(); res += c;\n    for (const nxt of adj[c]) if (--inDegree[nxt] === 0) queue.push(nxt);\n  }\n  return res.length === Object.keys(inDegree).length ? res : '';\n}`,
+          solutionHint: 'Topological sort on character dependency DAG.'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef alien_order(words: list[str]) -> str:\n    adj = {c: set() for w in words for c in w}\n    in_degree = {c: 0 for c in adj}\n    for i in range(len(words) - 1):\n        w1, w2 = words[i], words[i+1]\n        if len(w1) > len(w2) and w1.startswith(w2): return ""\n        for c1, c2 in zip(w1, w2):\n            if c1 != c2:\n                if c2 not in adj[c1]:\n                    adj[c1].add(c2); in_degree[c2] += 1\n                break\n    q = deque([c for c in in_degree if in_degree[c] == 0])\n    res = []\n    while q:\n        c = q.popleft(); res.append(c)\n        for nxt in adj[c]:\n            in_degree[nxt] -= 1\n            if in_degree[nxt] == 0: q.append(nxt)\n    return "".join(res) if len(res) == len(in_degree) else ""`,
+          solutionHint: 'Topological sorting across adjacent word character differences.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static String alienOrder(String[] words) {\n        Map<Character, Set<Character>> adj = new HashMap<>();\n        Map<Character, Integer> inDegree = new HashMap<>();\n        for (String w : words) for (char c : w.toCharArray()) { adj.putIfAbsent(c, new HashSet<>()); inDegree.putIfAbsent(c, 0); }\n        for (int i = 0; i < words.length - 1; i++) {\n            String w1 = words[i], w2 = words[i + 1];\n            if (w1.length() > w2.length() && w1.startsWith(w2)) return "";\n            for (int j = 0; j < Math.min(w1.length(), w2.length()); j++) {\n                char c1 = w1.charAt(j), c2 = w2.charAt(j);\n                if (c1 != c2) {\n                    if (adj.get(c1).add(c2)) inDegree.put(c2, inDegree.get(c2) + 1);\n                    break;\n                }\n            }\n        }\n        Deque<Character> q = new ArrayDeque<>();\n        for (char c : inDegree.keySet()) if (inDegree.get(c) == 0) q.offer(c);\n        StringBuilder sb = new StringBuilder();\n        while (!q.isEmpty()) {\n            char c = q.poll(); sb.append(c);\n            for (char nxt : adj.get(c)) {\n                inDegree.put(nxt, inDegree.get(nxt) - 1);\n                if (inDegree.get(nxt) == 0) q.offer(nxt);\n            }\n        }\n        return sb.length() == inDegree.size() ? sb.toString() : "";\n    }\n}`,
+          solutionHint: 'Kahn algorithm for alien character ordering.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <queue>\n\nstd::string alienOrder(const std::vector<std::string>& words) {\n    std::unordered_map<char, std::unordered_set<char>> adj;\n    std::unordered_map<char, int> inDegree;\n    for (const auto& w : words) for (char c : w) { adj[c]; inDegree[c] = 0; }\n    for (size_t i = 0; i < words.size() - 1; i++) {\n        const auto& w1 = words[i], &w2 = words[i+1];\n        if (w1.size() > w2.size() && w1.substr(0, w2.size()) == w2) return "";\n        for (size_t j = 0; j < std::min(w1.size(), w2.size()); j++) {\n            if (w1[j] != w2[j]) {\n                if (!adj[w1[j]].count(w2[j])) { adj[w1[j]].insert(w2[j]); inDegree[w2[j]]++; }\n                break;\n            }\n        }\n    }\n    std::queue<char> q;\n    for (auto [c, deg] : inDegree) if (deg == 0) q.push(c);\n    std::string res = "";\n    while (!q.empty()) {\n        char c = q.front(); q.pop(); res += c;\n        for (char nxt : adj[c]) if (--inDegree[nxt] == 0) q.push(nxt);\n    }\n    return res.size() == inDegree.size() ? res : "";\n}`,
+          solutionHint: 'Character level topological sort with cycle validation.'
+        }
+      }
+    },
+    {
+      id: 'grp-mod-8',
+      title: 'Module 8: Critical Connections (Tarjan\'s Bridge Algorithm)',
+      difficulty: 'Hard',
+      category: 'Graphs',
+      description: 'Given n servers numbered 0 to n - 1 connected by undirected connections, return all critical connections (bridges) whose removal disconnects the network in O(V + E) time.',
+      constraints: ['Time Complexity: O(V + E)', 'Space Complexity: O(V + E)'],
+      sampleInputs: [
+        { input: 'n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]', output: '[[1,3]]' }
+      ],
+      starterCode: `function criticalConnections(n, connections) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [u, v] of connections) { adj[u].push(v); adj[v].push(u); }\n  const disc = new Array(n).fill(-1), low = new Array(n).fill(-1);\n  const bridges = [];\n  let time = 0;\n  // TODO: Tarjan DFS tracking discovery & lowest reachable timestamps\n  \n  return bridges;\n}`,
+      solutionHint: 'function dfs(u, p) { disc[u] = low[u] = ++time; for (const v of adj[u]) { if (v === p) continue; if (disc[v] !== -1) low[u] = Math.min(low[u], disc[v]); else { dfs(v, u); low[u] = Math.min(low[u], low[v]); if (low[v] > disc[u]) bridges.push([u, v]); } } }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function criticalConnections(n, connections) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [u, v] of connections) { adj[u].push(v); adj[v].push(u); }\n  const disc = new Array(n).fill(-1), low = new Array(n).fill(-1), bridges = [];\n  let time = 0;\n  function dfs(u, p) {\n    disc[u] = low[u] = ++time;\n    for (const v of adj[u]) {\n      if (v === p) continue;\n      if (disc[v] !== -1) low[u] = Math.min(low[u], disc[v]);\n      else {\n        dfs(v, u);\n        low[u] = Math.min(low[u], low[v]);\n        if (low[v] > disc[u]) bridges.push([u, v]);\n      }\n    }\n  }\n  dfs(0, -1);\n  return bridges;\n}`,
+          solutionHint: 'Bridge condition: low[v] > disc[u].'
+        },
+        python: {
+          starterCode: `def critical_connections(n: int, connections: list[list[int]]) -> list[list[int]]:\n    adj = [[] for _ in range(n)]\n    for u, v in connections: adj[u].append(v); adj[v].append(u)\n    disc, low = [-1] * n, [-1] * n\n    bridges = []\n    time = 0\n    def dfs(u, p):\n        nonlocal time\n        time += 1\n        disc[u] = low[u] = time\n        for v in adj[u]:\n            if v == p: continue\n            if disc[v] != -1: low[u] = min(low[u], disc[v])\n            else:\n                dfs(v, u)\n                low[u] = min(low[u], low[v])\n                if low[v] > disc[u]: bridges.append([u, v])\n    dfs(0, -1)\n    return bridges`,
+          solutionHint: 'Tarjan discovery and low-link values identify bridge edges.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    private static int time = 0;\n    public static List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (List<Integer> c : connections) { adj.get(c.get(0)).add(c.get(1)); adj.get(c.get(1)).add(c.get(0)); }\n        int[] disc = new int[n], low = new int[n];\n        Arrays.fill(disc, -1);\n        List<List<Integer>> bridges = new ArrayList<>();\n        time = 0;\n        dfs(0, -1, adj, disc, low, bridges);\n        return bridges;\n    }\n    private static void dfs(int u, int p, List<List<Integer>> adj, int[] disc, int[] low, List<List<Integer>> bridges) {\n        disc[u] = low[u] = ++time;\n        for (int v : adj.get(u)) {\n            if (v == p) continue;\n            if (disc[v] != -1) low[u] = Math.min(low[u], disc[v]);\n            else {\n                dfs(v, u, adj, disc, low, bridges);\n                low[u] = Math.min(low[u], low[v]);\n                if (low[v] > disc[u]) bridges.add(Arrays.asList(u, v));\n            }\n        }\n    }\n}`,
+          solutionHint: 'Tarjan bridge finder recursion.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint timer = 0;\nvoid dfs(int u, int p, const std::vector<std::vector<int>>& adj, std::vector<int>& disc, std::vector<int>& low, std::vector<std::vector<int>>& bridges) {\n    disc[u] = low[u] = ++timer;\n    for (int v : adj[u]) {\n        if (v == p) continue;\n        if (disc[v] != -1) low[u] = std::min(low[u], disc[v]);\n        else {\n            dfs(v, u, adj, disc, low, bridges);\n            low[u] = std::min(low[u], low[v]);\n            if (low[v] > disc[u]) bridges.push_back({u, v});\n        }\n    }\n}\nstd::vector<std::vector<int>> criticalConnections(int n, const std::vector<std::vector<int>>& connections) {\n    std::vector<std::vector<int>> adj(n);\n    for (const auto& c : connections) { adj[c[0]].push_back(c[1]); adj[c[1]].push_back(c[0]); }\n    std::vector<int> disc(n, -1), low(n, -1);\n    std::vector<std::vector<int>> bridges;\n    timer = 0;\n    dfs(0, -1, adj, disc, low, bridges);\n    return bridges;\n}`,
+          solutionHint: 'Tarjan bridge algorithm in O(V + E).'
+        }
+      }
+    }
+  ],
+
+  'recursion': [
+    {
+      id: 'rec-mod-1',
+      title: 'Module 1: Recursive Power Function (Fast Exponentiation)',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Implement pow(x, n), which calculates x raised to the power n (i.e., x^n) using divide-and-conquer recursion in O(log n) time.',
+      constraints: ['Time Complexity: O(log n)', '-100.0 < x < 100.0', 'n is a 32-bit signed integer'],
+      sampleInputs: [
+        { input: 'x = 2.00000, n = 10', output: '1024.00000' },
+        { input: 'x = 2.00000, n = -2', output: '0.25000' }
+      ],
+      starterCode: `function myPow(x, n) {\n  if (n === 0) return 1.0;\n  if (n < 0) return 1.0 / myPow(x, -n);\n  // TODO: Fast exponentiation via half powers\n  \n  return 0.0;\n}\n\nconsole.log("2^10:", myPow(2, 10));`,
+      solutionHint: 'const half = myPow(x, Math.floor(n / 2)); return n % 2 === 0 ? half * half : half * half * x;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function myPow(x, n) {\n  if (n === 0) return 1.0;\n  if (n < 0) return 1.0 / myPow(x, -n);\n  const half = myPow(x, Math.floor(n / 2));\n  return n % 2 === 0 ? half * half : half * half * x;\n}`,
+          solutionHint: 'Divide exponent by 2 recursively.'
+        },
+        python: {
+          starterCode: `def my_pow(x: float, n: int) -> float:\n    if n == 0: return 1.0\n    if n < 0: return 1.0 / my_pow(x, -n)\n    half = my_pow(x, n // 2)\n    return half * half if n % 2 == 0 else half * half * x`,
+          solutionHint: 'O(log n) fast exponentiation recursion.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static double myPow(double x, int n) {\n        long N = n;\n        if (N < 0) { x = 1 / x; N = -N; }\n        return fastPow(x, N);\n    }\n    private static double fastPow(double x, long n) {\n        if (n == 0) return 1.0;\n        double half = fastPow(x, n / 2);\n        return n % 2 == 0 ? half * half : half * half * x;\n    }\n}`,
+          solutionHint: 'Handle Integer.MIN_VALUE by promoting n to long.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\ndouble fastPow(double x, long long n) {\n    if (n == 0) return 1.0;\n    double half = fastPow(x, n / 2);\n    return n % 2 == 0 ? half * half : half * half * x;\n}\ndouble myPow(double x, int n) {\n    long long N = n;\n    if (N < 0) { x = 1.0 / x; N = -N; }\n    return fastPow(x, N);\n}`,
+          solutionHint: 'Fast recursive exponentiation in O(log n).'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-2',
+      title: 'Module 2: Subsets (Power Set via Backtracking)',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Given an integer array nums of unique elements, return all possible subsets (the power set) of size 2^n using backtracking recursion.',
+      constraints: ['Time Complexity: O(2^n)', 'Space Complexity: O(n) recursion stack'],
+      sampleInputs: [
+        { input: 'nums = [1,2,3]', output: '[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]' }
+      ],
+      starterCode: `function subsets(nums) {\n  const result = [];\n  function backtrack(start, path) {\n    result.push([...path]);\n    // TODO: Iterate from start index and recurse\n    \n  }\n  backtrack(0, []);\n  return result;\n}`,
+      solutionHint: 'for (let i = start; i < nums.length; i++) { path.push(nums[i]); backtrack(i + 1, path); path.pop(); }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function subsets(nums) {\n  const res = [];\n  function backtrack(start, path) {\n    res.push([...path]);\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]); backtrack(i + 1, path); path.pop();\n    }\n  }\n  backtrack(0, []);\n  return res;\n}`,
+          solutionHint: 'Push copy of path at each decision node.'
+        },
+        python: {
+          starterCode: `def subsets(nums: list[int]) -> list[list[int]]:\n    res = []\n    def backtrack(start, path):\n        res.append(list(path))\n        for i in range(start, len(nums)):\n            path.append(nums[i])\n            backtrack(i + 1, path)\n            path.pop()\n    backtrack(0, [])\n    return res`,
+          solutionHint: 'Backtrack branching on each index.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<List<Integer>> subsets(int[] nums) {\n        List<List<Integer>> res = new ArrayList<>();\n        backtrack(0, nums, new ArrayList<>(), res);\n        return res;\n    }\n    private static void backtrack(int start, int[] nums, List<Integer> path, List<List<Integer>> res) {\n        res.add(new ArrayList<>(path));\n        for (int i = start; i < nums.length; i++) {\n            path.add(nums[i]);\n            backtrack(i + 1, nums, path, res);\n            path.remove(path.size() - 1);\n        }\n    }\n}`,
+          solutionHint: 'Backtracking power set tree exploration.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nvoid backtrack(int start, const std::vector<int>& nums, std::vector<int>& path, std::vector<std::vector<int>>& res) {\n    res.push_back(path);\n    for (int i = start; i < nums.size(); i++) {\n        path.push_back(nums[i]);\n        backtrack(i + 1, nums, path, res);\n        path.pop_back();\n    }\n}\nstd::vector<std::vector<int>> subsets(const std::vector<int>& nums) {\n    std::vector<std::vector<int>> res;\n    std::vector<int> path;\n    backtrack(0, nums, path, res);\n    return res;\n}`,
+          solutionHint: 'Push path and backtrack with push/pop.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-3',
+      title: 'Module 3: Combination Sum (Candidate Backtracking)',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Given an array of distinct integers candidates and a target integer target, return a list of all unique combinations where candidate numbers may be chosen an unlimited number of times.',
+      constraints: ['All numbers positive', 'Unique combinations only'],
+      sampleInputs: [
+        { input: 'candidates = [2,3,6,7], target = 7', output: '[[2,2,3],[7]]' }
+      ],
+      starterCode: `function combinationSum(candidates, target) {\n  const result = [];\n  function backtrack(start, remain, path) {\n    if (remain === 0) { result.push([...path]); return; }\n    if (remain < 0) return;\n    // TODO: Recurse with i maintaining repetition capability\n    \n  }\n  backtrack(0, target, []);\n  return result;\n}`,
+      solutionHint: 'for (let i = start; i < candidates.length; i++) { path.push(candidates[i]); backtrack(i, remain - candidates[i], path); path.pop(); }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function combinationSum(candidates, target) {\n  const res = [];\n  function backtrack(start, remain, path) {\n    if (remain === 0) { res.push([...path]); return; }\n    if (remain < 0) return;\n    for (let i = start; i < candidates.length; i++) {\n      path.push(candidates[i]);\n      backtrack(i, remain - candidates[i], path);\n      path.pop();\n    }\n  }\n  backtrack(0, target, []);\n  return res;\n}`,
+          solutionHint: 'Allow reusing index i in recursive call.'
+        },
+        python: {
+          starterCode: `def combination_sum(candidates: list[int], target: int) -> list[list[int]]:\n    res = []\n    def backtrack(start, remain, path):\n        if remain == 0: res.append(list(path)); return\n        if remain < 0: return\n        for i in range(start, len(candidates)):\n            path.append(candidates[i])\n            backtrack(i, remain - candidates[i], path)\n            path.pop()\n    backtrack(0, target, [])\n    return res`,
+          solutionHint: 'Pass current index i to allow unlimited candidate reuse.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<List<Integer>> combinationSum(int[] candidates, int target) {\n        List<List<Integer>> res = new ArrayList<>();\n        backtrack(0, target, candidates, new ArrayList<>(), res);\n        return res;\n    }\n    private static void backtrack(int start, int remain, int[] candidates, List<Integer> path, List<List<Integer>> res) {\n        if (remain == 0) { res.add(new ArrayList<>(path)); return; }\n        if (remain < 0) return;\n        for (int i = start; i < candidates.length; i++) {\n            path.add(candidates[i]);\n            backtrack(i, remain - candidates[i], candidates, path, res);\n            path.remove(path.size() - 1);\n        }\n    }\n}`,
+          solutionHint: 'Backtrack tree exploring candidate sums.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nvoid backtrack(int start, int remain, const std::vector<int>& candidates, std::vector<int>& path, std::vector<std::vector<int>>& res) {\n    if (remain == 0) { res.push_back(path); return; }\n    if (remain < 0) return;\n    for (int i = start; i < candidates.size(); i++) {\n        path.push_back(candidates[i]);\n        backtrack(i, remain - candidates[i], candidates, path, res);\n        path.pop_back();\n    }\n}\nstd::vector<std::vector<int>> combinationSum(const std::vector<int>& candidates, int target) {\n    std::vector<std::vector<int>> res;\n    std::vector<int> path;\n    backtrack(0, target, candidates, path, res);\n    return res;\n}`,
+          solutionHint: 'Target reduction recursion.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-4',
+      title: 'Module 4: Permutations (Full Array Ordering)',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Given an array nums of distinct integers, return all the possible permutations of size n! using swap-based or used-set backtracking.',
+      constraints: ['Time Complexity: O(n * n!)', 'All elements unique'],
+      sampleInputs: [
+        { input: 'nums = [1,2,3]', output: '[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]' }
+      ],
+      starterCode: `function permute(nums) {\n  const result = [];\n  const used = new Array(nums.length).fill(false);\n  function backtrack(path) {\n    if (path.length === nums.length) { result.push([...path]); return; }\n    // TODO: Iterate used array, mark used, backtrack, unmark\n    \n  }\n  backtrack([]);\n  return result;\n}`,
+      solutionHint: 'for (let i = 0; i < nums.length; i++) { if (used[i]) continue; used[i] = true; path.push(nums[i]); backtrack(path); path.pop(); used[i] = false; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function permute(nums) {\n  const res = [], used = new Array(nums.length).fill(false);\n  function backtrack(path) {\n    if (path.length === nums.length) { res.push([...path]); return; }\n    for (let i = 0; i < nums.length; i++) {\n      if (used[i]) continue;\n      used[i] = true; path.push(nums[i]);\n      backtrack(path);\n      path.pop(); used[i] = false;\n    }\n  }\n  backtrack([]);\n  return res;\n}`,
+          solutionHint: 'Track visited elements with boolean used flags.'
+        },
+        python: {
+          starterCode: `def permute(nums: list[int]) -> list[list[int]]:\n    res = []\n    used = [False] * len(nums)\n    def backtrack(path):\n        if len(path) == len(nums): res.append(list(path)); return\n        for i in range(len(nums)):\n            if used[i]: continue\n            used[i] = True; path.append(nums[i])\n            backtrack(path)\n            path.pop(); used[i] = False\n    backtrack([])\n    return res`,
+          solutionHint: 'Permutations generated using visited element flags.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<List<Integer>> permute(int[] nums) {\n        List<List<Integer>> res = new ArrayList<>();\n        boolean[] used = new boolean[nums.length];\n        backtrack(nums, used, new ArrayList<>(), res);\n        return res;\n    }\n    private static void backtrack(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> res) {\n        if (path.size() == nums.length) { res.add(new ArrayList<>(path)); return; }\n        for (int i = 0; i < nums.length; i++) {\n            if (used[i]) continue;\n            used[i] = true; path.add(nums[i]);\n            backtrack(nums, used, path, res);\n            path.remove(path.size() - 1); used[i] = false;\n        }\n    }\n}`,
+          solutionHint: 'Boolean used array permutation generator.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nvoid backtrack(const std::vector<int>& nums, std::vector<bool>& used, std::vector<int>& path, std::vector<std::vector<int>>& res) {\n    if (path.size() == nums.size()) { res.push_back(path); return; }\n    for (int i = 0; i < nums.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true; path.push_back(nums[i]);\n        backtrack(nums, used, path, res);\n        path.pop_back(); used[i] = false;\n    }\n}\nstd::vector<std::vector<int>> permute(const std::vector<int>& nums) {\n    std::vector<std::vector<int>> res;\n    std::vector<bool> used(nums.size(), false);\n    std::vector<int> path;\n    backtrack(nums, used, path, res);\n    return res;\n}`,
+          solutionHint: 'Vector used state backtracking.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-5',
+      title: 'Module 5: Generate Well-Formed Parentheses',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Given n pairs of parentheses, write a recursive function to generate all combinations of well-formed (valid) parentheses.',
+      constraints: ['1 <= n <= 8', 'Result count matches nth Catalan number'],
+      sampleInputs: [
+        { input: 'n = 3', output: '["((()))","(()())","(())()","()(())","()()()"]' },
+        { input: 'n = 1', output: '["()"]' }
+      ],
+      starterCode: `function generateParenthesis(n) {\n  const result = [];\n  function backtrack(curr, openCount, closeCount) {\n    if (curr.length === 2 * n) { result.push(curr); return; }\n    // TODO: Add \'(\' if openCount < n, add \')\' if closeCount < openCount\n    \n  }\n  backtrack('', 0, 0);\n  return result;\n}`,
+      solutionHint: 'if (openCount < n) backtrack(curr + "(", openCount + 1, closeCount); if (closeCount < openCount) backtrack(curr + ")", openCount, closeCount + 1);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function generateParenthesis(n) {\n  const res = [];\n  function backtrack(curr, open, close) {\n    if (curr.length === 2 * n) { res.push(curr); return; }\n    if (open < n) backtrack(curr + '(', open + 1, close);\n    if (close < open) backtrack(curr + ')', open, close + 1);\n  }\n  backtrack('', 0, 0);\n  return res;\n}`,
+          solutionHint: 'Only append closing parenthesis when fewer than opening.'
+        },
+        python: {
+          starterCode: `def generate_parenthesis(n: int) -> list[str]:\n    res = []\n    def backtrack(curr, open_cnt, close_cnt):\n        if len(curr) == 2 * n: res.append(curr); return\n        if open_cnt < n: backtrack(curr + '(', open_cnt + 1, close_cnt)\n        if close_cnt < open_cnt: backtrack(curr + ')', open_cnt, close_cnt + 1)\n    backtrack('', 0, 0)\n    return res`,
+          solutionHint: 'Catalan branching recursion maintaining valid balance.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<String> generateParenthesis(int n) {\n        List<String> res = new ArrayList<>();\n        backtrack("", 0, 0, n, res);\n        return res;\n    }\n    private static void backtrack(String curr, int open, int close, int n, List<String> res) {\n        if (curr.length() == 2 * n) { res.add(curr); return; }\n        if (open < n) backtrack(curr + "(", open + 1, close, n, res);\n        if (close < open) backtrack(curr + ")", open, close + 1, n, res);\n    }\n}`,
+          solutionHint: 'Recursive bracket expansion with bounds check.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n\nvoid backtrack(std::string curr, int open, int close, int n, std::vector<std::string>& res) {\n    if (curr.size() == 2 * n) { res.push_back(curr); return; }\n    if (open < n) backtrack(curr + "(", open + 1, close, n, res);\n    if (close < open) backtrack(curr + ")", open, close + 1, n, res);\n}\nstd::vector<std::string> generateParenthesis(int n) {\n    std::vector<std::string> res;\n    backtrack("", 0, 0, n, res);\n    return res;\n}`,
+          solutionHint: 'Parenthesis balancing recursion.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-6',
+      title: 'Module 6: Word Search in 2D Grid',
+      difficulty: 'Medium',
+      category: 'Recursion',
+      description: 'Given an m x n grid of characters board and a string word, return true if word exists in the grid constructed from sequentially adjacent cells in 4 directions.',
+      constraints: ['Same letter cell cannot be used more than once per word', 'Time Complexity: O(m * n * 4^L)'],
+      sampleInputs: [
+        { input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"', output: 'true' },
+        { input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"', output: 'false' }
+      ],
+      starterCode: `function exist(board, word) {\n  const m = board.length, n = board[0].length;\n  function dfs(r, c, idx) {\n    if (idx === word.length) return true;\n    if (r < 0 || r >= m || c < 0 || c >= n || board[r][c] !== word[idx]) return false;\n    const tmp = board[r][c];\n    board[r][c] = '#'; // mark visited\n    // TODO: Search 4 directions, then unmark board[r][c] = tmp\n    \n    return false;\n  }\n  // TODO: Search starting from every matching cell\n  return false;\n}`,
+      solutionHint: 'const found = dfs(r+1, c, idx+1) || dfs(r-1, c, idx+1) || dfs(r, c+1, idx+1) || dfs(r, c-1, idx+1); board[r][c] = tmp; return found;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function exist(board, word) {\n  const m = board.length, n = board[0].length;\n  function dfs(r, c, idx) {\n    if (idx === word.length) return true;\n    if (r < 0 || r >= m || c < 0 || c >= n || board[r][c] !== word[idx]) return false;\n    const tmp = board[r][c]; board[r][c] = '#';\n    const found = dfs(r + 1, c, idx + 1) || dfs(r - 1, c, idx + 1) || dfs(r, c + 1, idx + 1) || dfs(r, c - 1, idx + 1);\n    board[r][c] = tmp;\n    return found;\n  }\n  for (let r = 0; r < m; r++)\n    for (let c = 0; c < n; c++)\n      if (dfs(r, c, 0)) return true;\n  return false;\n}`,
+          solutionHint: 'Backtrack by temporarily replacing cell with "#".'
+        },
+        python: {
+          starterCode: `def exist(board: list[list[str]], word: str) -> bool:\n    m, n = len(board), len(board[0])\n    def dfs(r, c, idx):\n        if idx == len(word): return True\n        if r < 0 or r >= m or c < 0 or c >= n or board[r][c] != word[idx]: return False\n        tmp, board[r][c] = board[r][c], '#'\n        found = dfs(r + 1, c, idx + 1) or dfs(r - 1, c, idx + 1) or dfs(r, c + 1, idx + 1) or dfs(r, c - 1, idx + 1)\n        board[r][c] = tmp\n        return found\n    for r in range(m):\n        for c in range(n):\n            if dfs(r, c, 0): return True\n    return False`,
+          solutionHint: '4-directional DFS with backtrack unmarking.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean exist(char[][] board, String word) {\n        int m = board.length, n = board[0].length;\n        for (int r = 0; r < m; r++)\n            for (int c = 0; c < n; c++)\n                if (dfs(board, word, r, c, 0, m, n)) return true;\n        return false;\n    }\n    private static boolean dfs(char[][] board, String word, int r, int c, int idx, int m, int n) {\n        if (idx == word.length()) return true;\n        if (r < 0 || r >= m || c < 0 || c >= n || board[r][c] != word.charAt(idx)) return false;\n        char tmp = board[r][c]; board[r][c] = '#';\n        boolean found = dfs(board, word, r + 1, c, idx + 1, m, n) || dfs(board, word, r - 1, c, idx + 1, m, n) || dfs(board, word, r, c + 1, idx + 1, m, n) || dfs(board, word, r, c - 1, idx + 1, m, n);\n        board[r][c] = tmp;\n        return found;\n    }\n}`,
+          solutionHint: 'In-place character swap backtracking.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n\nbool dfs(std::vector<std::vector<char>>& board, const std::string& word, int r, int c, int idx, int m, int n) {\n    if (idx == word.size()) return true;\n    if (r < 0 || r >= m || c < 0 || c >= n || board[r][c] != word[idx]) return false;\n    char tmp = board[r][c]; board[r][c] = '#';\n    bool found = dfs(board, word, r + 1, c, idx + 1, m, n) || dfs(board, word, r - 1, c, idx + 1, m, n) || dfs(board, word, r, c + 1, idx + 1, m, n) || dfs(board, word, r, c - 1, idx + 1, m, n);\n    board[r][c] = tmp;\n    return found;\n}\nbool exist(std::vector<std::vector<char>>& board, const std::string& word) {\n    int m = board.size(), n = board[0].size();\n    for (int r = 0; r < m; r++)\n        for (int c = 0; c < n; c++)\n            if (dfs(board, word, r, c, 0, m, n)) return true;\n    return false;\n}`,
+          solutionHint: '2D grid character backtrack search.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-7',
+      title: 'Module 7: N-Queens Problem (Diagonal Backtracking)',
+      difficulty: 'Hard',
+      category: 'Recursion',
+      description: 'The n-queens puzzle is the problem of placing n queens on an n x n chessboard such that no two queens attack each other. Return all distinct solutions formatted as boards.',
+      constraints: ['1 <= n <= 9', 'No two queens in same row, column, or diagonal'],
+      sampleInputs: [
+        { input: 'n = 4', output: '[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]' }
+      ],
+      starterCode: `function solveNQueens(n) {\n  const result = [];\n  const cols = new Set(), diag1 = new Set(), diag2 = new Set();\n  const board = Array.from({ length: n }, () => new Array(n).fill('.'));\n  function backtrack(r) {\n    if (r === n) { result.push(board.map(row => row.join(''))); return; }\n    // TODO: Iterate columns c (0 to n-1), test diag constraints (r - c, r + c), backtrack\n    \n  }\n  backtrack(0);\n  return result;\n}`,
+      solutionHint: 'for (let c = 0; c < n; c++) { if (cols.has(c) || diag1.has(r - c) || diag2.has(r + c)) continue; cols.add(c); diag1.add(r - c); diag2.add(r + c); board[r][c] = "Q"; backtrack(r + 1); board[r][c] = "."; cols.delete(c); diag1.delete(r - c); diag2.delete(r + c); }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function solveNQueens(n) {\n  const res = [], cols = new Set(), diag1 = new Set(), diag2 = new Set();\n  const board = Array.from({ length: n }, () => new Array(n).fill('.'));\n  function backtrack(r) {\n    if (r === n) { res.push(board.map(row => row.join(''))); return; }\n    for (let c = 0; c < n; c++) {\n      if (cols.has(c) || diag1.has(r - c) || diag2.has(r + c)) continue;\n      cols.add(c); diag1.add(r - c); diag2.add(r + c); board[r][c] = 'Q';\n      backtrack(r + 1);\n      board[r][c] = '.'; cols.delete(c); diag1.delete(r - c); diag2.delete(r + c);\n    }\n  }\n  backtrack(0);\n  return res;\n}`,
+          solutionHint: 'Track occupied columns and diagonals (r - c, r + c).'
+        },
+        python: {
+          starterCode: `def solve_n_queens(n: int) -> list[list[str]]:\n    res = []\n    cols, diag1, diag2 = set(), set(), set()\n    board = [['.'] * n for _ in range(n)]\n    def backtrack(r):\n        if r == n: res.append(["".join(row) for row in board]); return\n        for c in range(n):\n            if c in cols or (r - c) in diag1 or (r + c) in diag2: continue\n            cols.add(c); diag1.add(r - c); diag2.add(r + c); board[r][c] = 'Q'\n            backtrack(r + 1)\n            board[r][c] = '.'; cols.remove(c); diag1.remove(r - c); diag2.remove(r + c)\n    backtrack(0)\n    return res`,
+          solutionHint: 'Use sets for column, main diagonal (r - c), and anti-diagonal (r + c).'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static List<List<String>> solveNQueens(int n) {\n        List<List<String>> res = new ArrayList<>();\n        char[][] board = new char[n][n];\n        for (char[] row : board) Arrays.fill(row, '.');\n        boolean[] cols = new boolean[n], diag1 = new boolean[2 * n], diag2 = new boolean[2 * n];\n        backtrack(0, n, board, cols, diag1, diag2, res);\n        return res;\n    }\n    private static void backtrack(int r, int n, char[][] board, boolean[] cols, boolean[] diag1, boolean[] diag2, List<List<String>> res) {\n        if (r == n) {\n            List<String> list = new ArrayList<>();\n            for (char[] row : board) list.add(new String(row));\n            res.add(list);\n            return;\n        }\n        for (int c = 0; c < n; c++) {\n            if (cols[c] || diag1[r - c + n] || diag2[r + c]) continue;\n            cols[c] = diag1[r - c + n] = diag2[r + c] = true;\n            board[r][c] = 'Q';\n            backtrack(r + 1, n, board, cols, diag1, diag2, res);\n            board[r][c] = '.';\n            cols[c] = diag1[r - c + n] = diag2[r + c] = false;\n        }\n    }\n}`,
+          solutionHint: 'Boolean arrays index diagonals with r - c + n offset.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n\nvoid backtrack(int r, int n, std::vector<std::string>& board, std::vector<bool>& cols, std::vector<bool>& diag1, std::vector<bool>& diag2, std::vector<std::vector<std::string>>& res) {\n    if (r == n) { res.push_back(board); return; }\n    for (int c = 0; c < n; c++) {\n        if (cols[c] || diag1[r - c + n] || diag2[r + c]) continue;\n        cols[c] = diag1[r - c + n] = diag2[r + c] = true;\n        board[r][c] = 'Q';\n        backtrack(r + 1, n, board, cols, diag1, diag2, res);\n        board[r][c] = '.';\n        cols[c] = diag1[r - c + n] = diag2[r + c] = false;\n    }\n}\nstd::vector<std::vector<std::string>> solveNQueens(int n) {\n    std::vector<std::vector<std::string>> res;\n    std::vector<std::string> board(n, std::string(n, '.'));\n    std::vector<bool> cols(n, false), diag1(2 * n, false), diag2(2 * n, false);\n    backtrack(0, n, board, cols, diag1, diag2, res);\n    return res;\n}`,
+          solutionHint: 'N-Queens diagonal constraint solver.'
+        }
+      }
+    },
+    {
+      id: 'rec-mod-8',
+      title: 'Module 8: Sudoku Solver (9x9 Constraint Backtracking)',
+      difficulty: 'Hard',
+      category: 'Recursion',
+      description: 'Write a program to solve a 9x9 Sudoku puzzle by filling the empty cells (marked with \'.\') ensuring each digit 1-9 occurs exactly once per row, column, and 3x3 sub-box.',
+      constraints: ['Input board always has unique valid solution', 'Time Complexity: O(9^(empty cells))'],
+      sampleInputs: [
+        { input: '9x9 board with empty cells marked with \'.\'', output: 'Fully solved valid 9x9 Sudoku board in-place' }
+      ],
+      starterCode: `function solveSudoku(board) {\n  function isValid(r, c, ch) {\n    for (let i = 0; i < 9; i++) {\n      if (board[r][i] === ch || board[i][c] === ch) return false;\n      const boxR = 3 * Math.floor(r / 3) + Math.floor(i / 3);\n      const boxC = 3 * Math.floor(c / 3) + (i % 3);\n      if (board[boxR][boxC] === ch) return false;\n    }\n    return true;\n  }\n  function solve() {\n    // TODO: Find first empty \'.\', try \'1\'-\'9\', backtrack\n    \n    return true;\n  }\n  solve();\n}`,
+      solutionHint: 'Loop r from 0-8, c from 0-8: if (board[r][c] === ".") { for (let d = 1; d <= 9; d++) { const ch = String(d); if (isValid(r, c, ch)) { board[r][c] = ch; if (solve()) return true; board[r][c] = "."; } } return false; } return true;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function solveSudoku(board) {\n  function isValid(r, c, ch) {\n    for (let i = 0; i < 9; i++) {\n      if (board[r][i] === ch || board[i][c] === ch) return false;\n      const br = 3 * Math.floor(r / 3) + Math.floor(i / 3), bc = 3 * Math.floor(c / 3) + (i % 3);\n      if (board[br][bc] === ch) return false;\n    }\n    return true;\n  }\n  function solve() {\n    for (let r = 0; r < 9; r++) {\n      for (let c = 0; c < 9; c++) {\n        if (board[r][c] === '.') {\n          for (let d = 1; d <= 9; d++) {\n            const ch = String(d);\n            if (isValid(r, c, ch)) {\n              board[r][c] = ch;\n              if (solve()) return true;\n              board[r][c] = '.';\n            }\n          }\n          return false;\n        }\n      }\n    }\n    return true;\n  }\n  solve();\n}`,
+          solutionHint: 'Try candidate digits 1-9 on empty cell with box, row, and column checks.'
+        },
+        python: {
+          starterCode: `def solve_sudoku(board: list[list[str]]) -> None:\n    def is_valid(r, c, ch):\n        for i in range(9):\n            if board[r][i] == ch or board[i][c] == ch: return False\n            if board[3 * (r // 3) + i // 3][3 * (c // 3) + i % 3] == ch: return False\n        return True\n    def solve():\n        for r in range(9):\n            for c in range(9):\n                if board[r][c] == '.':\n                    for d in '123456789':\n                        if is_valid(r, c, d):\n                            board[r][c] = d\n                            if solve(): return True\n                            board[r][c] = '.'\n                    return False\n        return True\n    solve()`,
+          solutionHint: 'In-place Sudoku board constraint propagation and backtracking.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static void solveSudoku(char[][] board) {\n        solve(board);\n    }\n    private static boolean solve(char[][] board) {\n        for (int r = 0; r < 9; r++) {\n            for (int c = 0; c < 9; c++) {\n                if (board[r][c] == '.') {\n                    for (char d = '1'; d <= '9'; d++) {\n                        if (isValid(board, r, c, d)) {\n                            board[r][c] = d;\n                            if (solve(board)) return true;\n                            board[r][c] = '.';\n                        }\n                    }\n                    return false;\n                }\n            }\n        }\n        return true;\n    }\n    private static boolean isValid(char[][] board, int r, int c, char ch) {\n        for (int i = 0; i < 9; i++) {\n            if (board[r][i] == ch || board[i][c] == ch) return false;\n            if (board[3 * (r / 3) + i / 3][3 * (c / 3) + i % 3] == ch) return false;\n        }\n        return true;\n    }\n}`,
+          solutionHint: 'Recursive cell filling with sub-box math check.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nbool isValid(const std::vector<std::vector<char>>& board, int r, int c, char ch) {\n    for (int i = 0; i < 9; i++) {\n        if (board[r][i] == ch || board[i][c] == ch) return false;\n        if (board[3 * (r / 3) + i / 3][3 * (c / 3) + i % 3] == ch) return false;\n    }\n    return true;\n}\nbool solve(std::vector<std::vector<char>>& board) {\n    for (int r = 0; r < 9; r++) {\n        for (int c = 0; c < 9; c++) {\n            if (board[r][c] == '.') {\n                for (char d = '1'; d <= '9'; d++) {\n                    if (isValid(board, r, c, d)) {\n                        board[r][c] = d;\n                        if (solve(board)) return true;\n                        board[r][c] = '.';\n                    }\n                }\n                return false;\n            }\n        }\n    }\n    return true;\n}\nvoid solveSudoku(std::vector<std::vector<char>>& board) {\n    solve(board);\n}`,
+          solutionHint: '9x9 Sudoku backtracking constraint solver.'
+        }
+      }
     }
   ],
 

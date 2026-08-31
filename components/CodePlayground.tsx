@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send, Users } from 'lucide-react';
+import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send, Users, Eye } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { SavedSnippet } from '../types';
+import { AlgorithmCanvas } from './AlgorithmCanvas';
+import { VisualizerToolbar } from './VisualizerToolbar';
+import { parseVisualizerState, type VisualizerSnapshot } from '../utils/visualizerStateParser';
 
 interface CodePlaygroundProps {
   initialCode: string;
@@ -41,6 +44,12 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [srcDoc, setSrcDoc] = useState('');
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+  const [visualizerMode, setVisualizerMode] = useState(false);
+  const [visualizerSnapshots, setVisualizerSnapshots] = useState<VisualizerSnapshot[]>([]);
+  const [visualizerStep, setVisualizerStep] = useState(0);
+  const [visualizerSpeed, setVisualizerSpeed] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [visualizerError, setVisualizerError] = useState<string | null>(null);
 
   const [savedSnippets, setSavedSnippets] = useState<SavedSnippet[]>([]);
   const [showSnippetsPanel, setShowSnippetsPanel] = useState(false);
@@ -218,6 +227,67 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
       timeoutRef.current = null;
     }
   };
+
+  const clampStep = (value: number, total: number) => {
+    if (total <= 0) return 0;
+    return Math.min(Math.max(value, 0), total - 1);
+  };
+
+  const handleVisualizerPlay = () => {
+    if (visualizerSnapshots.length === 0) return;
+    if (visualizerStep >= visualizerSnapshots.length - 1) {
+      setVisualizerStep(0);
+    }
+    setIsPlaying(true);
+  };
+
+  const handleVisualizerPause = () => {
+    setIsPlaying(false);
+  };
+
+  const handleVisualizerStepForward = () => {
+    setIsPlaying(false);
+    setVisualizerStep((prev) => clampStep(prev + 1, visualizerSnapshots.length));
+  };
+
+  const handleVisualizerStepBackward = () => {
+    setIsPlaying(false);
+    setVisualizerStep((prev) => clampStep(prev - 1, visualizerSnapshots.length));
+  };
+
+  useEffect(() => {
+    if (!visualizerMode) {
+      setVisualizerSnapshots([]);
+      setVisualizerStep(0);
+      setVisualizerError(null);
+      setIsPlaying(false);
+      return;
+    }
+
+    const parsed = parseVisualizerState(code);
+    setVisualizerSnapshots(parsed.snapshots);
+    setVisualizerError(parsed.unsupportedReason ?? null);
+    setVisualizerStep((prev) => clampStep(prev, parsed.snapshots.length || 0));
+    setIsPlaying(false);
+  }, [code, visualizerMode]);
+
+  useEffect(() => {
+    if (!visualizerMode || !isPlaying || visualizerSnapshots.length === 0) return;
+
+    const intervalMs = Math.max(250, 1200 / visualizerSpeed);
+    const intervalId = window.setInterval(() => {
+      setVisualizerStep((prev) => {
+        if (prev >= visualizerSnapshots.length - 1) {
+          setIsPlaying(false);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, intervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [visualizerMode, isPlaying, visualizerSpeed, visualizerSnapshots]);
+
   const getEditorLanguage = (lang?: string): string => {
     const l = (lang || '').toLowerCase().trim();
     if (l.includes('python') || l === 'py') return 'python';
@@ -324,6 +394,20 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
 
           <button
             type="button"
+            onClick={() => setVisualizerMode((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight ${
+              visualizerMode
+                ? 'bg-primary/15 text-primaryLight border-primary/30'
+                : 'text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 border-black/10 dark:border-white/5'
+            }`}
+            title="Toggle visualizer mode"
+          >
+            <Eye size={12} />
+            Visualizer Mode
+          </button>
+
+          <button
+            type="button"
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-textMuted hover:text-textMain hover:bg-black/5 dark:hover:bg-white/5 rounded-lg border border-black/10 dark:border-white/5 font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primaryLight"
             title="Reset to original code"
@@ -378,6 +462,35 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
           }}
         />
       </div>
+
+      {visualizerMode && (
+        <div className="border-t border-black/10 dark:border-white/10 bg-[#091121]">
+          <VisualizerToolbar
+            isPlaying={isPlaying}
+            currentStep={visualizerStep}
+            totalSteps={visualizerSnapshots.length}
+            speed={visualizerSpeed}
+            onPlay={handleVisualizerPlay}
+            onPause={handleVisualizerPause}
+            onStepForward={handleVisualizerStepForward}
+            onStepBackward={handleVisualizerStepBackward}
+            onSpeedChange={setVisualizerSpeed}
+            disabled={visualizerSnapshots.length === 0}
+          />
+
+          {visualizerError ? (
+            <div className="border-t border-black/10 px-4 py-4 text-sm text-amber-300 dark:border-white/10">
+              {visualizerError}
+            </div>
+          ) : (
+            <AlgorithmCanvas
+              snapshot={visualizerSnapshots[visualizerStep]}
+              currentStep={visualizerStep}
+              totalSteps={visualizerSnapshots.length}
+            />
+          )}
+        </div>
+      )}
 
       {/* Sandbox IFrame */}
       {isExecuting && srcDoc && (

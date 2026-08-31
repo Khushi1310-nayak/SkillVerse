@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Trophy, Flame, BookOpen, Award, Shield, Calendar, Lock,
-    Footprints, Briefcase, Loader2, UserX, Link2, Check
+    Footprints, Briefcase, Loader2, UserX, Link2, Check, EyeOff
 } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { BADGE_DEFINITIONS, XP_STORE_FRAMES } from '../constants';
 import { User } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 const AVATARS: Record<string, string> = {
     '1': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
@@ -23,6 +24,7 @@ const BADGE_ICONS: Record<string, any> = {
 export const PublicProfilePage: React.FC = () => {
     const { username } = useParams<{ username: string }>();
     const navigate = useNavigate();
+    const { user, appUser } = useAuth();
     const [profile, setProfile] = useState<(User & { uid: string }) | null>(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
@@ -73,6 +75,30 @@ export const PublicProfilePage: React.FC = () => {
         );
     }
 
+    const isOwner = Boolean(
+        user && (user.uid === profile.uid || (appUser?.username && appUser.username.toLowerCase() === profile.username.toLowerCase()))
+    );
+    const isProfilePrivate = profile.settings?.publicProfileEnabled === false;
+
+    if (isProfilePrivate && !isOwner) {
+        return (
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-6 shadow-xl">
+                    <Lock size={32} />
+                </div>
+                <h1 className="text-3xl font-bold text-textMain mb-4">This Profile is Private</h1>
+                <p className="text-textMuted max-w-md mb-8">
+                    {profile.username} has set their SkillVerse learner profile to private. Their achievements and learning progress are not publicly visible.
+                </p>
+                <button onClick={() => navigate('/')} className="px-6 py-3 bg-gradient-main text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
+                    Return to SkillVerse
+                </button>
+            </div>
+        );
+    }
+
+    const hiddenBadges = profile.settings?.publicProfileHiddenBadges || [];
+
     return (
         <div className="min-h-screen bg-background flex flex-col items-center px-4 py-10 sm:py-16">
             <div className="w-full max-w-2xl mb-6 flex justify-between items-center bg-white/5 backdrop-blur-md border border-black/20 dark:border-white/10 p-4 rounded-2xl shadow-xl">
@@ -90,6 +116,14 @@ export const PublicProfilePage: React.FC = () => {
 
             <div className="relative w-full max-w-2xl bg-glass border border-black/20 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="space-y-8">
+                    {/* Private preview warning for owner */}
+                    {isOwner && isProfilePrivate && (
+                        <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                            <EyeOff size={16} className="shrink-0" />
+                            <span>Your profile is currently set to <strong>Private</strong>. Only you can view this preview. You can enable public sharing in Settings.</span>
+                        </div>
+                    )}
+
                     {/* Header / Avatar & Info */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
                         <div className="relative">
@@ -164,8 +198,14 @@ export const PublicProfilePage: React.FC = () => {
                         </h2>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {BADGE_DEFINITIONS.map(badge => {
+                            {BADGE_DEFINITIONS.filter(badge => {
+                                if (!isOwner && hiddenBadges.includes(badge.id)) {
+                                    return false;
+                                }
+                                return true;
+                            }).map(badge => {
                                 const earned = (profile.badges || []).includes(badge.id);
+                                const isHiddenFromPublic = hiddenBadges.includes(badge.id);
                                 const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
 
                                 return (
@@ -180,8 +220,15 @@ export const PublicProfilePage: React.FC = () => {
                                             }`}>
                                             {earned ? <BadgeIcon size={20} /> : <Lock size={18} />}
                                         </div>
-                                        <div>
-                                            <div className="font-bold text-sm text-textMain">{badge.name}</div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-sm text-textMain">{badge.name}</span>
+                                                {isOwner && isHiddenFromPublic && (
+                                                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                        Hidden
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="text-xs text-textMuted">{badge.description}</div>
                                         </div>
                                     </div>

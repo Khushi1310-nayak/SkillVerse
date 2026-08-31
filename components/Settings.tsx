@@ -180,6 +180,15 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleToggleBadgeVisibility = (badgeId: string) => {
+    const currentHidden = formData.settings.publicProfileHiddenBadges || [];
+    const isHidden = currentHidden.includes(badgeId);
+    const updatedHidden = isHidden
+      ? currentHidden.filter(id => id !== badgeId)
+      : [...currentHidden, badgeId];
+    handleChange('publicProfileHiddenBadges', updatedHidden);
+  };
+
   const handleCopyProfileLink = async () => {
     const profileUrl = `${window.location.origin}${window.location.pathname}#/u/${encodeURIComponent(user.username)}`;
     try {
@@ -608,6 +617,22 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                   <h3 className="text-lg font-bold text-textMain flex items-center gap-2">
                     <Shield size={18} className="text-primaryLight" /> Privacy
                   </h3>
+
+                  <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-textMain">Public Profile Visibility</div>
+                      <div className="text-sm text-textMuted">
+                        Allow others to view your public profile page and verified achievements via your shareable link.
+                      </div>
+                    </div>
+                    <div className="shrink-0 mt-1">
+                      <Toggle
+                        checked={formData.settings.publicProfileEnabled !== false}
+                        onChange={(v) => handleChange('publicProfileEnabled', v)}
+                        ariaLabel="Toggle public profile visibility"
+                      />
+                    </div>
+                  </div>
 
                   <div className="flex items-start justify-between gap-4 p-4 bg-white/50 dark:bg-white/5 rounded-xl border border-black/20 dark:border-white/5">
                     <div className="flex-1 min-w-0">
@@ -1490,9 +1515,14 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
             {/* Achievements Section */}
             {activeTab === 'achievements' && (
               <div className="space-y-8 animate-fade-in">
-                <h2 className="text-2xl font-bold text-textMain mb-6 flex items-center gap-2">
-                  <Trophy className="text-primaryLight" /> {t('settings.achievements.title')}
-                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+                  <h2 className="text-2xl font-bold text-textMain flex items-center gap-2">
+                    <Trophy className="text-primaryLight" /> {t('settings.achievements.title')}
+                  </h2>
+                  <p className="text-xs text-textMuted">
+                    Customize which earned achievements appear on your public profile.
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(() => {
@@ -1502,8 +1532,11 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                       mockInterviews: storageService.getCareerProgress().mockInterviewScores.length,
                     };
 
+                    const hiddenBadges = formData.settings.publicProfileHiddenBadges || [];
+
                     return BADGE_DEFINITIONS.map(badge => {
                       const earned = (formData.badges || []).includes(badge.id);
+                      const isVisible = !hiddenBadges.includes(badge.id);
                       const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
                       const progress = !earned ? getBadgeProgress(badge, badgeMetrics) : null;
 
@@ -1528,6 +1561,18 @@ export const Settings: React.FC<SettingsProps> = ({ user, onPreviewUpdate, onUpd
                               <BadgeProgressBar current={progress.current} target={progress.target} label={progress.label} />
                             )}
                           </div>
+                          {earned && (
+                            <div className="shrink-0 flex flex-col items-end gap-1 pl-2">
+                              <span className="text-[10px] font-semibold text-textMuted uppercase tracking-wider">
+                                {isVisible ? 'Public' : 'Hidden'}
+                              </span>
+                              <Toggle
+                                checked={isVisible}
+                                onChange={() => handleToggleBadgeVisibility(badge.id)}
+                                ariaLabel={`Toggle public visibility for ${badge.name}`}
+                              />
+                            </div>
+                          )}
                         </div>
                       );
                     });

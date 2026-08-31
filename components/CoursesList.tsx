@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, PlayCircle, CheckCircle, ChevronDown, Star, Bookmark, ArrowUpDown, X, Lock } from 'lucide-react';
 import { isCourseUnlocked, getIncompletePrerequisites } from '../utils/prerequisites';
 import { CATEGORIES, COURSES } from '../constants';
@@ -9,22 +9,54 @@ import { firestoreService } from '../services/firestoreService';
 import { courseBookmarks } from '../utils/courseBookmarks';
 import { useBookmarks } from '../hooks/useBookmarks';
 import { Course } from '../types';
-
-type SortOption = 'default' | 'rating' | 'reviews' | 'az';
-type LevelFilter = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
-type TimeFilter = 'all' | 'under30' | '30to60' | '1to2h' | '2hplus';
+import {
+  type SortOption,
+  type LevelFilter,
+  type TimeFilter,
+  validateCategory,
+  validateLevel,
+  validateTime,
+  validateSort,
+  validateSavedOnly,
+} from '../utils/courseFiltersValidation';
 
 export const CoursesList: React.FC = () => {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [courses, setCourses] = useState<Course[]>(COURSES);
-  const [search, setSearch] = useState('');
-  const [filterCat, setFilterCat] = useState('all');
-  const [filterLevel, setFilterLevel] = useState<LevelFilter>('all');
-  const [filterTime, setFilterTime] = useState<TimeFilter>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [savedOnly, setSavedOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const bookmarkedIds = useBookmarks();
+
+  const search = searchParams.get('q') ?? '';
+  const filterCat = validateCategory(searchParams.get('category'));
+  const filterLevel = validateLevel(searchParams.get('level'));
+  const filterTime = validateTime(searchParams.get('time'));
+  const sortBy = validateSort(searchParams.get('sort'));
+  const savedOnly = searchParams.get('saved') === '1';
+
+  const updateFilter = (key: string, value: string) => {
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (value && value !== 'all' && value !== 'default' && value !== '0') {
+      nextParams.set(key, value);
+    } else {
+      nextParams.delete(key);
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  };
+
+  const toggleSavedOnly = () => {
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (savedOnly) {
+      nextParams.delete('saved');
+    } else {
+      nextParams.set('saved', '1');
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  };
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -125,13 +157,12 @@ export const CoursesList: React.FC = () => {
   const hasActiveFilters =
     search !== '' || filterCat !== 'all' || filterLevel !== 'all' || filterTime !== 'all' || sortBy !== 'default' || savedOnly;
 
+  const emptyStateMessage = hasActiveFilters
+    ? 'No courses match your current filters. Try broadening a filter or clear all filters to see the full catalog.'
+    : t('courses.empty');
+
   const clearFilters = () => {
-    setSearch('');
-    setFilterCat('all');
-    setFilterLevel('all');
-    setFilterTime('all');
-    setSortBy('default');
-    setSavedOnly(false);
+    setSearchParams({}, { replace: true });
   };
 
   return (
@@ -150,7 +181,7 @@ export const CoursesList: React.FC = () => {
             type="text"
             placeholder={t('courses.searchPlaceholder')}
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => updateFilter('q', e.target.value)}
             className="w-full bg-gradient-input border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-11 pr-4 text-black placeholder-textMuted focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight transition-all"
           />
         </div>
@@ -159,7 +190,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterCat}
-              onChange={e => setFilterCat(e.target.value)}
+              onChange={e => updateFilter('category', e.target.value)}
               title={t('courses.filterTitle')}
               aria-label={t('courses.filterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -175,7 +206,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterLevel}
-              onChange={e => setFilterLevel(e.target.value as LevelFilter)}
+              onChange={e => updateFilter('level', e.target.value)}
               title={t('courses.difficultyFilterTitle')}
               aria-label={t('courses.difficultyFilterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -191,7 +222,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[160px]">
             <select
               value={filterTime}
-              onChange={e => setFilterTime(e.target.value as TimeFilter)}
+              onChange={e => updateFilter('time', e.target.value)}
               title={t('courses.timeFilterTitle')}
               aria-label={t('courses.timeFilterTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -208,7 +239,7 @@ export const CoursesList: React.FC = () => {
           <div className="relative group min-w-[180px]">
             <select
               value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortOption)}
+              onChange={e => updateFilter('sort', e.target.value)}
               title={t('courses.sortTitle')}
               aria-label={t('courses.sortTitle')}
               className="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20 rounded-xl py-3 pl-4 pr-10 text-textMain focus:outline-none focus:border-primaryLight focus:ring-1 focus:ring-primaryLight appearance-none cursor-pointer transition-all"
@@ -222,7 +253,7 @@ export const CoursesList: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setSavedOnly(prev => !prev)}
+            onClick={toggleSavedOnly}
             aria-pressed={savedOnly}
             className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold text-sm transition-all ${savedOnly
                 ? 'bg-primary/20 border-primary/40 text-primaryLight'
@@ -428,8 +459,17 @@ export const CoursesList: React.FC = () => {
             })}
 
             {filtered.length === 0 && (
-              <div className="col-span-full text-center py-20 text-textMuted">
-                {t('courses.empty')}
+              <div className="col-span-full text-center py-20">
+                <p className="text-textMuted mb-4">{emptyStateMessage}</p>
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primaryLight hover:bg-primary/20 transition-colors font-semibold"
+                  >
+                    <X size={16} />
+                    {t('courses.clearFilters')}
+                  </button>
+                )}
               </div>
             )}
           </>

@@ -25,13 +25,13 @@ export const AIMascotLogo: React.FC<{ size?: number; className?: string }> = ({ 
   if (!imgError) {
     return (
       <div
-        className={`relative inline-flex items-center justify-center shrink-0 rounded-full overflow-hidden shadow-md ring-2 ring-primaryLight/40 ${className}`}
+        className={`relative inline-flex items-center justify-center shrink-0 rounded-full overflow-hidden shadow-md ring-1.5 ring-white/30 bg-[#0E1322] ${className}`}
         style={{ width: size, height: size }}
       >
         <img
           src="/ai-bot-avatar.png"
           alt="SkillVerse AI Tutor"
-          className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-300 rounded-full"
           onError={() => setImgError(true)}
           width={size}
           height={size}
@@ -48,7 +48,7 @@ export const AIMascotLogo: React.FC<{ size?: number; className?: string }> = ({ 
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`shrink-0 ${className}`}
+      className={`shrink-0 rounded-full bg-[#0E1322] ${className}`}
       aria-label="SkillVerse AI Mascot"
     >
       <defs>
@@ -377,7 +377,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
           <button
             id="ai-assistant-toggle"
             onClick={() => setIsOpen(true)}
-            className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary via-secondary to-indigo-600 p-1 text-white shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaryLight/50"
+            className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary via-secondary to-indigo-600 p-[3px] text-white shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primaryLight/50"
             title={t('aiAssistant.toggle.open', 'Open AI Assistant')}
             aria-label={t('aiAssistant.toggle.open', 'Open AI Assistant')}
           >
@@ -386,7 +386,11 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
 
             {/* Inner mascot container */}
             <div className="relative z-10 w-full h-full rounded-full bg-[#0E1322] flex items-center justify-center overflow-hidden border border-white/20 shadow-inner">
-              <AIMascotLogo size={48} className="transition-transform duration-300 group-hover/ai:scale-110 group-hover/ai:rotate-3" />
+              <img
+                src="/ai-bot-avatar.png"
+                alt="SkillVerse AI Tutor"
+                className="w-full h-full object-cover object-center rounded-full transition-transform duration-300 group-hover/ai:scale-110 group-hover/ai:rotate-3"
+              />
             </div>
 
             {/* Online Status Indicator */}
@@ -400,4 +404,3 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
     </div>
   );
 };
-

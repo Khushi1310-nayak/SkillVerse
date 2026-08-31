@@ -11,6 +11,7 @@ import { SavedSnippet } from '../types';
 interface CodePlaygroundProps {
   initialCode: string;
   language?: string;
+  height?: string;
   onRequestReview?: (code: string, language: string) => Promise<void>;
   isReviewSubmitting?: boolean;
 }
@@ -30,6 +31,7 @@ interface RuntimeError {
 export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   initialCode,
   language,
+  height = '360px',
   onRequestReview,
   isReviewSubmitting = false,
 }) => {
@@ -304,7 +306,7 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
       {/* Monaco Editor Component */}
       <div className="relative border-b border-black/10 dark:border-white/5 bg-[#1e1e1e]">
         <Editor
-          height="250px"
+          height={height}
           defaultLanguage="javascript"
           language="javascript"
           value={code}

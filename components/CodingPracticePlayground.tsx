@@ -159,64 +159,80 @@ export const CodingPracticePlayground: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Workspace Split Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Stacked Main Workspace: Problem Statement Full Width ON TOP, Monaco Editor Full Width UNDERNEATH */}
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* Left Panel: Problem Statement & Instructions */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="bg-glass border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl space-y-6">
-            
-            {/* Title & Metadata */}
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border ${getDifficultyColor(currentProblem.difficulty)}`}>
-                  {currentProblem.difficulty}
-                </span>
-                <span className="text-xs font-bold text-textMuted uppercase tracking-widest">
-                  Module {selectedModuleIndex + 1} of 8
-                </span>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {currentProblem.title}
-              </h2>
-              <p className="text-textMuted text-sm leading-relaxed">
-                {currentProblem.description}
-              </p>
+        {/* TOP SECTION: Problem Statement, Constraints, Sample Cases & Hints (Full Width) */}
+        <div className="bg-glass border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+          {/* Header Row: Difficulty, Module Progress & Course Badge */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <span className={`px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider border shadow-sm ${getDifficultyColor(currentProblem.difficulty)}`}>
+                {currentProblem.difficulty}
+              </span>
+              <span className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-textMuted tracking-wider">
+                Module {selectedModuleIndex + 1} of 8
+              </span>
+              <span className="px-3 py-1 rounded-xl bg-primary/10 border border-primary/20 text-xs font-semibold text-primaryLight">
+                {activeCourse.title} Track
+              </span>
             </div>
+            <Link
+              to={`/course/${activeCourse.id}`}
+              className="inline-flex items-center gap-2 text-xs font-bold text-primaryLight hover:text-white transition-colors px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
+            >
+              <BookOpen size={14} /> Review {activeCourse.title} Theory
+            </Link>
+          </div>
 
-            {/* Constraints */}
+          {/* Problem Title & Full Description */}
+          <div>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">
+              {currentProblem.title}
+            </h2>
+            <p className="text-textMuted text-sm md:text-base leading-relaxed max-w-5xl">
+              {currentProblem.description}
+            </p>
+          </div>
+
+          {/* 3-Column Detail Cards Grid: Constraints, Samples, and Solution Hint */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
+            
+            {/* Column 1: Constraints & Requirements */}
             {currentProblem.constraints && currentProblem.constraints.length > 0 && (
-              <div className="border-t border-white/10 pt-5">
-                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider mb-3">
-                  Constraints & Requirements
-                </h3>
-                <ul className="space-y-2">
-                  {currentProblem.constraints.map((constraint, i) => (
-                    <li key={i} className="flex items-center gap-2.5 text-xs text-textMuted font-mono">
-                      <CheckCircle2 size={14} className="text-primaryLight shrink-0" />
-                      <span>{constraint}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="bg-[#0f1623]/80 rounded-2xl p-5 border border-white/5 space-y-3 shadow-inner flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-primaryLight" /> Constraints & Rules
+                  </h3>
+                  <ul className="space-y-2">
+                    {currentProblem.constraints.map((constraint, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs text-textMuted font-mono">
+                        <span className="text-primaryLight font-bold">•</span>
+                        <span>{constraint}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
 
-            {/* Sample Inputs & Outputs */}
+            {/* Column 2: Sample Test Cases */}
             {currentProblem.sampleInputs && currentProblem.sampleInputs.length > 0 && (
-              <div className="border-t border-white/10 pt-5">
-                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider mb-3">
-                  Sample Test Cases
+              <div className="bg-[#0f1623]/80 rounded-2xl p-5 border border-white/5 space-y-3 shadow-inner">
+                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Code2 size={14} className="text-blue-400" /> Sample Test Cases
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-3 max-h-[190px] overflow-y-auto pr-1 custom-scrollbar">
                   {currentProblem.sampleInputs.map((sample, i) => (
-                    <div key={i} className="bg-[#0f1623] rounded-2xl p-4 border border-white/5 space-y-2 font-mono text-xs shadow-inner">
+                    <div key={i} className="bg-black/30 rounded-xl p-3 border border-white/5 space-y-1.5 font-mono text-xs">
                       <div>
-                        <span className="text-textMuted/60 text-[10px] uppercase block mb-1">Input:</span>
-                        <code className="text-blue-300 bg-white/5 px-2 py-1 rounded-md block overflow-x-auto">{sample.input}</code>
+                        <span className="text-textMuted/70 text-[10px] uppercase font-bold block">Input:</span>
+                        <code className="text-blue-300 bg-white/5 px-2 py-0.5 rounded text-[11px] block overflow-x-auto">{sample.input}</code>
                       </div>
                       <div>
-                        <span className="text-textMuted/60 text-[10px] uppercase block mb-1">Expected Output:</span>
-                        <code className="text-emerald-400 bg-white/5 px-2 py-1 rounded-md block overflow-x-auto">{sample.output}</code>
+                        <span className="text-textMuted/70 text-[10px] uppercase font-bold block">Expected Output:</span>
+                        <code className="text-emerald-400 bg-white/5 px-2 py-0.5 rounded text-[11px] block overflow-x-auto">{sample.output}</code>
                       </div>
                     </div>
                   ))}
@@ -224,56 +240,65 @@ export const CodingPracticePlayground: React.FC = () => {
               </div>
             )}
 
-            {/* Collapsible Solution Hint */}
-            <div className="border-t border-white/10 pt-5">
-              <button
-                onClick={() => setShowHint(!showHint)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-all text-xs font-bold"
-              >
-                <div className="flex items-center gap-2">
-                  <Lightbulb size={16} />
-                  <span>{showHint ? 'Hide Solution Hint' : 'Need a Hint?'}</span>
-                </div>
-                <ChevronRight size={16} className={`transition-transform ${showHint ? 'rotate-90' : ''}`} />
-              </button>
-              {showHint && (
-                <div className="mt-3 p-4 rounded-2xl bg-[#0f1623] border border-amber-500/30 text-amber-200 text-xs font-mono leading-relaxed animate-fade-in shadow-inner">
-                  💡 <strong>Hint:</strong> {currentProblem.solutionHint}
-                </div>
-              )}
+            {/* Column 3: Solution Guidance & Hints */}
+            <div className="bg-[#0f1623]/80 rounded-2xl p-5 border border-white/5 space-y-3 shadow-inner flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Lightbulb size={14} className="text-amber-400" /> Solution Guidance
+                </h3>
+                <p className="text-xs text-textMuted leading-relaxed mb-3">
+                  Need a hint to get started? Reveal the solution architecture tip below.
+                </p>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowHint(!showHint)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-all text-xs font-bold"
+                >
+                  <div className="flex items-center gap-2">
+                    <Lightbulb size={15} />
+                    <span>{showHint ? 'Hide Solution Hint' : 'Reveal Solution Hint'}</span>
+                  </div>
+                  <ChevronRight size={15} className={`transition-transform duration-200 ${showHint ? 'rotate-90' : ''}`} />
+                </button>
+                {showHint && (
+                  <div className="mt-3 p-3.5 rounded-xl bg-black/40 border border-amber-500/30 text-amber-200 text-xs font-mono leading-relaxed animate-fade-in shadow-inner">
+                    💡 <strong>Hint:</strong> {currentProblem.solutionHint}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Back to Course Action */}
-            <div className="border-t border-white/10 pt-5 flex items-center justify-between">
-              <Link
-                to={`/course/${activeCourse.id}`}
-                className="inline-flex items-center gap-2 text-xs font-bold text-primaryLight hover:text-white transition-colors"
-              >
-                <BookOpen size={14} /> Review {activeCourse.title} Theory
-              </Link>
-            </div>
           </div>
         </div>
 
-        {/* Right Panel: Monaco Code Editor & Live Terminal */}
-        <div className="lg:col-span-7">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-              <span className="text-xs font-bold text-textMuted uppercase tracking-wider flex items-center gap-2">
-                <Terminal size={14} className="text-primaryLight" /> Candidate Starter Code Sandbox
+        {/* BOTTOM SECTION: Full-Width Monaco Code Editor & Live Sandbox Terminal */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-2">
+              <Terminal size={16} className="text-primaryLight" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">
+                Full-Screen Candidate Starter Code Sandbox
               </span>
-              <span className="text-xs text-textMuted/60 italic">Edit code below and click "Run Code"</span>
+              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-primaryLight">
+                {currentLanguage}
+              </span>
             </div>
-            
-            {/* Interactive Code Playground Component with Starter Code */}
-            <CodePlayground
-              key={`${activeCourse.id}-${selectedModuleIndex}`}
-              initialCode={currentProblem.starterCode}
-              language={currentLanguage}
-              onRequestReview={handleRequestReview}
-              isReviewSubmitting={isReviewSubmitting}
-            />
+            <span className="text-xs text-textMuted hidden sm:inline">
+              Edit the implementation below and click <strong className="text-emerald-400">"Run Code"</strong> to test live.
+            </span>
           </div>
+          
+          {/* Full-Width Interactive Code Playground */}
+          <CodePlayground
+            key={`${activeCourse.id}-${selectedModuleIndex}`}
+            initialCode={currentProblem.starterCode}
+            language={currentLanguage}
+            height="380px"
+            onRequestReview={handleRequestReview}
+            isReviewSubmitting={isReviewSubmitting}
+          />
         </div>
 
       </div>

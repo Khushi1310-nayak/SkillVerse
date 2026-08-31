@@ -346,3 +346,27 @@ export interface PairSession {
   participants: PairSessionParticipant[];
   createdAt: string;
 }
+
+// --- Daily Micro-Challenge & Streak Saver ---
+export interface MicroChallenge {
+  id: string;
+  topic: string;
+  type: 'multiple-choice' | 'output-prediction' | 'syntax';
+  question: string;
+  codeSnippet?: string;
+  language?: string;
+  options: string[];
+  correctAnswer: number; // 0-based index
+  explanation: string;
+  xpReward: number;
+}
+
+export interface MicroChallengeState {
+  date: string; // YYYY-MM-DD
+  challengeId: string;
+  completed: boolean;
+  selectedAnswer: number | null;
+  isCorrect: boolean;
+  rewardClaimed: boolean;
+}
+

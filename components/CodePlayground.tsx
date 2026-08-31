@@ -51,15 +51,16 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   const { showToast } = useToast();
 
   const handleStartPairSession = async () => {
-    if (!user?.uid) {
+    const effectiveUserId = user?.uid || appUser?.uid;
+    if (!effectiveUserId) {
       showToast({ message: 'Please log in to start a pair programming session.', type: 'error' });
       return;
     }
     setIsStartingPairSession(true);
     try {
-      const username = appUser?.username || user.displayName || 'Learner';
+      const username = appUser?.username || user?.displayName || 'Learner';
       const session = await firestoreService.createPairSession(
-        user.uid,
+        effectiveUserId,
         username,
         code || initialCode,
         language || 'javascript'

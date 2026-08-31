@@ -356,5 +356,54 @@ service cloud.firestore {
       allow delete: if isAuthenticated()
         && (request.auth.uid == resource.data.hostUserId || isAdmin());
     }
+
+    // --- CODE REVIEW REQUESTS COLLECTION ---
+    match /codeReviewRequests/{requestId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+          'userId', 'username', 'code', 'language', 'status', 'createdAt'
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'open';
+
+      allow update: if isAuthenticated()
+        && (
+          // Author or admin can update
+          request.auth.uid == resource.data.userId
+          || isAdmin()
+          // Anyone can mark reviewed or status changes as part of workflow
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        );
+
+      allow delete: if isAuthenticated()
+        && (request.auth.uid == resource.data.userId || isAdmin());
+
+      // Code review comments subcollection
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+
+        allow create: if isAuthenticated()
+          && request.resource.data.keys().hasAll([
+            'requestId', 'userId', 'username', 'content', 'createdAt'
+          ])
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.requestId == requestId;
+
+        allow update: if isAuthenticated()
+          && (
+            // Upvotes
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'upvotedBy'])
+            // Author edit
+            || (request.auth.uid == resource.data.userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content']))
+            // Pinning by instructor or admin
+            || (isAdminOrInstructor() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned']))
+          );
+
+        allow delete: if isAuthenticated()
+          && (request.auth.uid == resource.data.userId || isAdmin());
+      }
+    }
   }
 }

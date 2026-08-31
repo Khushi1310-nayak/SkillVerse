@@ -49,6 +49,28 @@ service cloud.firestore {
         allow read, update, delete: if isOwner(userId);
         allow create: if isAuthenticated();
       }
+
+      // User Quests Progress subcollection
+      match /quests/{questId} {
+        allow read: if true;
+        allow write: if isOwner(userId) || isAuthenticated();
+      }
+    }
+
+    // --- QUESTS & COMMUNITY BOSS BATTLES ---
+    match /quests/{questId} {
+      allow read: if true;
+      allow write: if isAuthenticated() || isAdmin();
+    }
+
+    match /communityBosses/{bossId} {
+      allow read: if true;
+      allow write: if isAuthenticated() || isAdmin();
+
+      match /progress/{progressId} {
+        allow read: if true;
+        allow write: if isAuthenticated() || isAdmin();
+      }
     }
 
     // --- COURSES COLLECTION ---

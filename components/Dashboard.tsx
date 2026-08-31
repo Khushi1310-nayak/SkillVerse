@@ -11,6 +11,8 @@ import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
 import { ActivityFeedWidget } from './ActivityFeedWidget'; // 🛠️ Added ActivityFeedWidget import
 import { DailyMicroChallengeWidget } from './DailyMicroChallengeWidget';
+import { QuestBoard } from './QuestBoard';
+import { CommunityBossCard } from './CommunityBossCard';
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';

@@ -68,15 +68,21 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
         language || 'javascript'
       );
 
-      const quests = await firestoreService.getActiveQuestDefinitions();
-      await Promise.all(quests.map(async (quest) => {
-        const objective = quest.objectives.find((item) => item.type === 'pair-session');
-        if (!objective) return null;
-        return firestoreService.recordQuestObjectiveProgress(user.uid, quest.id, objective.id, 1);
-      }));
+      if (effectiveUserId) {
+        firestoreService.getActiveQuestDefinitions().then((quests) => {
+          return Promise.all(quests.map(async (quest) => {
+            const objective = quest.objectives.find((item) => item.type === 'pair-session');
+            if (!objective) return null;
+            return firestoreService.recordQuestObjectiveProgress(effectiveUserId, quest.id, objective.id, 1);
+          }));
+        }).catch(console.error);
 
-      const boss = await firestoreService.getActiveCommunityBoss();
-      await firestoreService.incrementCommunityBossProgress(boss.id, 1);
+        firestoreService.getActiveCommunityBoss().then((boss) => {
+          if (boss?.id) {
+            return firestoreService.incrementCommunityBossProgress(boss.id, 1);
+          }
+        }).catch(console.error);
+      }
 
       navigate(`/pair-session/${session.id}`, { state: { autoOpenShare: true } });
     } catch (err) {

@@ -471,17 +471,20 @@ export const CourseView: React.FC = () => {
       // Only award XP if the user hasn't completed this course before
       completeCourse(course.id, 100).catch(console.error);
 
-      if (user?.uid) {
+      const userId = user?.uid;
+      if (userId) {
         firestoreService.getActiveQuestDefinitions().then((quests) => {
           return Promise.all(quests.map(async (quest) => {
             const objective = quest.objectives.find((item) => item.type === 'course');
             if (!objective) return null;
-            return firestoreService.recordQuestObjectiveProgress(user.uid, quest.id, objective.id, 1);
+            return firestoreService.recordQuestObjectiveProgress(userId, quest.id, objective.id, 1);
           }));
         }).catch((err) => console.error('Error updating quest progress after course completion:', err));
 
         firestoreService.getActiveCommunityBoss().then((boss) => {
-          return firestoreService.incrementCommunityBossProgress(boss.id, 1);
+          if (boss?.id) {
+            return firestoreService.incrementCommunityBossProgress(boss.id, 1);
+          }
         }).catch((err) => console.error('Error updating boss progress after course completion:', err));
       }
     }

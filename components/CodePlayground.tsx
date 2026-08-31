@@ -64,6 +64,17 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
         code || initialCode,
         language || 'javascript'
       );
+
+      const quests = await firestoreService.getActiveQuestDefinitions();
+      await Promise.all(quests.map(async (quest) => {
+        const objective = quest.objectives.find((item) => item.type === 'pair-session');
+        if (!objective) return null;
+        return firestoreService.recordQuestObjectiveProgress(user.uid, quest.id, objective.id, 1);
+      }));
+
+      const boss = await firestoreService.getActiveCommunityBoss();
+      await firestoreService.incrementCommunityBossProgress(boss.id, 1);
+
       navigate(`/pair-session/${session.id}`, { state: { autoOpenShare: true } });
     } catch (err) {
       console.error('Error starting pair session:', err);

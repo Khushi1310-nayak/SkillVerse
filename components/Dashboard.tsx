@@ -9,7 +9,9 @@ import { storageService, DailyChallengeSummary, getLocalDateString } from '../se
 import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
-import { ActivityFeedWidget } from './ActivityFeedWidget'; // 🛠️ Added ActivityFeedWidget import
+import { ActivityFeedWidget } from './ActivityFeedWidget';
+import { QuestBoard } from './QuestBoard';
+import { CommunityBossCard } from './CommunityBossCard';
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
@@ -834,6 +836,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
+        <QuestBoard userId={user.uid} currentUser={user} />
+        <CommunityBossCard userId={user.uid} />
       </div>
 
       {/* Study Activity Feed */}

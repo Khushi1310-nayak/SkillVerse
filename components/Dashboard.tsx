@@ -10,6 +10,7 @@ import { User, Progress } from '../types';
 import { TourOverlay } from './TourOverlay';
 import { Leaderboard } from './Leaderboard';
 import { ActivityFeedWidget } from './ActivityFeedWidget'; // 🛠️ Added ActivityFeedWidget import
+import { DailyMicroChallengeWidget } from './DailyMicroChallengeWidget';
 import { getRecommendedCourses } from '../utils/recommendations';
 import { useToast } from '../contexts/ToastContext';
 import { StreakCelebration } from './StreakCelebration';
@@ -436,6 +437,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           )}
         </div>
       </div>
+
+      {/* Daily Micro-Challenge & Streak Saver Widget */}
+      <DailyMicroChallengeWidget user={user} />
 
       {/* Daily Coding Challenge Hero Card */}
       {dailyChallenge && dailyChallenge.total > 0 && (

@@ -404,4 +404,3 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ courseContext, courseT
     </div>
   );
 };
-

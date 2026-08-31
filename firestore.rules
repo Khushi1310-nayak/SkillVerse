@@ -303,5 +303,58 @@ service cloud.firestore {
 
       allow delete: if isOwner(userId);
     }
+
+    // --- PAIR PROGRAMMING SESSIONS ---
+    // Session IDs are unguessable Firestore auto-IDs (20-char random strings).
+    // Knowledge of the session ID (via the share link) is the implicit "invite".
+    //
+    // ⚠ KNOWN LIMITATION 1: Firestore rules cannot iterate over an array of
+    // maps to check if request.auth.uid is inside the participants[].userId
+    // field. Strictly enforcing "only participants may write" would require a
+    // parallel participantIds: string[] field — out of v1 scope. Instead, write
+    // access is open to any authenticated user, with the immutable identity
+    // fields (hostUserId, createdAt) locked to prevent privilege escalation.
+    // Acceptable for v1 because session IDs are unguessable and ephemeral.
+    //
+    // ⚠ KNOWN LIMITATION 2: The update rule does not validate that entries
+    // written into the participants[] array match the request.auth.uid of the
+    // user making the write. A user who holds the session link could therefore
+    // theoretically inject or alter another participant's displayed identity
+    // (username, photoURL) within that session document. Acceptable for v1
+    // given the ephemeral, consent-based, link-only nature of sessions, but
+    // should be tightened in a future version alongside Limitation 1.
+    match /pairSessions/{sessionId} {
+      // Any authenticated user who knows the ID may read (needed to join via link).
+      allow read: if isAuthenticated();
+
+      // Only the user creating the session may create it, and they must declare
+      // themselves as host and as the first editor.
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll([
+            'hostUserId', 'code', 'language',
+            'lastEditedBy', 'lastEditedAt',
+            'output', 'outputUpdatedAt',
+            'participants', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+            'hostUserId', 'code', 'language',
+            'lastEditedBy', 'lastEditedAt',
+            'output', 'outputUpdatedAt',
+            'participants', 'createdAt'
+        ])
+        && request.resource.data.hostUserId == request.auth.uid
+        && request.resource.data.lastEditedBy == request.auth.uid
+        && request.resource.data.participants is list;
+
+      // Any authenticated user may update — but the identity fields set at
+      // creation (hostUserId, createdAt) must remain unchanged.
+      allow update: if isAuthenticated()
+        && request.resource.data.hostUserId == resource.data.hostUserId
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      // Only the host or an admin may delete the session.
+      allow delete: if isAuthenticated()
+        && (request.auth.uid == resource.data.hostUserId || isAdmin());
+    }
   }
 }

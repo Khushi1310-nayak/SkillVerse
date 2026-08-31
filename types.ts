@@ -298,3 +298,25 @@ export interface AppNotification {
   link?: string;
 }
 
+// --- Pair Programming Session ---
+
+export interface PairSessionParticipant {
+  userId: string;
+  username: string;
+  photoURL?: string;
+  joinedAt: string;
+  lastActiveAt: string;
+}
+
+export interface PairSession {
+  id: string;
+  hostUserId: string;
+  code: string;
+  language: string;
+  lastEditedBy: string;
+  lastEditedAt: string;
+  output: string;
+  outputUpdatedAt: string;
+  participants: PairSessionParticipant[];
+  createdAt: string;
+}

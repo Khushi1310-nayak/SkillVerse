@@ -36,6 +36,7 @@ const CredentialVerification = lazy(() => import('./components/CredentialVerific
 const DocumentationPage = lazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
 const PublicProfilePage = lazy(() => import('./components/PublicProfilePage').then(m => ({ default: m.PublicProfilePage })));
 const NotesPage = lazy(() => import('./components/NotesPage'));
+const CollaborativePlayground = lazy(() => import('./components/playground/CollaborativePlayground').then(m => ({ default: m.CollaborativePlayground })));
 
 const PageLoader = ({ fullscreen = true }: { fullscreen?: boolean }) => (
   <div className={`${fullscreen ? 'fixed inset-0 z-50' : 'w-full py-20'} flex flex-col items-center justify-center bg-background`}>
@@ -127,6 +128,7 @@ const AppRoutes = () => {
                           <Route path="/notes" element={<NotesPage />} />
                           <Route path="/roadmap" element={<Roadmap user={appUser} />} />
                           <Route path="/playground" element={<CodingPracticePlayground />} />
+                          <Route path="/pair-session/:roomId" element={<CollaborativePlayground />} />
                           <Route path="/code-review" element={<CodeReviewQueue />} />
                           <Route path="/career" element={<CareerMode user={appUser} />} />
                           <Route path="/certifications" element={<CertificationsList />} />

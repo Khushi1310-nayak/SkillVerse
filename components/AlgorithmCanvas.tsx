@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ArrowRight, BinaryTree, Database, GitBranch, Network, Variable } from 'lucide-react';
+import { Activity, ArrowRight, Database, Network, Variable } from 'lucide-react';
 import type { VisualizerSnapshot } from '../utils/visualizerStateParser';
 
 interface AlgorithmCanvasProps {
@@ -8,11 +8,20 @@ interface AlgorithmCanvasProps {
   totalSteps: number;
 }
 
-const getNodeStyle = (active: boolean, visited?: boolean) => ({
-  background: active ? 'linear-gradient(135deg, rgba(103, 232, 249, 0.28), rgba(96, 165, 250, 0.18))' : visited ? 'linear-gradient(135deg, rgba(74, 222, 128, 0.22), rgba(52, 211, 153, 0.12))' : 'rgba(15, 23, 42, 0.72)',
-  borderColor: active ? 'rgba(103, 232, 249, 0.8)' : visited ? 'rgba(74, 222, 128, 0.7)' : 'rgba(148, 163, 184, 0.35)',
-  boxShadow: active ? '0 0 0 1px rgba(103, 232, 249, 0.45), 0 8px 30px rgba(59, 130, 246, 0.15)' : 'none',
-});
+const getNodeStyle = (active?: boolean, visited?: boolean, isCompare?: boolean) => {
+  if (isCompare) {
+    return {
+      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.28), rgba(245, 158, 11, 0.18))',
+      borderColor: 'rgba(251, 191, 36, 0.8)',
+      boxShadow: '0 0 0 1px rgba(251, 191, 36, 0.45), 0 8px 30px rgba(245, 158, 11, 0.15)',
+    };
+  }
+  return {
+    background: active ? 'linear-gradient(135deg, rgba(103, 232, 249, 0.28), rgba(96, 165, 250, 0.18))' : visited ? 'linear-gradient(135deg, rgba(74, 222, 128, 0.22), rgba(52, 211, 153, 0.12))' : 'rgba(15, 23, 42, 0.72)',
+    borderColor: active ? 'rgba(103, 232, 249, 0.8)' : visited ? 'rgba(74, 222, 128, 0.7)' : 'rgba(148, 163, 184, 0.35)',
+    boxShadow: active ? '0 0 0 1px rgba(103, 232, 249, 0.45), 0 8px 30px rgba(59, 130, 246, 0.15)' : 'none',
+  };
+};
 
 const renderArray = (snapshot: VisualizerSnapshot) => {
   const arrayState = snapshot.arrays?.[0];
@@ -23,14 +32,14 @@ const renderArray = (snapshot: VisualizerSnapshot) => {
       <div className="flex flex-wrap items-end gap-3">
         {arrayState.values.map((value, index) => {
           const isActive = arrayState.activeIndices.includes(index);
-          const isCompare = arrayState.compareIndices?.includes(index);
+          const isCompare = Boolean(arrayState.compareIndices?.includes(index));
 
           return (
             <div key={`${value}-${index}`} className="flex flex-col items-center gap-2">
               <div
                 className="flex h-16 w-14 items-center justify-center rounded-xl border text-sm font-bold text-white transition-all duration-200"
                 style={{
-                  ...getNodeStyle(isActive || isCompare, isActive || isCompare),
+                  ...getNodeStyle(isActive, isActive, isCompare),
                   opacity: isActive || isCompare ? 1 : 0.8,
                 }}
               >
@@ -55,14 +64,14 @@ const renderString = (snapshot: VisualizerSnapshot) => {
     <div className="flex flex-wrap gap-2">
       {stringState.value.split('').map((char, index) => {
         const isActive = stringState.activeIndices.includes(index);
-        const isCompare = stringState.compareIndices?.includes(index);
+        const isCompare = Boolean(stringState.compareIndices?.includes(index));
 
         return (
           <div
             key={`${char}-${index}`}
             className="flex h-12 w-10 items-center justify-center rounded-lg border text-sm font-bold text-white"
             style={{
-              ...getNodeStyle(isActive || isCompare, isActive || isCompare),
+              ...getNodeStyle(isActive, isActive, isCompare),
             }}
           >
             {char}

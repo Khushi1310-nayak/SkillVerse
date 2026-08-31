@@ -217,7 +217,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('python') || l === 'py') return 'python';
     if (l.includes('java') && !l.includes('script')) return 'java';
     if (l.includes('typescript') || l === 'ts') return 'typescript';
-    if (l.includes('c++') || l.includes('cpp') || l === 'c') return 'cpp';
+    if (l.includes('c++') || l.includes('cpp')) return 'cpp';
+    if (l === 'c' || l === 'c-programming' || l.startsWith('c-')) return 'c';
     if (l.includes('html')) return 'html';
     if (l.includes('css')) return 'css';
     return 'javascript';
@@ -228,7 +229,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     if (l.includes('python') || l === 'py') return 'main.py';
     if (l.includes('java') && !l.includes('script')) return 'Solution.java';
     if (l.includes('typescript') || l === 'ts') return 'index.ts';
-    if (l.includes('c++') || l.includes('cpp') || l === 'c') return 'main.cpp';
+    if (l.includes('c++') || l.includes('cpp')) return 'main.cpp';
+    if (l === 'c' || l === 'c-programming' || l.startsWith('c-')) return 'main.c';
     if (l.includes('html')) return 'index.html';
     if (l.includes('css')) return 'styles.css';
     return 'sandbox.js';

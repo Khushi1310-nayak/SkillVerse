@@ -338,31 +338,340 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
     }
   ],
 
+  'c': [
+    {
+      id: 'c-mod-1',
+      title: 'Module 1: Pointer-Based Array Reverse In-Place',
+      difficulty: 'Easy',
+      category: 'C',
+      description: 'Implement void reverse_array(int *arr, int size) in C that reverses an integer array in-place using raw pointer arithmetic with O(1) auxiliary space.',
+      constraints: ['Array size: 1 to 10,000', 'Space Complexity: O(1) in-place', 'Do not use VLA (Variable Length Arrays)'],
+      sampleInputs: [
+        { input: 'arr = [10, 20, 30, 40, 50], size = 5', output: '[50, 40, 30, 20, 10]' }
+      ],
+      starterCode: `#include <stdio.h>\n\nvoid reverse_array(int *arr, int size) {\n    int *left = arr;\n    int *right = arr + size - 1;\n    // TODO: Swap values using raw pointers until left >= right\n    \n}\n\nint main() {\n    int nums[] = {10, 20, 30, 40, 50};\n    int size = sizeof(nums) / sizeof(nums[0]);\n    reverse_array(nums, size);\n    printf("Reversed: ");\n    for (int i = 0; i < size; i++) printf("%d ", nums[i]);\n    printf("\\n");\n    return 0;\n}`,
+      solutionHint: 'while (left < right) { int temp = *left; *left = *right; *right = temp; left++; right--; }'
+    },
+    {
+      id: 'c-mod-2',
+      title: 'Module 2: Custom String Concatenation & Null Terminator Safety',
+      difficulty: 'Easy',
+      category: 'C',
+      description: 'Implement char* custom_strcat(char *dest, const char *src) without using <string.h> functions, properly appending src to dest and ensuring proper null termination.',
+      constraints: ['Buffer overflow prevention: assume dest has sufficient allocated capacity', 'Time Complexity: O(length(dest) + length(src))'],
+      sampleInputs: [
+        { input: 'dest = "Hello, ", src = "SkillVerse C!"', output: '"Hello, SkillVerse C!"' }
+      ],
+      starterCode: `#include <stdio.h>\n\nchar* custom_strcat(char *dest, const char *src) {\n    char *ptr = dest;\n    // TODO: Advance ptr to the end of dest (null character '\\0')\n    \n    // TODO: Copy src into ptr including terminating '\\0'\n    \n    return dest;\n}\n\nint main() {\n    char buffer[100] = "Hello, ";\n    custom_strcat(buffer, "SkillVerse C!");\n    printf("Concatenated: %s\\n", buffer);\n    return 0;\n}`,
+      solutionHint: 'while (*ptr) ptr++; while (*src) { *ptr++ = *src++; } *ptr = "\\0"; return dest;'
+    },
+    {
+      id: 'c-mod-3',
+      title: 'Module 3: Singly Linked List Node Insertion & Deallocation',
+      difficulty: 'Medium',
+      category: 'C',
+      description: 'Create a singly linked list structure and implement push_front(Node **head, int val) and free_list(Node *head) using dynamic heap memory allocation (malloc/free).',
+      constraints: ['Handle memory allocation failure checking if malloc returns NULL', 'Avoid memory leaks by freeing every node'],
+      sampleInputs: [
+        { input: 'push_front 30, push_front 20, push_front 10', output: '10 -> 20 -> 30 -> NULL' }
+      ],
+      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int val;\n    struct Node *next;\n} Node;\n\nvoid push_front(Node **head, int val) {\n    // TODO: Allocate memory with malloc and prepend new node to head\n    \n}\n\nvoid free_list(Node *head) {\n    // TODO: Traverse and safely free all allocated nodes\n    \n}\n\nint main() {\n    Node *head = NULL;\n    push_front(&head, 30);\n    push_front(&head, 20);\n    push_front(&head, 10);\n    for (Node *curr = head; curr; curr = curr->next) printf("%d -> ", curr->val);\n    printf("NULL\\n");\n    free_list(head);\n    return 0;\n}`,
+      solutionHint: 'Node *newNode = (Node *)malloc(sizeof(Node)); newNode->val = val; newNode->next = *head; *head = newNode;'
+    },
+    {
+      id: 'c-mod-4',
+      title: 'Module 4: Bitwise Operations & Hamming Weight (Set Bits Counter)',
+      difficulty: 'Medium',
+      category: 'C',
+      description: 'Implement int count_set_bits(unsigned int n) using Brian Kernighan bit manipulation algorithm (n & (n - 1)) in O(k) time where k is the number of set 1-bits.',
+      constraints: ['Time Complexity: O(number of set bits)', 'Space Complexity: O(1)'],
+      sampleInputs: [
+        { input: 'n = 29 (binary 11101)', output: '4' }
+      ],
+      starterCode: `#include <stdio.h>\n\nint count_set_bits(unsigned int n) {\n    int count = 0;\n    // TODO: Use Brian Kernighan's bit trick: n = n & (n - 1)\n    \n    return count;\n}\n\nint main() {\n    unsigned int val = 29;\n    printf("Set bits in %u: %d\\n", val, count_set_bits(val));\n    return 0;\n}`,
+      solutionHint: 'while (n > 0) { n = n & (n - 1); count++; } return count;'
+    },
+    {
+      id: 'c-mod-5',
+      title: 'Module 5: Generic Memory Swap with Void Pointers',
+      difficulty: 'Medium',
+      category: 'C',
+      description: 'Implement void generic_swap(void *a, void *b, size_t size) using raw byte-by-byte memory swapping with char* casting and a dynamic or byte buffer.',
+      constraints: ['Must work on any data type (int, double, structs)', 'Avoid undefined behavior'],
+      sampleInputs: [
+        { input: 'x = 3.1415, y = 2.7182', output: 'x = 2.7182, y = 3.1415' }
+      ],
+      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nvoid generic_swap(void *a, void *b, size_t size) {\n    char *p1 = (char *)a;\n    char *p2 = (char *)b;\n    // TODO: Swap 'size' bytes between p1 and p2\n    \n}\n\nint main() {\n    double x = 3.1415, y = 2.7182;\n    generic_swap(&x, &y, sizeof(double));\n    printf("Swapped doubles: x = %f, y = %f\\n", x, y);\n    return 0;\n}`,
+      solutionHint: 'for (size_t i = 0; i < size; i++) { char temp = p1[i]; p1[i] = p2[i]; p2[i] = temp; }'
+    },
+    {
+      id: 'c-mod-6',
+      title: 'Module 6: Circular Ring Buffer with Overwrite Detection',
+      difficulty: 'Hard',
+      category: 'C',
+      description: 'Implement a ring buffer struct RingBuffer with enqueue(rb, val) and dequeue(rb, *out) methods maintaining head/tail indices with modulo arithmetic.',
+      constraints: ['Fixed buffer size without dynamic resizing', 'Return false on buffer full / empty'],
+      sampleInputs: [
+        { input: 'enqueue(100), enqueue(200), dequeue()', output: 'Dequeued: 100' }
+      ],
+      starterCode: `#include <stdio.h>\n#include <stdbool.h>\n\n#define CAPACITY 4\n\ntypedef struct {\n    int data[CAPACITY];\n    int head;\n    int tail;\n    int size;\n} RingBuffer;\n\nvoid init_buffer(RingBuffer *rb) {\n    rb->head = 0;\n    rb->tail = 0;\n    rb->size = 0;\n}\n\nbool enqueue(RingBuffer *rb, int val) {\n    // TODO: Insert val at tail if not full, advance tail modulo CAPACITY\n    \n    return false;\n}\n\nbool dequeue(RingBuffer *rb, int *out) {\n    // TODO: Extract val from head if not empty, advance head modulo CAPACITY\n    \n    return false;\n}\n\nint main() {\n    RingBuffer rb;\n    init_buffer(&rb);\n    enqueue(&rb, 100); enqueue(&rb, 200); enqueue(&rb, 300); enqueue(&rb, 400);\n    int out;\n    dequeue(&rb, &out); printf("Dequeued: %d\\n", out);\n    enqueue(&rb, 500);\n    while (dequeue(&rb, &out)) printf("Item: %d\\n", out);\n    return 0;\n}`,
+      solutionHint: 'if (rb->size == CAPACITY) return false; rb->data[rb->tail] = val; rb->tail = (rb->tail + 1) % CAPACITY; rb->size++; return true;'
+    },
+    {
+      id: 'c-mod-7',
+      title: 'Module 7: Fixed-Size Arena Memory Pool Allocator',
+      difficulty: 'Hard',
+      category: 'C',
+      description: 'Implement an Arena allocator struct Arena with arena_alloc(Arena *arena, size_t size) and arena_reset(Arena *arena) that allocates memory contiguously with 8-byte boundary alignment.',
+      constraints: ['Align allocations to 8-byte boundaries', 'Return NULL if requested size exceeds remaining capacity'],
+      sampleInputs: [
+        { input: 'arena_alloc(5 * sizeof(int))', output: 'Contiguous valid pointer block' }
+      ],
+      starterCode: `#include <stdio.h>\n#include <stdint.h>\n#include <stddef.h>\n\n#define ARENA_SIZE 1024\n\ntypedef struct {\n    uint8_t buffer[ARENA_SIZE];\n    size_t offset;\n} Arena;\n\nvoid arena_init(Arena *a) { a->offset = 0; }\n\nvoid* arena_alloc(Arena *a, size_t size) {\n    // TODO: Align to 8-byte boundary, allocate and update offset\n    \n    return NULL;\n}\n\nvoid arena_reset(Arena *a) { a->offset = 0; }\n\nint main() {\n    Arena arena;\n    arena_init(&arena);\n    int *numbers = (int *)arena_alloc(&arena, 5 * sizeof(int));\n    for (int i = 0; i < 5; i++) numbers[i] = (i + 1) * 10;\n    printf("Arena allocated: %d, %d, %d\\n", numbers[0], numbers[1], numbers[2]);\n    arena_reset(&arena);\n    return 0;\n}`,
+      solutionHint: 'size_t aligned_size = (size + 7) & ~7; if (a->offset + aligned_size > ARENA_SIZE) return NULL; void *ptr = &a->buffer[a->offset]; a->offset += aligned_size; return ptr;'
+    },
+    {
+      id: 'c-mod-8',
+      title: 'Module 8: Binary Expression Tree Evaluator',
+      difficulty: 'Hard',
+      category: 'C',
+      description: 'Construct a binary expression tree from operators and operands and recursively evaluate the mathematical result supporting operators +, -, *, /.',
+      constraints: ['Division by zero handling', 'Time Complexity: O(n) where n is total tree nodes'],
+      sampleInputs: [
+        { input: 'Tree: (3 + 7) * 4', output: '40' }
+      ],
+      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n#include <stdbool.h>\n\ntypedef struct ExpNode {\n    char op; // '\\0' if operand\n    int val;\n    struct ExpNode *left;\n    struct ExpNode *right;\n} ExpNode;\n\nint evaluate_tree(ExpNode *root) {\n    if (!root) return 0;\n    if (!root->left && !root->right) return root->val;\n    // TODO: Recursively evaluate left and right subtrees and apply root->op\n    \n    return 0;\n}\n\nint main() {\n    ExpNode n1 = {'\\0', 3, NULL, NULL};\n    ExpNode n2 = {'\\0', 7, NULL, NULL};\n    ExpNode add = {'+', 0, &n1, &n2};\n    ExpNode n3 = {'\\0', 4, NULL, NULL};\n    ExpNode mul = {'*', 0, &add, &n3};\n\n    printf("Evaluated Result: %d\\n", evaluate_tree(&mul)); // Expected: 40\n    return 0;\n}`,
+      solutionHint: 'int l = evaluate_tree(root->left); int r = evaluate_tree(root->right); if (root->op == "+") return l + r; if (root->op == "-") return l - r; if (root->op == "*") return l * r; if (root->op == "/") return r != 0 ? l / r : 0;'
+    }
+  ],
+
   'cpp': [
     {
-      id: 'cpp-1',
-      title: '1. Pointer Memory Allocation Counter',
+      id: 'cpp-mod-1',
+      title: 'Module 1: Two Sum with std::unordered_map',
+      difficulty: 'Easy',
+      category: 'C++',
+      description: 'Implement twoSum(const std::vector<int>& nums, int target) using std::unordered_map to find the 2 indices that sum up to target in O(n) time.',
+      constraints: ['Time Complexity: O(n)', 'Return empty vector if no pair exists'],
+      sampleInputs: [
+        { input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]' }
+      ],
+      starterCode: `#include <iostream>\n#include <vector>\n#include <unordered_map>\n\nstd::vector<int> twoSum(const std::vector<int>& nums, int target) {\n    std::unordered_map<int, int> seen;\n    // TODO: Find complement target - nums[i] in O(n) time\n    \n    return {};\n}\n\nint main() {\n    std::vector<int> nums = {2, 7, 11, 15};\n    auto res = twoSum(nums, 9);\n    std::cout << "Indices: [" << res[0] << ", " << res[1] << "]\\n";\n    return 0;\n}`,
+      solutionHint: 'for (int i = 0; i < nums.size(); i++) { int diff = target - nums[i]; if (seen.count(diff)) return {seen[diff], i}; seen[nums[i]] = i; } return {};'
+    },
+    {
+      id: 'cpp-mod-2',
+      title: 'Module 2: RAII Dynamic Array Resource Wrapper',
+      difficulty: 'Easy',
+      category: 'C++',
+      description: 'Build a SimpleVector<T> class following RAII principles with constructor, destructor (freeing dynamic memory), push_back, and operator[].',
+      constraints: ['Manage raw heap buffer with new[] and delete[]', 'Double capacity upon buffer overflow'],
+      sampleInputs: [
+        { input: 'push_back(10), push_back(20), push_back(30)', output: 'Size: 3, Element 2: 30' }
+      ],
+      starterCode: `#include <iostream>\n#include <algorithm>\n\ntemplate<typename T>\nclass SimpleVector {\nprivate:\n    T* data;\n    size_t size;\n    size_t capacity;\npublic:\n    SimpleVector() : data(new T[2]), size(0), capacity(2) {}\n    ~SimpleVector() { delete[] data; }\n    \n    void push_back(const T& val) {\n        // TODO: Resize buffer if full and append element\n        \n    }\n\n    T& operator[](size_t idx) { return data[idx]; }\n    size_t getSize() const { return size; }\n};\n\nint main() {\n    SimpleVector<int> vec;\n    vec.push_back(10); vec.push_back(20); vec.push_back(30);\n    std::cout << "Vector Size: " << vec.getSize() << ", Element 2: " << vec[2] << "\\n";\n    return 0;\n}`,
+      solutionHint: 'if (size == capacity) { capacity *= 2; T* next = new T[capacity]; for (size_t i = 0; i < size; i++) next[i] = data[i]; delete[] data; data = next; } data[size++] = val;'
+    },
+    {
+      id: 'cpp-mod-3',
+      title: 'Module 3: Custom UniquePtr Smart Pointer (Rule of 5)',
       difficulty: 'Medium',
       category: 'C++',
-      description: 'Implement `allocateBlocks(size, blockSize)` calculating total blocks needed.',
-      constraints: ['size > 0, blockSize > 0'],
-      sampleInputs: [{ input: 'size = 10, blockSize = 3', output: '4' }],
-      starterCode: `function allocateBlocks(size, blockSize) {\n  // TODO: Calculate ceil(size / blockSize)\n  \n}\n\nconsole.log(allocateBlocks(10, 3));`,
-      solutionHint: 'Use Math.ceil(size / blockSize)'
+      description: 'Implement a lightweight UniquePtr<T> with exclusive ownership semantics, move constructor, move assignment operator, and deleted copy operations.',
+      constraints: ['Disable copy constructor and copy assignment', 'Support std::move ownership transfer'],
+      sampleInputs: [
+        { input: 'UniquePtr<int> p1(new int(42)); UniquePtr<int> p2 = std::move(p1);', output: '*p2 is 42, p1.get() is nullptr' }
+      ],
+      starterCode: `#include <iostream>\n#include <utility>\n\ntemplate<typename T>\nclass UniquePtr {\nprivate:\n    T* ptr;\npublic:\n    explicit UniquePtr(T* p = nullptr) : ptr(p) {}\n    ~UniquePtr() { delete ptr; }\n\n    UniquePtr(const UniquePtr&) = delete;\n    UniquePtr& operator=(const UniquePtr&) = delete;\n\n    // TODO: Implement move constructor and move assignment operator\n    \n    T& operator*() const { return *ptr; }\n    T* operator->() const { return ptr; }\n    T* get() const { return ptr; }\n};\n\nint main() {\n    UniquePtr<int> p1(new int(42));\n    UniquePtr<int> p2 = std::move(p1);\n    std::cout << "P2 Value: " << *p2 << ", P1 is null: " << (p1.get() == nullptr) << "\\n";\n    return 0;\n}`,
+      solutionHint: 'UniquePtr(UniquePtr&& other) noexcept : ptr(other.ptr) { other.ptr = nullptr; } UniquePtr& operator=(UniquePtr&& other) noexcept { if (this != &other) { delete ptr; ptr = other.ptr; other.ptr = nullptr; } return *this; }'
+    },
+    {
+      id: 'cpp-mod-4',
+      title: 'Module 4: LRU Cache with STL List & Hash Map',
+      difficulty: 'Medium',
+      category: 'C++',
+      description: 'Design an LRUCache with get(key) and put(key, val) running in O(1) time using std::list and std::unordered_map storing list iterators.',
+      constraints: ['get and put both execute in O(1) average time', 'Capacity >= 1'],
+      sampleInputs: [
+        { input: 'put(1, 100), put(2, 200), get(1), put(3, 300)', output: 'get(2) returns -1' }
+      ],
+      starterCode: `#include <iostream>\n#include <list>\n#include <unordered_map>\n\nclass LRUCache {\nprivate:\n    int capacity;\n    std::list<std::pair<int, int>> items;\n    std::unordered_map<int, std::list<std::pair<int, int>>::iterator> cache;\npublic:\n    LRUCache(int cap) : capacity(cap) {}\n\n    int get(int key) {\n        // TODO: Move to front of list and return value or -1\n        \n        return -1;\n    }\n\n    void put(int key, int value) {\n        // TODO: Update or insert at front; evict back if size > capacity\n        \n    }\n};\n\nint main() {\n    LRUCache lru(2);\n    lru.put(1, 100); lru.put(2, 200);\n    std::cout << "Get 1: " << lru.get(1) << "\\n";\n    lru.put(3, 300); // evicts key 2\n    std::cout << "Get 2 (should be -1): " << lru.get(2) << "\\n";\n    return 0;\n}`,
+      solutionHint: 'if (!cache.count(key)) return -1; items.splice(items.begin(), items, cache[key]); return cache[key]->second;'
+    },
+    {
+      id: 'cpp-mod-5',
+      title: 'Module 5: Thread-Safe Concurrent Queue with std::mutex',
+      difficulty: 'Medium',
+      category: 'C++',
+      description: 'Implement a ConcurrentQueue<T> supporting push(item) and pop() using std::mutex, std::unique_lock, and std::condition_variable.',
+      constraints: ['Thread-safe across multiple concurrent threads', 'pop() blocks until item is available'],
+      sampleInputs: [
+        { input: 'push(10), push(20), pop(), pop()', output: 'Popped 10, then 20' }
+      ],
+      starterCode: `#include <iostream>\n#include <queue>\n#include <mutex>\n#include <condition_variable>\n\ntemplate<typename T>\nclass ConcurrentQueue {\nprivate:\n    std::queue<T> q;\n    mutable std::mutex mtx;\n    std::condition_variable cv;\npublic:\n    void push(T val) {\n        // TODO: Lock mutex, push to queue, and notify_one\n        \n    }\n\n    T pop() {\n        // TODO: Wait until !q.empty(), pop front and return\n        \n        return T();\n    }\n};\n\nint main() {\n    ConcurrentQueue<int> cq;\n    cq.push(10);\n    cq.push(20);\n    std::cout << "Popped: " << cq.pop() << ", Popped: " << cq.pop() << "\\n";\n    return 0;\n}`,
+      solutionHint: 'void push(T val) { std::lock_guard<std::mutex> lock(mtx); q.push(val); cv.notify_one(); } T pop() { std::unique_lock<std::mutex> lock(mtx); cv.wait(lock, [this]{ return !q.empty(); }); T val = q.front(); q.pop(); return val; }'
+    },
+    {
+      id: 'cpp-mod-6',
+      title: 'Module 6: constexpr Fibonacci & Template Metaprogramming',
+      difficulty: 'Hard',
+      category: 'C++',
+      description: 'Implement a compile-time Fibonacci sequence computation using C++ constexpr functions and template metaprogramming.',
+      constraints: ['Evaluated at compile-time when assigned to constexpr variable', 'Handle n = 0, 1 base cases'],
+      sampleInputs: [
+        { input: 'constexpr_fib(10)', output: '55' }
+      ],
+      starterCode: `#include <iostream>\n\nconstexpr unsigned long long constexpr_fib(int n) {\n    // TODO: Compile-time constexpr Fibonacci computation\n    if (n <= 0) return 0;\n    if (n == 1) return 1;\n    unsigned long long a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        unsigned long long c = a + b;\n        a = b;\n        b = c;\n    }\n    return b;\n}\n\nint main() {\n    constexpr unsigned long long fib10 = constexpr_fib(10);\n    std::cout << "Compile-Time Fib(10): " << fib10 << "\\n";\n    return 0;\n}`,
+      solutionHint: 'Use iterative constexpr loop or compile-time recursive template struct Fib<N> { static constexpr int value = Fib<N-1>::value + Fib<N-2>::value; };'
+    },
+    {
+      id: 'cpp-mod-7',
+      title: 'Module 7: Trie Prefix Tree with Word Search and Autocomplete',
+      difficulty: 'Hard',
+      category: 'C++',
+      description: 'Implement a Trie class supporting insert(word), search(word), and startsWith(prefix) using a 26-pointer child array and boolean isEndOfWord flag.',
+      constraints: ['Input strings contain lowercase English letters', 'Time Complexity: O(length of word) for all operations'],
+      sampleInputs: [
+        { input: 'insert("apple"), search("apple"), search("app"), startsWith("app")', output: '1, 0, 1' }
+      ],
+      starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n\nclass Trie {\nprivate:\n    struct TrieNode {\n        TrieNode* children[26] = {nullptr};\n        bool isEndOfWord = false;\n    };\n    TrieNode* root;\npublic:\n    Trie() : root(new TrieNode()) {}\n\n    void insert(const std::string& word) {\n        // TODO: Traverse and create nodes for characters\n        \n    }\n\n    bool search(const std::string& word) {\n        // TODO: Traverse characters and verify isEndOfWord\n        \n        return false;\n    }\n\n    bool startsWith(const std::string& prefix) {\n        // TODO: Traverse characters and return true if path exists\n        \n        return false;\n    }\n};\n\nint main() {\n    Trie trie;\n    trie.insert("apple");\n    std::cout << "Search apple: " << trie.search("apple") << "\\n";   // 1\n    std::cout << "Search app: " << trie.search("app") << "\\n";       // 0\n    std::cout << "Prefix app: " << trie.startsWith("app") << "\\n";   // 1\n    return 0;\n}`,
+      solutionHint: 'TrieNode* curr = root; for (char c : word) { int idx = c - "a"; if (!curr->children[idx]) curr->children[idx] = new TrieNode(); curr = curr->children[idx]; } curr->isEndOfWord = true;'
+    },
+    {
+      id: 'cpp-mod-8',
+      title: 'Module 8: Dijkstra Shortest Path Algorithm (Adjacency List)',
+      difficulty: 'Hard',
+      category: 'C++',
+      description: 'Implement dijkstra(n, edges, src) returning the shortest distance from src to all vertices using std::priority_queue with min-heap comparator.',
+      constraints: ['Vertices: 1 to 50,000, Edges: 1 to 200,000', 'Time Complexity: O(E log V)'],
+      sampleInputs: [
+        { input: 'edges = [[0,1,4],[0,2,1],[2,1,2],[1,3,1],[2,3,5]], src = 0', output: 'dist = [0, 3, 1, 4]' }
+      ],
+      starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n#include <climits>\n\nstd::vector<int> dijkstra(int n, const std::vector<std::vector<int>>& edges, int src) {\n    std::vector<std::vector<std::pair<int, int>>> adj(n);\n    for (const auto& e : edges) {\n        adj[e[0]].push_back({e[1], e[2]});\n    }\n    std::vector<int> dist(n, INT_MAX);\n    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;\n\n    // TODO: Initialize dist[src] = 0 and process shortest paths with priority queue\n    \n    return dist;\n}\n\nint main() {\n    std::vector<std::vector<int>> edges = {\n        {0, 1, 4}, {0, 2, 1}, {2, 1, 2}, {1, 3, 1}, {2, 3, 5}\n    };\n    auto d = dijkstra(4, edges, 0);\n    std::cout << "Shortest distances from 0: ";\n    for (int x : d) std::cout << x << " ";\n    std::cout << "\\n";\n    return 0;\n}`,
+      solutionHint: 'dist[src] = 0; pq.push({0, src}); while (!pq.empty()) { auto [d, u] = pq.top(); pq.pop(); if (d > dist[u]) continue; for (auto [v, w] : adj[u]) { if (dist[u] + w < dist[v]) { dist[v] = dist[u] + w; pq.push({dist[v], v}); } } } return dist;'
     }
   ],
 
   'c++': [
     {
-      id: 'cpp-1',
-      title: '1. Pointer Memory Allocation Counter',
-      difficulty: 'Medium',
+      id: 'cpp-mod-1',
+      title: 'Module 1: Two Sum with std::unordered_map',
+      difficulty: 'Easy',
       category: 'C++',
-      description: 'Implement `allocateBlocks(size, blockSize)` calculating total blocks needed.',
-      constraints: ['size > 0, blockSize > 0'],
-      sampleInputs: [{ input: 'size = 10, blockSize = 3', output: '4' }],
-      starterCode: `function allocateBlocks(size, blockSize) {\n  // TODO: Calculate ceil(size / blockSize)\n  \n}\n\nconsole.log(allocateBlocks(10, 3));`,
-      solutionHint: 'Use Math.ceil(size / blockSize)'
+      description: 'Implement twoSum(const std::vector<int>& nums, int target) using std::unordered_map to find the 2 indices that sum up to target in O(n) time.',
+      constraints: ['Time Complexity: O(n)', 'Return empty vector if no pair exists'],
+      sampleInputs: [
+        { input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]' }
+      ],
+      starterCode: `#include <iostream>\n#include <vector>\n#include <unordered_map>\n\nstd::vector<int> twoSum(const std::vector<int>& nums, int target) {\n    std::unordered_map<int, int> seen;\n    // TODO: Find complement target - nums[i] in O(n) time\n    \n    return {};\n}\n\nint main() {\n    std::vector<int> nums = {2, 7, 11, 15};\n    auto res = twoSum(nums, 9);\n    std::cout << "Indices: [" << res[0] << ", " << res[1] << "]\\n";\n    return 0;\n}`,
+      solutionHint: 'for (int i = 0; i < nums.size(); i++) { int diff = target - nums[i]; if (seen.count(diff)) return {seen[diff], i}; seen[nums[i]] = i; } return {};'
+    }
+  ],
+
+  'typescript': [
+    {
+      id: 'ts-mod-1',
+      title: 'Module 1: Discriminated Union Event Processor',
+      difficulty: 'Easy',
+      category: 'TypeScript',
+      description: 'Implement processEvent(event: UserEvent): string with exhaustive switch-case type narrowing across login, logout, and purchase action types.',
+      constraints: ['Strict TypeScript discriminated union pattern', 'Compile-time exhaustiveness check'],
+      sampleInputs: [
+        { input: '{ type: "purchase", userId: "u1", amount: 49.99, item: "Pro Pass" }', output: '"User u1 purchased Pro Pass for $49.99"' }
+      ],
+      starterCode: `type LoginEvent = { type: 'login'; userId: string; timestamp: number };\ntype LogoutEvent = { type: 'logout'; userId: string };\ntype PurchaseEvent = { type: 'purchase'; userId: string; amount: number; item: string };\n\ntype UserEvent = LoginEvent | LogoutEvent | PurchaseEvent;\n\nfunction processEvent(event: UserEvent): string {\n  // TODO: Exhaustive type narrowing with TypeScript pattern matching\n  switch (event.type) {\n    case 'login':\n      return \`User \${event.userId} logged in at \${event.timestamp}\`;\n    default:\n      return 'Unknown event';\n  }\n}\n\nconsole.log(processEvent({ type: 'purchase', userId: 'user-101', amount: 49.99, item: 'Pro Pass' }));`,
+      solutionHint: 'case "purchase": return `User ${event.userId} purchased ${event.item} for $${event.amount}`; case "logout": return `User ${event.userId} logged out`;'
+    },
+    {
+      id: 'ts-mod-2',
+      title: 'Module 2: Generic Key-Value Map Builder',
+      difficulty: 'Easy',
+      category: 'TypeScript',
+      description: 'Implement arrayToMap<T, K extends keyof T>(items: T[], keyField: K): Map<T[K], T> producing a strongly typed Map indexed by the specified object property.',
+      constraints: ['Preserve generic type inference T and key constraint K extends keyof T', 'Return ES6 Map'],
+      sampleInputs: [
+        { input: 'users = [{ id: "u1", name: "Alice" }], key = "id"', output: 'Map containing "u1" => user object' }
+      ],
+      starterCode: `function arrayToMap<T, K extends keyof T>(items: T[], keyField: K): Map<T[K], T> {\n  const map = new Map<T[K], T>();\n  // TODO: Index each item in map by item[keyField]\n  \n  return map;\n}\n\nconst users = [\n  { id: 'u1', name: 'Alice', role: 'admin' },\n  { id: 'u2', name: 'Bob', role: 'engineer' }\n];\nconst userMap = arrayToMap(users, 'id');\nconsole.log('User u1:', userMap.get('u1'));`,
+      solutionHint: 'for (const item of items) { map.set(item[keyField], item); } return map;'
+    },
+    {
+      id: 'ts-mod-3',
+      title: 'Module 3: Finite State Machine with Type-Safe State Transitions',
+      difficulty: 'Medium',
+      category: 'TypeScript',
+      description: 'Build a generic StateMachine class with transition(event) that enforces valid state transitions according to a typed state machine schema and throws an error on invalid transitions.',
+      constraints: ['Enforce strict state transition lookup table', 'Throw descriptive Error on invalid state transition'],
+      sampleInputs: [
+        { input: 'fsm.transition("FETCH") -> fsm.transition("RESOLVE")', output: '"loading" -> "success"' }
+      ],
+      starterCode: `type State = 'idle' | 'loading' | 'success' | 'error';\ntype Event = 'FETCH' | 'RESOLVE' | 'REJECT' | 'RETRY';\n\nclass StateMachine {\n  private state: State = 'idle';\n  private transitions: Record<State, Partial<Record<Event, State>>> = {\n    idle: { FETCH: 'loading' },\n    loading: { RESOLVE: 'success', REJECT: 'error' },\n    success: { FETCH: 'loading' },\n    error: { RETRY: 'loading' }\n  };\n\n  transition(event: Event): State {\n    // TODO: Verify valid transition and update state or throw Error\n    \n    return this.state;\n  }\n\n  getState(): State { return this.state; }\n}\n\nconst fsm = new StateMachine();\nconsole.log('Next:', fsm.transition('FETCH'));   // loading\nconsole.log('Next:', fsm.transition('RESOLVE')); // success`,
+      solutionHint: 'const nextState = this.transitions[this.state]?.[event]; if (!nextState) throw new Error(`Invalid transition from ${this.state} on ${event}`); this.state = nextState; return this.state;'
+    },
+    {
+      id: 'ts-mod-4',
+      title: 'Module 4: Deep Immutability Object Freeze Guard',
+      difficulty: 'Medium',
+      category: 'TypeScript',
+      description: 'Implement deepFreeze<T extends object>(obj: T): Readonly<T> recursively freezing all nested objects and arrays with TypeScript recursive type support.',
+      constraints: ['Deeply freeze all nested objects and arrays', 'Return object with Readonly type'],
+      sampleInputs: [
+        { input: 'deepFreeze({ api: { endpoint: "https://..." } })', output: 'Deeply frozen immutable object' }
+      ],
+      starterCode: `function deepFreeze<T extends object>(obj: T): Readonly<T> {\n  // TODO: Recursively call Object.freeze on all object properties\n  \n  return Object.freeze(obj);\n}\n\nconst config = { api: { endpoint: 'https://skillverse.com', timeout: 5000 }, tags: ['prod', 'v1'] };\nconst frozen = deepFreeze(config);\nconsole.log('Frozen object endpoint:', frozen.api.endpoint);`,
+      solutionHint: 'Object.keys(obj).forEach(prop => { const val = (obj as any)[prop]; if (val && typeof val === "object" && !Object.isFrozen(val)) deepFreeze(val); }); return Object.freeze(obj);'
+    },
+    {
+      id: 'ts-mod-5',
+      title: 'Module 5: Type-Safe Strongly-Typed Event Bus',
+      difficulty: 'Medium',
+      category: 'TypeScript',
+      description: 'Design a TypedEventBus<TEventMap> where on and emit strictly enforce payload types matching registered event keys with an unsubscribe callback.',
+      constraints: ['Type safe event-to-payload mappings', 'Return unsubscribe cleanup function'],
+      sampleInputs: [
+        { input: 'bus.on("badge:unlocked", ({ badgeId, xp }) => ...)', output: 'Dispatches typed payload safely' }
+      ],
+      starterCode: `interface AppEvents {\n  'user:signup': { userId: string; email: string };\n  'badge:unlocked': { badgeId: string; xp: number };\n}\n\nclass TypedEventBus<TMap extends Record<string, any>> {\n  private listeners: { [K in keyof TMap]?: Array<(payload: TMap[K]) => void> } = {};\n\n  on<K extends keyof TMap>(event: K, listener: (payload: TMap[K]) => void): () => void {\n    // TODO: Register listener and return unsubscribe callback\n    \n    return () => {};\n  }\n\n  emit<K extends keyof TMap>(event: K, payload: TMap[K]): void {\n    // TODO: Dispatch payload to listeners\n    \n  }\n}\n\nconst bus = new TypedEventBus<AppEvents>();\nbus.on('badge:unlocked', (data) => console.log(\`Unlocked badge \${data.badgeId} (+\${data.xp} XP)\`));\nbus.emit('badge:unlocked', { badgeId: 'boss-slayer', xp: 500 });`,
+      solutionHint: 'on: (this.listeners[event] = this.listeners[event] || []).push(listener); return () => { this.listeners[event] = this.listeners[event]?.filter(l => l !== listener); }; emit: (this.listeners[event] || []).forEach(l => l(payload));'
+    },
+    {
+      id: 'ts-mod-6',
+      title: 'Module 6: Type-Safe Nested Property Getter (Lodash Get Polyfill)',
+      difficulty: 'Hard',
+      category: 'TypeScript',
+      description: 'Implement safeGet<T, TFallback>(obj: any, path: string, fallback: TFallback): T | TFallback that parses dot-separated paths with bracketed array indices.',
+      constraints: ['Parse array index notation like "skills[0].name"', 'Return default fallback on undefined intermediate keys'],
+      sampleInputs: [
+        { input: 'safeGet({ user: { skills: [{ name: "TS" }] } }, "user.skills[0].name", "N/A")', output: '"TS"' }
+      ],
+      starterCode: `function safeGet<T = any, TFallback = undefined>(\n  target: any,\n  path: string,\n  fallback?: TFallback\n): T | TFallback {\n  // TODO: Parse path like "user.profile.skills[0].name" and traverse target\n  \n  return fallback as TFallback;\n}\n\nconst state = { user: { profile: { skills: [{ name: 'TypeScript' }] } } };\nconsole.log('Skill:', safeGet(state, 'user.profile.skills[0].name', 'N/A'));\nconsole.log('Missing:', safeGet(state, 'user.settings.theme', 'dark'));`,
+      solutionHint: 'const keys = path.replace(/\\[(\\w+)\\]/g, ".$1").replace(/^\\./, "").split("."); let curr = target; for (const k of keys) { if (curr === null || curr === undefined) return fallback as TFallback; curr = curr[k]; } return (curr !== undefined ? curr : fallback) as T | TFallback;'
+    },
+    {
+      id: 'ts-mod-7',
+      title: 'Module 7: Reactive Observable State Store with Selector Subscriptions',
+      difficulty: 'Hard',
+      category: 'TypeScript',
+      description: 'Build createStore<T>(initialState) returning getState(), setState(updater), and select(selector, listener) firing only when the selected slice value changes.',
+      constraints: ['Memoize selector output and prevent redundant callbacks', 'Return unsubscribe cleanup function'],
+      sampleInputs: [
+        { input: 'store.select(s => s.counter, count => ...)', output: 'Fires only when counter changes, ignores unrelated state mutations' }
+      ],
+      starterCode: `type Listener<T> = (val: T) => void;\n\nfunction createStore<T extends object>(initialState: T) {\n  let state = initialState;\n  const subscribers = new Set<() => void>();\n\n  return {\n    getState: (): T => state,\n    setState: (updater: Partial<T> | ((prev: T) => Partial<T>)): void => {\n      const next = typeof updater === 'function' ? updater(state) : updater;\n      state = { ...state, ...next };\n      subscribers.forEach(fn => fn());\n    },\n    select: <S>(selector: (s: T) => S, callback: (selected: S) => void) => {\n      let prev = selector(state);\n      const check = () => {\n        const current = selector(state);\n        if (current !== prev) {\n          prev = current;\n          callback(current);\n        }\n      };\n      subscribers.add(check);\n      return () => subscribers.delete(check);\n    }\n  };\n}\n\nconst store = createStore({ counter: 0, user: 'Alex' });\nconst unsub = store.select(s => s.counter, count => console.log('Counter changed to:', count));\nstore.setState(s => ({ counter: s.counter + 1 }));\nstore.setState({ user: 'Jordan' }); // Selector won\'t re-trigger\nstore.setState(s => ({ counter: s.counter + 1 }));`,
+      solutionHint: 'Maintain a Set of change listener callbacks and check selector equality in subscriber runner.'
+    },
+    {
+      id: 'ts-mod-8',
+      title: 'Module 8: Circuit Breaker Fault-Tolerant Async Wrapper',
+      difficulty: 'Hard',
+      category: 'TypeScript',
+      description: 'Implement CircuitBreaker class with states CLOSED, OPEN, and HALF_OPEN, tripping open when failure threshold is reached within resetTimeoutMs window.',
+      constraints: ['Auto reset to HALF_OPEN after timeout', 'Fast-fail without executing action when breaker is OPEN'],
+      sampleInputs: [
+        { input: 'breaker.execute(failingService) x 2 (threshold = 2)', output: 'Throws error immediately without network call on 3rd attempt' }
+      ],
+      starterCode: `type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';\n\nclass CircuitBreaker {\n  private state: CircuitState = 'CLOSED';\n  private failureCount = 0;\n  private lastFailureTime = 0;\n\n  constructor(\n    private threshold: number = 2,\n    private resetTimeoutMs: number = 500\n  ) {}\n\n  async execute<T>(action: () => Promise<T>): Promise<T> {\n    // TODO: Check OPEN state and timeout; execute action, track failures and trip breaker\n    \n    return action();\n  }\n\n  getState(): CircuitState { return this.state; }\n}\n\nconst breaker = new CircuitBreaker(2, 500);\nconst flakyService = async (succeed: boolean) => {\n  if (!succeed) throw new Error('Service Unavailable');\n  return 'OK Response';\n};\n\nasync function test() {\n  try { await breaker.execute(() => flakyService(false)); } catch (e) {}\n  try { await breaker.execute(() => flakyService(false)); } catch (e) {}\n  console.log('Breaker state after 2 failures:', breaker.getState()); // OPEN\n}\ntest();`,
+      solutionHint: 'if (this.state === "OPEN") { if (Date.now() - this.lastFailureTime > this.resetTimeoutMs) this.state = "HALF_OPEN"; else throw new Error("Circuit is OPEN"); } try { const res = await action(); this.state = "CLOSED"; this.failureCount = 0; return res; } catch (err) { this.failureCount++; this.lastFailureTime = Date.now(); if (this.failureCount >= this.threshold) this.state = "OPEN"; throw err; }'
     }
   ],
 

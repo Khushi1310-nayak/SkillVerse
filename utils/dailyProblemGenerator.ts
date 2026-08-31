@@ -14,10 +14,16 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
 
   if (normalizedId.includes('javascript') || normalizedId.includes('js')) {
     problemList = PLAYGROUND_PROBLEMS['javascript'];
+  } else if (normalizedId.includes('typescript') || normalizedId.includes('ts')) {
+    problemList = PLAYGROUND_PROBLEMS['typescript'];
   } else if (normalizedId.includes('python') || normalizedId.includes('py')) {
     problemList = PLAYGROUND_PROBLEMS['python'];
   } else if (normalizedId.includes('java') && !normalizedId.includes('script')) {
     problemList = PLAYGROUND_PROBLEMS['java'];
+  } else if (normalizedId.includes('c++') || normalizedId.includes('cpp')) {
+    problemList = PLAYGROUND_PROBLEMS['cpp'];
+  } else if (normalizedId === 'c' || normalizedId === 'c-programming' || normalizedId.startsWith('c-')) {
+    problemList = PLAYGROUND_PROBLEMS['c'];
   } else if (normalizedId.includes('array') || normalizedId.includes('dsa')) {
     problemList = PLAYGROUND_PROBLEMS['arrays'];
   } else if (normalizedId.includes('ui') || normalizedId.includes('design') || normalizedId.includes('ux')) {

@@ -29,3 +29,6 @@ jobs:
       # Note: Skipped lint, typecheck, and test as those scripts do not exist in package.json
       - name: Build Project
         run: npm run build
+
+      - name: Check i18n locale parity
+        run: npm run i18n:check

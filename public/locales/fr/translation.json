@@ -10,7 +10,12 @@
     "menu": "Menu",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
-    "saved": "Enregistrés"
+    "saved": "Enregistrés",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "Annuler",
@@ -77,6 +82,18 @@
       "title": "Historique des entretiens blancs",
       "emptyMessage": "Lancez un entretien blanc en Mode Carrière pour tester vos compétences dans des conditions réelles.",
       "button": "Commencer l'entretien blanc"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}} cours trouvés",
     "clearFilters": "Effacer les filtres",
     "bookmarkAdd": "Enregistrer le cours",
-    "bookmarkRemove": "Retirer des enregistrés"
+    "bookmarkRemove": "Retirer des enregistrés",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "Cours enregistrés",
@@ -164,6 +187,7 @@
         "retryReminder": "Prenez un moment pour revoir le contenu du cours avant de réessayer !",
         "retryCountdown": "⏳ Vous pourrez réessayer dans {{time}}",
         "retry": "Réessayer le quiz",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "La possibilité de repasser les quiz est désactivée dans vos paramètres.",
         "reviewAnswers": "Revoir les réponses"
       }
@@ -173,6 +197,25 @@
       "body": "Une erreur s'est produite lors du chargement du cours. Vérifiez votre connexion et réessayez.",
       "retry": "Réessayer",
       "backToCourses": "Retour aux cours"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "Donner un exemple"
     },
     "toggle": {
-      "open": "Ouvrir l'assistant IA"
+      "open": "Ouvrir l'assistant IA",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "Désolé, j'ai des difficultés de connexion pour le moment. Veuillez vérifier votre connexion ou votre clé API.",

@@ -10,7 +10,12 @@
     "menu": "菜单",
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",
-    "saved": "已保存"
+    "saved": "已保存",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "取消",
@@ -77,6 +82,18 @@
       "title": "模拟面试历史",
       "emptyMessage": "前往职业模式发起一次模拟面试，在实战环境中检验您的技能。",
       "button": "开始模拟面试"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "找到 {{count}} 门课程",
     "clearFilters": "清除筛选",
     "bookmarkAdd": "保存课程",
-    "bookmarkRemove": "从已保存中移除"
+    "bookmarkRemove": "从已保存中移除",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "已保存的课程",
@@ -164,6 +187,7 @@
         "retryReminder": "在重新尝试之前，花点时间复习一下课程资料吧！",
         "retryCountdown": "⏳ 您可以在 {{time}} 后重新尝试",
         "retry": "重新测试",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "您的设置中已禁用重新测试功能。",
         "reviewAnswers": "查看答案解析"
       }
@@ -173,6 +197,25 @@
       "body": "获取课程时出错。请检查网络连接后重试。",
       "retry": "重试",
       "backToCourses": "返回课程列表"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "举个例子"
     },
     "toggle": {
-      "open": "打开 AI 助手"
+      "open": "打开 AI 助手",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "抱歉，网络连接出现问题。请检查您的网络连接或 API 密钥配置。",

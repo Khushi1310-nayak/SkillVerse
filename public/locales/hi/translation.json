@@ -10,7 +10,12 @@
     "menu": "मेनू",
     "openMenu": "मेनू खोलें",
     "closeMenu": "मेनू बंद करें",
-    "saved": "सहेजे गए"
+    "saved": "सहेजे गए",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "रद्द करें",
@@ -77,6 +82,18 @@
       "title": "मॉक इंटरव्यू का इतिहास",
       "emptyMessage": "वास्तविक परिस्थितियों में अपने कौशल का परीक्षण करने के लिए करियर मोड में मॉक इंटरव्यू शुरू करें।",
       "button": "मॉक इंटरव्यू शुरू करें"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}} कोर्स मिले",
     "clearFilters": "फ़िल्टर साफ़ करें",
     "bookmarkAdd": "कोर्स सहेजें",
-    "bookmarkRemove": "सहेजे गए से हटाएं"
+    "bookmarkRemove": "सहेजे गए से हटाएं",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "सहेजे गए कोर्स",
@@ -164,6 +187,7 @@
         "retryReminder": "पुनः प्रयास करने से पहले कोर्स सामग्री को दोहराने के लिए कुछ समय निकालें!",
         "retryCountdown": "⏳ आप {{time}} में पुनः प्रयास कर सकते हैं",
         "retry": "क्विज़ दोबारा दें",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "आपकी सेटिंग्स में क्विज़ दोहराने का विकल्प अक्षम (Disabled) है।",
         "reviewAnswers": "उत्तरों की समीक्षा करें"
       }
@@ -173,6 +197,25 @@
       "body": "कोर्स लाते समय कुछ गड़बड़ हो गई। अपना कनेक्शन जाँचें और फिर से प्रयास करें।",
       "retry": "फिर से प्रयास करें",
       "backToCourses": "कोर्स पर वापस जाएँ"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "एक उदाहरण दें"
     },
     "toggle": {
-      "open": "AI सहायक खोलें"
+      "open": "AI सहायक खोलें",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "क्षमा करें, मुझे इस समय कनेक्शन की समस्या आ रही है। कृपया अपना इंटरनेट कनेक्शन या API कुंजी जांचें।",

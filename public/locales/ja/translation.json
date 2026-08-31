@@ -10,7 +10,12 @@
     "menu": "メニュー",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
-    "saved": "保存済み"
+    "saved": "保存済み",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "キャンセル",
@@ -77,6 +82,18 @@
       "title": "模擬面接の履歴",
       "emptyMessage": "キャリアモードで模擬面接を開始し、実践的な環境でスキルを試してみましょう。",
       "button": "模擬面接を開始"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}}件のコースが見つかりました",
     "clearFilters": "フィルターをクリア",
     "bookmarkAdd": "コースを保存",
-    "bookmarkRemove": "保存済みから削除"
+    "bookmarkRemove": "保存済みから削除",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "保存済みコース",
@@ -164,6 +187,7 @@
         "retryReminder": "再挑戦する前に、コース教材を復習してみましょう！",
         "retryCountdown": "⏳ {{time}} 後に再挑戦できます",
         "retry": "もう一度挑戦する",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "設定で小テストの再挑戦が無効になっています。",
         "reviewAnswers": "回答を確認する"
       }
@@ -173,6 +197,25 @@
       "body": "コースの取得中に問題が発生しました。接続を確認してもう一度お試しください。",
       "retry": "再試行",
       "backToCourses": "コース一覧に戻る"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "例をあげて"
     },
     "toggle": {
-      "open": "AIアシスタントを開く"
+      "open": "AIアシスタントを開く",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "申し訳ありません。現在接続に問題が発生しています。インターネット接続またはAPIキーを確認してください。",

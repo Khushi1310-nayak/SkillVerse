@@ -10,7 +10,12 @@
     "menu": "Menü",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
-    "saved": "Gespeichert"
+    "saved": "Gespeichert",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "Abbrechen",
@@ -77,6 +82,18 @@
       "title": "Verlauf der Test-Interviews",
       "emptyMessage": "Starten Sie ein Test-Interview im Karrieremodus, um Ihre Fähigkeiten unter realen Bedingungen zu testen.",
       "button": "Test-Interview starten"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}} Kurse gefunden",
     "clearFilters": "Filter zurücksetzen",
     "bookmarkAdd": "Kurs speichern",
-    "bookmarkRemove": "Aus Gespeichert entfernen"
+    "bookmarkRemove": "Aus Gespeichert entfernen",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "Gespeicherte Kurse",
@@ -164,6 +187,7 @@
         "retryReminder": "Nehmen Sie sich einen Moment Zeit, um das Kursmaterial zu wiederholen, bevor Sie es erneut versuchen!",
         "retryCountdown": "⏳ Sie können es in {{time}} erneut versuchen",
         "retry": "Test wiederholen",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "Das Wiederholen von Tests ist in Ihren Einstellungen deaktiviert.",
         "reviewAnswers": "Antworten überprüfen"
       }
@@ -173,6 +197,25 @@
       "body": "Beim Laden des Kurses ist etwas schiefgelaufen. Prüfe deine Verbindung und versuche es erneut.",
       "retry": "Erneut versuchen",
       "backToCourses": "Zurück zu den Kursen"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "Ein Beispiel geben"
     },
     "toggle": {
-      "open": "KI-Assistenten öffnen"
+      "open": "KI-Assistenten öffnen",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "Entschuldigung, ich habe derzeit Verbindungsprobleme. Bitte überprüfen Sie Ihre Internetverbindung oder Ihren API-Schlüssel.",

@@ -10,7 +10,12 @@
     "menu": "메뉴",
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
-    "saved": "저장됨"
+    "saved": "저장됨",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "취소",
@@ -77,6 +82,18 @@
       "title": "모의 면접 기록",
       "emptyMessage": "실제 환경에서 실력을 테스트하려면 커리어 모드에서 모의 면접을 시작하세요.",
       "button": "모의 면접 시작"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}}개의 강좌를 찾았습니다",
     "clearFilters": "필터 초기화",
     "bookmarkAdd": "강좌 저장",
-    "bookmarkRemove": "저장 목록에서 제거"
+    "bookmarkRemove": "저장 목록에서 제거",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "저장한 강좌",
@@ -164,6 +187,7 @@
         "retryReminder": "다시 시도하기 전에 코스 자료를 잠시 복습해보세요!",
         "retryCountdown": "⏳ {{time}} 후에 다시 시도할 수 있습니다",
         "retry": "퀴즈 다시 풀기",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "설정에서 퀴즈 재시도가 비활성화되어 있습니다.",
         "reviewAnswers": "답안 검토"
       }
@@ -173,6 +197,25 @@
       "body": "코스를 가져오는 중 문제가 발생했습니다. 연결을 확인한 후 다시 시도해 주세요.",
       "retry": "다시 시도",
       "backToCourses": "코스 목록으로"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "예시를 들어 줘"
     },
     "toggle": {
-      "open": "AI 도우미 열기"
+      "open": "AI 도우미 열기",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "죄송합니다. 현재 연결에 문제가 발생했습니다. 인터넷 연결이나 API 키를 확인해 주세요.",

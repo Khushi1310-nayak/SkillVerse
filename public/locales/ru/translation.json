@@ -10,7 +10,12 @@
     "menu": "Меню",
     "openMenu": "Открыть меню",
     "closeMenu": "Закрыть меню",
-    "saved": "Сохранённые"
+    "saved": "Сохранённые",
+    "starred": "Starred Questions",
+    "notes": "Notes",
+    "roadmap": "Roadmap",
+    "playground": "Playground",
+    "codeReview": "Peer Reviews"
   },
   "common": {
     "cancel": "Отмена",
@@ -77,6 +82,18 @@
       "title": "История пробных собеседований",
       "emptyMessage": "Запустите пробное собеседование в Карьерном режиме, чтобы проверить свои навыки в реальных условиях.",
       "button": "Начать пробное собеседование"
+    },
+    "dailyChallenge": {
+      "title": "Daily Challenge",
+      "progressMessage": "{{completed}}/{{total}} Completed — keep your streak alive!",
+      "completeMessage": "Daily Challenge complete! Great work today.",
+      "bonusXp": "+{{xp}} XP Bonus",
+      "bonusClaimed": "Bonus Claimed",
+      "startButton": "Start Challenge",
+      "reviewButton": "Review Again",
+      "toast": {
+        "bonusAwarded": "Daily Challenge complete! +{{xp}} XP bonus awarded."
+      }
     }
   },
   "courses": {
@@ -106,7 +123,13 @@
     "resultsCount_plural": "{{count}} курсов найдено",
     "clearFilters": "Сбросить фильтры",
     "bookmarkAdd": "Сохранить курс",
-    "bookmarkRemove": "Убрать из сохранённых"
+    "bookmarkRemove": "Убрать из сохранённых",
+    "timeFilterTitle": "Filter by duration",
+    "allDurations": "All Durations",
+    "timeUnder30": "Under 30 min",
+    "time30to60": "30–60 min",
+    "time1to2h": "1–2 hours",
+    "time2hPlus": "2+ hours"
   },
   "savedCourses": {
     "title": "Сохранённые курсы",
@@ -164,6 +187,7 @@
         "retryReminder": "Уделите немного времени повторению материалов курса перед следующей попыткой!",
         "retryCountdown": "⏳ Вы сможете повторить попытку через {{time}}",
         "retry": "Пройти тест заново",
+        "retakeMistakes": "Retake Mistakes Only",
         "retryDisabled": "Повторное прохождение тестов отключено в ваших настройках.",
         "reviewAnswers": "Просмотреть ответы"
       }
@@ -173,6 +197,25 @@
       "body": "При загрузке курса произошла ошибка. Проверьте подключение и попробуйте снова.",
       "retry": "Повторить",
       "backToCourses": "Вернуться к курсам"
+    },
+    "pomodoro": {
+      "title": "Pomodoro Focus Timer",
+      "focusPhase": "Focus Session",
+      "breakPhase": "Short Break",
+      "focusDesc": "25 min focused study interval",
+      "breakDesc": "5 min rest to recharge",
+      "statusFocusing": "Focusing...",
+      "statusResting": "On Break...",
+      "statusPaused": "Paused",
+      "statusReady": "Ready",
+      "start": "Start Focus",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "skipToBreak": "Skip to Break",
+      "skipToFocus": "Skip to Focus",
+      "expand": "Expand timer",
+      "collapse": "Collapse timer"
     }
   },
   "aiAssistant": {
@@ -197,7 +240,8 @@
       "example": "Приведи пример"
     },
     "toggle": {
-      "open": "Открыть ИИ-ассистента"
+      "open": "Открыть ИИ-ассистента",
+      "badge": "Ask AI Tutor"
     },
     "error": {
       "connection": "Извините, сейчас возникли проблемы с подключением. Проверьте интернет-соединение или ваш API-ключ.",

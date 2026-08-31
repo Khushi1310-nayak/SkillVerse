@@ -234,6 +234,12 @@ export interface SavedSnippet {
   updatedAt: string; // ISO timestamp
 }
 
+export interface StarredQuestion {
+  courseId: string;
+  questionId: number;
+  starredAt: string; // ISO timestamp
+}
+
 export interface LessonComment {
   id: string;
   courseId: string;

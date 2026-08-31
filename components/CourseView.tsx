@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, Lock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, CheckCircle, XCircle, RefreshCcw, Download, Clock, Sparkles, Loader2, Lock, Star } from 'lucide-react';
 import { firestoreService } from '../services/firestoreService';
 import { storageService } from '../services/storageService';
 import { safeStorage, isPlainObject } from '../utils/safeStorage';
@@ -97,7 +97,14 @@ export const CourseView: React.FC = () => {
   const [missedQuestionIds, setMissedQuestionIds] = useState<string[]>([]);
   const [retakeMode, setRetakeMode] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0); // seconds remaining in cooldown
+  const [starredVersion, setStarredVersion] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleToggleStar = (questionId: number) => {
+    if (!course) return;
+    storageService.toggleStarQuestion(course.id, questionId);
+    setStarredVersion(v => v + 1);
+  };
 
   // Top-level unconditional hooks (must remain above all early returns)
   const allProgress = useMemo(() => storageService.getAllProgress(), []);
@@ -717,10 +724,27 @@ export const CourseView: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mb-8">
-                    <p className="text-xl text-textMain font-medium leading-relaxed">
+                  <div className="mb-8 flex items-start justify-between gap-4">
+                    <p className="text-xl text-textMain font-medium leading-relaxed flex-1">
                       {activeQuestions[currentQuestion]?.question}
                     </p>
+                    {activeQuestions[currentQuestion] && (
+                      <button
+                        onClick={() => handleToggleStar(activeQuestions[currentQuestion].id)}
+                        className={`p-2.5 rounded-xl border transition-all shrink-0 ${
+                          storageService.isQuestionStarred(course.id, activeQuestions[currentQuestion].id)
+                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                            : 'bg-white/5 border-black/20 dark:border-white/10 text-textMuted hover:text-amber-400 hover:bg-white/10'
+                        }`}
+                        title={storageService.isQuestionStarred(course.id, activeQuestions[currentQuestion].id) ? 'Unstar Question' : 'Star Question'}
+                        aria-label={storageService.isQuestionStarred(course.id, activeQuestions[currentQuestion].id) ? 'Unstar Question' : 'Star Question'}
+                      >
+                        <Star
+                          size={20}
+                          className={storageService.isQuestionStarred(course.id, activeQuestions[currentQuestion].id) ? 'fill-amber-400' : ''}
+                        />
+                      </button>
+                    )}
                   </div>
 
                   <div className="space-y-4 mb-10" role="radiogroup" aria-label={activeQuestions[currentQuestion]?.question}>
@@ -883,9 +907,23 @@ export const CourseView: React.FC = () => {
 
                         return (
                           <div key={qIdx} className="bg-red-500/5 p-6 rounded-2xl border border-red-500/20">
-                            <div className="flex items-center gap-2 mb-4">
-                              <XCircle size={18} className="text-red-500 shrink-0" />
-                              <p className="text-lg font-medium text-textMain">{qIdx + 1}. {q.question}</p>
+                            <div className="flex items-start justify-between gap-2 mb-4">
+                              <div className="flex items-center gap-2">
+                                <XCircle size={18} className="text-red-500 shrink-0" />
+                                <p className="text-lg font-medium text-textMain">{qIdx + 1}. {q.question}</p>
+                              </div>
+                              <button
+                                onClick={() => handleToggleStar(q.id)}
+                                className={`p-1.5 rounded-lg border transition-all shrink-0 ${
+                                  storageService.isQuestionStarred(course.id, q.id)
+                                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                                    : 'bg-white/5 border-black/20 dark:border-white/10 text-textMuted hover:text-amber-400'
+                                }`}
+                                title={storageService.isQuestionStarred(course.id, q.id) ? 'Unstar Question' : 'Star Question'}
+                                aria-label={storageService.isQuestionStarred(course.id, q.id) ? 'Unstar Question' : 'Star Question'}
+                              >
+                                <Star size={16} className={storageService.isQuestionStarred(course.id, q.id) ? 'fill-amber-400' : ''} />
+                              </button>
                             </div>
 
                             <div className="space-y-2 mb-4">
@@ -927,7 +965,21 @@ export const CourseView: React.FC = () => {
                       <h3 className="text-2xl font-bold text-textMain text-center mb-8">{t('courseView.quiz.result.reviewAnswers')}</h3>
                       {course.quiz.map((q, qIdx) => (
                         <div key={qIdx} className="bg-white/50 dark:bg-white/5 p-6 rounded-2xl border border-black/20 dark:border-white/10">
-                          <p className="text-lg font-medium text-textMain mb-4">{qIdx + 1}. {q.question}</p>
+                          <div className="flex items-start justify-between gap-2 mb-4">
+                            <p className="text-lg font-medium text-textMain">{qIdx + 1}. {q.question}</p>
+                            <button
+                              onClick={() => handleToggleStar(q.id)}
+                              className={`p-1.5 rounded-lg border transition-all shrink-0 ${
+                                storageService.isQuestionStarred(course.id, q.id)
+                                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                                  : 'bg-white/5 border-black/20 dark:border-white/10 text-textMuted hover:text-amber-400'
+                              }`}
+                              title={storageService.isQuestionStarred(course.id, q.id) ? 'Unstar Question' : 'Star Question'}
+                              aria-label={storageService.isQuestionStarred(course.id, q.id) ? 'Unstar Question' : 'Star Question'}
+                            >
+                              <Star size={16} className={storageService.isQuestionStarred(course.id, q.id) ? 'fill-amber-400' : ''} />
+                            </button>
+                          </div>
                           <div className="space-y-3">
                             {q.options.map((opt, oIdx) => {
                               const isCorrect = oIdx === q.correctAnswer;

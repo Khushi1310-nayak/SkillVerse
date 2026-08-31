@@ -31,7 +31,8 @@ export const CodingPracticePlayground: React.FC = () => {
 
   const handleRequestReview = async (code: string, language: string) => {
     if (isReviewSubmitting) return;
-    if (!user?.uid) {
+    const effectiveUserId = user?.uid || appUser?.uid;
+    if (!effectiveUserId) {
       showToast({ message: 'Please log in to request a code review.', type: 'error' });
       return;
     }
@@ -39,8 +40,8 @@ export const CodingPracticePlayground: React.FC = () => {
     setIsReviewSubmitting(true);
     try {
       await firestoreService.createCodeReviewRequest({
-        userId: user.uid,
-        username: appUser?.username || user.displayName || 'Learner',
+        userId: effectiveUserId,
+        username: appUser?.username || user?.displayName || 'Learner',
         code,
         language,
         problemContext: `${activeCourse.title}: ${currentProblem.title}`,

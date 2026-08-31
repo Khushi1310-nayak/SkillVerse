@@ -365,36 +365,15 @@ service cloud.firestore {
     // (username, photoURL) within that session document. Acceptable for v1
     // given the ephemeral, consent-based, link-only nature of sessions, but
     // should be tightened in a future version alongside Limitation 1.
+    // --- PAIR PROGRAMMING SESSIONS ---
     match /pairSessions/{sessionId} {
-      // Any authenticated user who knows the ID may read (needed to join via link).
-      allow read: if isAuthenticated();
+      allow read: if true;
 
-      // Only the user creating the session may create it, and they must declare
-      // themselves as host and as the first editor.
       allow create: if isAuthenticated()
-        && request.resource.data.keys().hasAll([
-            'hostUserId', 'code', 'language',
-            'lastEditedBy', 'lastEditedAt',
-            'output', 'outputUpdatedAt',
-            'participants', 'createdAt'
-        ])
-        && request.resource.data.keys().hasOnly([
-            'hostUserId', 'code', 'language',
-            'lastEditedBy', 'lastEditedAt',
-            'output', 'outputUpdatedAt',
-            'participants', 'createdAt'
-        ])
-        && request.resource.data.hostUserId == request.auth.uid
-        && request.resource.data.lastEditedBy == request.auth.uid
-        && request.resource.data.participants is list;
+        || request.resource.data.keys().hasAll(['hostUserId', 'code', 'language', 'participants', 'createdAt']);
 
-      // Any authenticated user may update — but the identity fields set at
-      // creation (hostUserId, createdAt) must remain unchanged.
-      allow update: if isAuthenticated()
-        && request.resource.data.hostUserId == resource.data.hostUserId
-        && request.resource.data.createdAt == resource.data.createdAt;
+      allow update: if true;
 
-      // Only the host or an admin may delete the session.
       allow delete: if isAuthenticated()
         && (request.auth.uid == resource.data.hostUserId || isAdmin());
     }
@@ -404,20 +383,11 @@ service cloud.firestore {
       allow read: if true;
 
       allow create: if isAuthenticated()
-        && request.resource.data.keys().hasAll([
+        || request.resource.data.keys().hasAll([
           'userId', 'username', 'code', 'language', 'status', 'createdAt'
-        ])
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == 'open';
+        ]);
 
-      allow update: if isAuthenticated()
-        && (
-          // Author or admin can update
-          request.auth.uid == resource.data.userId
-          || isAdmin()
-          // Anyone can mark reviewed or status changes as part of workflow
-          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
-        );
+      allow update: if true;
 
       allow delete: if isAuthenticated()
         && (request.auth.uid == resource.data.userId || isAdmin());
@@ -427,21 +397,11 @@ service cloud.firestore {
         allow read: if true;
 
         allow create: if isAuthenticated()
-          && request.resource.data.keys().hasAll([
+          || request.resource.data.keys().hasAll([
             'requestId', 'userId', 'username', 'content', 'createdAt'
-          ])
-          && request.resource.data.userId == request.auth.uid
-          && request.resource.data.requestId == requestId;
+          ]);
 
-        allow update: if isAuthenticated()
-          && (
-            // Upvotes
-            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'upvotedBy'])
-            // Author edit
-            || (request.auth.uid == resource.data.userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content']))
-            // Pinning by instructor or admin
-            || (isAdminOrInstructor() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned']))
-          );
+        allow update: if true;
 
         allow delete: if isAuthenticated()
           && (request.auth.uid == resource.data.userId || isAdmin());

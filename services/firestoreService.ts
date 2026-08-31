@@ -1200,8 +1200,6 @@ export const firestoreService = {
         createdAt: now,
       };
       const docRef = await addDoc(collection(db, 'pairSessions'), sessionData);
-      // Write the generated id back into the document so reads include it
-      await updateDoc(docRef, { id: docRef.id });
       return { id: docRef.id, ...sessionData };
     } catch (err) {
       console.error('Error creating pair session:', err);

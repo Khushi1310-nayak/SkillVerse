@@ -19,9 +19,83 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PublicLessonNote, PairSession, PairSessionParticipant } from '../types';
+import { Course, Company, QuizQuestion, Chapter, LessonComment, CourseReview, User, ContentReport, ReportStatus, AppNotification, CodeReviewRequest, CodeReviewComment, PublicLessonNote, PairSession, PairSessionParticipant, WeeklyQuestDefinition, UserQuestProgress, CommunityBossDefinition, CommunityBossProgress } from '../types';
 import { COURSES, COMPANIES } from "../constants";
 import { safeStorage, isArray } from "../utils/safeStorage";
+
+const FALLBACK_QUESTS: WeeklyQuestDefinition[] = [
+  {
+    id: "weekly-quest-1",
+    title: "Build Momentum",
+    description: "Complete a mix of learning goals this week.",
+    startsAt: new Date(Date.now()).toISOString(),
+    endsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
+    objectives: [
+      { id: "course-completion", type: "course", title: "Complete 2 courses", target: 2 },
+      { id: "pair-session-start", type: "pair-session", title: "Start 1 pair session", target: 1 },
+      { id: "code-review-request", type: "code-review", title: "Request 1 code review", target: 1 },
+    ],
+    reward: { xp: 250, badgeId: "quest-master" },
+  },
+  {
+    id: "weekly-quest-2",
+    title: "Review & Refine",
+    description: "Keep practicing and learning together this week.",
+    startsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3).toISOString(),
+    endsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10).toISOString(),
+    objectives: [
+      { id: "course-completion-2", type: "course", title: "Complete 1 course", target: 1 },
+      { id: "pair-session-start-2", type: "pair-session", title: "Start 1 pair session", target: 1 },
+      { id: "code-review-request-2", type: "code-review", title: "Request 1 code review", target: 1 },
+    ],
+    reward: { xp: 300, frameId: "neon-pulse" },
+  },
+];
+
+const FALLBACK_BOSS: CommunityBossDefinition = {
+  id: "boss-ember-wyrm",
+  title: "Ember Wyrm",
+  description: "A shared challenge for the whole SkillVerse community.",
+  startsAt: new Date(Date.now()).toISOString(),
+  endsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3).toISOString(),
+  target: 12,
+  reward: { xp: 500, badgeId: "boss-slayer", themeId: "cyberpunk" },
+};
+
+const getFallbackQuestDefinitions = (): WeeklyQuestDefinition[] => {
+  const now = Date.now();
+  const startOfWeek = new Date();
+  startOfWeek.setHours(0, 0, 0, 0);
+  const day = (startOfWeek.getDay() + 6) % 7;
+  startOfWeek.setDate(startOfWeek.getDate() - day);
+
+  const currentWeek = new Date(startOfWeek);
+  const nextWeek = new Date(startOfWeek);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+
+  return [
+    {
+      ...FALLBACK_QUESTS[0],
+      startsAt: currentWeek.toISOString(),
+      endsAt: nextWeek.toISOString(),
+    },
+    {
+      ...FALLBACK_QUESTS[1],
+      startsAt: new Date(currentWeek.getTime() + 1000 * 60 * 60 * 24 * 3).toISOString(),
+      endsAt: new Date(currentWeek.getTime() + 1000 * 60 * 60 * 24 * 10).toISOString(),
+    },
+  ].filter((quest) => new Date(quest.startsAt).getTime() <= now && new Date(quest.endsAt).getTime() >= now);
+};
+
+const getFallbackBoss = (): CommunityBossDefinition => {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 3);
+
+  return { ...FALLBACK_BOSS, startsAt: start.toISOString(), endsAt: end.toISOString() };
+};
 
 // --- COURSE CATALOG CACHE (#328) ---
 // A single shared in-memory snapshot of the courses collection.  It is
@@ -313,7 +387,23 @@ export const firestoreService = {
     }
 
     const request = requestSnapshot.data() as CodeReviewRequest;
+    if (request.status === "reviewed") {
+      return;
+    }
+
     await updateDoc(requestRef, { status: "reviewed" });
+
+    const questDefinitions = await firestoreService.getActiveQuestDefinitions();
+    await Promise.all(
+      questDefinitions.map(async (quest) => {
+        const objective = quest.objectives.find((item) => item.type === "code-review");
+        if (!objective) return null;
+        return firestoreService.recordQuestObjectiveProgress(request.userId, quest.id, objective.id, 1);
+      }),
+    );
+
+    const boss = await firestoreService.getActiveCommunityBoss();
+    await firestoreService.incrementCommunityBossProgress(boss.id, 1);
 
     await firestoreService.createNotification(request.userId, {
       type: "comment_reply",
@@ -999,6 +1089,127 @@ export const firestoreService = {
     });
   },
 
+  getActiveQuestDefinitions: async (): Promise<WeeklyQuestDefinition[]> => {
+    const now = Date.now();
+    const snapshot = await getDocs(collection(db, "quests"));
+
+    if (!snapshot.empty) {
+      const active = snapshot.docs
+        .map((docSnap) => ({ id: docSnap.id, ...(docSnap.data() as Omit<WeeklyQuestDefinition, "id">) } as WeeklyQuestDefinition))
+        .filter((quest) => {
+          const startsAt = new Date(quest.startsAt).getTime();
+          const endsAt = new Date(quest.endsAt).getTime();
+          return startsAt <= now && endsAt >= now;
+        });
+
+      if (active.length > 0) return active;
+    }
+
+    return getFallbackQuestDefinitions();
+  },
+
+  getActiveCommunityBoss: async (): Promise<CommunityBossDefinition> => {
+    const bossId = "boss-ember-wyrm";
+    const bossSnap = await getDoc(doc(db, "communityBosses", bossId));
+
+    if (bossSnap.exists()) {
+      return { id: bossSnap.id, ...(bossSnap.data() as Omit<CommunityBossDefinition, "id">) } as CommunityBossDefinition;
+    }
+
+    return getFallbackBoss();
+  },
+
+  recordQuestObjectiveProgress: async (
+    userId: string,
+    questId: string,
+    objectiveId: string,
+    amount: number = 1,
+  ): Promise<UserQuestProgress | null> => {
+    const quest = await firestoreService.getQuestDefinition(questId);
+    if (!quest) return null;
+
+    const objective = quest.objectives.find((item) => item.id === objectiveId);
+    if (!objective) return null;
+
+    const questDocRef = doc(db, "users", userId, "quests", questId);
+    const userDocRef = doc(db, "users", userId);
+
+    return runTransaction(db, async (transaction) => {
+      const questSnap = await transaction.get(questDocRef);
+      const userSnap = await transaction.get(userDocRef);
+
+      const previousProgress = questSnap.exists()
+        ? ((questSnap.data() as Partial<UserQuestProgress>).objectiveProgress || {})
+        : {};
+      const nextProgress = { ...previousProgress };
+      const currentValue = Number(nextProgress[objectiveId] || 0);
+      const nextValue = Math.min(objective.target, currentValue + Math.max(0, amount));
+      nextProgress[objectiveId] = nextValue;
+
+      const allObjectivesComplete = quest.objectives.every((item) => {
+        const completedValue = Number(nextProgress[item.id] || 0);
+        return completedValue >= item.target;
+      });
+
+      const rewardClaimed = Boolean((questSnap.data() as Partial<UserQuestProgress>)?.rewardClaimed);
+      const now = new Date().toISOString();
+      const finalProgress: UserQuestProgress = {
+        userId,
+        questId,
+        objectiveProgress: nextProgress,
+        completed: allObjectivesComplete,
+        rewardClaimed,
+        updatedAt: now,
+      };
+
+      transaction.set(questDocRef, finalProgress, { merge: true });
+
+      if (allObjectivesComplete && !rewardClaimed) {
+        const reward = quest.reward;
+        const userData = userSnap.data() || {};
+        const storedSettings = userData.preferences?.settings || userData.settings || {};
+        const settings = {
+          ...storedSettings,
+          unlockedThemes: Array.isArray(storedSettings.unlockedThemes) ? [...storedSettings.unlockedThemes] : ['dark', 'light'],
+          unlockedFrames: Array.isArray(storedSettings.unlockedFrames) ? [...storedSettings.unlockedFrames] : ['none'],
+        };
+
+        if (reward.themeId && !settings.unlockedThemes.includes(reward.themeId)) {
+          settings.unlockedThemes = [...settings.unlockedThemes, reward.themeId];
+          settings.activeTheme = reward.themeId;
+        }
+
+        if (reward.frameId && !settings.unlockedFrames.includes(reward.frameId)) {
+          settings.unlockedFrames = [...settings.unlockedFrames, reward.frameId];
+          settings.activeFrame = reward.frameId;
+        }
+
+        const updates: Record<string, any> = {
+          xp: increment(reward.xp),
+          weeklyXP: increment(reward.xp),
+          monthlyXP: increment(reward.xp),
+          "preferences.settings": settings,
+        };
+
+        if (reward.badgeId) {
+          updates.badges = arrayUnion(reward.badgeId);
+        }
+
+        transaction.update(userDocRef, updates);
+        transaction.update(questDocRef, {
+          rewardClaimed: true,
+          claimedAt: now,
+          completed: true,
+        });
+
+        finalProgress.rewardClaimed = true;
+        finalProgress.claimedAt = now;
+      }
+
+      return finalProgress;
+    });
+  },
+
   getFriendActivityFeed: async (followingIds: string[]): Promise<any[]> => {
     if (!followingIds || followingIds.length === 0) return [];
 
@@ -1070,6 +1281,135 @@ export const firestoreService = {
       kudosCount: increment(1),
       kudosUsers: arrayUnion(currentUserId),
     });
+  },
+
+  // --- QUESTS & COMMUNITY BOSS ---
+  getUserQuestProgress: async (userId: string): Promise<UserQuestProgress[]> => {
+    const colRef = collection(db, 'users', userId, 'quests');
+    const snapshot = await getDocs(colRef);
+    const quests: UserQuestProgress[] = [];
+
+    snapshot.forEach((docSnap) => {
+      const value = docSnap.data() as Partial<UserQuestProgress>;
+      quests.push({
+        userId,
+        questId: docSnap.id,
+        objectiveProgress: value.objectiveProgress || {},
+        completed: Boolean(value.completed),
+        rewardClaimed: Boolean(value.rewardClaimed),
+        updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : new Date().toISOString(),
+        claimedAt: typeof value.claimedAt === 'string' ? value.claimedAt : undefined,
+      });
+    });
+
+    return quests;
+  },
+
+  getQuestDefinition: async (questId: string): Promise<WeeklyQuestDefinition | null> => {
+    const docRef = doc(db, 'quests', questId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...(docSnap.data() as Omit<WeeklyQuestDefinition, 'id'>) } as WeeklyQuestDefinition;
+    }
+
+    const fallback = getFallbackQuestDefinitions().find((quest) => quest.id === questId);
+    if (fallback) return fallback;
+    return null;
+  },
+
+  upsertUserQuestProgress: async (
+    userId: string,
+    questId: string,
+    objectiveProgress: Record<string, number>,
+    completed: boolean,
+  ): Promise<UserQuestProgress> => {
+    const docRef = doc(db, 'users', userId, 'quests', questId);
+    const now = new Date().toISOString();
+    const data: UserQuestProgress = {
+      userId,
+      questId,
+      objectiveProgress,
+      completed,
+      rewardClaimed: false,
+      updatedAt: now,
+    };
+
+    await setDoc(docRef, data, { merge: true });
+    return data;
+  },
+
+  claimUserQuestReward: async (userId: string, questId: string): Promise<void> => {
+    const docRef = doc(db, 'users', userId, 'quests', questId);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) return;
+
+    const current = snap.data() as Partial<UserQuestProgress>;
+    if (current.rewardClaimed) return;
+
+    await updateDoc(docRef, {
+      rewardClaimed: true,
+      claimedAt: new Date().toISOString(),
+      completed: true,
+    });
+  },
+
+  getCommunityBoss: async (bossId: string): Promise<CommunityBossDefinition | null> => {
+    const docRef = doc(db, 'communityBosses', bossId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    return { id: docSnap.id, ...(docSnap.data() as Omit<CommunityBossDefinition, 'id'>) } as CommunityBossDefinition;
+  },
+
+  getCommunityBossProgress: async (bossId: string): Promise<CommunityBossProgress | null> => {
+    const docRef = doc(db, 'communityBosses', bossId, 'progress', 'global');
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    return { bossId, ...(docSnap.data() as Omit<CommunityBossProgress, 'bossId'>) } as CommunityBossProgress;
+  },
+
+  incrementCommunityBossProgress: async (
+    bossId: string,
+    amount: number,
+  ): Promise<CommunityBossProgress> => {
+    if (amount <= 0) {
+      const existing = await firestoreService.getCommunityBossProgress(bossId);
+      return existing || {
+        bossId,
+        totalProgress: 0,
+        target: 0,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    const bossRef = doc(db, 'communityBosses', bossId);
+    const progressRef = doc(db, 'communityBosses', bossId, 'progress', 'global');
+
+    const next = await runTransaction(db, async (transaction) => {
+      const bossSnap = await transaction.get(bossRef);
+      const progressSnap = await transaction.get(progressRef);
+      const bossData = bossSnap.exists() ? (bossSnap.data() as Partial<CommunityBossDefinition>) : null;
+      const target = bossData?.target || 0;
+      const current = progressSnap.exists()
+        ? ((progressSnap.data() as Partial<CommunityBossProgress>).totalProgress || 0)
+        : 0;
+      const totalProgress = Math.min(current + amount, target || current + amount);
+
+      transaction.set(progressRef, {
+        bossId,
+        totalProgress,
+        target,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      return {
+        bossId,
+        totalProgress,
+        target,
+        updatedAt: new Date().toISOString(),
+      } as CommunityBossProgress;
+    });
+
+    return next;
   },
 
   // --- PUBLIC LESSON NOTES (#355) ---

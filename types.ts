@@ -126,6 +126,60 @@ export interface BadgeDefinition {
   requirement: BadgeRequirement;
 }
 
+export type QuestObjectiveType = 'course' | 'lesson' | 'pair-session' | 'code-review' | 'practice';
+
+export interface QuestRewardDefinition {
+  xp: number;
+  badgeId?: string;
+  themeId?: string;
+  frameId?: string;
+}
+
+export interface QuestObjectiveDefinition {
+  id: string;
+  type: QuestObjectiveType;
+  title: string;
+  description?: string;
+  target: number;
+}
+
+export interface WeeklyQuestDefinition {
+  id: string;
+  title: string;
+  description: string;
+  startsAt: string;
+  endsAt: string;
+  objectives: QuestObjectiveDefinition[];
+  reward: QuestRewardDefinition;
+}
+
+export interface UserQuestProgress {
+  userId: string;
+  questId: string;
+  objectiveProgress: Record<string, number>;
+  completed: boolean;
+  rewardClaimed: boolean;
+  updatedAt: string;
+  claimedAt?: string;
+}
+
+export interface CommunityBossDefinition {
+  id: string;
+  title: string;
+  description: string;
+  startsAt: string;
+  endsAt: string;
+  target: number;
+  reward: QuestRewardDefinition;
+}
+
+export interface CommunityBossProgress {
+  bossId: string;
+  totalProgress: number;
+  target: number;
+  updatedAt: string;
+}
+
 export interface QuizQuestion {
   id: number;
   question: string;

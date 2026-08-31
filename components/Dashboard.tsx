@@ -840,6 +840,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
+        <QuestBoard userId={user.uid} currentUser={user} />
+        <CommunityBossCard userId={user.uid} />
+      </div>
+
       {/* Study Activity Feed */}
       <div id="dash-activity-feed" className="mt-8">
         <ActivityFeedWidget currentUserId={user.uid} followingIds={user.following || []} />

@@ -107,6 +107,20 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     icon: 'Briefcase',
     requirement: { metric: 'mockInterviews', target: 1 },
   },
+  {
+    id: 'quest-master',
+    name: 'Quest Master',
+    description: 'Complete a weekly quest objective set.',
+    icon: 'Trophy',
+    requirement: { metric: 'courses', target: 1 },
+  },
+  {
+    id: 'boss-slayer',
+    name: 'Boss Slayer',
+    description: 'Help defeat a community boss battle.',
+    icon: 'Shield',
+    requirement: { metric: 'courses', target: 1 },
+  },
 ];
 
 const getDocLink = (topic: string) => {

@@ -48,6 +48,10 @@ export function getDailyPlaygroundProblem(courseId: string, moduleIndex: number,
     problemList = PLAYGROUND_PROBLEMS['graphs'];
   } else if (normalizedId.includes('recur')) {
     problemList = PLAYGROUND_PROBLEMS['recursion'];
+  } else if (normalizedId.includes('dynamic') || normalizedId.includes('dp')) {
+    problemList = PLAYGROUND_PROBLEMS['dynamic-programming'];
+  } else if (normalizedId.includes('greed')) {
+    problemList = PLAYGROUND_PROBLEMS['greedy-algorithms'];
   } else {
     problemList = PLAYGROUND_PROBLEMS[normalizedId];
   }

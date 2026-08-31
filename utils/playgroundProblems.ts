@@ -3155,14 +3155,470 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
   'dynamic-programming': [
     {
       id: 'dp-1',
-      title: '1. Fibonacci Nth Term Memoization',
+      title: '1. Climbing Stairs (Fibonacci 1D DP)',
       difficulty: 'Easy',
       category: 'Dynamic Programming',
-      description: 'Calculate Nth Fibonacci number in O(n) time using memoization or DP table.',
-      constraints: ['N between 0 and 50'],
-      sampleInputs: [{ input: '10', output: '55' }],
-      starterCode: `function fib(n) {\n  const dp = [0, 1];\n  // TODO: Fill DP array up to n\n  \n  return dp[n];\n}\n\nconsole.log(fib(10));`,
-      solutionHint: 'for (let i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2]'
+      description: 'You are climbing a staircase with n steps. Each time you can climb 1 or 2 steps. In how many distinct ways can you reach the top?',
+      constraints: ['1 <= n <= 45', 'Time Complexity: O(n)', 'Space Complexity: O(1)'],
+      sampleInputs: [{ input: 'n = 5', output: '8' }],
+      starterCode: `function climbStairs(n) {\n  if (n <= 2) return n;\n  let prev2 = 1, prev1 = 2;\n  // TODO: Compute ways to climb n stairs\n  \n  return prev1;\n}\n\nconsole.log(climbStairs(5));`,
+      solutionHint: 'for (let i = 3; i <= n; i++) { let cur = prev1 + prev2; prev2 = prev1; prev1 = cur; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function climbStairs(n) {\n  if (n <= 2) return n;\n  let prev2 = 1, prev1 = 2;\n  for (let i = 3; i <= n; i++) {\n    const cur = prev1 + prev2;\n    prev2 = prev1;\n    prev1 = cur;\n  }\n  return prev1;\n}\n\nconsole.log(climbStairs(5));`,
+          solutionHint: 'Fibonacci state transition: dp[i] = dp[i-1] + dp[i-2]'
+        },
+        python: {
+          starterCode: `def climb_stairs(n: int) -> int:\n    if n <= 2:\n        return n\n    prev2, prev1 = 1, 2\n    # TODO: Compute DP steps\n    for _ in range(3, n + 1):\n        prev2, prev1 = prev1, prev2 + prev1\n    return prev1\n\nprint(climb_stairs(5))`,
+          solutionHint: 'prev2, prev1 = prev1, prev2 + prev1'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int climbStairs(int n) {\n        if (n <= 2) return n;\n        int prev2 = 1, prev1 = 2;\n        for (int i = 3; i <= n; i++) {\n            int cur = prev1 + prev2;\n            prev2 = prev1;\n            prev1 = cur;\n        }\n        return prev1;\n    }\n    public static void main(String[] args) {\n        System.out.println(climbStairs(5));\n    }\n}`,
+          solutionHint: 'O(1) space Fibonacci iteration.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n\nint climbStairs(int n) {\n    if (n <= 2) return n;\n    int prev2 = 1, prev1 = 2;\n    for (int i = 3; i <= n; i++) {\n        int cur = prev1 + prev2;\n        prev2 = prev1;\n        prev1 = cur;\n    }\n    return prev1;\n}\n\nint main() {\n    std::cout << climbStairs(5) << "\\n";\n    return 0;\n}`,
+          solutionHint: '1D DP space optimization with two variables.'
+        }
+      }
+    },
+    {
+      id: 'dp-2',
+      title: '2. Coin Change (Minimum Coins DP)',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Given an array of coin denominations and a target amount, return the fewest coins needed to make up that amount. Return -1 if impossible.',
+      constraints: ['1 <= coins.length <= 12', '0 <= amount <= 10^4', 'Time: O(coins * amount)'],
+      sampleInputs: [{ input: 'coins = [1, 2, 5], amount = 11', output: '3 (5 + 5 + 1)' }],
+      starterCode: `function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  // TODO: Fill minimum coin DP table\n  \n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nconsole.log(coinChange([1, 2, 5], 11));`,
+      solutionHint: 'For each coin, for amount from coin to total: dp[i] = min(dp[i], dp[i - coin] + 1)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let i = 1; i <= amount; i++) {\n    for (const coin of coins) {\n      if (i - coin >= 0) {\n        dp[i] = Math.min(dp[i], dp[i - coin] + 1);\n      }\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nconsole.log(coinChange([1, 2, 5], 11));`,
+          solutionHint: 'Unbounded knapsack: dp[i] = min(dp[i], dp[i - coin] + 1)'
+        },
+        python: {
+          starterCode: `def coin_change(coins: list[int], amount: int) -> int:\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for i in range(1, amount + 1):\n        for coin in coins:\n            if i - coin >= 0:\n                dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1\n\nprint(coin_change([1, 2, 5], 11))`,
+          solutionHint: 'dp[i] = min(dp[i], dp[i - coin] + 1)'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int coinChange(int[] coins, int amount) {\n        int[] dp = new int[amount + 1];\n        Arrays.fill(dp, amount + 1);\n        dp[0] = 0;\n        for (int i = 1; i <= amount; i++) {\n            for (int coin : coins) {\n                if (i - coin >= 0) {\n                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);\n                }\n            }\n        }\n        return dp[amount] > amount ? -1 : dp[amount];\n    }\n    public static void main(String[] args) {\n        System.out.println(coinChange(new int[]{1, 2, 5}, 11));\n    }\n}`,
+          solutionHint: 'Fill array with amount + 1 as sentinel.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint coinChange(const std::vector<int>& coins, int amount) {\n    std::vector<int> dp(amount + 1, amount + 1);\n    dp[0] = 0;\n    for (int i = 1; i <= amount; i++) {\n        for (int coin : coins) {\n            if (i - coin >= 0) {\n                dp[i] = std::min(dp[i], dp[i - coin] + 1);\n            }\n        }\n    }\n    return dp[amount] > amount ? -1 : dp[amount];\n}\n\nint main() {\n    std::cout << coinChange({1, 2, 5}, 11) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Classic 1D DP tabulation for minimum coin count.'
+        }
+      }
+    },
+    {
+      id: 'dp-3',
+      title: '3. Longest Increasing Subsequence (LIS)',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Given an integer array nums, return the length of the longest strictly increasing subsequence in O(n log n) or O(n^2) time.',
+      constraints: ['1 <= nums.length <= 2500', 'Subsequence elements do not need to be contiguous'],
+      sampleInputs: [{ input: 'nums = [10, 9, 2, 5, 3, 7, 101, 18]', output: '4 ([2, 3, 7, 101])' }],
+      starterCode: `function lengthOfLIS(nums) {\n  if (!nums.length) return 0;\n  const dp = new Array(nums.length).fill(1);\n  // TODO: Compute longest increasing subsequence\n  \n  return Math.max(...dp);\n}\n\nconsole.log(lengthOfLIS([10, 9, 2, 5, 3, 7, 101, 18]));`,
+      solutionHint: 'For i from 1 to n: for j from 0 to i-1: if nums[i] > nums[j], dp[i] = max(dp[i], dp[j] + 1)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function lengthOfLIS(nums) {\n  if (!nums.length) return 0;\n  const dp = new Array(nums.length).fill(1);\n  for (let i = 1; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[i] > nums[j]) {\n        dp[i] = Math.max(dp[i], dp[j] + 1);\n      }\n    }\n  }\n  return Math.max(...dp);\n}\n\nconsole.log(lengthOfLIS([10, 9, 2, 5, 3, 7, 101, 18]));`,
+          solutionHint: 'dp[i] stores longest increasing subsequence ending at index i.'
+        },
+        python: {
+          starterCode: `import bisect\n\ndef length_of_lis(nums: list[int]) -> int:\n    tails = []\n    for x in nums:\n        idx = bisect.bisect_left(tails, x)\n        if idx == len(tails):\n            tails.append(x)\n        else:\n            tails[idx] = x\n    return len(tails)\n\nprint(length_of_lis([10, 9, 2, 5, 3, 7, 101, 18]))`,
+          solutionHint: 'Patience sort binary search in O(n log n).'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int lengthOfLIS(int[] nums) {\n        int[] dp = new int[nums.length];\n        int len = 0;\n        for (int x : nums) {\n            int i = Arrays.binarySearch(dp, 0, len, x);\n            if (i < 0) i = -(i + 1);\n            dp[i] = x;\n            if (i == len) len++;\n        }\n        return len;\n    }\n    public static void main(String[] args) {\n        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5, 3, 7, 101, 18}));\n    }\n}`,
+          solutionHint: 'Patience sorting with binary search replacement.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint lengthOfLIS(const std::vector<int>& nums) {\n    std::vector<int> tails;\n    for (int x : nums) {\n        auto it = std::lower_bound(tails.begin(), tails.end(), x);\n        if (it == tails.end()) tails.push_back(x);\n        else *it = x;\n    }\n    return tails.size();\n}\n\nint main() {\n    std::cout << lengthOfLIS({10, 9, 2, 5, 3, 7, 101, 18}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'std::lower_bound greedy tail array maintenance.'
+        }
+      }
+    },
+    {
+      id: 'dp-4',
+      title: '4. 0/1 Knapsack Problem',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Given item weights, values, and max capacity W, find the maximum value achievable without exceeding weight W where each item can only be selected once.',
+      constraints: ['1 <= N <= 1000', '1 <= W <= 1000', 'Time: O(N * W)', 'Space: O(W)'],
+      sampleInputs: [{ input: 'weights = [2, 3, 4, 5], values = [3, 4, 5, 6], W = 5', output: '7 (item 1 + item 2)' }],
+      starterCode: `function knapsack(weights, values, W) {\n  const dp = new Array(W + 1).fill(0);\n  // TODO: Compute maximum value fitting in knapsack W\n  \n  return dp[W];\n}\n\nconsole.log(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 5));`,
+      solutionHint: 'Iterate items: for cap from W down to weight: dp[cap] = max(dp[cap], dp[cap - weight] + val)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function knapsack(weights, values, W) {\n  const dp = new Array(W + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    const w = weights[i];\n    const v = values[i];\n    for (let cap = W; cap >= w; cap--) {\n      dp[cap] = Math.max(dp[cap], dp[cap - w] + v);\n    }\n  }\n  return dp[W];\n}\n\nconsole.log(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 5));`,
+          solutionHint: 'Traverse capacity backwards to prevent reusing the same item.'
+        },
+        python: {
+          starterCode: `def knapsack(weights: list[int], values: list[int], W: int) -> int:\n    dp = [0] * (W + 1)\n    for w, v in zip(weights, values):\n        for cap in range(W, w - 1, -1):\n            dp[cap] = max(dp[cap], dp[cap - w] + v)\n    return dp[W]\n\nprint(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 5))`,
+          solutionHint: 'Reverse capacity loop ensures 0/1 single item constraint.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int knapsack(int[] weights, int[] values, int W) {\n        int[] dp = new int[W + 1];\n        for (int i = 0; i < weights.length; i++) {\n            int w = weights[i], v = values[i];\n            for (int cap = W; cap >= w; cap--) {\n                dp[cap] = Math.max(dp[cap], dp[cap - w] + v);\n            }\n        }\n        return dp[W];\n    }\n    public static void main(String[] args) {\n        System.out.println(knapsack(new int[]{2, 3, 4, 5}, new int[]{3, 4, 5, 6}, 5));\n    }\n}`,
+          solutionHint: 'O(W) 1D space optimized bounded knapsack.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint knapsack(const std::vector<int>& weights, const std::vector<int>& values, int W) {\n    std::vector<int> dp(W + 1, 0);\n    for (size_t i = 0; i < weights.size(); i++) {\n        for (int cap = W; cap >= weights[i]; cap--) {\n            dp[cap] = std::max(dp[cap], dp[cap - weights[i]] + values[i]);\n        }\n    }\n    return dp[W];\n}\n\nint main() {\n    std::cout << knapsack({2, 3, 4, 5}, {3, 4, 5, 6}, 5) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Backward inner loop maintains 1D DP table correctness.'
+        }
+      }
+    },
+    {
+      id: 'dp-5',
+      title: '5. Longest Common Subsequence (LCS 2D DP)',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Given two strings text1 and text2, return the length of their longest common subsequence in O(m * n) time.',
+      constraints: ['1 <= text1.length, text2.length <= 1000', 'Subsequence preserves relative order'],
+      sampleInputs: [{ input: 'text1 = "abcde", text2 = "ace"', output: '3 ("ace")' }],
+      starterCode: `function longestCommonSubsequence(text1, text2) {\n  const m = text1.length, n = text2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  // TODO: Build 2D LCS grid\n  \n  return dp[m][n];\n}\n\nconsole.log(longestCommonSubsequence("abcde", "ace"));`,
+      solutionHint: 'if text1[i-1] === text2[j-1]: dp[i][j] = 1 + dp[i-1][j-1], else max(dp[i-1][j], dp[i][j-1])',
+      languageVariants: {
+        javascript: {
+          starterCode: `function longestCommonSubsequence(text1, text2) {\n  const m = text1.length, n = text2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (text1[i - 1] === text2[j - 1]) {\n        dp[i][j] = 1 + dp[i - 1][j - 1];\n      } else {\n        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n      }\n    }\n  }\n  return dp[m][n];\n}\n\nconsole.log(longestCommonSubsequence("abcde", "ace"));`,
+          solutionHint: 'Classic 2D matrix matching state transitions.'
+        },
+        python: {
+          starterCode: `def longest_common_subsequence(text1: str, text2: str) -> int:\n    m, n = len(text1), len(text2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if text1[i - 1] == text2[j - 1]:\n                dp[i][j] = 1 + dp[i - 1][j - 1]\n            else:\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n    return dp[m][n]\n\nprint(longest_common_subsequence("abcde", "ace"))`,
+          solutionHint: '2D grid match: 1 + dp[i-1][j-1] or max(adjacent).'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int longestCommonSubsequence(String text1, String text2) {\n        int m = text1.length(), n = text2.length();\n        int[][] dp = new int[m + 1][n + 1];\n        for (int i = 1; i <= m; i++) {\n            for (int j = 1; j <= n; j++) {\n                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {\n                    dp[i][j] = 1 + dp[i - 1][j - 1];\n                } else {\n                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n                }\n            }\n        }\n        return dp[m][n];\n    }\n    public static void main(String[] args) {\n        System.out.println(longestCommonSubsequence("abcde", "ace"));\n    }\n}`,
+          solutionHint: '2D table comparing characters at (i-1, j-1).'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <algorithm>\n\nint longestCommonSubsequence(const std::string& text1, const std::string& text2) {\n    int m = text1.size(), n = text2.size();\n    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));\n    for (int i = 1; i <= m; i++) {\n        for (int j = 1; j <= n; j++) {\n            if (text1[i - 1] == text2[j - 1]) {\n                dp[i][j] = 1 + dp[i - 1][j - 1];\n            } else {\n                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);\n            }\n        }\n    }\n    return dp[m][n];\n}\n\nint main() {\n    std::cout << longestCommonSubsequence("abcde", "ace") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Matrix cell (m, n) yields longest common sequence length.'
+        }
+      }
+    },
+    {
+      id: 'dp-6',
+      title: '6. Word Break (String Segmentation DP)',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Given a string s and a dictionary wordDict, return true if s can be segmented into a space-separated sequence of valid dictionary words.',
+      constraints: ['1 <= s.length <= 300', '1 <= wordDict.length <= 1000', 'Words can be reused'],
+      sampleInputs: [{ input: 's = "leetcode", wordDict = ["leet", "code"]', output: 'true' }],
+      starterCode: `function wordBreak(s, wordDict) {\n  const wordSet = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  // TODO: Validate prefix substrings\n  \n  return dp[s.length];\n}\n\nconsole.log(wordBreak("leetcode", ["leet", "code"]));`,
+      solutionHint: 'For i from 1 to n: for j from 0 to i-1: if dp[j] && wordSet.has(s.substring(j, i)), dp[i] = true',
+      languageVariants: {
+        javascript: {
+          starterCode: `function wordBreak(s, wordDict) {\n  const wordSet = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && wordSet.has(s.substring(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nconsole.log(wordBreak("leetcode", ["leet", "code"]));`,
+          solutionHint: 'Prefix substring matching against HashSet.'
+        },
+        python: {
+          starterCode: `def word_break(s: str, word_dict: list[str]) -> bool:\n    word_set = set(word_dict)\n    dp = [False] * (len(s) + 1)\n    dp[0] = True\n    for i in range(1, len(s) + 1):\n        for j in range(i):\n            if dp[j] and s[j:i] in word_set:\n                dp[i] = True\n                break\n    return dp[len(s)]\n\nprint(word_break("leetcode", ["leet", "code"]))`,
+          solutionHint: 'dp[i] checks if prefix s[:i] can be segmented.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static boolean wordBreak(String s, List<String> wordDict) {\n        Set<String> wordSet = new HashSet<>(wordDict);\n        boolean[] dp = new boolean[s.length() + 1];\n        dp[0] = true;\n        for (int i = 1; i <= s.length(); i++) {\n            for (int j = 0; j < i; j++) {\n                if (dp[j] && wordSet.contains(s.substring(j, i))) {\n                    dp[i] = true;\n                    break;\n                }\n            }\n        }\n        return dp[s.length()];\n    }\n    public static void main(String[] args) {\n        System.out.println(wordBreak("leetcode", Arrays.asList("leet", "code")));\n    }\n}`,
+          solutionHint: 'O(n^2) prefix DP with sub-string verification.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_set>\n\nbool wordBreak(const std::string& s, const std::vector<std::string>& wordDict) {\n    std::unordered_set<std::string> wordSet(wordDict.begin(), wordDict.end());\n    std::vector<bool> dp(s.size() + 1, false);\n    dp[0] = true;\n    for (size_t i = 1; i <= s.size(); i++) {\n        for (size_t j = 0; j < i; j++) {\n            if (dp[j] && wordSet.count(s.substr(j, i - j))) {\n                dp[i] = true;\n                break;\n            }\n        }\n    }\n    return dp[s.size()];\n}\n\nint main() {\n    std::cout << (wordBreak("leetcode", {"leet", "code"}) ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'String slice hash check with boolean array.'
+        }
+      }
+    },
+    {
+      id: 'dp-7',
+      title: '7. House Robber II (Circular Array DP)',
+      difficulty: 'Medium',
+      category: 'Dynamic Programming',
+      description: 'Houses are arranged in a circular street. First and last houses are adjacent. Return maximum money you can rob without triggering police alarm.',
+      constraints: ['1 <= nums.length <= 100', '0 <= nums[i] <= 1000', 'Time: O(n)', 'Space: O(1)'],
+      sampleInputs: [{ input: 'nums = [2, 3, 2]', output: '3' }],
+      starterCode: `function rob(nums) {\n  if (nums.length === 1) return nums[0];\n  const robLinear = (arr) => {\n    let prev2 = 0, prev1 = 0;\n    for (const num of arr) {\n      const cur = Math.max(prev1, prev2 + num);\n      prev2 = prev1;\n      prev1 = cur;\n    }\n    return prev1;\n  };\n  // TODO: Return max between [0..n-2] and [1..n-1]\n  \n  return Math.max(robLinear(nums.slice(0, -1)), robLinear(nums.slice(1)));\n}\n\nconsole.log(rob([2, 3, 2]));`,
+      solutionHint: 'Circular break: Max of linear rob excluding first vs linear rob excluding last house.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function rob(nums) {\n  if (nums.length === 1) return nums[0];\n  const robLinear = (arr) => {\n    let prev2 = 0, prev1 = 0;\n    for (const num of arr) {\n      const cur = Math.max(prev1, prev2 + num);\n      prev2 = prev1;\n      prev1 = cur;\n    }\n    return prev1;\n  };\n  return Math.max(robLinear(nums.slice(0, -1)), robLinear(nums.slice(1)));\n}\n\nconsole.log(rob([2, 3, 2]));`,
+          solutionHint: 'Two-pass linear robing breaking the circle.'
+        },
+        python: {
+          starterCode: `def rob(nums: list[int]) -> int:\n    if len(nums) == 1:\n        return nums[0]\n    def rob_linear(arr):\n        prev2, prev1 = 0, 0\n        for x in arr:\n            prev2, prev1 = prev1, max(prev1, prev2 + x)\n        return prev1\n    return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))\n\nprint(rob([2, 3, 2]))`,
+          solutionHint: 'max(rob_linear(nums[:-1]), rob_linear(nums[1:]))'
+        },
+        java: {
+          starterCode: `public class Solution {\n    private static int robLinear(int[] nums, int start, int end) {\n        int prev2 = 0, prev1 = 0;\n        for (int i = start; i <= end; i++) {\n            int cur = Math.max(prev1, prev2 + nums[i]);\n            prev2 = prev1;\n            prev1 = cur;\n        }\n        return prev1;\n    }\n    public static int rob(int[] nums) {\n        if (nums.length == 1) return nums[0];\n        return Math.max(robLinear(nums, 0, nums.length - 2), robLinear(nums, 1, nums.length - 1));\n    }\n    public static void main(String[] args) {\n        System.out.println(rob(new int[]{2, 3, 2}));\n    }\n}`,
+          solutionHint: 'O(1) space dual linear DP comparison.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint robLinear(const std::vector<int>& nums, int start, int end) {\n    int prev2 = 0, prev1 = 0;\n    for (int i = start; i <= end; i++) {\n        int cur = std::max(prev1, prev2 + nums[i]);\n        prev2 = prev1;\n        prev1 = cur;\n    }\n    return prev1;\n}\nint rob(const std::vector<int>& nums) {\n    if (nums.size() == 1) return nums[0];\n    return std::max(robLinear(nums, 0, nums.size() - 2), robLinear(nums, 1, nums.size() - 1));\n}\n\nint main() {\n    std::cout << rob({2, 3, 2}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Compare ranges [0..n-2] and [1..n-1].'
+        }
+      }
+    },
+    {
+      id: 'dp-8',
+      title: '8. Edit Distance (Levenshtein Distance 2D DP)',
+      difficulty: 'Hard',
+      category: 'Dynamic Programming',
+      description: 'Given two strings word1 and word2, return the minimum number of operations (insert, delete, or replace a character) required to convert word1 to word2.',
+      constraints: ['0 <= word1.length, word2.length <= 500', 'Time: O(m * n)', 'Space: O(m * n)'],
+      sampleInputs: [{ input: 'word1 = "horse", word2 = "ros"', output: '3 (replace h->r, remove r, remove e)' }],
+      starterCode: `function minDistance(word1, word2) {\n  const m = word1.length, n = word2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  // TODO: Base cases & Levenshtein matrix\n  \n  return dp[m][n];\n}\n\nconsole.log(minDistance("horse", "ros"));`,
+      solutionHint: 'if match: dp[i-1][j-1]; else: 1 + min(dp[i-1][j] (del), dp[i][j-1] (ins), dp[i-1][j-1] (rep))',
+      languageVariants: {
+        javascript: {
+          starterCode: `function minDistance(word1, word2) {\n  const m = word1.length, n = word2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 0; i <= m; i++) dp[i][0] = i;\n  for (let j = 0; j <= n; j++) dp[0][j] = j;\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (word1[i - 1] === word2[j - 1]) {\n        dp[i][j] = dp[i - 1][j - 1];\n      } else {\n        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n      }\n    }\n  }\n  return dp[m][n];\n}\n\nconsole.log(minDistance("horse", "ros"));`,
+          solutionHint: '2D grid: 1 + min(insertion, deletion, replacement)'
+        },
+        python: {
+          starterCode: `def min_distance(word1: str, word2: str) -> int:\n    m, n = len(word1), len(word2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(m + 1): dp[i][0] = i\n    for j in range(n + 1): dp[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if word1[i - 1] == word2[j - 1]:\n                dp[i][j] = dp[i - 1][j - 1]\n            else:\n                dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])\n    return dp[m][n]\n\nprint(min_distance("horse", "ros"))`,
+          solutionHint: 'Levenshtein edit distance matrix transformation.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int minDistance(String word1, String word2) {\n        int m = word1.length(), n = word2.length();\n        int[][] dp = new int[m + 1][n + 1];\n        for (int i = 0; i <= m; i++) dp[i][0] = i;\n        for (int j = 0; j <= n; j++) dp[0][j] = j;\n        for (int i = 1; i <= m; i++) {\n            for (int j = 1; j <= n; j++) {\n                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {\n                    dp[i][j] = dp[i - 1][j - 1];\n                } else {\n                    dp[i][j] = 1 + Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1]));\n                }\n            }\n        }\n        return dp[m][n];\n    }\n    public static void main(String[] args) {\n        System.out.println(minDistance("horse", "ros"));\n    }\n}`,
+          solutionHint: '2D matrix computing min edit operations.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <algorithm>\n\nint minDistance(const std::string& word1, const std::string& word2) {\n    int m = word1.size(), n = word2.size();\n    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));\n    for (int i = 0; i <= m; i++) dp[i][0] = i;\n    for (int j = 0; j <= n; j++) dp[0][j] = j;\n    for (int i = 1; i <= m; i++) {\n        for (int j = 1; j <= n; j++) {\n            if (word1[i - 1] == word2[j - 1]) {\n                dp[i][j] = dp[i - 1][j - 1];\n            } else {\n                dp[i][j] = 1 + std::min({dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]});\n            }\n        }\n    }\n    return dp[m][n];\n}\n\nint main() {\n    std::cout << minDistance("horse", "ros") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Classic Levenshtein DP calculation.'
+        }
+      }
+    }
+  ],
+
+  'greedy-algorithms': [
+    {
+      id: 'greedy-1',
+      title: '1. Jump Game (Greedy Maximum Reach)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'You are given an integer array nums where nums[i] represents maximum jump distance from that index. Return true if you can reach the last index.',
+      constraints: ['1 <= nums.length <= 10^4', '0 <= nums[i] <= 10^5', 'Time: O(n)', 'Space: O(1)'],
+      sampleInputs: [{ input: 'nums = [2, 3, 1, 1, 4]', output: 'true' }],
+      starterCode: `function canJump(nums) {\n  let maxReach = 0;\n  // TODO: Greedily track farthest reachable index\n  \n  return true;\n}\n\nconsole.log(canJump([2, 3, 1, 1, 4]));`,
+      solutionHint: 'Loop index i: if i > maxReach return false; maxReach = max(maxReach, i + nums[i])',
+      languageVariants: {
+        javascript: {
+          starterCode: `function canJump(nums) {\n  let maxReach = 0;\n  for (let i = 0; i < nums.length; i++) {\n    if (i > maxReach) return false;\n    maxReach = Math.max(maxReach, i + nums[i]);\n    if (maxReach >= nums.length - 1) return true;\n  }\n  return true;\n}\n\nconsole.log(canJump([2, 3, 1, 1, 4]));`,
+          solutionHint: 'Track maxReach in single linear pass.'
+        },
+        python: {
+          starterCode: `def can_jump(nums: list[int]) -> bool:\n    max_reach = 0\n    for i, jump in enumerate(nums):\n        if i > max_reach:\n            return False\n        max_reach = max(max_reach, i + jump)\n        if max_reach >= len(nums) - 1:\n            return True\n    return True\n\nprint(can_jump([2, 3, 1, 1, 4]))`,
+          solutionHint: 'Greedy reach boundary comparison.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean canJump(int[] nums) {\n        int maxReach = 0;\n        for (int i = 0; i < nums.length; i++) {\n            if (i > maxReach) return false;\n            maxReach = Math.max(maxReach, i + nums[i]);\n            if (maxReach >= nums.length - 1) return true;\n        }\n        return true;\n    }\n    public static void main(String[] args) {\n        System.out.println(canJump(new int[]{2, 3, 1, 1, 4}));\n    }\n}`,
+          solutionHint: 'O(n) time and O(1) space max reach tracking.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nbool canJump(const std::vector<int>& nums) {\n    int maxReach = 0;\n    for (size_t i = 0; i < nums.size(); i++) {\n        if (static_cast<int>(i) > maxReach) return false;\n        maxReach = std::max(maxReach, static_cast<int>(i) + nums[i]);\n        if (maxReach >= static_cast<int>(nums.size()) - 1) return true;\n    }\n    return true;\n}\n\nint main() {\n    std::cout << (canJump({2, 3, 1, 1, 4}) ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Single loop greedy frontier expansion.'
+        }
+      }
+    },
+    {
+      id: 'greedy-2',
+      title: '2. Gas Station (Circular Circuit Route)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'There are n gas stations along a circular route. Return starting gas station index if you can complete the circuit once, or -1 otherwise.',
+      constraints: ['1 <= gas.length == cost.length <= 10^5', 'Time: O(n)', 'Space: O(1)'],
+      sampleInputs: [{ input: 'gas = [1, 2, 3, 4, 5], cost = [3, 4, 5, 1, 2]', output: '3 (station index 3)' }],
+      starterCode: `function canCompleteCircuit(gas, cost) {\n  let totalGas = 0, currentGas = 0, startIndex = 0;\n  // TODO: Greedily determine valid start station\n  \n  return totalGas >= 0 ? startIndex : -1;\n}\n\nconsole.log(canCompleteCircuit([1, 2, 3, 4, 5], [3, 4, 5, 1, 2]));`,
+      solutionHint: 'Add (gas[i] - cost[i]) to total & current. If current < 0: reset current = 0, startIndex = i + 1.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function canCompleteCircuit(gas, cost) {\n  let totalGas = 0, currentGas = 0, startIndex = 0;\n  for (let i = 0; i < gas.length; i++) {\n    const diff = gas[i] - cost[i];\n    totalGas += diff;\n    currentGas += diff;\n    if (currentGas < 0) {\n      currentGas = 0;\n      startIndex = i + 1;\n    }\n  }\n  return totalGas >= 0 ? startIndex : -1;\n}\n\nconsole.log(canCompleteCircuit([1, 2, 3, 4, 5], [3, 4, 5, 1, 2]));`,
+          solutionHint: 'If totalGas >= 0, a unique starting index is guaranteed.'
+        },
+        python: {
+          starterCode: `def can_complete_circuit(gas: list[int], cost: list[int]) -> int:\n    if sum(gas) < sum(cost):\n        return -1\n    total = 0\n    start = 0\n    for i in range(len(gas)):\n        total += gas[i] - cost[i]\n        if total < 0:\n            total = 0\n            start = i + 1\n    return start\n\nprint(can_complete_circuit([1, 2, 3, 4, 5], [3, 4, 5, 1, 2]))`,
+          solutionHint: 'Reset start index whenever running gas deficit occurs.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int canCompleteCircuit(int[] gas, int[] cost) {\n        int totalGas = 0, currentGas = 0, start = 0;\n        for (int i = 0; i < gas.length; i++) {\n            int diff = gas[i] - cost[i];\n            totalGas += diff;\n            currentGas += diff;\n            if (currentGas < 0) {\n                currentGas = 0;\n                start = i + 1;\n            }\n        }\n        return totalGas >= 0 ? start : -1;\n    }\n    public static void main(String[] args) {\n        System.out.println(canCompleteCircuit(new int[]{1, 2, 3, 4, 5}, new int[]{3, 4, 5, 1, 2}));\n    }\n}`,
+          solutionHint: 'Single O(n) pass greedy index shift.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nint canCompleteCircuit(const std::vector<int>& gas, const std::vector<int>& cost) {\n    int totalGas = 0, currentGas = 0, start = 0;\n    for (size_t i = 0; i < gas.size(); i++) {\n        int diff = gas[i] - cost[i];\n        totalGas += diff;\n        currentGas += diff;\n        if (currentGas < 0) {\n            currentGas = 0;\n            start = i + 1;\n        }\n    }\n    return totalGas >= 0 ? start : -1;\n}\n\nint main() {\n    std::cout << canCompleteCircuit({1, 2, 3, 4, 5}, {3, 4, 5, 1, 2}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Greedy prefix deficit reset.'
+        }
+      }
+    },
+    {
+      id: 'greedy-3',
+      title: '3. Non-Overlapping Intervals (Interval Scheduling)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'Given an array of intervals intervals, find the minimum number of intervals to remove to make the rest non-overlapping.',
+      constraints: ['1 <= intervals.length <= 10^5', 'intervals[i] = [start, end]', 'Time: O(n log n)'],
+      sampleInputs: [{ input: 'intervals = [[1, 2], [2, 3], [3, 4], [1, 3]]', output: '1 (remove [1, 3])' }],
+      starterCode: `function eraseOverlapIntervals(intervals) {\n  if (!intervals.length) return 0;\n  // Sort by end time ascending\n  intervals.sort((a, b) => a[1] - b[1]);\n  let removals = 0, prevEnd = intervals[0][1];\n  // TODO: Count overlapping intervals\n  \n  return removals;\n}\n\nconsole.log(eraseOverlapIntervals([[1, 2], [2, 3], [3, 4], [1, 3]]));`,
+      solutionHint: 'For interval: if start < prevEnd: removals++; else: prevEnd = end',
+      languageVariants: {
+        javascript: {
+          starterCode: `function eraseOverlapIntervals(intervals) {\n  if (!intervals.length) return 0;\n  intervals.sort((a, b) => a[1] - b[1]);\n  let removals = 0, prevEnd = intervals[0][1];\n  for (let i = 1; i < intervals.length; i++) {\n    if (intervals[i][0] < prevEnd) {\n      removals++;\n    } else {\n      prevEnd = intervals[i][1];\n    }\n  }\n  return removals;\n}\n\nconsole.log(eraseOverlapIntervals([[1, 2], [2, 3], [3, 4], [1, 3]]));`,
+          solutionHint: 'Greedy interval scheduling: prioritize earliest finish time.'
+        },
+        python: {
+          starterCode: `def erase_overlap_intervals(intervals: list[list[int]]) -> int:\n    if not intervals:\n        return 0\n    intervals.sort(key=lambda x: x[1])\n    removals = 0\n    prev_end = intervals[0][1]\n    for start, end in intervals[1:]:\n        if start < prev_end:\n            removals += 1\n        else:\n            prev_end = end\n    return removals\n\nprint(erase_overlap_intervals([[1, 2], [2, 3], [3, 4], [1, 3]]))`,
+          solutionHint: 'Sort by interval end time.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int eraseOverlapIntervals(int[][] intervals) {\n        if (intervals.length == 0) return 0;\n        Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));\n        int removals = 0, prevEnd = intervals[0][1];\n        for (int i = 1; i < intervals.length; i++) {\n            if (intervals[i][0] < prevEnd) {\n                removals++;\n            } else {\n                prevEnd = intervals[i][1];\n            }\n        }\n        return removals;\n    }\n    public static void main(String[] args) {\n        System.out.println(eraseOverlapIntervals(new int[][]{{1, 2}, {2, 3}, {3, 4}, {1, 3}}));\n    }\n}`,
+          solutionHint: 'Sort by finish time to leave maximum room for remaining intervals.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint eraseOverlapIntervals(std::vector<std::vector<int>>& intervals) {\n    if (intervals.empty()) return 0;\n    std::sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) {\n        return a[1] < b[1];\n    });\n    int removals = 0, prevEnd = intervals[0][1];\n    for (size_t i = 1; i < intervals.size(); i++) {\n        if (intervals[i][0] < prevEnd) {\n            removals++;\n        } else {\n            prevEnd = intervals[i][1];\n        }\n    }\n    return removals;\n}\n\nint main() {\n    std::vector<std::vector<int>> intervals = {{1, 2}, {2, 3}, {3, 4}, {1, 3}};\n    std::cout << eraseOverlapIntervals(intervals) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Custom lambda sort on interval finish time.'
+        }
+      }
+    },
+    {
+      id: 'greedy-4',
+      title: '4. Minimum Number of Arrows to Burst Balloons',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'Balloons are horizontal segments [xstart, xend]. An arrow shot at x bursts all balloons with xstart <= x <= xend. Return minimum arrows needed.',
+      constraints: ['1 <= points.length <= 10^5', '-2^31 <= xstart < xend <= 2^31 - 1', 'Time: O(n log n)'],
+      sampleInputs: [{ input: 'points = [[10, 16], [2, 8], [1, 6], [7, 12]]', output: '2 (shots at x=6, x=12)' }],
+      starterCode: `function findMinArrowShots(points) {\n  if (!points.length) return 0;\n  points.sort((a, b) => a[1] - b[1]);\n  let arrows = 1, currentEnd = points[0][1];\n  // TODO: Greedily shot overlapping balloons\n  \n  return arrows;\n}\n\nconsole.log(findMinArrowShots([[10, 16], [2, 8], [1, 6], [7, 12]]));`,
+      solutionHint: 'Loop points: if point[0] > currentEnd: arrows++; currentEnd = point[1]',
+      languageVariants: {
+        javascript: {
+          starterCode: `function findMinArrowShots(points) {\n  if (!points.length) return 0;\n  points.sort((a, b) => a[1] - b[1]);\n  let arrows = 1, currentEnd = points[0][1];\n  for (let i = 1; i < points.length; i++) {\n    if (points[i][0] > currentEnd) {\n      arrows++;\n      currentEnd = points[i][1];\n    }\n  }\n  return arrows;\n}\n\nconsole.log(findMinArrowShots([[10, 16], [2, 8], [1, 6], [7, 12]]));`,
+          solutionHint: 'Sort by right coordinate; shot at farthest right position.'
+        },
+        python: {
+          starterCode: `def find_min_arrow_shots(points: list[list[int]]) -> int:\n    if not points:\n        return 0\n    points.sort(key=lambda x: x[1])\n    arrows = 1\n    current_end = points[0][1]\n    for start, end in points[1:]:\n        if start > current_end:\n            arrows += 1\n            current_end = end\n    return arrows\n\nprint(find_min_arrow_shots([[10, 16], [2, 8], [1, 6], [7, 12]]))`,
+          solutionHint: 'Shoot arrow at the end of each non-overlapping cluster.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int findMinArrowShots(int[][] points) {\n        if (points.length == 0) return 0;\n        Arrays.sort(points, (a, b) -> Integer.compare(a[1], b[1]));\n        int arrows = 1, currentEnd = points[0][1];\n        for (int i = 1; i < points.length; i++) {\n            if (points[i][0] > currentEnd) {\n                arrows++;\n                currentEnd = points[i][1];\n            }\n        }\n        return arrows;\n    }\n    public static void main(String[] args) {\n        System.out.println(findMinArrowShots(new int[][]{{10, 16}, {2, 8}, {1, 6}, {7, 12}}));\n    }\n}`,
+          solutionHint: 'Integer.compare prevents 32-bit overflow when sorting coordinates.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint findMinArrowShots(std::vector<std::vector<int>>& points) {\n    if (points.empty()) return 0;\n    std::sort(points.begin(), points.end(), [](const auto& a, const auto& b) {\n        return a[1] < b[1];\n    });\n    int arrows = 1, currentEnd = points[0][1];\n    for (size_t i = 1; i < points.size(); i++) {\n        if (points[i][0] > currentEnd) {\n            arrows++;\n            currentEnd = points[i][1];\n        }\n    }\n    return arrows;\n}\n\nint main() {\n    std::vector<std::vector<int>> points = {{10, 16}, {2, 8}, {1, 6}, {7, 12}};\n    std::cout << findMinArrowShots(points) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Greedy interval overlapping arrow reduction.'
+        }
+      }
+    },
+    {
+      id: 'greedy-5',
+      title: '5. Task Scheduler (CPU Cooling Intervals)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'Given CPU tasks and a cooldown period n between identical tasks, return the least number of units of times the CPU will take to finish all tasks.',
+      constraints: ['1 <= tasks.length <= 10^4', '0 <= n <= 100', 'Tasks represented by uppercase letters A-Z'],
+      sampleInputs: [{ input: 'tasks = ["A", "A", "A", "B", "B", "B"], n = 2', output: '8 (A -> B -> idle -> A -> B -> idle -> A -> B)' }],
+      starterCode: `function leastInterval(tasks, n) {\n  const freq = {};\n  for (const t of tasks) freq[t] = (freq[t] || 0) + 1;\n  const maxFreq = Math.max(...Object.values(freq));\n  const maxCount = Object.values(freq).filter(f => f === maxFreq).length;\n  // TODO: Compute minimal time formula\n  \n  return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n}\n\nconsole.log(leastInterval(["A", "A", "A", "B", "B", "B"], 2));`,
+      solutionHint: 'Formula: Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function leastInterval(tasks, n) {\n  const freq = {};\n  for (const t of tasks) freq[t] = (freq[t] || 0) + 1;\n  const maxFreq = Math.max(...Object.values(freq));\n  const maxCount = Object.values(freq).filter(f => f === maxFreq).length;\n  return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n}\n\nconsole.log(leastInterval(["A", "A", "A", "B", "B", "B"], 2));`,
+          solutionHint: 'Greedy frequency chunking formula: (maxFreq - 1) * (n + 1) + maxCount'
+        },
+        python: {
+          starterCode: `from collections import Counter\n\ndef least_interval(tasks: list[str], n: int) -> int:\n    counts = Counter(tasks)\n    max_freq = max(counts.values())\n    max_count = sum(1 for count in counts.values() if count == max_freq)\n    return max(len(tasks), (max_freq - 1) * (n + 1) + max_count)\n\nprint(least_interval(["A", "A", "A", "B", "B", "B"], 2))`,
+          solutionHint: 'max(len(tasks), (max_freq - 1) * (n + 1) + max_count)'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int leastInterval(char[] tasks, int n) {\n        int[] counts = new int[26];\n        for (char c : tasks) counts[c - 'A']++;\n        int maxFreq = 0;\n        for (int c : counts) maxFreq = Math.max(maxFreq, c);\n        int maxCount = 0;\n        for (int c : counts) if (c == maxFreq) maxCount++;\n        return Math.max(tasks.length, (maxFreq - 1) * (n + 1) + maxCount);\n    }\n    public static void main(String[] args) {\n        System.out.println(leastInterval(new char[]{'A', 'A', 'A', 'B', 'B', 'B'}, 2));\n    }\n}`,
+          solutionHint: 'Greedy cooling bucket mathematics.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint leastInterval(const std::vector<char>& tasks, int n) {\n    std::vector<int> counts(26, 0);\n    for (char c : tasks) counts[c - 'A']++;\n    int maxFreq = *std::max_element(counts.begin(), counts.end());\n    int maxCount = std::count(counts.begin(), counts.end(), maxFreq);\n    return std::max(static_cast<int>(tasks.size()), (maxFreq - 1) * (n + 1) + maxCount);\n}\n\nint main() {\n    std::cout << leastInterval({'A', 'A', 'A', 'B', 'B', 'B'}, 2) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'O(tasks.size()) greedy frame calculation.'
+        }
+      }
+    },
+    {
+      id: 'greedy-6',
+      title: '6. Hand of Straights (Consecutive Group Greedy)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'Given an array hand of cards and groupSize, determine if cards can be rearranged into groups of size groupSize consisting of consecutive numbers.',
+      constraints: ['1 <= hand.length <= 10^4', '1 <= groupSize <= hand.length', 'Time: O(n log n)'],
+      sampleInputs: [{ input: 'hand = [1, 2, 3, 6, 2, 3, 4, 7, 8], groupSize = 3', output: 'true ([1, 2, 3], [2, 3, 4], [6, 7, 8])' }],
+      starterCode: `function isNStraightHand(hand, groupSize) {\n  if (hand.length % groupSize !== 0) return false;\n  const count = {};\n  for (const card of hand) count[card] = (count[card] || 0) + 1;\n  hand.sort((a, b) => a - b);\n  // TODO: Greedily build consecutive groups\n  \n  return true;\n}\n\nconsole.log(isNStraightHand([1, 2, 3, 6, 2, 3, 4, 7, 8], 3));`,
+      solutionHint: 'For card in sorted hand: if count[card] > 0: decrement count for card .. card + groupSize - 1',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isNStraightHand(hand, groupSize) {\n  if (hand.length % groupSize !== 0) return false;\n  const count = {};\n  for (const card of hand) count[card] = (count[card] || 0) + 1;\n  hand.sort((a, b) => a - b);\n  for (const card of hand) {\n    if (count[card] > 0) {\n      for (let i = 0; i < groupSize; i++) {\n        const nextCard = card + i;\n        if (!count[nextCard]) return false;\n        count[nextCard]--;\n      }\n    }\n  }\n  return true;\n}\n\nconsole.log(isNStraightHand([1, 2, 3, 6, 2, 3, 4, 7, 8], 3));`,
+          solutionHint: 'Always begin group from smallest available card.'
+        },
+        python: {
+          starterCode: `from collections import Counter\nimport heapq\n\ndef is_n_straight_hand(hand: list[int], group_size: int) -> bool:\n    if len(hand) % group_size != 0:\n        return False\n    count = Counter(hand)\n    min_heap = list(count.keys())\n    heapq.heapify(min_heap)\n    while min_heap:\n        first = min_heap[0]\n        for i in range(first, first + group_size):\n            if count[i] == 0:\n                return False\n            count[i] -= 1\n            if count[i] == 0:\n                if i != heapq.heappop(min_heap):\n                    return False\n    return True\n\nprint(is_n_straight_hand([1, 2, 3, 6, 2, 3, 4, 7, 8], 3))`,
+          solutionHint: 'Greedy min-heap checking consecutive card availability.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static boolean isNStraightHand(int[] hand, int groupSize) {\n        if (hand.length % groupSize != 0) return false;\n        TreeMap<Integer, Integer> map = new TreeMap<>();\n        for (int c : hand) map.put(c, map.getOrDefault(c, 0) + 1);\n        for (int key : map.keySet()) {\n            int count = map.get(key);\n            if (count > 0) {\n                for (int i = 0; i < groupSize; i++) {\n                    int next = key + i;\n                    if (map.getOrDefault(next, 0) < count) return false;\n                    map.put(next, map.get(next) - count);\n                }\n            }\n        }\n        return true;\n    }\n    public static void main(String[] args) {\n        System.out.println(isNStraightHand(new int[]{1, 2, 3, 6, 2, 3, 4, 7, 8}, 3));\n    }\n}`,
+          solutionHint: 'TreeMap guarantees natural ascending card processing.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <map>\n\nbool isNStraightHand(const std::vector<int>& hand, int groupSize) {\n    if (hand.size() % groupSize != 0) return false;\n    std::map<int, int> count;\n    for (int card : hand) count[card]++;\n    for (auto& [card, cnt] : count) {\n        if (cnt > 0) {\n            int needed = cnt;\n            for (int i = 0; i < groupSize; i++) {\n                if (count[card + i] < needed) return false;\n                count[card + i] -= needed;\n            }\n        }\n    }\n    return true;\n}\n\nint main() {\n    std::cout << (isNStraightHand({1, 2, 3, 6, 2, 3, 4, 7, 8}, 3) ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'std::map sorted frequency reduction.'
+        }
+      }
+    },
+    {
+      id: 'greedy-7',
+      title: '7. Minimum Cost to Connect Sticks (Greedy Min-Heap)',
+      difficulty: 'Medium',
+      category: 'Greedy Algorithms',
+      description: 'You have sticks of different lengths. Cost to connect two sticks is their sum. Find the minimum total cost to connect all sticks into one stick.',
+      constraints: ['1 <= sticks.length <= 10^4', '1 <= sticks[i] <= 10^4', 'Time: O(n log n)'],
+      sampleInputs: [{ input: 'sticks = [2, 4, 3]', output: '14 ((2+3=5) -> (5+4=9) -> cost 5+9=14)' }],
+      starterCode: `function connectSticks(sticks) {\n  if (sticks.length <= 1) return 0;\n  // Simulate min-heap with sorted array / priority queue\n  sticks.sort((a, b) => a - b);\n  let totalCost = 0;\n  // TODO: Greedily merge two smallest sticks\n  \n  return totalCost;\n}\n\nconsole.log(connectSticks([2, 4, 3]));`,
+      solutionHint: 'Always pick the two smallest sticks, sum them, add to total cost, and insert sum back.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function connectSticks(sticks) {\n  if (sticks.length <= 1) return 0;\n  sticks.sort((a, b) => a - b);\n  let totalCost = 0;\n  while (sticks.length > 1) {\n    const sum = sticks.shift() + sticks.shift();\n    totalCost += sum;\n    // Binary insert back into sorted list\n    let idx = 0;\n    while (idx < sticks.length && sticks[idx] < sum) idx++;\n    sticks.splice(idx, 0, sum);\n  }\n  return totalCost;\n}\n\nconsole.log(connectSticks([2, 4, 3]));`,
+          solutionHint: 'Huffman coding tree greedy min-heap merge.'
+        },
+        python: {
+          starterCode: `import heapq\n\ndef connect_sticks(sticks: list[int]) -> int:\n    if len(sticks) <= 1:\n        return 0\n    heapq.heapify(sticks)\n    total_cost = 0\n    while len(sticks) > 1:\n        first = heapq.heappop(sticks)\n        second = heapq.heappop(sticks)\n        merged = first + second\n        total_cost += merged\n        heapq.heappush(sticks, merged)\n    return total_cost\n\nprint(connect_sticks([2, 4, 3]))`,
+          solutionHint: 'heapq min-heap pops smallest two elements.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int connectSticks(int[] sticks) {\n        if (sticks.length <= 1) return 0;\n        PriorityQueue<Integer> pq = new PriorityQueue<>();\n        for (int s : sticks) pq.offer(s);\n        int totalCost = 0;\n        while (pq.size() > 1) {\n            int sum = pq.poll() + pq.poll();\n            totalCost += sum;\n            pq.offer(sum);\n        }\n        return totalCost;\n    }\n    public static void main(String[] args) {\n        System.out.println(connectSticks(new int[]{2, 4, 3}));\n    }\n}`,
+          solutionHint: 'PriorityQueue min-heap in O(n log n) time.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <queue>\n\nint connectSticks(const std::vector<int>& sticks) {\n    if (sticks.size() <= 1) return 0;\n    std::priority_queue<int, std::vector<int>, std::greater<int>> pq(sticks.begin(), sticks.end());\n    int totalCost = 0;\n    while (pq.size() > 1) {\n        int a = pq.top(); pq.pop();\n        int b = pq.top(); pq.pop();\n        int sum = a + b;\n        totalCost += sum;\n        pq.push(sum);\n    }\n    return totalCost;\n}\n\nint main() {\n    std::cout << connectSticks({2, 4, 3}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'std::greater<int> min priority queue.'
+        }
+      }
+    },
+    {
+      id: 'greedy-8',
+      title: '8. Candy Distribution (Two-Pass Greedy Slope)',
+      difficulty: 'Hard',
+      category: 'Greedy Algorithms',
+      description: 'Children stand in line with ratings. Each child gets >= 1 candy. A child with higher rating gets more candies than immediate neighbors. Find min candies needed.',
+      constraints: ['1 <= ratings.length <= 2 * 10^4', '0 <= ratings[i] <= 2 * 10^4', 'Time: O(n)', 'Space: O(n)'],
+      sampleInputs: [{ input: 'ratings = [1, 0, 2]', output: '5 ([2, 1, 2])' }],
+      starterCode: `function candy(ratings) {\n  const n = ratings.length;\n  const candies = new Array(n).fill(1);\n  // Pass 1: Left to right\n  for (let i = 1; i < n; i++) {\n    if (ratings[i] > ratings[i - 1]) candies[i] = candies[i - 1] + 1;\n  }\n  // TODO: Pass 2 Right to left\n  \n  return candies.reduce((a, b) => a + b, 0);\n}\n\nconsole.log(candy([1, 0, 2]));`,
+      solutionHint: 'Pass 2: for i from n-2 down to 0: if ratings[i] > ratings[i+1]: candies[i] = max(candies[i], candies[i+1] + 1)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function candy(ratings) {\n  const n = ratings.length;\n  const candies = new Array(n).fill(1);\n  for (let i = 1; i < n; i++) {\n    if (ratings[i] > ratings[i - 1]) candies[i] = candies[i - 1] + 1;\n  }\n  for (let i = n - 2; i >= 0; i--) {\n    if (ratings[i] > ratings[i + 1]) {\n      candies[i] = Math.max(candies[i], candies[i + 1] + 1);\n    }\n  }\n  return candies.reduce((a, b) => a + b, 0);\n}\n\nconsole.log(candy([1, 0, 2]));`,
+          solutionHint: 'Dual left-right pass satisfying bidirectional slope constraints.'
+        },
+        python: {
+          starterCode: `def candy(ratings: list[int]) -> int:\n    n = len(ratings)\n    candies = [1] * n\n    for i in range(1, n):\n        if ratings[i] > ratings[i - 1]:\n            candies[i] = candies[i - 1] + 1\n    for i in range(n - 2, -1, -1):\n        if ratings[i] > ratings[i + 1]:\n            candies[i] = max(candies[i], candies[i + 1] + 1)\n    return sum(candies)\n\nprint(candy([1, 0, 2]))`,
+          solutionHint: 'Two linear greedy sweeps satisfying local maximums.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int candy(int[] ratings) {\n        int n = ratings.length;\n        int[] candies = new int[n];\n        Arrays.fill(candies, 1);\n        for (int i = 1; i < n; i++) {\n            if (ratings[i] > ratings[i - 1]) candies[i] = candies[i - 1] + 1;\n        }\n        for (int i = n - 2; i >= 0; i--) {\n            if (ratings[i] > ratings[i + 1]) {\n                candies[i] = Math.max(candies[i], candies[i + 1] + 1);\n            }\n        }\n        int sum = 0;\n        for (int c : candies) sum += c;\n        return sum;\n    }\n    public static void main(String[] args) {\n        System.out.println(candy(new int[]{1, 0, 2}));\n    }\n}`,
+          solutionHint: 'O(n) time and O(n) space two-pass greedy optimization.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <numeric>\n#include <algorithm>\n\nint candy(const std::vector<int>& ratings) {\n    int n = ratings.size();\n    std::vector<int> candies(n, 1);\n    for (int i = 1; i < n; i++) {\n        if (ratings[i] > ratings[i - 1]) candies[i] = candies[i - 1] + 1;\n    }\n    for (int i = n - 2; i >= 0; i--) {\n        if (ratings[i] > ratings[i + 1]) {\n            candies[i] = std::max(candies[i], candies[i + 1] + 1);\n        }\n    }\n    return std::accumulate(candies.begin(), candies.end(), 0);\n}\n\nint main() {\n    std::cout << candy({1, 0, 2}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Bidirectional pass with std::accumulate total summation.'
+        }
+      }
     }
   ]
 };

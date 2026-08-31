@@ -621,29 +621,29 @@ export const parseVisualizerState = (code: string): VisualizerParseResult => {
   }
 
   // 2. Binary Tree
-  if (/(binary tree|treenode|left|right|root\s*[:=]|\.left|\.right)/i.test(lower)) {
+  if (/(binary\s*tree|treenode|root\s*[:=]|root\b|\.left|\.right|->left|->right)/i.test(lower)) {
     return { snapshots: buildBinaryTreeSnapshots() };
   }
 
   // 3. Graph
-  if (/(graph|adjacency|bfs|dfs|dijkstra|topological|edges)/i.test(lower)) {
+  if (/(graph|adjacency|bfs|dfs|dijkstra|topological|edges|edge)/i.test(lower)) {
     return { snapshots: buildGraphSnapshots() };
   }
 
   // 4. Linked List
-  if (/(linked list|listnode|head\.|next\s*[:=]|\.next)/i.test(lower)) {
+  if (/(linked\s*list|listnode|head\.|next\s*[:=]|\.next|->next)/i.test(lower)) {
     const arr = parseArraySource(code) || [10, 20, 30, 40];
     return { snapshots: buildLinkedListSnapshots(arr) };
   }
 
   // 5. Two Pointers / Reverse / Palindrome
   if (/(reverse|palindrome|swap|two.*pointer|left.*right)/i.test(lower)) {
-    const arr = parseArraySource(code);
-    if (arr) {
-      return { snapshots: buildTwoPointerSnapshots(arr) };
+    if (/(string|str|char|palindrome)/i.test(lower)) {
+      const str = parseStringSource(code) || 'racecar';
+      return { snapshots: buildStringSnapshots(str) };
     }
-    const str = parseStringSource(code) || 'racecar';
-    return { snapshots: buildStringSnapshots(str) };
+    const arr = parseArraySource(code) || [1, 2, 3, 4, 5];
+    return { snapshots: buildTwoPointerSnapshots(arr) };
   }
 
   // 6. Generic Array / List

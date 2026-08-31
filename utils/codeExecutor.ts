@@ -66,7 +66,18 @@ function executeJavaScript(code: string, startTime: number): Promise<ExecutionRe
     const logs: ExecutionLog[] = [];
     let runtimeError: ExecutionResult['error'] = null;
 
-    // Create unique message channel
+    if (typeof window === 'undefined') {
+      try {
+        const captured: string[] = [];
+        const customConsole = { log: (...args: any[]) => captured.push(args.map(String).join(' ')) };
+        new Function('console', code)(customConsole);
+        captured.forEach(msg => logs.push({ type: 'log', message: msg }));
+        return resolve({ logs, error: null, durationMs: Math.round(performance.now() - startTime) });
+      } catch (err: any) {
+        return resolve({ logs: [{ type: 'error', message: err.message }], error: { message: err.message }, durationMs: 0 });
+      }
+    }
+
     const channelId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     const handleMessage = (event: MessageEvent) => {
@@ -226,7 +237,6 @@ function executeJava(code: string, startTime: number): ExecutionResult {
   logs.push({ type: 'log', message: '☕ OpenJDK 21.0.2 compiler & JVM Initialized' });
 
   try {
-    // Check basic Java class declaration
     if (!code.includes('class')) {
       throw new Error('Missing class declaration in Java source.');
     }
@@ -366,24 +376,20 @@ function executeGo(code: string, startTime: number): ExecutionResult {
 }
 
 function cleanOutputString(expr: string): string {
-  // Strip string quotes if raw string
   if (/^["'].*["']$/.test(expr)) {
     return expr.slice(1, -1);
   }
 
-  // Handle Java Arrays.toString(...)
   if (expr.includes('Arrays.toString')) {
     const inner = expr.match(/Arrays\.toString\(([\s\S]*?)\)/);
     if (inner) return cleanOutputString(inner[1]);
   }
 
-  // Handle new int[]{...}
   if (expr.includes('new int[]')) {
     const match = expr.match(/new\s+int\[\]\s*\{([\s\S]*?)\}/);
     if (match) return `[${match[1].trim()}]`;
   }
 
-  // Clean common concatenations
   return expr
     .replace(/["']\s*\+\s*/g, '')
     .replace(/\s*\+\s*["']/g, '')
@@ -396,26 +402,121 @@ function cleanOutputString(expr: string): string {
  */
 function transpilePythonToJs(pyCode: string): string | null {
   try {
-    let js = pyCode
-      .replace(/print\((.*?)\)/g, 'console.log($1)')
-      .replace(/def\s+(\w+)\s*\((.*?)\)\s*(?:->.*?)?:/g, (match, fnName, params) => {
-        // Strip type annotations from params
-        const cleanParams = params.split(',').map((p: string) => p.split(':')[0].trim()).filter(Boolean).join(', ');
-        return `function ${fnName}(${cleanParams}) {`;
-      })
-      .replace(/True/g, 'true')
-      .replace(/False/g, 'false')
-      .replace(/None/g, 'null')
-      .replace(/len\((.*?)\)/g, '$1.length')
-      .replace(/float\(['"]inf['"]\)/g, 'Infinity')
-      .replace(/(\w+)\.append\((.*?)\)/g, '$1.push($2)');
+    const lines = pyCode.split('\n');
+    const jsLines: string[] = [];
+    const indentStack = [0];
 
-    // Add closing braces if needed
-    if (js.includes('function ') && !js.includes('}')) {
-      js += '\n}';
+    for (const rawLine of lines) {
+      if (/^\s*#/.test(rawLine) || !rawLine.trim()) {
+        continue;
+      }
+
+      const indent = rawLine.match(/^\s*/)?.[0]?.length || 0;
+      let line = rawLine.trim();
+
+      while (indentStack.length > 1 && indent < indentStack[indentStack.length - 1]) {
+        indentStack.pop();
+        jsLines.push('}');
+      }
+
+      if (/^print\s*\(/.test(line)) {
+        line = line.replace(/^print\s*\(([\s\S]*?)\)$/, 'console.log($1);');
+        jsLines.push(line);
+        continue;
+      }
+
+      const defMatch = line.match(/^def\s+([A-Za-z_]\w*)\s*\(([\s\S]*?)\)\s*(?:->.*?)?:/);
+      if (defMatch) {
+        const fnName = defMatch[1];
+        const params = defMatch[2].split(',').map(p => p.split(':')[0].trim()).filter(Boolean).join(', ');
+        jsLines.push(`function ${fnName}(${params}) {`);
+        indentStack.push(indent + 4);
+        continue;
+      }
+
+      const enumMatch = line.match(/^for\s+([A-Za-z_]\w*)\s*,\s*([A-Za-z_]\w*)\s+in\s+enumerate\((.*?)\):/);
+      if (enumMatch) {
+        const iVar = enumMatch[1];
+        const numVar = enumMatch[2];
+        const arrExpr = enumMatch[3];
+        jsLines.push(`for (let ${iVar} = 0; ${iVar} < ${arrExpr}.length; ${iVar}++) {`);
+        jsLines.push(`let ${numVar} = ${arrExpr}[${iVar}];`);
+        indentStack.push(indent + 4);
+        continue;
+      }
+
+      const forInMatch = line.match(/^for\s+([A-Za-z_]\w*)\s+in\s+(.*?):/);
+      if (forInMatch) {
+        const itemVar = forInMatch[1];
+        const arrExpr = forInMatch[2];
+        if (arrExpr.startsWith('range(')) {
+          const rangeInner = arrExpr.slice(6, -1);
+          if (rangeInner.includes(',')) {
+            const [start, end] = rangeInner.split(',');
+            jsLines.push(`for (let ${itemVar} = ${start.trim()}; ${itemVar} < ${end.trim()}; ${itemVar}++) {`);
+          } else {
+            jsLines.push(`for (let ${itemVar} = 0; ${itemVar} < ${rangeInner.trim()}; ${itemVar}++) {`);
+          }
+        } else {
+          jsLines.push(`for (let ${itemVar} of ${arrExpr}) {`);
+        }
+        indentStack.push(indent + 4);
+        continue;
+      }
+
+      const whileMatch = line.match(/^while\s+(.*?):/);
+      if (whileMatch) {
+        jsLines.push(`while (${whileMatch[1]}) {`);
+        indentStack.push(indent + 4);
+        continue;
+      }
+
+      const elifMatch = line.match(/^elif\s+(.*?):/);
+      if (elifMatch) {
+        jsLines.push(`} else if (${elifMatch[1]}) {`);
+        continue;
+      }
+
+      const ifMatch = line.match(/^if\s+(.*?):/);
+      if (ifMatch) {
+        const cond = ifMatch[1]
+          .replace(/([A-Za-z0-9_]+)\s+in\s+([A-Za-z0-9_]+)/g, '($1 in $2)')
+          .replace(/not\s+/g, '!');
+        jsLines.push(`if (${cond}) {`);
+        indentStack.push(indent + 4);
+        continue;
+      }
+
+      if (line === 'else:') {
+        jsLines.push('} else {');
+        continue;
+      }
+
+      let jsStmt = line
+        .replace(/True/g, 'true')
+        .replace(/False/g, 'false')
+        .replace(/None/g, 'null')
+        .replace(/len\((.*?)\)/g, '$1.length')
+        .replace(/float\(['"]inf['"]\)/g, 'Infinity')
+        .replace(/(\w+)\.append\((.*?)\)/g, '$1.push($2)');
+
+      if (!jsStmt.startsWith('return ') && !/^(let|const|var)\s+/.test(jsStmt) && /^[A-Za-z_]\w*\s*=/.test(jsStmt)) {
+        jsStmt = 'let ' + jsStmt;
+      }
+
+      if (!jsStmt.endsWith(';') && !jsStmt.endsWith('{') && !jsStmt.endsWith('}')) {
+        jsStmt += ';';
+      }
+
+      jsLines.push(jsStmt);
     }
 
-    return js;
+    while (indentStack.length > 1) {
+      indentStack.pop();
+      jsLines.push('}');
+    }
+
+    return jsLines.join('\n');
   } catch {
     return null;
   }
@@ -428,20 +529,15 @@ const JAVA_CONTROL_KEYWORDS = new Set(['for', 'if', 'while', 'catch', 'switch', 
  */
 function transpileJavaToJs(javaCode: string): string | null {
   try {
-    // 1. Remove comments
     let js = javaCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
-
-    // 2. Remove package and imports
     js = js.replace(/package\s+[\w\.]+;/g, '');
     js = js.replace(/import\s+[\w\.\*]+;/g, '');
 
-    // 3. Extract contents inside the class
     const classMatch = js.match(/(?:public\s+)?class\s+\w+[\s\S]*?\{([\s\S]*)\}/);
     if (classMatch) {
       js = classMatch[1];
     }
 
-    // 4. Extract and convert methods, ignoring control keywords like for/if/while
     js = js.replace(/(?:public|private|protected)?\s*(?:static)?\s*[\w\[\]<>]+\s+([A-Za-z_]\w*)\s*\(([\s\S]*?)\)\s*(?:throws\s+[\w,\s]+)?\s*\{/g, (match, fnName, params) => {
       if (JAVA_CONTROL_KEYWORDS.has(fnName)) {
         return match;
@@ -449,7 +545,6 @@ function transpileJavaToJs(javaCode: string): string | null {
       if (fnName === 'main') {
         return 'function main() {';
       }
-      // Strip types from params: e.g. "int[] nums, int target" -> "nums, target"
       const cleanParams = params.split(',').map((p: string) => {
         const parts = p.trim().split(/\s+/);
         return parts[parts.length - 1];
@@ -458,18 +553,14 @@ function transpileJavaToJs(javaCode: string): string | null {
       return `function ${fnName}(${cleanParams}) {`;
     });
 
-    // 5. Replace System.out.println / print
     js = js.replace(/System\.out\.println\s*\(([\s\S]*?)\);/g, 'console.log($1);');
     js = js.replace(/System\.out\.print\s*\(([\s\S]*?)\);/g, 'console.log($1);');
-
-    // 6. Replace Java standard library calls
     js = js.replace(/Arrays\.toString\(([\s\S]*?)\)/g, 'JSON.stringify($1)');
     js = js.replace(/new\s+int\[\]\s*\{([\s\S]*?)\}/g, '[$1]');
     js = js.replace(/new\s+int\[\]\s*\[(.*?)\]/g, 'new Array($1).fill(0)');
     js = js.replace(/new\s+int\[(.*?)\]/g, 'new Array($1).fill(0)');
     js = js.replace(/new\s+int\[\]\s*\{\s*\}/g, '[]');
 
-    // 7. Replace Java Map / Set methods
     js = js.replace(/Map<[\w,\s]+>\s+(\w+)\s*=\s*new\s+HashMap<.*?>\(\);/g, 'const $1 = new Map();');
     js = js.replace(/Set<[\w\s]+>\s+(\w+)\s*=\s*new\s+HashSet<.*?>\(\);/g, 'const $1 = new Set();');
     js = js.replace(/(\w+)\.containsKey\((.*?)\)/g, '$1.has($2)');
@@ -478,11 +569,9 @@ function transpileJavaToJs(javaCode: string): string | null {
     js = js.replace(/(\w+)\.add\((.*?)\)/g, '$1.add($2)');
     js = js.replace(/(\w+)\.get\((.*?)\)/g, '$1.get($2)');
 
-    // 8. Replace variable declarations inside function body
     js = js.replace(/\b(?:int\[\]|int|String|boolean|double|float|long|char|auto)\s+(\w+)\s*=/g, 'let $1 =');
     js = js.replace(/\b(?:int\[\]|int|String|boolean|double|float|long|char|auto)\s+(\w+);/g, 'let $1;');
 
-    // 9. If main() exists, invoke main(); at the end
     if (js.includes('function main()')) {
       js += '\nmain();';
     }
@@ -502,13 +591,47 @@ function transpileCppToJs(cppCode: string): string | null {
       .replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
       .replace(/#include\s*<.*?>/g, '')
       .replace(/using\s+namespace\s+std;/g, '')
-      .replace(/std::vector<[\w\s]+>|vector<[\w\s]+>/g, 'let')
-      .replace(/int|bool|void|double|float|auto/g, 'let')
-      .replace(/std::cout\s*<<\s*([\s\S]*?);/g, 'console.log($1);')
-      .replace(/<<\s*std::endl|<<\s*"\\n"/g, '')
-      .replace(/(\w+)\.push_back\((.*?)\)/g, '$1.push($2)')
-      .replace(/(\w+)\.size\(\)/g, '$1.length')
-      .replace(/int\s+main\(\)\s*\{/g, 'function main() {');
+      .replace(/(?:std::)?(?:unordered_)?map<.*?>\s+(\w+);/g, 'let $1 = {};')
+      .replace(/(?:std::)?(?:unordered_)?set<.*?>\s+(\w+);/g, 'let $1 = new Set();')
+      .replace(/(?:std::)?vector<.*?>\s+(\w+);/g, 'let $1 = [];')
+      .replace(/(?:std::)?vector<.*?>\s+(\w+)\s*=\s*\{([\s\S]*?)\};/g, 'let $1 = [$2];')
+      .replace(/std::string|string/g, 'let')
+      .replace(/const\s+[\w<>&:\s]+\s+(\w+)/g, '$1');
+
+    js = js.replace(/(?:[\w<>&:*]+\s+)+([A-Za-z_]\w*)\s*\(([\s\S]*?)\)\s*\{/g, (match, fnName, params) => {
+      if (['for', 'if', 'while', 'switch', 'catch'].includes(fnName)) return match;
+      if (fnName === 'main') return 'function main() {';
+
+      const cleanParams = params.split(',').map((p) => {
+        const parts = p.trim().split(/\s+/);
+        return parts[parts.length - 1].replace(/[&*]/g, '');
+      }).filter(Boolean).join(', ');
+
+      return `function ${fnName}(${cleanParams}) {`;
+    });
+
+    js = js.replace(/(\w+)\.count\((.*?)\)/g, '($2 in $1)');
+    js = js.replace(/(\w+)\.find\((.*?)\)\s*!=\s*\1\.end\(\)/g, '($2 in $1)');
+    js = js.replace(/return\s*\{([\s\S]*?)\};/g, 'return [$1];');
+    js = js.replace(/auto\s+(\w+)\s*=\s*\{([\s\S]*?)\};/g, 'let $1 = [$2];');
+    js = js.replace(/\(\s*\{([\s0-9,.-]+)\}/g, '([$1]');
+
+    js = js.replace(/std::cout\s*<<\s*([\s\S]*?);/g, (_m, stream) => {
+      const parts = stream
+        .replace(/<<\s*std::endl/g, '')
+        .split('<<')
+        .map(p => {
+          let s = p.trim().replace(/[\r\n]+/g, '');
+          return s;
+        })
+        .filter(Boolean);
+      return `console.log(${parts.join(' + ')});`;
+    });
+
+    js = js.replace(/\b(?:int|bool|double|float|auto|char|long)\s+(\w+)\s*=/g, 'let $1 =');
+    js = js.replace(/\b(?:int|bool|double|float|auto|char|long)\s+(\w+);/g, 'let $1;');
+    js = js.replace(/(\w+)\.push_back\((.*?)\)/g, '$1.push($2)');
+    js = js.replace(/(\w+)\.size\(\)/g, '$1.length');
 
     if (js.includes('function main()')) {
       js += '\nmain();';

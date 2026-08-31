@@ -23,13 +23,24 @@ export const CodingPracticePlayground: React.FC = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId);
   const [selectedModuleIndex, setSelectedModuleIndex] = useState(initialModuleIndex);
+  const [selectedDsaLang, setSelectedDsaLang] = useState<'javascript' | 'python' | 'java' | 'cpp'>('javascript');
   const [showHint, setShowHint] = useState(false);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
 
   const activeCourse = codingCourses.find(c => c.id === selectedCourseId) || codingCourses[0] || COURSES[0];
   const problemsList = getCoursePlaygroundProblems(activeCourse.id);
   const currentProblem: PracticeProblem = problemsList[selectedModuleIndex] || getDailyPlaygroundProblem(activeCourse.id, selectedModuleIndex);
-  const currentLanguage = activeCourse.id;
+  
+  const isDsaCourse = activeCourse.categoryId === 'dsa' || !!currentProblem.languageVariants;
+  const currentLanguage = isDsaCourse ? selectedDsaLang : activeCourse.id;
+
+  const currentStarterCode = (isDsaCourse && currentProblem.languageVariants?.[selectedDsaLang]?.starterCode)
+    ? currentProblem.languageVariants[selectedDsaLang]!.starterCode
+    : currentProblem.starterCode;
+
+  const currentSolutionHint = (isDsaCourse && currentProblem.languageVariants?.[selectedDsaLang]?.solutionHint)
+    ? currentProblem.languageVariants[selectedDsaLang]!.solutionHint
+    : currentProblem.solutionHint;
 
   const handleRequestReview = async (code: string, language: string) => {
     if (isReviewSubmitting) return;
@@ -266,7 +277,7 @@ export const CodingPracticePlayground: React.FC = () => {
                 </button>
                 {showHint && (
                   <div className="mt-3 p-3.5 rounded-xl bg-black/40 border border-amber-500/30 text-amber-200 text-xs font-mono leading-relaxed animate-fade-in shadow-inner">
-                    💡 <strong>Hint:</strong> {currentProblem.solutionHint}
+                    💡 <strong>Hint:</strong> {currentSolutionHint}
                   </div>
                 )}
               </div>
@@ -277,25 +288,51 @@ export const CodingPracticePlayground: React.FC = () => {
 
         {/* BOTTOM SECTION: Full-Width Monaco Code Editor & Live Sandbox Terminal */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
             <div className="flex items-center gap-2">
               <Terminal size={16} className="text-primaryLight" />
               <span className="text-xs font-bold text-white uppercase tracking-wider">
-                Full-Screen Candidate Starter Code Sandbox
+                Interactive Code Sandbox
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-primaryLight">
+              <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-primaryLight uppercase">
                 {currentLanguage}
               </span>
             </div>
-            <span className="text-xs text-textMuted hidden sm:inline">
-              Edit the implementation below and click <strong className="text-emerald-400">"Run Code"</strong> to test live.
-            </span>
+
+            {/* 4 Syntax Options Switcher for DSA Tracks */}
+            {isDsaCourse && (
+              <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#0f1623] border border-white/10 shadow-inner">
+                <span className="text-[10px] font-bold text-textMuted uppercase px-2 hidden md:inline">Language:</span>
+                {[
+                  { id: 'javascript', label: 'JavaScript', icon: '⚡' },
+                  { id: 'python', label: 'Python', icon: '🐍' },
+                  { id: 'java', label: 'Java', icon: '☕' },
+                  { id: 'cpp', label: 'C++', icon: '🚀' }
+                ].map(lang => {
+                  const isSelected = selectedDsaLang === lang.id;
+                  return (
+                    <button
+                      key={lang.id}
+                      onClick={() => setSelectedDsaLang(lang.id as any)}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                        isSelected
+                          ? 'bg-gradient-main text-white shadow-md border border-primaryLight/50 scale-105'
+                          : 'text-textMuted hover:text-white hover:bg-white/5 border border-transparent'
+                      }`}
+                    >
+                      <span className="text-xs">{lang.icon}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
           
           {/* Full-Width Interactive Code Playground */}
           <CodePlayground
-            key={`${activeCourse.id}-${selectedModuleIndex}`}
-            initialCode={currentProblem.starterCode}
+            key={`${activeCourse.id}-${selectedModuleIndex}-${currentLanguage}`}
+            initialCode={currentStarterCode}
             language={currentLanguage}
             height="380px"
             onRequestReview={handleRequestReview}

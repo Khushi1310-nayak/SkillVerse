@@ -1,3 +1,8 @@
+export interface LanguageVariant {
+  starterCode: string;
+  solutionHint: string;
+}
+
 export interface PracticeProblem {
   id: string;
   title: string;
@@ -8,6 +13,12 @@ export interface PracticeProblem {
   sampleInputs: { input: string; output: string }[];
   starterCode: string;
   solutionHint: string;
+  languageVariants?: {
+    javascript?: LanguageVariant;
+    python?: LanguageVariant;
+    java?: LanguageVariant;
+    cpp?: LanguageVariant;
+  };
 }
 
 export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
@@ -1120,7 +1131,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]' }
       ],
       starterCode: `function twoSum(nums, target) {\n  const map = new Map();\n  // TODO: Iterate nums, compute complement target - num, and return [map.get(comp), i]\n  \n  return [];\n}\n\nconsole.log("Indices:", twoSum([2, 7, 11, 15], 9));`,
-      solutionHint: 'for (let i = 0; i < nums.length; i++) { const diff = target - nums[i]; if (map.has(diff)) return [map.get(diff), i]; map.set(nums[i], i); }'
+      solutionHint: 'for (let i = 0; i < nums.length; i++) { const diff = target - nums[i]; if (map.has(diff)) return [map.get(diff), i]; map.set(nums[i], i); }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function twoSum(nums, target) {\n  const map = new Map();\n  // TODO: Find complement target - nums[i]\n  \n  return [];\n}\n\nconsole.log("Indices:", twoSum([2, 7, 11, 15], 9));`,
+          solutionHint: 'for (let i = 0; i < nums.length; i++) { const diff = target - nums[i]; if (map.has(diff)) return [map.get(diff), i]; map.set(nums[i], i); }'
+        },
+        python: {
+          starterCode: `def two_sum(nums: list[int], target: int) -> list[int]:\n    seen = {}\n    # TODO: Iterate and find target - num in seen\n    \n    return []\n\nprint("Indices:", two_sum([2, 7, 11, 15], 9))`,
+          solutionHint: 'for i, num in enumerate(nums): diff = target - num; if diff in seen: return [seen[diff], i]; seen[num] = i'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        // TODO: Find complement target - nums[i]\n        \n        return new int[]{};\n    }\n\n    public static void main(String[] args) {\n        int[] res = twoSum(new int[]{2, 7, 11, 15}, 9);\n        System.out.println("Indices: " + Arrays.toString(res));\n    }\n}`,
+          solutionHint: 'for (int i = 0; i < nums.length; i++) { int diff = target - nums[i]; if (map.containsKey(diff)) return new int[]{map.get(diff), i}; map.put(nums[i], i); }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <unordered_map>\n\nstd::vector<int> twoSum(const std::vector<int>& nums, int target) {\n    std::unordered_map<int, int> seen;\n    // TODO: Find complement target - nums[i]\n    \n    return {};\n}\n\nint main() {\n    auto res = twoSum({2, 7, 11, 15}, 9);\n    std::cout << "Indices: [" << res[0] << ", " << res[1] << "]\\n";\n    return 0;\n}`,
+          solutionHint: 'for (int i = 0; i < nums.size(); i++) { int diff = target - nums[i]; if (seen.count(diff)) return {seen[diff], i}; seen[nums[i]] = i; } return {};'
+        }
+      }
     },
     {
       id: 'arr-mod-2',
@@ -1133,7 +1162,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 'nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]', output: 'k = 5, nums prefix = [0, 1, 2, 3, 4]' }
       ],
       starterCode: `function removeDuplicates(nums) {\n  if (nums.length === 0) return 0;\n  let writeIdx = 1;\n  // TODO: Iterate readIdx from 1 to nums.length and write distinct values\n  \n  return writeIdx;\n}\n\nconst arr = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];\nconst k = removeDuplicates(arr);\nconsole.log("Unique count:", k, "Prefix:", arr.slice(0, k));`,
-      solutionHint: 'for (let i = 1; i < nums.length; i++) { if (nums[i] !== nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;'
+      solutionHint: 'for (let i = 1; i < nums.length; i++) { if (nums[i] !== nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function removeDuplicates(nums) {\n  if (nums.length === 0) return 0;\n  let writeIdx = 1;\n  // TODO: Iterate and write unique elements in-place\n  \n  return writeIdx;\n}\n\nconst arr = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];\nconst k = removeDuplicates(arr);\nconsole.log("Unique count:", k, "Prefix:", arr.slice(0, k));`,
+          solutionHint: 'for (let i = 1; i < nums.length; i++) { if (nums[i] !== nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;'
+        },
+        python: {
+          starterCode: `def remove_duplicates(nums: list[int]) -> int:\n    if not nums: return 0\n    write_idx = 1\n    # TODO: Modify nums in-place and return unique count\n    \n    return write_idx\n\nnums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]\nk = remove_duplicates(nums)\nprint(f"Unique count: {k}, Prefix: {nums[:k]}")`,
+          solutionHint: 'for i in range(1, len(nums)): if nums[i] != nums[i - 1]: nums[write_idx] = nums[i]; write_idx += 1'
+        },
+        java: {
+          starterCode: `import java.util.Arrays;\n\npublic class Solution {\n    public static int removeDuplicates(int[] nums) {\n        if (nums.length == 0) return 0;\n        int writeIdx = 1;\n        // TODO: In-place two pointers\n        \n        return writeIdx;\n    }\n\n    public static void main(String[] args) {\n        int[] arr = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};\n        int k = removeDuplicates(arr);\n        System.out.println("Unique count: " + k + ", Prefix: " + Arrays.toString(Arrays.copyOf(arr, k)));\n    }\n}`,
+          solutionHint: 'for (int i = 1; i < nums.length; i++) { if (nums[i] != nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nint removeDuplicates(std::vector<int>& nums) {\n    if (nums.empty()) return 0;\n    int writeIdx = 1;\n    // TODO: In-place two pointers\n    \n    return writeIdx;\n}\n\nint main() {\n    std::vector<int> nums = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};\n    int k = removeDuplicates(nums);\n    std::cout << "Unique count: " << k << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (size_t i = 1; i < nums.size(); i++) { if (nums[i] != nums[i - 1]) nums[writeIdx++] = nums[i]; } return writeIdx;'
+        }
+      }
     },
     {
       id: 'arr-mod-3',
@@ -1146,7 +1193,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 'nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]', output: '6 ([4, -1, 2, 1])' }
       ],
       starterCode: `function maxSubArray(nums) {\n  let maxSoFar = nums[0];\n  let currentMax = nums[0];\n  // TODO: Loop from index 1 to nums.length, updating currentMax and maxSoFar\n  \n  return maxSoFar;\n}\n\nconsole.log("Max Subarray:", maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4]));`,
-      solutionHint: 'for (let i = 1; i < nums.length; i++) { currentMax = Math.max(nums[i], currentMax + nums[i]); maxSoFar = Math.max(maxSoFar, currentMax); } return maxSoFar;'
+      solutionHint: 'for (let i = 1; i < nums.length; i++) { currentMax = Math.max(nums[i], currentMax + nums[i]); maxSoFar = Math.max(maxSoFar, currentMax); } return maxSoFar;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function maxSubArray(nums) {\n  let maxSoFar = nums[0];\n  let currentMax = nums[0];\n  // TODO: Kadane algorithm\n  \n  return maxSoFar;\n}\n\nconsole.log("Max Subarray:", maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4]));`,
+          solutionHint: 'for (let i = 1; i < nums.length; i++) { currentMax = Math.max(nums[i], currentMax + nums[i]); maxSoFar = Math.max(maxSoFar, currentMax); }'
+        },
+        python: {
+          starterCode: `def max_sub_array(nums: list[int]) -> int:\n    max_so_far = current_max = nums[0]\n    # TODO: Kadane's algorithm\n    \n    return max_so_far\n\nprint("Max Subarray:", max_sub_array([-2, 1, -3, 4, -1, 2, 1, -5, 4]))`,
+          solutionHint: 'for num in nums[1:]: current_max = max(num, current_max + num); max_so_far = max(max_so_far, current_max)'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int maxSubArray(int[] nums) {\n        int maxSoFar = nums[0], currentMax = nums[0];\n        // TODO: Kadane's loop\n        \n        return maxSoFar;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Max: " + maxSubArray(new int[]{-2, 1, -3, 4, -1, 2, 1, -5, 4}));\n    }\n}`,
+          solutionHint: 'for (int i = 1; i < nums.length; i++) { currentMax = Math.max(nums[i], currentMax + nums[i]); maxSoFar = Math.max(maxSoFar, currentMax); }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint maxSubArray(const std::vector<int>& nums) {\n    int maxSoFar = nums[0], currentMax = nums[0];\n    // TODO: Kadane algorithm\n    \n    return maxSoFar;\n}\n\nint main() {\n    std::cout << "Max: " << maxSubArray({-2, 1, -3, 4, -1, 2, 1, -5, 4}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (size_t i = 1; i < nums.size(); i++) { currentMax = std::max(nums[i], currentMax + nums[i]); maxSoFar = std::max(maxSoFar, currentMax); }'
+        }
+      }
     },
     {
       id: 'arr-mod-4',
@@ -1159,7 +1224,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 'height = [1, 8, 6, 2, 5, 4, 8, 3, 7]', output: '49' }
       ],
       starterCode: `function maxArea(height) {\n  let left = 0, right = height.length - 1;\n  let maxWater = 0;\n  // TODO: Calculate area = min(height[left], height[right]) * (right - left), move smaller pointer\n  \n  return maxWater;\n}\n\nconsole.log("Max Water:", maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));`,
-      solutionHint: 'while (left < right) { const w = right - left; const h = Math.min(height[left], height[right]); maxWater = Math.max(maxWater, w * h); if (height[left] < height[right]) left++; else right--; }'
+      solutionHint: 'while (left < right) { const w = right - left; const h = Math.min(height[left], height[right]); maxWater = Math.max(maxWater, w * h); if (height[left] < height[right]) left++; else right--; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function maxArea(height) {\n  let left = 0, right = height.length - 1;\n  let maxWater = 0;\n  // TODO: Two pointers inward scan\n  \n  return maxWater;\n}\n\nconsole.log("Max Water:", maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));`,
+          solutionHint: 'while (left < right) { const area = Math.min(height[left], height[right]) * (right - left); maxWater = Math.max(maxWater, area); if (height[left] < height[right]) left++; else right--; }'
+        },
+        python: {
+          starterCode: `def max_area(height: list[int]) -> int:\n    left, right = 0, len(height) - 1\n    max_water = 0\n    # TODO: Inward two pointers\n    \n    return max_water\n\nprint("Max Water:", max_area([1, 8, 6, 2, 5, 4, 8, 3, 7]))`,
+          solutionHint: 'while left < right: area = min(height[left], height[right]) * (right - left); max_water = max(max_water, area); if height[left] < height[right]: left += 1; else: right -= 1'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int maxArea(int[] height) {\n        int left = 0, right = height.length - 1, maxWater = 0;\n        // TODO: Two pointers\n        \n        return maxWater;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Max Water: " + maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}));\n    }\n}`,
+          solutionHint: 'while (left < right) { int area = Math.min(height[left], height[right]) * (right - left); maxWater = Math.max(maxWater, area); if (height[left] < height[right]) left++; else right--; }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint maxArea(const std::vector<int>& height) {\n    int left = 0, right = height.size() - 1, maxWater = 0;\n    // TODO: Two pointers\n    \n    return maxWater;\n}\n\nint main() {\n    std::cout << "Max Water: " << maxArea({1, 8, 6, 2, 5, 4, 8, 3, 7}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'while (left < right) { int area = std::min(height[left], height[right]) * (right - left); maxWater = std::max(maxWater, area); if (height[left] < height[right]) left++; else right--; }'
+        }
+      }
     },
     {
       id: 'arr-mod-5',
@@ -1172,7 +1255,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: '[[1,3],[2,6],[8,10],[15,18]]', output: '[[1,6],[8,10],[15,18]]' }
       ],
       starterCode: `function mergeIntervals(intervals) {\n  if (intervals.length <= 1) return intervals;\n  intervals.sort((a, b) => a[0] - b[0]);\n  const merged = [intervals[0]];\n\n  // TODO: Iterate remaining intervals and merge if current start <= previous end\n  \n  return merged;\n}\n\nconsole.log("Merged:", mergeIntervals([[1,3],[2,6],[8,10],[15,18]]));`,
-      solutionHint: 'for (let i = 1; i < intervals.length; i++) { const curr = intervals[i]; const last = merged[merged.length - 1]; if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]); else merged.push(curr); }'
+      solutionHint: 'for (let i = 1; i < intervals.length; i++) { const curr = intervals[i]; const last = merged[merged.length - 1]; if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]); else merged.push(curr); }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function mergeIntervals(intervals) {\n  if (intervals.length <= 1) return intervals;\n  intervals.sort((a, b) => a[0] - b[0]);\n  const merged = [intervals[0]];\n  // TODO: Merge overlapping intervals\n  \n  return merged;\n}\n\nconsole.log("Merged:", mergeIntervals([[1,3],[2,6],[8,10],[15,18]]));`,
+          solutionHint: 'for (let i = 1; i < intervals.length; i++) { const curr = intervals[i]; const last = merged[merged.length - 1]; if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]); else merged.push(curr); }'
+        },
+        python: {
+          starterCode: `def merge_intervals(intervals: list[list[int]]) -> list[list[int]]:\n    if len(intervals) <= 1: return intervals\n    intervals.sort(key=lambda x: x[0])\n    merged = [intervals[0]]\n    # TODO: Merge overlapping intervals\n    \n    return merged\n\nprint("Merged:", merge_intervals([[1,3],[2,6],[8,10],[15,18]]))`,
+          solutionHint: 'for start, end in intervals[1:]: if start <= merged[-1][1]: merged[-1][1] = max(merged[-1][1], end); else: merged.append([start, end])'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int[][] merge(int[][] intervals) {\n        if (intervals.length <= 1) return intervals;\n        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));\n        List<int[]> merged = new ArrayList<>();\n        merged.add(intervals[0]);\n        // TODO: Merge intervals\n        \n        return merged.toArray(new int[merged.size()][]);\n    }\n\n    public static void main(String[] args) {\n        int[][] res = merge(new int[][]{{1,3},{2,6},{8,10},{15,18}});\n        for (int[] row : res) System.out.print(Arrays.toString(row) + " ");\n        System.out.println();\n    }\n}`,
+          solutionHint: 'for (int i = 1; i < intervals.length; i++) { int[] curr = intervals[i]; int[] last = merged.get(merged.size() - 1); if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]); else merged.add(curr); }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nstd::vector<std::vector<int>> merge(std::vector<std::vector<int>>& intervals) {\n    if (intervals.size() <= 1) return intervals;\n    std::sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) { return a[0] < b[0]; });\n    std::vector<std::vector<int>> merged = {intervals[0]};\n    // TODO: Merge intervals\n    \n    return merged;\n}\n\nint main() {\n    std::vector<std::vector<int>> input = {{1,3},{2,6},{8,10},{15,18}};\n    auto res = merge(input);\n    std::cout << "Merged count: " << res.size() << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (size_t i = 1; i < intervals.size(); i++) { if (intervals[i][0] <= merged.back()[1]) merged.back()[1] = std::max(merged.back()[1], intervals[i][1]); else merged.push_back(intervals[i]); }'
+        }
+      }
     },
     {
       id: 'arr-mod-6',
@@ -1185,7 +1286,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: '[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]', output: '6' }
       ],
       starterCode: `function trap(height) {\n  let left = 0, right = height.length - 1;\n  let leftMax = 0, rightMax = 0;\n  let totalWater = 0;\n\n  // TODO: Process two pointers tracking leftMax and rightMax\n  \n  return totalWater;\n}\n\nconsole.log("Trapped Water:", trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]));`,
-      solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else totalWater += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else totalWater += rightMax - height[right]; right--; } }'
+      solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else totalWater += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else totalWater += rightMax - height[right]; right--; } }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function trap(height) {\n  let left = 0, right = height.length - 1;\n  let leftMax = 0, rightMax = 0, totalWater = 0;\n  // TODO: Inward two pointers tracking leftMax and rightMax\n  \n  return totalWater;\n}\n\nconsole.log("Trapped Water:", trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]));`,
+          solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else totalWater += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else totalWater += rightMax - height[right]; right--; } }'
+        },
+        python: {
+          starterCode: `def trap(height: list[int]) -> int:\n    left, right = 0, len(height) - 1\n    left_max = right_max = total_water = 0\n    # TODO: Two pointers rain trap\n    \n    return total_water\n\nprint("Trapped Water:", trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]))`,
+          solutionHint: 'while left < right: if height[left] < height[right]: if height[left] >= left_max: left_max = height[left]; else: total_water += left_max - height[left]; left += 1; else: if height[right] >= right_max: right_max = height[right]; else: total_water += right_max - height[right]; right -= 1'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int trap(int[] height) {\n        int left = 0, right = height.length - 1, leftMax = 0, rightMax = 0, total = 0;\n        // TODO: Two pointers rain trap\n        \n        return total;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Trapped: " + trap(new int[]{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}));\n    }\n}`,
+          solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else total += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else total += rightMax - height[right]; right--; } }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nint trap(const std::vector<int>& height) {\n    int left = 0, right = height.size() - 1, leftMax = 0, rightMax = 0, total = 0;\n    // TODO: Two pointers rain trap\n    \n    return total;\n}\n\nint main() {\n    std::cout << "Trapped: " << trap({0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'while (left < right) { if (height[left] < height[right]) { if (height[left] >= leftMax) leftMax = height[left]; else total += leftMax - height[left]; left++; } else { if (height[right] >= rightMax) rightMax = height[right]; else total += rightMax - height[right]; right--; } }'
+        }
+      }
     },
     {
       id: 'arr-mod-7',
@@ -1198,7 +1317,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 'nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3', output: '[3, 3, 5, 5, 6, 7]' }
       ],
       starterCode: `function maxSlidingWindow(nums, k) {\n  const deque = [];\n  const result = [];\n\n  for (let i = 0; i < nums.length; i++) {\n    // TODO: 1. Remove indices outside current window (i - k)\n    // TODO: 2. Remove indices with values smaller than nums[i] from back\n    // TODO: 3. Push i, and record deque[0] once i >= k - 1\n    \n  }\n\n  return result;\n}\n\nconsole.log("Sliding Max:", maxSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3));`,
-      solutionHint: 'while (deque.length && deque[0] <= i - k) deque.shift(); while (deque.length && nums[deque[deque.length - 1]] < nums[i]) deque.pop(); deque.push(i); if (i >= k - 1) result.push(nums[deque[0]]);'
+      solutionHint: 'while (deque.length && deque[0] <= i - k) deque.shift(); while (deque.length && nums[deque[deque.length - 1]] < nums[i]) deque.pop(); deque.push(i); if (i >= k - 1) result.push(nums[deque[0]]);',
+      languageVariants: {
+        javascript: {
+          starterCode: `function maxSlidingWindow(nums, k) {\n  const deque = [];\n  const result = [];\n  // TODO: Monotonic deque sliding window\n  \n  return result;\n}\n\nconsole.log("Sliding Max:", maxSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3));`,
+          solutionHint: 'while (deque.length && deque[0] <= i - k) deque.shift(); while (deque.length && nums[deque[deque.length - 1]] < nums[i]) deque.pop(); deque.push(i); if (i >= k - 1) result.push(nums[deque[0]]);'
+        },
+        python: {
+          starterCode: `from collections import deque\n\ndef max_sliding_window(nums: list[int], k: int) -> list[int]:\n    q = deque()\n    result = []\n    # TODO: Monotonic deque\n    \n    return result\n\nprint("Sliding Max:", max_sliding_window([1, 3, -1, -3, 5, 3, 6, 7], 3))`,
+          solutionHint: 'for i, n in enumerate(nums): while q and q[0] <= i - k: q.popleft(); while q and nums[q[-1]] < n: q.pop(); q.append(i); if i >= k - 1: result.append(nums[q[0]])'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int[] maxSlidingWindow(int[] nums, int k) {\n        Deque<Integer> deque = new ArrayDeque<>();\n        int[] result = new int[nums.length - k + 1];\n        // TODO: Monotonic deque\n        \n        return result;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Sliding Max: " + Arrays.toString(maxSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3)));\n    }\n}`,
+          solutionHint: 'for (int i = 0; i < nums.length; i++) { while (!deque.isEmpty() && deque.peekFirst() <= i - k) deque.pollFirst(); while (!deque.isEmpty() && nums[deque.peekLast()] < nums[i]) deque.pollLast(); deque.offerLast(i); if (i >= k - 1) result[i - k + 1] = nums[deque.peekFirst()]; }'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <deque>\n\nstd::vector<int> maxSlidingWindow(const std::vector<int>& nums, int k) {\n    std::deque<int> dq;\n    std::vector<int> result;\n    // TODO: Monotonic deque\n    \n    return result;\n}\n\nint main() {\n    auto res = maxSlidingWindow({1, 3, -1, -3, 5, 3, 6, 7}, 3);\n    for (int x : res) std::cout << x << " ";\n    std::cout << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (int i = 0; i < nums.size(); i++) { while (!dq.empty() && dq.front() <= i - k) dq.pop_front(); while (!dq.empty() && nums[dq.back()] < nums[i]) dq.pop_back(); dq.push_back(i); if (i >= k - 1) result.push_back(nums[dq.front()]); }'
+        }
+      }
     },
     {
       id: 'arr-mod-8',
@@ -1212,7 +1349,25 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: '[7, 8, 9, 11, 12]', output: '1' }
       ],
       starterCode: `function firstMissingPositive(nums) {\n  const n = nums.length;\n  // TODO: Place each number x in index x - 1 if 1 <= x <= n\n  \n  // TODO: Find first index i where nums[i] !== i + 1\n  \n  return n + 1;\n}\n\nconsole.log("Missing:", firstMissingPositive([3, 4, -1, 1]));\nconsole.log("Missing:", firstMissingPositive([7, 8, 9, 11, 12]));`,
-      solutionHint: 'for (let i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) { const temp = nums[nums[i] - 1]; nums[nums[i] - 1] = nums[i]; nums[i] = temp; } } for (let i = 0; i < n; i++) { if (nums[i] !== i + 1) return i + 1; } return n + 1;'
+      solutionHint: 'for (let i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) { const temp = nums[nums[i] - 1]; nums[nums[i] - 1] = nums[i]; nums[i] = temp; } } for (let i = 0; i < n; i++) { if (nums[i] !== i + 1) return i + 1; } return n + 1;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function firstMissingPositive(nums) {\n  const n = nums.length;\n  // TODO: Cycle sort in-place\n  \n  return n + 1;\n}\n\nconsole.log("Missing:", firstMissingPositive([3, 4, -1, 1]));`,
+          solutionHint: 'for (let i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) { const temp = nums[nums[i] - 1]; nums[nums[i] - 1] = nums[i]; nums[i] = temp; } } for (let i = 0; i < n; i++) { if (nums[i] !== i + 1) return i + 1; } return n + 1;'
+        },
+        python: {
+          starterCode: `def first_missing_positive(nums: list[int]) -> int:\n    n = len(nums)\n    # TODO: Cycle sort\n    \n    return n + 1\n\nprint("Missing:", first_missing_positive([3, 4, -1, 1]))`,
+          solutionHint: 'for i in range(n): while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]: target = nums[i] - 1; nums[i], nums[target] = nums[target], nums[i]; for i in range(n): if nums[i] != i + 1: return i + 1'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int firstMissingPositive(int[] nums) {\n        int n = nums.length;\n        // TODO: Cycle sort in-place\n        \n        return n + 1;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Missing: " + firstMissingPositive(new int[]{3, 4, -1, 1}));\n    }\n}`,
+          solutionHint: 'for (int i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i]) { int target = nums[i] - 1; int temp = nums[target]; nums[target] = nums[i]; nums[i] = temp; } } for (int i = 0; i < n; i++) { if (nums[i] != i + 1) return i + 1; } return n + 1;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <utility>\n\nint firstMissingPositive(std::vector<int>& nums) {\n    int n = nums.size();\n    // TODO: Cycle sort\n    \n    return n + 1;\n}\n\nint main() {\n    std::vector<int> input = {3, 4, -1, 1};\n    std::cout << "Missing: " << firstMissingPositive(input) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (int i = 0; i < n; i++) { while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i]) { std::swap(nums[i], nums[nums[i] - 1]); } } for (int i = 0; i < n; i++) { if (nums[i] != i + 1) return i + 1; } return n + 1;'
+        }
+      }
     }
   ],
 
@@ -1228,8 +1383,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: '"A man, a plan, a canal: Panama"', output: 'true' },
         { input: '"race a car"', output: 'false' }
       ],
-      starterCode: `function isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let left = 0, right = clean.length - 1;\n  // TODO: Compare characters from outside inwards\n  \n  return true;\n}\n\nconsole.log("Is Palindrome:", isPalindrome("A man, a plan, a canal: Panama"));\nconsole.log("Is Palindrome:", isPalindrome("race a car"));`,
-      solutionHint: 'while (left < right) { if (clean[left++] !== clean[right--]) return false; } return true;'
+      starterCode: `function isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let left = 0, right = clean.length - 1;\n  // TODO: Compare characters from outside inwards\n  \n  return true;\n}\n\nconsole.log("Is Palindrome:", isPalindrome("A man, a plan, a canal: Panama"));`,
+      solutionHint: 'while (left < right) { if (clean[left++] !== clean[right--]) return false; } return true;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let left = 0, right = clean.length - 1;\n  // TODO: Two pointers palindrome check\n  \n  return true;\n}\n\nconsole.log("Is Palindrome:", isPalindrome("A man, a plan, a canal: Panama"));`,
+          solutionHint: 'while (left < right) { if (clean[left++] !== clean[right--]) return false; } return true;'
+        },
+        python: {
+          starterCode: `import re\n\ndef is_palindrome(s: str) -> bool:\n    clean = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    left, right = 0, len(clean) - 1\n    # TODO: Two pointers\n    \n    return True\n\nprint("Is Palindrome:", is_palindrome("A man, a plan, a canal: Panama"))`,
+          solutionHint: 'while left < right: if clean[left] != clean[right]: return False; left += 1; right -= 1; return True'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isPalindrome(String s) {\n        String clean = s.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();\n        int left = 0, right = clean.length() - 1;\n        // TODO: Two pointers\n        \n        return true;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Is Palindrome: " + isPalindrome("A man, a plan, a canal: Panama"));\n    }\n}`,
+          solutionHint: 'while (left < right) { if (clean.charAt(left++) != clean.charAt(right--)) return false; } return true;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <cctype>\n\nbool isPalindrome(const std::string& s) {\n    std::string clean = "";\n    for (char c : s) if (isalnum(c)) clean += tolower(c);\n    int left = 0, right = (int)clean.size() - 1;\n    // TODO: Two pointers\n    \n    return true;\n}\n\nint main() {\n    std::cout << "Is Palindrome: " << (isPalindrome("A man, a plan, a canal: Panama") ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'while (left < right) { if (clean[left++] != clean[right--]) return false; } return true;'
+        }
+      }
     },
     {
       id: 'str-mod-2',
@@ -1241,8 +1414,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       sampleInputs: [
         { input: '["flower", "flow", "flight"]', output: '"fl"' }
       ],
-      starterCode: `function longestCommonPrefix(strs) {\n  if (!strs || strs.length === 0) return "";\n  let prefix = strs[0];\n  // TODO: Iterate remaining strings and truncate prefix until it matches\n  \n  return prefix;\n}\n\nconsole.log("Prefix:", longestCommonPrefix(["flower", "flow", "flight"]));`,
-      solutionHint: 'for (let i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) !== 0) { prefix = prefix.substring(0, prefix.length - 1); if (!prefix) return ""; } } return prefix;'
+      starterCode: `function longestCommonPrefix(strs) {\n  if (!strs || strs.length === 0) return "";\n  let prefix = strs[0];\n  // TODO: Truncate prefix until all match\n  \n  return prefix;\n}\n\nconsole.log("Prefix:", longestCommonPrefix(["flower", "flow", "flight"]));`,
+      solutionHint: 'for (let i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) !== 0) { prefix = prefix.substring(0, prefix.length - 1); if (!prefix) return ""; } } return prefix;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function longestCommonPrefix(strs) {\n  if (!strs || strs.length === 0) return "";\n  let prefix = strs[0];\n  // TODO: Truncate prefix until all match\n  \n  return prefix;\n}\n\nconsole.log("Prefix:", longestCommonPrefix(["flower", "flow", "flight"]));`,
+          solutionHint: 'for (let i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) !== 0) { prefix = prefix.substring(0, prefix.length - 1); if (!prefix) return ""; } } return prefix;'
+        },
+        python: {
+          starterCode: `def longest_common_prefix(strs: list[str]) -> str:\n    if not strs: return ""\n    prefix = strs[0]\n    # TODO: Truncate prefix\n    \n    return prefix\n\nprint("Prefix:", longest_common_prefix(["flower", "flow", "flight"]))`,
+          solutionHint: 'for s in strs[1:]: while not s.startswith(prefix): prefix = prefix[:-1]; if not prefix: return ""; return prefix'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static String longestCommonPrefix(String[] strs) {\n        if (strs == null || strs.length == 0) return "";\n        String prefix = strs[0];\n        // TODO: Truncate prefix\n        \n        return prefix;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Prefix: " + longestCommonPrefix(new String[]{"flower", "flow", "flight"}));\n    }\n}`,
+          solutionHint: 'for (int i = 1; i < strs.length; i++) { while (strs[i].indexOf(prefix) != 0) { prefix = prefix.substring(0, prefix.length - 1); if (prefix.isEmpty()) return ""; } } return prefix;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n\nstd::string longestCommonPrefix(const std::vector<std::string>& strs) {\n    if (strs.empty()) return "";\n    std::string prefix = strs[0];\n    // TODO: Truncate prefix\n    \n    return prefix;\n}\n\nint main() {\n    std::cout << "Prefix: " << longestCommonPrefix({"flower", "flow", "flight"}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (size_t i = 1; i < strs.size(); i++) { while (strs[i].find(prefix) != 0) { prefix = prefix.substr(0, prefix.size() - 1); if (prefix.empty()) return ""; } } return prefix;'
+        }
+      }
     },
     {
       id: 'str-mod-3',
@@ -1252,11 +1443,28 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       description: 'Given a string s, find the length of the longest substring without repeating characters in O(n) time using a sliding window and Map.',
       constraints: ['Time Complexity: O(n)', 'Space Complexity: O(min(m, n))'],
       sampleInputs: [
-        { input: '"abcabcbb"', output: '3 ("abc")' },
-        { input: '"bbbbb"', output: '1 ("b")' }
+        { input: '"abcabcbb"', output: '3 ("abc")' }
       ],
-      starterCode: `function lengthOfLongestSubstring(s) {\n  const charIndexMap = new Map();\n  let maxLength = 0;\n  let windowStart = 0;\n\n  // TODO: Expand windowEnd, adjust windowStart on collision, compute maxLength\n  \n  return maxLength;\n}\n\nconsole.log("Longest Unique Substring:", lengthOfLongestSubstring("abcabcbb"));`,
-      solutionHint: 'for (let windowEnd = 0; windowEnd < s.length; windowEnd++) { const rightChar = s[windowEnd]; if (charIndexMap.has(rightChar)) { windowStart = Math.max(windowStart, charIndexMap.get(rightChar) + 1); } charIndexMap.set(rightChar, windowEnd); maxLength = Math.max(maxLength, windowEnd - windowStart + 1); } return maxLength;'
+      starterCode: `function lengthOfLongestSubstring(s) {\n  const charIndexMap = new Map();\n  let maxLength = 0, windowStart = 0;\n  // TODO: Sliding window\n  \n  return maxLength;\n}\n\nconsole.log("Longest Unique Substring:", lengthOfLongestSubstring("abcabcbb"));`,
+      solutionHint: 'for (let windowEnd = 0; windowEnd < s.length; windowEnd++) { const rightChar = s[windowEnd]; if (charIndexMap.has(rightChar)) { windowStart = Math.max(windowStart, charIndexMap.get(rightChar) + 1); } charIndexMap.set(rightChar, windowEnd); maxLength = Math.max(maxLength, windowEnd - windowStart + 1); } return maxLength;',
+      languageVariants: {
+        javascript: {
+          starterCode: `function lengthOfLongestSubstring(s) {\n  const charIndexMap = new Map();\n  let maxLength = 0, windowStart = 0;\n  // TODO: Sliding window\n  \n  return maxLength;\n}\n\nconsole.log("Longest Unique Substring:", lengthOfLongestSubstring("abcabcbb"));`,
+          solutionHint: 'for (let windowEnd = 0; windowEnd < s.length; windowEnd++) { const rightChar = s[windowEnd]; if (charIndexMap.has(rightChar)) { windowStart = Math.max(windowStart, charIndexMap.get(rightChar) + 1); } charIndexMap.set(rightChar, windowEnd); maxLength = Math.max(maxLength, windowEnd - windowStart + 1); } return maxLength;'
+        },
+        python: {
+          starterCode: `def length_of_longest_substring(s: str) -> int:\n    seen = {}\n    max_len = start = 0\n    # TODO: Sliding window\n    \n    return max_len\n\nprint("Longest Unique:", length_of_longest_substring("abcabcbb"))`,
+          solutionHint: 'for end, char in enumerate(s): if char in seen: start = max(start, seen[char] + 1); seen[char] = end; max_len = max(max_len, end - start + 1); return max_len'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int lengthOfLongestSubstring(String s) {\n        Map<Character, Integer> map = new HashMap<>();\n        int maxLen = 0, start = 0;\n        // TODO: Sliding window\n        \n        return maxLen;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Longest: " + lengthOfLongestSubstring("abcabcbb"));\n    }\n}`,
+          solutionHint: 'for (int end = 0; end < s.length(); end++) { char c = s.charAt(end); if (map.containsKey(c)) start = Math.max(start, map.get(c) + 1); map.put(c, end); maxLen = Math.max(maxLen, end - start + 1); } return maxLen;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\n\nint lengthOfLongestSubstring(const std::string& s) {\n    std::unordered_map<char, int> seen;\n    int maxLen = 0, start = 0;\n    // TODO: Sliding window\n    \n    return maxLen;\n}\n\nint main() {\n    std::cout << "Longest: " << lengthOfLongestSubstring("abcabcbb") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (int end = 0; end < (int)s.size(); end++) { if (seen.count(s[end])) start = std::max(start, seen[s[end]] + 1); seen[s[end]] = end; maxLen = std::max(maxLen, end - start + 1); } return maxLen;'
+        }
+      }
     },
     {
       id: 'str-mod-4',
@@ -1269,8 +1477,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: '"   -42"', output: '-42' },
         { input: '"4193 with words"', output: '4193' }
       ],
-      starterCode: `function myAtoi(s) {\n  let i = 0, sign = 1, total = 0;\n  const INT_MAX = 2147483647, INT_MIN = -2147483648;\n  // TODO: Skip whitespace, parse sign, parse digits, clamp to [INT_MIN, INT_MAX]\n  \n  return total * sign;\n}\n\nconsole.log("Atoi \'   -42\':", myAtoi("   -42"));\nconsole.log("Atoi \'4193 with words\':", myAtoi("4193 with words"));`,
-      solutionHint: 'while (s[i] === " ") i++; if (s[i] === "+" || s[i] === "-") { sign = s[i] === "-" ? -1 : 1; i++; } while (i < s.length && s[i] >= "0" && s[i] <= "9") { total = total * 10 + (s.charCodeAt(i) - 48); if (total * sign >= INT_MAX) return INT_MAX; if (total * sign <= INT_MIN) return INT_MIN; i++; }'
+      starterCode: `function myAtoi(s) {\n  let i = 0, sign = 1, total = 0;\n  const INT_MAX = 2147483647, INT_MIN = -2147483648;\n  // TODO: Parse string to 32-bit int with clamping\n  \n  return total * sign;\n}\n\nconsole.log("Atoi \'   -42\':", myAtoi("   -42"));`,
+      solutionHint: 'while (s[i] === " ") i++; if (s[i] === "+" || s[i] === "-") { sign = s[i] === "-" ? -1 : 1; i++; } while (i < s.length && s[i] >= "0" && s[i] <= "9") { total = total * 10 + (s.charCodeAt(i) - 48); if (total * sign >= INT_MAX) return INT_MAX; if (total * sign <= INT_MIN) return INT_MIN; i++; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function myAtoi(s) {\n  let i = 0, sign = 1, total = 0;\n  const INT_MAX = 2147483647, INT_MIN = -2147483648;\n  // TODO: Parse string to 32-bit int\n  \n  return total * sign;\n}\n\nconsole.log("Atoi \'   -42\':", myAtoi("   -42"));`,
+          solutionHint: 'while (s[i] === " ") i++; if (s[i] === "+" || s[i] === "-") { sign = s[i] === "-" ? -1 : 1; i++; } while (i < s.length && s[i] >= "0" && s[i] <= "9") { total = total * 10 + (s.charCodeAt(i) - 48); if (total * sign >= INT_MAX) return INT_MAX; if (total * sign <= INT_MIN) return INT_MIN; i++; }'
+        },
+        python: {
+          starterCode: `def my_atoi(s: str) -> int:\n    i = total = 0\n    sign = 1\n    INT_MAX, INT_MIN = 2**31 - 1, -2**31\n    s = s.lstrip()\n    if not s: return 0\n    if s[0] in ['+', '-']:\n        sign = -1 if s[0] == '-' else 1\n        s = s[1:]\n    for c in s:\n        if not c.isdigit(): break\n        total = total * 10 + int(c)\n        if total * sign >= INT_MAX: return INT_MAX\n        if total * sign <= INT_MIN: return INT_MIN\n    return total * sign\n\nprint("Atoi:", my_atoi("   -42"))`,
+          solutionHint: 'Strip whitespace, extract leading sign, accumulate digits, and clamp between INT_MIN and INT_MAX'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int myAtoi(String s) {\n        int i = 0, sign = 1;\n        long total = 0;\n        while (i < s.length() && s.charAt(i) == ' ') i++;\n        if (i < s.length() && (s.charAt(i) == '+' || s.charAt(i) == '-')) {\n            sign = s.charAt(i) == '-' ? -1 : 1;\n            i++;\n        }\n        while (i < s.length() && Character.isDigit(s.charAt(i))) {\n            total = total * 10 + (s.charAt(i) - '0');\n            if (total * sign >= Integer.MAX_VALUE) return Integer.MAX_VALUE;\n            if (total * sign <= Integer.MIN_VALUE) return Integer.MIN_VALUE;\n            i++;\n        }\n        return (int)(total * sign);\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Atoi: " + myAtoi("   -42"));\n    }\n}`,
+          solutionHint: 'Use long total for intermediate sums and check Integer.MAX_VALUE / Integer.MIN_VALUE bounds.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <climits>\n\nint myAtoi(const std::string& s) {\n    int i = 0, sign = 1;\n    long total = 0;\n    while (i < s.size() && s[i] == ' ') i++;\n    if (i < s.size() && (s[i] == '+' || s[i] == '-')) {\n        sign = s[i] == '-' ? -1 : 1;\n        i++;\n    }\n    while (i < s.size() && isdigit(s[i])) {\n        total = total * 10 + (s[i] - '0');\n        if (total * sign >= INT_MAX) return INT_MAX;\n        if (total * sign <= INT_MIN) return INT_MIN;\n        i++;\n    }\n    return total * sign;\n}\n\nint main() {\n    std::cout << "Atoi: " << myAtoi("   -42") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Check whitespace, parse +/- sign, convert digit chars to int and clamp to INT_MAX/INT_MIN.'
+        }
+      }
     },
     {
       id: 'str-mod-5',
@@ -1280,11 +1506,28 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       description: 'Given a string s, return the longest palindromic substring in s in O(n^2) time and O(1) extra space using expand around center.',
       constraints: ['Time Complexity: O(n^2)', 'Space Complexity: O(1)'],
       sampleInputs: [
-        { input: '"babad"', output: '"bab" or "aba"' },
-        { input: '"cbbd"', output: '"bb"' }
+        { input: '"babad"', output: '"bab" or "aba"' }
       ],
-      starterCode: `function longestPalindrome(s) {\n  if (!s || s.length < 1) return "";\n  let start = 0, end = 0;\n\n  const expand = (left, right) => {\n    while (left >= 0 && right < s.length && s[left] === s[right]) {\n      left--;\n      right++;\n    }\n    return right - left - 1;\n  };\n\n  // TODO: Expand around i (odd length) and i, i+1 (even length), update start/end\n  \n  return s.substring(start, end + 1);\n}\n\nconsole.log("Longest Palindrome:", longestPalindrome("babad"));`,
-      solutionHint: 'for (let i = 0; i < s.length; i++) { const len1 = expand(i, i); const len2 = expand(i, i + 1); const len = Math.max(len1, len2); if (len > end - start) { start = i - Math.floor((len - 1) / 2); end = i + Math.floor(len / 2); } }'
+      starterCode: `function longestPalindrome(s) {\n  if (!s || s.length < 1) return "";\n  let start = 0, end = 0;\n  // TODO: Expand around center\n  \n  return s.substring(start, end + 1);\n}\n\nconsole.log("Longest Palindrome:", longestPalindrome("babad"));`,
+      solutionHint: 'for (let i = 0; i < s.length; i++) { const len1 = expand(i, i); const len2 = expand(i, i + 1); const len = Math.max(len1, len2); if (len > end - start) { start = i - Math.floor((len - 1) / 2); end = i + Math.floor(len / 2); } }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function longestPalindrome(s) {\n  if (!s || s.length < 1) return "";\n  let start = 0, end = 0;\n  const expand = (l, r) => {\n    while (l >= 0 && r < s.length && s[l] === s[r]) { l--; r++; }\n    return r - l - 1;\n  };\n  for (let i = 0; i < s.length; i++) {\n    const len = Math.max(expand(i, i), expand(i, i + 1));\n    if (len > end - start) {\n      start = i - Math.floor((len - 1) / 2);\n      end = i + Math.floor(len / 2);\n    }\n  }\n  return s.substring(start, end + 1);\n}\n\nconsole.log("Longest Palindrome:", longestPalindrome("babad"));`,
+          solutionHint: 'Expand outward around each center index (both odd and even lengths) and track start/end indices.'
+        },
+        python: {
+          starterCode: `def longest_palindrome(s: str) -> str:\n    if not s: return ""\n    start = end = 0\n    def expand(l, r):\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            l -= 1; r += 1\n        return r - l - 1\n    for i in range(len(s)):\n        length = max(expand(i, i), expand(i, i + 1))\n        if length > end - start:\n            start = i - (length - 1) // 2\n            end = i + length // 2\n    return s[start:end + 1]\n\nprint("Longest Palindrome:", longest_palindrome("babad"))`,
+          solutionHint: 'Expand around center for both single and paired characters and slice longest matching palindrome.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    private static int expand(String s, int l, int r) {\n        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }\n        return r - l - 1;\n    }\n    public static String longestPalindrome(String s) {\n        if (s == null || s.isEmpty()) return "";\n        int start = 0, end = 0;\n        for (int i = 0; i < s.length(); i++) {\n            int len = Math.max(expand(s, i, i), expand(s, i, i + 1));\n            if (len > end - start) {\n                start = i - (len - 1) / 2;\n                end = i + len / 2;\n            }\n        }\n        return s.substring(start, end + 1);\n    }\n    public static void main(String[] args) {\n        System.out.println("Longest: " + longestPalindrome("babad"));\n    }\n}`,
+          solutionHint: 'Expand outward around center indices and maintain substring boundaries.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <algorithm>\n\nint expand(const std::string& s, int l, int r) {\n    while (l >= 0 && r < (int)s.size() && s[l] == s[r]) { l--; r++; }\n    return r - l - 1;\n}\n\nstd::string longestPalindrome(const std::string& s) {\n    if (s.empty()) return "";\n    int start = 0, end = 0;\n    for (int i = 0; i < (int)s.size(); i++) {\n        int len = std::max(expand(s, i, i), expand(s, i, i + 1));\n        if (len > end - start) {\n            start = i - (len - 1) / 2;\n            end = i + len / 2;\n        }\n    }\n    return s.substr(start, end - start + 1);\n}\n\nint main() {\n    std::cout << "Longest: " << longestPalindrome("babad") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Helper function expand() checks boundary parity and returns substring length.'
+        }
+      }
     },
     {
       id: 'str-mod-6',
@@ -1296,8 +1539,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       sampleInputs: [
         { input: 's = "ADOBECODEBANC", t = "ABC"', output: '"BANC"' }
       ],
-      starterCode: `function minWindow(s, t) {\n  if (s.length === 0 || t.length === 0) return "";\n  const targetMap = {};\n  for (const c of t) targetMap[c] = (targetMap[c] || 0) + 1;\n\n  let required = Object.keys(targetMap).length;\n  let l = 0, r = 0, formed = 0;\n  const windowCounts = {};\n  let minLen = Infinity, minStart = 0;\n\n  // TODO: Expand r, check matched counts, contract l while window is valid\n  \n  return minLen === Infinity ? "" : s.substring(minStart, minStart + minLen);\n}\n\nconsole.log("Min Window:", minWindow("ADOBECODEBANC", "ABC"));`,
-      solutionHint: 'while (r < s.length) { const c = s[r]; windowCounts[c] = (windowCounts[c] || 0) + 1; if (targetMap[c] && windowCounts[c] === targetMap[c]) formed++; while (l <= r && formed === required) { if (r - l + 1 < minLen) { minLen = r - l + 1; minStart = l; } windowCounts[s[l]]--; if (targetMap[s[l]] && windowCounts[s[l]] < targetMap[s[l]]) formed--; l++; } r++; }'
+      starterCode: `function minWindow(s, t) {\n  if (s.length === 0 || t.length === 0) return "";\n  const targetMap = {};\n  for (const c of t) targetMap[c] = (targetMap[c] || 0) + 1;\n  let required = Object.keys(targetMap).length;\n  let l = 0, r = 0, formed = 0;\n  const windowCounts = {};\n  let minLen = Infinity, minStart = 0;\n  // TODO: Sliding window expand & contract\n  \n  return minLen === Infinity ? "" : s.substring(minStart, minStart + minLen);\n}\n\nconsole.log("Min Window:", minWindow("ADOBECODEBANC", "ABC"));`,
+      solutionHint: 'while (r < s.length) { const c = s[r]; windowCounts[c] = (windowCounts[c] || 0) + 1; if (targetMap[c] && windowCounts[c] === targetMap[c]) formed++; while (l <= r && formed === required) { if (r - l + 1 < minLen) { minLen = r - l + 1; minStart = l; } windowCounts[s[l]]--; if (targetMap[s[l]] && windowCounts[s[l]] < targetMap[s[l]]) formed--; l++; } r++; }',
+      languageVariants: {
+        javascript: {
+          starterCode: `function minWindow(s, t) {\n  if (s.length === 0 || t.length === 0) return "";\n  const targetMap = {};\n  for (const c of t) targetMap[c] = (targetMap[c] || 0) + 1;\n  let required = Object.keys(targetMap).length;\n  let l = 0, r = 0, formed = 0;\n  const windowCounts = {};\n  let minLen = Infinity, minStart = 0;\n  while (r < s.length) {\n    const c = s[r];\n    windowCounts[c] = (windowCounts[c] || 0) + 1;\n    if (targetMap[c] && windowCounts[c] === targetMap[c]) formed++;\n    while (l <= r && formed === required) {\n      if (r - l + 1 < minLen) { minLen = r - l + 1; minStart = l; }\n      windowCounts[s[l]]--;\n      if (targetMap[s[l]] && windowCounts[s[l]] < targetMap[s[l]]) formed--;\n      l++;\n    }\n    r++;\n  }\n  return minLen === Infinity ? "" : s.substring(minStart, minStart + minLen);\n}\n\nconsole.log("Min Window:", minWindow("ADOBECODEBANC", "ABC"));`,
+          solutionHint: 'Two pointers window expansion on right and contraction on left when all character frequencies match.'
+        },
+        python: {
+          starterCode: `from collections import Counter\n\ndef min_window(s: str, t: str) -> str:\n    if not s or not t: return ""\n    target_counts = Counter(t)\n    required = len(target_counts)\n    l = r = formed = 0\n    window_counts = {}\n    min_len, min_start = float('inf'), 0\n    while r < len(s):\n        c = s[r]\n        window_counts[c] = window_counts.get(c, 0) + 1\n        if c in target_counts and window_counts[c] == target_counts[c]:\n            formed += 1\n        while l <= r and formed == required:\n            if r - l + 1 < min_len:\n                min_len = r - l + 1\n                min_start = l\n            window_counts[s[l]] -= 1\n            if s[l] in target_counts and window_counts[s[l]] < target_counts[s[l]]:\n                formed -= 1\n            l += 1\n        r += 1\n    return "" if min_len == float('inf') else s[min_start:min_start + min_len]\n\nprint("Min Window:", min_window("ADOBECODEBANC", "ABC"))`,
+          solutionHint: 'Sliding window tracking formed character frequency matches with dynamic contraction.'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static String minWindow(String s, String t) {\n        if (s.isEmpty() || t.isEmpty()) return "";\n        int[] target = new int[128], window = new int[128];\n        for (char c : t.toCharArray()) target[c]++;\n        int required = 0;\n        for (int count : target) if (count > 0) required++;\n        int l = 0, r = 0, formed = 0, minLen = Integer.MAX_VALUE, start = 0;\n        while (r < s.length()) {\n            char c = s.charAt(r);\n            window[c]++;\n            if (target[c] > 0 && window[c] == target[c]) formed++;\n            while (l <= r && formed == required) {\n                if (r - l + 1 < minLen) { minLen = r - l + 1; start = l; }\n                char leftChar = s.charAt(l);\n                window[leftChar]--;\n                if (target[leftChar] > 0 && window[leftChar] < target[leftChar]) formed--;\n                l++;\n            }\n            r++;\n        }\n        return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start + minLen);\n    }\n    public static void main(String[] args) {\n        System.out.println("Min Window: " + minWindow("ADOBECODEBANC", "ABC"));\n    }\n}`,
+          solutionHint: 'Use 128-element ASCII frequency array for high-performance O(1) character lookup.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n#include <climits>\n\nstd::string minWindow(const std::string& s, const std::string& t) {\n    if (s.empty() || t.empty()) return "";\n    std::vector<int> target(128, 0), window(128, 0);\n    for (char c : t) target[c]++;\n    int required = 0;\n    for (int count : target) if (count > 0) required++;\n    int l = 0, r = 0, formed = 0, minLen = INT_MAX, start = 0;\n    while (r < (int)s.size()) {\n        char c = s[r];\n        window[c]++;\n        if (target[c] > 0 && window[c] == target[c]) formed++;\n        while (l <= r && formed == required) {\n            if (r - l + 1 < minLen) { minLen = r - l + 1; start = l; }\n            char leftChar = s[l];\n            window[leftChar]--;\n            if (target[leftChar] > 0 && window[leftChar] < target[leftChar]) formed--;\n            l++;\n        }\n        r++;\n    }\n    return minLen == INT_MAX ? "" : s.substr(start, minLen);\n}\n\nint main() {\n    std::cout << "Min Window: " << minWindow("ADOBECODEBANC", "ABC") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Slide right pointer to expand, contract left pointer when window matches all t frequencies.'
+        }
+      }
     },
     {
       id: 'str-mod-7',
@@ -1309,8 +1570,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
       sampleInputs: [
         { input: 'haystack = "ABABDABACDABABCABAB", needle = "ABABCABAB"', output: '10' }
       ],
-      starterCode: `function strStrKMP(haystack, needle) {\n  if (needle.length === 0) return 0;\n  const lps = new Array(needle.length).fill(0);\n  let prevLPS = 0, i = 1;\n  while (i < needle.length) {\n    if (needle[i] === needle[prevLPS]) {\n      lps[i++] = ++prevLPS;\n    } else if (prevLPS === 0) {\n      lps[i++] = 0;\n    } else {\n      prevLPS = lps[prevLPS - 1];\n    }\n  }\n\n  // TODO: Search haystack using LPS table without backtracking haystack pointer\n  \n  return -1;\n}\n\nconsole.log("KMP Match Index:", strStrKMP("ABABDABACDABABCABAB", "ABABCABAB"));`,
-      solutionHint: 'let h = 0, n = 0; while (h < haystack.length) { if (haystack[h] === needle[n]) { h++; n++; } if (n === needle.length) return h - n; if (h < haystack.length && haystack[h] !== needle[n]) { if (n !== 0) n = lps[n - 1]; else h++; } } return -1;'
+      starterCode: `function strStrKMP(haystack, needle) {\n  if (needle.length === 0) return 0;\n  const lps = new Array(needle.length).fill(0);\n  let prevLPS = 0, i = 1;\n  while (i < needle.length) {\n    if (needle[i] === needle[prevLPS]) { lps[i++] = ++prevLPS; }\n    else if (prevLPS === 0) { lps[i++] = 0; }\n    else { prevLPS = lps[prevLPS - 1]; }\n  }\n  let h = 0, n = 0;\n  while (h < haystack.length) {\n    if (haystack[h] === needle[n]) { h++; n++; }\n    if (n === needle.length) return h - n;\n    if (h < haystack.length && haystack[h] !== needle[n]) {\n      if (n !== 0) n = lps[n - 1]; else h++;\n    }\n  }\n  return -1;\n}\n\nconsole.log("KMP Match Index:", strStrKMP("ABABDABACDABABCABAB", "ABABCABAB"));`,
+      solutionHint: 'Build Longest Prefix Suffix (LPS) table to shift pattern position without backtracking source pointer.',
+      languageVariants: {
+        javascript: {
+          starterCode: `function strStrKMP(haystack, needle) {\n  if (needle.length === 0) return 0;\n  const lps = new Array(needle.length).fill(0);\n  let prevLPS = 0, i = 1;\n  while (i < needle.length) {\n    if (needle[i] === needle[prevLPS]) { lps[i++] = ++prevLPS; }\n    else if (prevLPS === 0) { lps[i++] = 0; }\n    else { prevLPS = lps[prevLPS - 1]; }\n  }\n  let h = 0, n = 0;\n  while (h < haystack.length) {\n    if (haystack[h] === needle[n]) { h++; n++; }\n    if (n === needle.length) return h - n;\n    if (h < haystack.length && haystack[h] !== needle[n]) {\n      if (n !== 0) n = lps[n - 1]; else h++;\n    }\n  }\n  return -1;\n}\n\nconsole.log("KMP Match Index:", strStrKMP("ABABDABACDABABCABAB", "ABABCABAB"));`,
+          solutionHint: 'Precompute LPS array in O(m) and run linear scan on haystack without pointer backtracking.'
+        },
+        python: {
+          starterCode: `def str_str_kmp(haystack: str, needle: str) -> int:\n    if not needle: return 0\n    lps = [0] * len(needle)\n    prev_lps, i = 0, 1\n    while i < len(needle):\n        if needle[i] == needle[prev_lps]:\n            prev_lps += 1\n            lps[i] = prev_lps\n            i += 1\n        elif prev_lps == 0:\n            lps[i] = 0\n            i += 1\n        else:\n            prev_lps = lps[prev_lps - 1]\n    h = n = 0\n    while h < len(haystack):\n        if haystack[h] == needle[n]:\n            h += 1; n += 1\n        if n == len(needle):\n            return h - n\n        if h < len(haystack) and haystack[h] != needle[n]:\n            if n != 0: n = lps[n - 1]\n            else: h += 1\n    return -1\n\nprint("KMP Match Index:", str_str_kmp("ABABDABACDABABCABAB", "ABABCABAB"))`,
+          solutionHint: 'Knuth-Morris-Pratt pattern searching using precomputed Longest Prefix Suffix list.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int strStr(String haystack, String needle) {\n        if (needle.isEmpty()) return 0;\n        int[] lps = new int[needle.length()];\n        int prevLPS = 0, i = 1;\n        while (i < needle.length()) {\n            if (needle.charAt(i) == needle.charAt(prevLPS)) { lps[i++] = ++prevLPS; }\n            else if (prevLPS == 0) { lps[i++] = 0; }\n            else { prevLPS = lps[prevLPS - 1]; }\n        }\n        int h = 0, n = 0;\n        while (h < haystack.length()) {\n            if (haystack.charAt(h) == needle.charAt(n)) { h++; n++; }\n            if (n == needle.length()) return h - n;\n            if (h < haystack.length() && haystack.charAt(h) != needle.charAt(n)) {\n                if (n != 0) n = lps[n - 1]; else h++;\n            }\n        }\n        return -1;\n    }\n    public static void main(String[] args) {\n        System.out.println("KMP Match: " + strStr("ABABDABACDABABCABAB", "ABABCABAB"));\n    }\n}`,
+          solutionHint: 'Linear time pattern match using LPS array avoid backtracking on the source string.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n\nint strStrKMP(const std::string& haystack, const std::string& needle) {\n    if (needle.empty()) return 0;\n    std::vector<int> lps(needle.size(), 0);\n    int prevLPS = 0, i = 1;\n    while (i < (int)needle.size()) {\n        if (needle[i] == needle[prevLPS]) { lps[i++] = ++prevLPS; }\n        else if (prevLPS == 0) { lps[i++] = 0; }\n        else { prevLPS = lps[prevLPS - 1]; }\n    }\n    int h = 0, n = 0;\n    while (h < (int)haystack.size()) {\n        if (haystack[h] == needle[n]) { h++; n++; }\n        if (n == (int)needle.size()) return h - n;\n        if (h < (int)haystack.size() && haystack[h] != needle[n]) {\n            if (n != 0) n = lps[n - 1]; else h++;\n        }\n    }\n    return -1;\n}\n\nint main() {\n    std::cout << "KMP Match: " << strStrKMP("ABABDABACDABABCABAB", "ABABCABAB") << "\\n";\n    return 0;\n}`,
+          solutionHint: 'Build LPS jump table and match in single pass O(N + M).'
+        }
+      }
     },
     {
       id: 'str-mod-8',
@@ -1323,8 +1602,26 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
         { input: 's = "aab", p = "c*a*b"', output: 'true' },
         { input: 's = "mississippi", p = "mis*is*p*."', output: 'false' }
       ],
-      starterCode: `function isMatch(s, p) {\n  const dp = Array.from({ length: s.length + 1 }, () => new Array(p.length + 1).fill(false));\n  dp[0][0] = true;\n\n  for (let j = 1; j <= p.length; j++) {\n    if (p[j - 1] === '*') dp[0][j] = dp[0][j - 2];\n  }\n\n  // TODO: Fill DP table for characters, \'.\', and \'*\'\n  \n  return dp[s.length][p.length];\n}\n\nconsole.log("Match \'aab\' against \'c*a*b\':", isMatch("aab", "c*a*b"));`,
-      solutionHint: 'for (let i = 1; i <= s.length; i++) { for (let j = 1; j <= p.length; j++) { if (p[j - 1] === s[i - 1] || p[j - 1] === ".") { dp[i][j] = dp[i - 1][j - 1]; } else if (p[j - 1] === "*") { dp[i][j] = dp[i][j - 2]; if (p[j - 2] === s[i - 1] || p[j - 2] === ".") dp[i][j] = dp[i][j] || dp[i - 1][j]; } } } return dp[s.length][p.length];'
+      starterCode: `function isMatch(s, p) {\n  const dp = Array.from({ length: s.length + 1 }, () => new Array(p.length + 1).fill(false));\n  dp[0][0] = true;\n  for (let j = 1; j <= p.length; j++) {\n    if (p[j - 1] === '*') dp[0][j] = dp[0][j - 2];\n  }\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 1; j <= p.length; j++) {\n      if (p[j - 1] === s[i - 1] || p[j - 1] === '.') {\n        dp[i][j] = dp[i - 1][j - 1];\n      } else if (p[j - 1] === '*') {\n        dp[i][j] = dp[i][j - 2];\n        if (p[j - 2] === s[i - 1] || p[j - 2] === '.') {\n          dp[i][j] = dp[i][j] || dp[i - 1][j];\n        }\n      }\n    }\n  }\n  return dp[s.length][p.length];\n}\n\nconsole.log("Match \'aab\' against \'c*a*b\':", isMatch("aab", "c*a*b"));`,
+      solutionHint: '2D DP grid where dp[i][j] tracks if prefix s[0..i] matches pattern p[0..j].',
+      languageVariants: {
+        javascript: {
+          starterCode: `function isMatch(s, p) {\n  const dp = Array.from({ length: s.length + 1 }, () => new Array(p.length + 1).fill(false));\n  dp[0][0] = true;\n  for (let j = 1; j <= p.length; j++) {\n    if (p[j - 1] === '*') dp[0][j] = dp[0][j - 2];\n  }\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 1; j <= p.length; j++) {\n      if (p[j - 1] === s[i - 1] || p[j - 1] === '.') {\n        dp[i][j] = dp[i - 1][j - 1];\n      } else if (p[j - 1] === '*') {\n        dp[i][j] = dp[i][j - 2];\n        if (p[j - 2] === s[i - 1] || p[j - 2] === '.') {\n          dp[i][j] = dp[i][j] || dp[i - 1][j];\n        }\n      }\n    }\n  }\n  return dp[s.length][p.length];\n}\n\nconsole.log("Match \'aab\' against \'c*a*b\':", isMatch("aab", "c*a*b"));`,
+          solutionHint: '2D boolean DP grid where asterisk transitions take either zero matches (j-2) or match previous character.'
+        },
+        python: {
+          starterCode: `def is_match(s: str, p: str) -> bool:\n    dp = [[False] * (len(p) + 1) for _ in range(len(s) + 1)]\n    dp[0][0] = True\n    for j in range(1, len(p) + 1):\n        if p[j - 1] == '*':\n            dp[0][j] = dp[0][j - 2]\n    for i in range(1, len(s) + 1):\n        for j in range(1, len(p) + 1):\n            if p[j - 1] == s[i - 1] or p[j - 1] == '.':\n                dp[i][j] = dp[i - 1][j - 1]\n            elif p[j - 1] == '*':\n                dp[i][j] = dp[i][j - 2]\n                if p[j - 2] == s[i - 1] or p[j - 2] == '.':\n                    dp[i][j] = dp[i][j] or dp[i - 1][j]\n    return dp[len(s)][len(p)]\n\nprint("Match 'aab' against 'c*a*b':", is_match("aab", "c*a*b"))`,
+          solutionHint: 'Dynamic programming table evaluating exact characters, wildcard dots, and repeating asterisks.'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static boolean isMatch(String s, String p) {\n        boolean[][] dp = new boolean[s.length() + 1][p.length() + 1];\n        dp[0][0] = true;\n        for (int j = 1; j <= p.length(); j++) {\n            if (p.charAt(j - 1) == '*') dp[0][j] = dp[0][j - 2];\n        }\n        for (int i = 1; i <= s.length(); i++) {\n            for (int j = 1; j <= p.length(); j++) {\n                if (p.charAt(j - 1) == s.charAt(i - 1) || p.charAt(j - 1) == '.') {\n                    dp[i][j] = dp[i - 1][j - 1];\n                } else if (p.charAt(j - 1) == '*') {\n                    dp[i][j] = dp[i][j - 2];\n                    if (p.charAt(j - 2) == s.charAt(i - 1) || p.charAt(j - 2) == '.') {\n                        dp[i][j] = dp[i][j] || dp[i - 1][j];\n                    }\n                }\n            }\n        }\n        return dp[s.length()][p.length()];\n    }\n    public static void main(String[] args) {\n        System.out.println("Match: " + isMatch("aab", "c*a*b"));\n    }\n}`,
+          solutionHint: '2D boolean DP grid tracking state transitions across pattern tokens and string characters.'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <string>\n#include <vector>\n\nbool isMatch(const std::string& s, const std::string& p) {\n    int m = s.size(), n = p.size();\n    std::vector<std::vector<bool>> dp(m + 1, std::vector<bool>(n + 1, false));\n    dp[0][0] = true;\n    for (int j = 1; j <= n; j++) {\n        if (p[j - 1] == '*') dp[0][j] = dp[0][j - 2];\n    }\n    for (int i = 1; i <= m; i++) {\n        for (int j = 1; j <= n; j++) {\n            if (p[j - 1] == s[i - 1] || p[j - 1] == '.') {\n                dp[i][j] = dp[i - 1][j - 1];\n            } else if (p[j - 1] == '*') {\n                dp[i][j] = dp[i][j - 2];\n                if (p[j - 2] == s[i - 1] || p[j - 2] == '.') {\n                    dp[i][j] = dp[i][j] || dp[i - 1][j];\n                }\n            }\n        }\n    }\n    return dp[m][n];\n}\n\nint main() {\n    std::cout << "Match: " << (isMatch("aab", "c*a*b") ? "true" : "false") << "\\n";\n    return 0;\n}`,
+          solutionHint: '2D DP grid evaluating characters, period wildcard, and repeating asterisk transitions.'
+        }
+      }
     }
   ],
 
@@ -1384,7 +1681,25 @@ export function getGenericPlaygroundProblem(courseId: string, moduleIndex: numbe
       constraints: ['Time Complexity: O(n)', 'Handle null & empty inputs'],
       sampleInputs: [{ input: 'data = [10, 20, 30]', output: '[20, 40, 60]' }],
       starterCode: `function process${modNum}(data) {\n  // TODO: Implement ${topicTitle} Module ${modNum} processing logic\n  return data.map(x => x * 2);\n}\n\nconsole.log(process${modNum}([10, 20, 30]));`,
-      solutionHint: 'Use data.filter(Boolean).map(x => x * 2)'
+      solutionHint: 'Use data.filter(Boolean).map(x => x * 2)',
+      languageVariants: {
+        javascript: {
+          starterCode: `function process${modNum}(data) {\n  // TODO: Implement ${topicTitle} Module ${modNum} processing logic\n  return data.map(x => x * 2);\n}\n\nconsole.log(process${modNum}([10, 20, 30]));`,
+          solutionHint: 'Use data.filter(Boolean).map(x => x * 2)'
+        },
+        python: {
+          starterCode: `def process_${modNum}(data: list[int]) -> list[int]:\n    # TODO: Implement ${topicTitle} Module ${modNum} processing logic\n    return [x * 2 for x in data]\n\nprint(process_${modNum}([10, 20, 30]))`,
+          solutionHint: 'return [x * 2 for x in data if x is not None]'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int[] process${modNum}(int[] data) {\n        // TODO: Implement ${topicTitle} Module ${modNum} processing logic\n        return Arrays.stream(data).map(x -> x * 2).toArray();\n    }\n    public static void main(String[] args) {\n        System.out.println(Arrays.toString(process${modNum}(new int[]{10, 20, 30})));\n    }\n}`,
+          solutionHint: 'return Arrays.stream(data).map(x -> x * 2).toArray();'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n\nstd::vector<int> process${modNum}(const std::vector<int>& data) {\n    std::vector<int> res;\n    for (int x : data) res.push_back(x * 2);\n    return res;\n}\n\nint main() {\n    auto res = process${modNum}({10, 20, 30});\n    for (int x : res) std::cout << x << " ";\n    std::cout << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (int x : data) res.push_back(x * 2); return res;'
+        }
+      }
     },
     {
       title: `${modNum}. ${topicTitle} Frequency Lookup Map`,
@@ -1393,7 +1708,25 @@ export function getGenericPlaygroundProblem(courseId: string, moduleIndex: numbe
       constraints: ['Space Complexity: O(n)', 'O(1) lookup speed'],
       sampleInputs: [{ input: 'items = ["a", "b", "a"]', output: '{"a": 2, "b": 1}' }],
       starterCode: `function countFrequency(items) {\n  const map = {};\n  // TODO: Count occurrences of each item in map\n  \n  return map;\n}\n\nconsole.log(countFrequency(["a", "b", "a"]));`,
-      solutionHint: 'Loop items: map[item] = (map[item] || 0) + 1'
+      solutionHint: 'Loop items: map[item] = (map[item] || 0) + 1',
+      languageVariants: {
+        javascript: {
+          starterCode: `function countFrequency(items) {\n  const map = {};\n  // TODO: Count occurrences of each item in map\n  \n  return map;\n}\n\nconsole.log(countFrequency(["a", "b", "a"]));`,
+          solutionHint: 'Loop items: map[item] = (map[item] || 0) + 1'
+        },
+        python: {
+          starterCode: `def count_frequency(items: list[str]) -> dict[str, int]:\n    freq = {}\n    # TODO: Build frequency dictionary\n    \n    return freq\n\nprint(count_frequency(["a", "b", "a"]))`,
+          solutionHint: 'for item in items: freq[item] = freq.get(item, 0) + 1; return freq'
+        },
+        java: {
+          starterCode: `import java.util.*;\n\npublic class Solution {\n    public static Map<String, Integer> countFrequency(String[] items) {\n        Map<String, Integer> map = new HashMap<>();\n        // TODO: Frequency map\n        \n        return map;\n    }\n    public static void main(String[] args) {\n        System.out.println(countFrequency(new String[]{"a", "b", "a"}));\n    }\n}`,
+          solutionHint: 'for (String s : items) map.put(s, map.getOrDefault(s, 0) + 1); return map;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_map>\n\nstd::unordered_map<std::string, int> countFrequency(const std::vector<std::string>& items) {\n    std::unordered_map<std::string, int> map;\n    // TODO: Frequency map\n    \n    return map;\n}\n\nint main() {\n    auto res = countFrequency({"a", "b", "a"});\n    for (const auto& [k, v] : res) std::cout << k << ": " << v << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (const auto& item : items) map[item]++; return map;'
+        }
+      }
     },
     {
       title: `${modNum}. ${topicTitle} Optimization & Boundary Validation`,
@@ -1402,7 +1735,25 @@ export function getGenericPlaygroundProblem(courseId: string, moduleIndex: numbe
       constraints: ['Optimized linear pass', 'Handle negative integers'],
       sampleInputs: [{ input: 'nums = [5, 1, 9, 3]', output: '9' }],
       starterCode: `function findMaxOptimal(nums) {\n  let max = nums[0];\n  // TODO: Single pass max search\n  \n  return max;\n}\n\nconsole.log(findMaxOptimal([5, 1, 9, 3]));`,
-      solutionHint: 'Iterate nums: if (nums[i] > max) max = nums[i]'
+      solutionHint: 'Iterate nums: if (nums[i] > max) max = nums[i]',
+      languageVariants: {
+        javascript: {
+          starterCode: `function findMaxOptimal(nums) {\n  let max = nums[0];\n  // TODO: Single pass max search\n  \n  return max;\n}\n\nconsole.log(findMaxOptimal([5, 1, 9, 3]));`,
+          solutionHint: 'Iterate nums: if (nums[i] > max) max = nums[i]'
+        },
+        python: {
+          starterCode: `def find_max_optimal(nums: list[int]) -> int:\n    max_val = nums[0]\n    # TODO: Linear search\n    \n    return max_val\n\nprint(find_max_optimal([5, 1, 9, 3]))`,
+          solutionHint: 'for num in nums[1:]: if num > max_val: max_val = num; return max_val'
+        },
+        java: {
+          starterCode: `public class Solution {\n    public static int findMaxOptimal(int[] nums) {\n        int max = nums[0];\n        // TODO: Linear max search\n        \n        return max;\n    }\n    public static void main(String[] args) {\n        System.out.println(findMaxOptimal(new int[]{5, 1, 9, 3}));\n    }\n}`,
+          solutionHint: 'for (int i = 1; i < nums.length; i++) if (nums[i] > max) max = nums[i]; return max;'
+        },
+        cpp: {
+          starterCode: `#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint findMaxOptimal(const std::vector<int>& nums) {\n    int maxVal = nums[0];\n    // TODO: Linear max search\n    \n    return maxVal;\n}\n\nint main() {\n    std::cout << findMaxOptimal({5, 1, 9, 3}) << "\\n";\n    return 0;\n}`,
+          solutionHint: 'for (size_t i = 1; i < nums.size(); i++) if (nums[i] > maxVal) maxVal = nums[i]; return maxVal;'
+        }
+      }
     }
   ];
 
@@ -1416,6 +1767,7 @@ export function getGenericPlaygroundProblem(courseId: string, moduleIndex: numbe
     constraints: selected.constraints,
     sampleInputs: selected.sampleInputs,
     starterCode: selected.starterCode,
-    solutionHint: selected.solutionHint
+    solutionHint: selected.solutionHint,
+    languageVariants: selected.languageVariants
   };
 }

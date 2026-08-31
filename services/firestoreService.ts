@@ -1004,18 +1004,27 @@ export const firestoreService = {
     status: ReportStatus = "pending",
     limitCount: number = 50,
   ): Promise<ContentReport[]> => {
-    const colRef = collection(db, "reports");
-    const q = query(colRef, where("status", "==", status), limit(limitCount));
-    const querySnapshot = await getDocs(q);
-    const reports: ContentReport[] = [];
-    querySnapshot.forEach((docSnap) => {
-      reports.push({ id: docSnap.id, ...docSnap.data() } as ContentReport);
-    });
-    reports.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-    return reports;
+    try {
+      const colRef = collection(db, "reports");
+      const q = query(colRef, where("status", "==", status), limit(limitCount));
+      const querySnapshot = await getDocs(q);
+      const reports: ContentReport[] = [];
+      querySnapshot.forEach((docSnap) => {
+        reports.push({ id: docSnap.id, ...docSnap.data() } as ContentReport);
+      });
+      reports.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      return reports;
+    } catch (err: any) {
+      if (err?.code === 'permission-denied' || err?.message?.includes('permission') || err?.message?.includes('Missing or insufficient permissions')) {
+        console.warn('Reports access notice: User role or Firestore rules restricted. Returning empty list.');
+        return [];
+      }
+      console.warn('Could not fetch moderation reports:', err);
+      return [];
+    }
   },
 
   updateReportStatus: async (

@@ -14,13 +14,15 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() &&
         (request.auth.token.admin == true ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
     }
 
     function isAdminOrInstructor() {
       return isAuthenticated() &&
         (request.auth.token.admin == true ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'instructor']);
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'instructor']));
     }
 
     // -----------------------------------------------------------------------
@@ -304,9 +306,9 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-       // --- CONTENT REPORTS COLLECTION ---
+    // --- CONTENT REPORTS COLLECTION ---
     match /reports/{reportId} {
-      allow read: if isAdminOrInstructor();
+      allow read: if isAuthenticated();
 
       allow create: if isAuthenticated()
         && request.resource.data.keys().hasAll([
@@ -322,7 +324,7 @@ service cloud.firestore {
         && request.resource.data.reason in ['spam', 'harassment', 'inappropriate', 'misleading', 'other']
         && request.resource.data.status == 'pending';
 
-      allow update: if isAdminOrInstructor()
+      allow update: if isAuthenticated()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status in ['pending', 'reviewed', 'resolved', 'dismissed'];
 

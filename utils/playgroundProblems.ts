@@ -123,68 +123,218 @@ export const PLAYGROUND_PROBLEMS: Record<string, PracticeProblem[]> = {
 
   'python': [
     {
-      id: 'py-1',
-      title: '1. Dictionary Key Value Inversion',
+      id: 'py-mod-1',
+      title: 'Module 1: Dictionary Inversion & Value Mapping',
       difficulty: 'Easy',
       category: 'Python',
-      description: 'Implement `invert_dict(d)` that swaps keys and values in a dictionary.',
-      constraints: ['Keys and values are unique strings/numbers'],
-      sampleInputs: [{ input: '{"a": 1, "b": 2}', output: '{1: "a", 2: "b"}' }],
-      starterCode: `function invertDict(d) {\n  // TODO: Swap dictionary keys and values\n  const res = {};\n  \n  return res;\n}\n\nconsole.log(invertDict({ a: 1, b: 2 }));`,
-      solutionHint: 'Iterate Object.entries(d) and assign res[val] = key'
+      description: 'Implement invert_dict(d) that swaps dictionary keys and values. If multiple keys share the exact same value, group the original keys into a sorted list.',
+      constraints: ['Keys are strings, values are hashable numbers or strings', 'Time Complexity: O(n)', 'Return a standard Python dictionary'],
+      sampleInputs: [
+        { input: '{"a": 1, "b": 2, "c": 1}', output: '{1: ["a", "c"], 2: ["b"]}' },
+        { input: '{"x": 10, "y": 20}', output: '{10: ["x"], 20: ["y"]}' }
+      ],
+      starterCode: `def invert_dict(d: dict) -> dict:\n    result = {}\n    # TODO: Swap keys and values, grouping duplicate values in a list\n    \n    return result\n\n# Test execution:\nprint(invert_dict({"a": 1, "b": 2, "c": 1}))`,
+      solutionHint: 'Iterate d.items(). If val in result, result[val].append(key); else result[val] = [key].'
     },
     {
-      id: 'py-2',
-      title: '2. List Anagram Grouping',
-      difficulty: 'Medium',
-      category: 'Python',
-      description: 'Group an array of strings into anagram clusters.',
-      constraints: ['Strings contain lowercase English letters'],
-      sampleInputs: [{ input: '["eat", "tea", "tan", "ate", "nat", "bat"]', output: '[["eat","tea","ate"],["tan","nat"],["bat"]]' }],
-      starterCode: `function groupAnagrams(words) {\n  const map = new Map();\n  // TODO: Sort word characters as hash key\n  \n  return Array.from(map.values());\n}\n\nconsole.log(groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));`,
-      solutionHint: 'Sort characters of word: word.split("").sort().join("")'
-    }
-  ],
-
-  'python-programming': [
-    {
-      id: 'py-1',
-      title: '1. Dictionary Key Value Inversion',
+      id: 'py-mod-2',
+      title: 'Module 2: List Comprehension Matrix Transpose',
       difficulty: 'Easy',
       category: 'Python',
-      description: 'Implement `invert_dict(d)` that swaps keys and values in a dictionary.',
-      constraints: ['Keys and values are unique strings/numbers'],
-      sampleInputs: [{ input: '{"a": 1, "b": 2}', output: '{1: "a", 2: "b"}' }],
-      starterCode: `function invertDict(d) {\n  // TODO: Swap dictionary keys and values\n  const res = {};\n  \n  return res;\n}\n\nconsole.log(invertDict({ a: 1, b: 2 }));`,
-      solutionHint: 'Iterate Object.entries(d) and assign res[val] = key'
+      description: 'Write transpose_matrix(matrix) using idiomatic Python list comprehensions to swap the rows and columns of an M x N grid.',
+      constraints: ['Matrix dimensions: 1x1 to 100x100', 'Do not use external NumPy library', 'Preserve inner integer values'],
+      sampleInputs: [
+        { input: '[[1, 2, 3], [4, 5, 6]]', output: '[[1, 4], [2, 5], [3, 6]]' },
+        { input: '[[1]]', output: '[[1]]' }
+      ],
+      starterCode: `def transpose_matrix(matrix: list[list[int]]) -> list[list[int]]:\n    # TODO: Transpose matrix using list comprehension or zip\n    \n    pass\n\ngrid = [\n    [1, 2, 3],\n    [4, 5, 6]\n]\nprint("Transposed:", transpose_matrix(grid))`,
+      solutionHint: 'Use [list(row) for row in zip(*matrix)] or [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))].'
+    },
+    {
+      id: 'py-mod-3',
+      title: 'Module 3: Anagram Grouping with Character Count Hashes',
+      difficulty: 'Medium',
+      category: 'Python',
+      description: 'Implement group_anagrams(words) that groups an array of strings into anagram clusters using character frequency tuples or sorted string keys.',
+      constraints: ['Words contain lowercase ASCII letters', 'Time Complexity: O(n * k log k)', 'Return a list of lists of strings'],
+      sampleInputs: [
+        { input: '["eat", "tea", "tan", "ate", "nat", "bat"]', output: '[["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]' }
+      ],
+      starterCode: `from collections import defaultdict\n\ndef group_anagrams(words: list[str]) -> list[list[str]]:\n    anagram_map = defaultdict(list)\n    # TODO: Group words by sorted canonical character signature\n    \n    return list(anagram_map.values())\n\nwords = ["eat", "tea", "tan", "ate", "nat", "bat"]\nprint("Anagram Groups:", group_anagrams(words))`,
+      solutionHint: 'Use tuple(sorted(word)) or "".join(sorted(word)) as dictionary keys in defaultdict(list).'
+    },
+    {
+      id: 'py-mod-4',
+      title: 'Module 4: Least Recently Used (LRU) Cache',
+      difficulty: 'Medium',
+      category: 'Python',
+      description: 'Design an LRUCache class with get(key) and put(key, value) operations running in O(1) average time complexity. Evict the least recently used key when capacity is exceeded.',
+      constraints: ['Capacity >= 1', 'get and put run in O(1) average time', 'Return -1 when key is not found'],
+      sampleInputs: [
+        { input: 'cache = LRUCache(2); cache.put(1, 100); cache.put(2, 200); cache.get(1); cache.put(3, 300); cache.get(2)', output: 'cache.get(2) returns -1 (evicted)' }
+      ],
+      starterCode: `from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key: int) -> int:\n        # TODO: Return value and move key to most recently used\n        \n        return -1\n\n    def put(self, key: int, value: int) -> None:\n        # TODO: Insert/update value and evict oldest if exceeding capacity\n        \n        pass\n\nlru = LRUCache(2)\nlru.put(1, 100)\nlru.put(2, 200)\nprint("Get 1:", lru.get(1))  # 100\nlru.put(3, 300)             # Evicts key 2\nprint("Get 2 (should be -1):", lru.get(2))\nprint("Get 3:", lru.get(3))`,
+      solutionHint: 'Use self.cache.move_to_end(key) on access and self.cache.popitem(last=False) when len > capacity.'
+    },
+    {
+      id: 'py-mod-5',
+      title: 'Module 5: Retry Decorator with Exponential Backoff',
+      difficulty: 'Medium',
+      category: 'Python',
+      description: 'Create a function decorator @retry(max_attempts=3, backoff_factor=1.5) that catches exceptions and retries the wrapped function with exponential backoff up to max_attempts before raising the final exception.',
+      constraints: ['Use functools.wraps to preserve function metadata', 'Forward arbitrary *args and **kwargs', 'Raise original exception if all retries fail'],
+      sampleInputs: [
+        { input: '@retry(max_attempts=3) def flaky_api()', output: 'Retries on failure up to 3 times before raising exception' }
+      ],
+      starterCode: `import time\nfrom functools import wraps\n\ndef retry(max_attempts: int = 3, backoff_factor: float = 1.5):\n    def decorator(func):\n        @wraps(func)\n        def wrapper(*args, **kwargs):\n            # TODO: Loop attempts and catch Exception, re-raising on final failure\n            \n            pass\n        return wrapper\n    return decorator\n\nattempts = 0\n@retry(max_attempts=3, backoff_factor=1.0)\ndef simulate_network_call():\n    global attempts\n    attempts += 1\n    if attempts < 3:\n        print(f"Attempt {attempts} failed, retrying...")\n        raise ConnectionError("Network timeout")\n    return "Success on attempt 3!"\n\nprint("Result:", simulate_network_call())`,
+      solutionHint: 'Use a try-except block inside a for attempt in range(max_attempts) loop and time.sleep(backoff_factor ** attempt).'
+    },
+    {
+      id: 'py-mod-6',
+      title: 'Module 6: Generator Stream & Sliding Window Batches',
+      difficulty: 'Hard',
+      category: 'Python',
+      description: 'Write a generator function fibonacci_stream() that yields Fibonacci numbers indefinitely in O(1) memory, and a consumer chunk_stream(gen, n) that yields tuples of size n from any generator.',
+      constraints: ['Memory Complexity: O(1)', 'Yield lazily without materializing entire infinite sequence', 'Handle non-empty iterator streams'],
+      sampleInputs: [
+        { input: 'take 4 chunks of size 3 from fibonacci_stream()', output: '(0, 1, 1), (2, 3, 5), (8, 13, 21), (34, 55, 89)' }
+      ],
+      starterCode: `from typing import Generator, Iterator, Tuple\nimport itertools\n\ndef fibonacci_stream() -> Generator[int, None, None]:\n    a, b = 0, 1\n    while True:\n        yield a\n        a, b = b, a + b\n\ndef chunk_stream(stream: Iterator[int], chunk_size: int) -> Generator[Tuple[int, ...], None, None]:\n    # TODO: Yield tuples of size 'chunk_size' lazily from stream\n    \n    pass\n\nfib_gen = fibonacci_stream()\nchunker = chunk_stream(fib_gen, 3)\nfor _ in range(4):\n    print("Chunk:", next(chunker))`,
+      solutionHint: 'Use tuple(itertools.islice(stream, chunk_size)) in a loop and yield while chunk is non-empty.'
+    },
+    {
+      id: 'py-mod-7',
+      title: 'Module 7: Topological Sort Dependency Resolver (Kahn Algorithm)',
+      difficulty: 'Hard',
+      category: 'Python',
+      description: 'Given a dictionary of package dependencies, return a valid build order (topological sort) or raise a ValueError("Cyclic dependency detected") if a cycle exists.',
+      constraints: ['Graph vertices: 1 to 500', 'Time Complexity: O(V + E)', 'Detect circular dependency deadlocks'],
+      sampleInputs: [
+        { input: '{"web": ["api", "ui"], "api": ["db"], "ui": ["common"], "db": ["common"], "common": []}', output: '["common", "db", "ui", "api", "web"]' }
+      ],
+      starterCode: `from collections import deque, defaultdict\n\ndef resolve_dependencies(graph: dict[str, list[str]]) -> list[str]:\n    in_degree = {u: 0 for u in graph}\n    adj = defaultdict(list)\n    for u, deps in graph.items():\n        for dep in deps:\n            adj[dep].append(u)\n            in_degree[u] += 1\n\n    queue = deque([u for u, deg in in_degree.items() if deg == 0])\n    order = []\n\n    # TODO: Process queue with Kahn's algorithm and return build order\n    \n    return order\n\npackages = {\n    "web": ["api", "ui"],\n    "api": ["database"],\n    "ui": ["common"],\n    "database": ["common"],\n    "common": []\n}\nprint("Build Order:", resolve_dependencies(packages))`,
+      solutionHint: 'While queue: node = queue.popleft(); order.append(node); for neighbor in adj[node]: in_degree[neighbor] -= 1; if in_degree[neighbor] == 0: queue.append(neighbor). Raise ValueError if len(order) != len(graph).'
+    },
+    {
+      id: 'py-mod-8',
+      title: 'Module 8: Asynchronous Pipeline with asyncio.Semaphore',
+      difficulty: 'Hard',
+      category: 'Python',
+      description: 'Implement an async worker crawl_urls(urls, max_concurrency) using asyncio.Semaphore to bound concurrent async fetches, collecting all processed responses.',
+      constraints: ['Never exceed max_concurrency concurrent tasks', 'Handle simulated network latency with asyncio.sleep', 'Return list of result dictionaries'],
+      sampleInputs: [
+        { input: 'crawl_urls(["url1", "url2", "url3", "url4"], max_concurrency=2)', output: 'Returns all 4 fetched response payloads' }
+      ],
+      starterCode: `import asyncio\n\nasync def fetch_url(sem: asyncio.Semaphore, url: str) -> dict:\n    async with sem:\n        await asyncio.sleep(0.05)  # Simulate network latency\n        return {"url": url, "status": 200, "data": f"Content of {url}"}\n\nasync def crawl_urls(urls: list[str], max_concurrency: int = 2) -> list[dict]:\n    sem = asyncio.Semaphore(max_concurrency)\n    # TODO: Create tasks and gather results concurrently\n    tasks = [fetch_url(sem, url) for url in urls]\n    return await asyncio.gather(*tasks)\n\nasync def main():\n    targets = [f"https://api.skillverse.com/data/{i}" for i in range(1, 5)]\n    results = await crawl_urls(targets, max_concurrency=2)\n    print(f"Scraped {len(results)} endpoints successfully.")\n    for r in results:\n        print(r)\n\nasyncio.run(main())`,
+      solutionHint: 'Use asyncio.Semaphore inside an async context manager and execute with asyncio.gather(*tasks).'
     }
   ],
 
   'java': [
     {
-      id: 'java-1',
-      title: '1. Custom String Reverser without Built-ins',
+      id: 'java-mod-1',
+      title: 'Module 1: In-Place Two-Pointer String Reversal',
       difficulty: 'Easy',
       category: 'Java',
-      description: 'Write `reverseString(str)` without using reverse functions.',
-      constraints: ['String length 1-1000'],
-      sampleInputs: [{ input: '"hello"', output: '"olleh"' }],
-      starterCode: `function reverseString(str) {\n  let res = "";\n  // TODO: Iterate string from end to start\n  \n  return res;\n}\n\nconsole.log(reverseString("hello"));`,
-      solutionHint: 'Loop i = str.length - 1 down to 0 and append str[i]'
-    }
-  ],
-
-  'java-programming': [
+      description: 'Implement reverseString(char[] s) in Java using a two-pointer approach to reverse a character array in-place with O(1) auxiliary memory.',
+      constraints: ['Array length: 1 to 100,000', 'Space Complexity: O(1) in-place', 'Time Complexity: O(n)'],
+      sampleInputs: [
+        { input: "['h', 'e', 'l', 'l', 'o']", output: "['o', 'l', 'l', 'e', 'h']" }
+      ],
+      starterCode: `public class Solution {\n    public static void reverseString(char[] s) {\n        int left = 0;\n        int right = s.length - 1;\n        // TODO: Swap characters using two pointers\n        \n    }\n\n    public static void main(String[] args) {\n        char[] word = {'h', 'e', 'l', 'l', 'o'};\n        reverseString(word);\n        System.out.println("Reversed: " + new String(word));\n    }\n}`,
+      solutionHint: 'while (left < right) { char temp = s[left]; s[left++] = s[right]; s[right--] = temp; }'
+    },
     {
-      id: 'java-1',
-      title: '1. Custom String Reverser without Built-ins',
+      id: 'java-mod-2',
+      title: 'Module 2: First Non-Repeating Character Index',
       difficulty: 'Easy',
       category: 'Java',
-      description: 'Write `reverseString(str)` without using reverse functions.',
-      constraints: ['String length 1-1000'],
-      sampleInputs: [{ input: '"hello"', output: '"olleh"' }],
-      starterCode: `function reverseString(str) {\n  let res = "";\n  // TODO: Iterate string from end to start\n  \n  return res;\n}\n\nconsole.log(reverseString("hello"));`,
-      solutionHint: 'Loop i = str.length - 1 down to 0 and append str[i]'
+      description: 'Implement firstUniqChar(String s) returning the index of the first non-repeating character, or -1 if no unique character exists.',
+      constraints: ['String contains lowercase English letters', 'Time Complexity: O(n)', 'Space Complexity: O(1) fixed 26-char frequency table'],
+      sampleInputs: [
+        { input: '"leetcode"', output: '0' },
+        { input: '"loveleetcode"', output: '2' }
+      ],
+      starterCode: `public class Solution {\n    public static int firstUniqChar(String s) {\n        int[] freq = new int[26];\n        // TODO: Count frequencies and find first index with freq == 1\n        \n        return -1;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("First Unique Index: " + firstUniqChar("loveleetcode")); // Expected: 2\n    }\n}`,
+      solutionHint: 'for (char c : s.toCharArray()) freq[c - "a"]++; then iterate s with index i and check freq[s.charAt(i) - "a"] == 1.'
+    },
+    {
+      id: 'java-mod-3',
+      title: 'Module 3: MinStack with O(1) Minimum Value Lookup',
+      difficulty: 'Medium',
+      category: 'Java',
+      description: 'Design a MinStack class supporting push, pop, top, and getMin, each executing in O(1) time complexity.',
+      constraints: ['Stack operations run in O(1) time', 'Handle positive and negative integers', 'Maintain twin synchronized stack state'],
+      sampleInputs: [
+        { input: 'push(-2); push(0); push(-3); getMin() -> -3; pop(); top() -> 0; getMin() -> -2', output: 'getMin() returns -2' }
+      ],
+      starterCode: `import java.util.Stack;\n\npublic class MinStack {\n    private Stack<Integer> stack = new Stack<>();\n    private Stack<Integer> minStack = new Stack<>();\n\n    public void push(int val) {\n        stack.push(val);\n        // TODO: Update minStack with min(val, currentMin)\n        \n    }\n\n    public void pop() {\n        stack.pop();\n        minStack.pop();\n    }\n\n    public int top() {\n        return stack.peek();\n    }\n\n    public int getMin() {\n        return minStack.peek();\n    }\n\n    public static void main(String[] args) {\n        MinStack minStack = new MinStack();\n        minStack.push(-2);\n        minStack.push(0);\n        minStack.push(-3);\n        System.out.println("Min: " + minStack.getMin()); // -3\n        minStack.pop();\n        System.out.println("Top: " + minStack.top()); // 0\n        System.out.println("Min: " + minStack.getMin()); // -2\n    }\n}`,
+      solutionHint: 'if (minStack.isEmpty() || val <= minStack.peek()) minStack.push(val); else minStack.push(minStack.peek());'
+    },
+    {
+      id: 'java-mod-4',
+      title: 'Module 4: Binary Tree Level Order Traversal (BFS)',
+      difficulty: 'Medium',
+      category: 'Java',
+      description: 'Given the root of a binary tree, return the level order traversal of its nodes values (i.e., from left to right, level by level) using a Queue.',
+      constraints: ['Tree node count: 0 to 2,000', 'Time Complexity: O(n)', 'Space Complexity: O(n) Queue memory'],
+      sampleInputs: [
+        { input: 'root = [3, 9, 20, null, null, 15, 7]', output: '[[3], [9, 20], [15, 7]]' }
+      ],
+      starterCode: `import java.util.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left, right;\n    TreeNode(int val) { this.val = val; }\n}\n\npublic class Solution {\n    public static List<List<Integer>> levelOrder(TreeNode root) {\n        List<List<Integer>> result = new ArrayList<>();\n        if (root == null) return result;\n        Queue<TreeNode> queue = new LinkedList<>();\n        queue.offer(root);\n\n        // TODO: Process nodes level by level using queue size\n        \n        return result;\n    }\n\n    public static void main(String[] args) {\n        TreeNode root = new TreeNode(3);\n        root.left = new TreeNode(9);\n        root.right = new TreeNode(20);\n        root.right.left = new TreeNode(15);\n        root.right.right = new TreeNode(7);\n\n        System.out.println("Level Order: " + levelOrder(root));\n    }\n}`,
+      solutionHint: 'int size = queue.size(); List<Integer> level = new ArrayList<>(); for (int i = 0; i < size; i++) { TreeNode node = queue.poll(); level.add(node.val); if (node.left != null) queue.offer(node.left); if (node.right != null) queue.offer(node.right); } result.add(level);'
+    },
+    {
+      id: 'java-mod-5',
+      title: 'Module 5: Java Streams Grouping & Metric Aggregation',
+      difficulty: 'Medium',
+      category: 'Java',
+      description: 'Given a list of Employee records (id, name, department, salary), use the Java 8 Stream API and Collectors.groupingBy to calculate the average salary per department.',
+      constraints: ['Use declarative Java 8 Stream pipelines', 'Return Map<String, Double>', 'Handle empty department lists gracefully'],
+      sampleInputs: [
+        { input: '[("Eng", 120000), ("Eng", 140000), ("Sales", 90000)]', output: '{"Engineering": 130000.0, "Sales": 90000.0}' }
+      ],
+      starterCode: `import java.util.*;\nimport java.util.stream.Collectors;\n\nclass Employee {\n    String name;\n    String department;\n    double salary;\n    Employee(String name, String dept, double salary) {\n        this.name = name;\n        this.department = dept;\n        this.salary = salary;\n    }\n    public String getDepartment() { return department; }\n    public double getSalary() { return salary; }\n}\n\npublic class Solution {\n    public static Map<String, Double> averageSalaryByDept(List<Employee> employees) {\n        // TODO: Group by department and collect averagingDouble(Employee::getSalary)\n        \n        return null;\n    }\n\n    public static void main(String[] args) {\n        List<Employee> list = Arrays.asList(\n            new Employee("Alice", "Engineering", 120000),\n            new Employee("Bob", "Engineering", 140000),\n            new Employee("Charlie", "Sales", 90000)\n        );\n        System.out.println("Department Averages: " + averageSalaryByDept(list));\n    }\n}`,
+      solutionHint: 'return employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.averagingDouble(Employee::getSalary)));'
+    },
+    {
+      id: 'java-mod-6',
+      title: 'Module 6: Merge K Sorted Lists with PriorityQueue',
+      difficulty: 'Hard',
+      category: 'Java',
+      description: 'Merge K sorted linked lists into one single sorted linked list in O(N log k) time using a PriorityQueue (Min-Heap).',
+      constraints: ['K between 0 and 10,000', 'Total nodes N up to 100,000', 'Time Complexity: O(N log K)'],
+      sampleInputs: [
+        { input: '[[1, 4, 5], [1, 3, 4], [2, 6]]', output: '1 -> 1 -> 2 -> 3 -> 4 -> 4 -> 5 -> 6' }
+      ],
+      starterCode: `import java.util.PriorityQueue;\n\nclass ListNode {\n    int val;\n    ListNode next;\n    ListNode(int val) { this.val = val; }\n}\n\npublic class Solution {\n    public static ListNode mergeKLists(ListNode[] lists) {\n        if (lists == null || lists.length == 0) return null;\n        PriorityQueue<ListNode> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));\n        // TODO: Add all head nodes to pq and reconstruct sorted linked list\n        \n        return null;\n    }\n\n    public static void main(String[] args) {\n        ListNode l1 = new ListNode(1); l1.next = new ListNode(4); l1.next.next = new ListNode(5);\n        ListNode l2 = new ListNode(1); l2.next = new ListNode(3); l2.next.next = new ListNode(4);\n        ListNode l3 = new ListNode(2); l3.next = new ListNode(6);\n\n        ListNode merged = mergeKLists(new ListNode[]{l1, l2, l3});\n        System.out.print("Merged: ");\n        while (merged != null) {\n            System.out.print(merged.val + " -> ");\n            merged = merged.next;\n        }\n        System.out.println("null");\n    }\n}`,
+      solutionHint: 'for (ListNode head : lists) if (head != null) pq.offer(head); ListNode dummy = new ListNode(0); ListNode curr = dummy; while (!pq.isEmpty()) { ListNode top = pq.poll(); curr.next = top; curr = curr.next; if (top.next != null) pq.offer(top.next); } return dummy.next;'
+    },
+    {
+      id: 'java-mod-7',
+      title: 'Module 7: Thread-Safe Bounded Blocking Queue',
+      difficulty: 'Hard',
+      category: 'Java',
+      description: 'Implement a thread-safe BoundedBlockingQueue<T> with put(item) and take() methods using synchronized monitors or explicit locks with condition variables.',
+      constraints: ['Support concurrent producer and consumer threads without race conditions', 'Block on put() when queue is full', 'Block on take() when queue is empty'],
+      sampleInputs: [
+        { input: 'queue = new BoundedBlockingQueue(2); queue.put(10); queue.put(20); queue.take()', output: '10' }
+      ],
+      starterCode: `import java.util.LinkedList;\nimport java.util.Queue;\n\npublic class BoundedBlockingQueue<T> {\n    private final Queue<T> queue = new LinkedList<>();\n    private final int capacity;\n\n    public BoundedBlockingQueue(int capacity) {\n        this.capacity = capacity;\n    }\n\n    public synchronized void put(T item) throws InterruptedException {\n        // TODO: Wait while queue.size() == capacity, then offer item and notifyAll()\n        \n    }\n\n    public synchronized T take() throws InterruptedException {\n        // TODO: Wait while queue.isEmpty(), then poll item and notifyAll()\n        \n        return null;\n    }\n\n    public static void main(String[] args) throws InterruptedException {\n        BoundedBlockingQueue<Integer> bq = new BoundedBlockingQueue<>(2);\n        bq.put(100);\n        bq.put(200);\n        System.out.println("Took: " + bq.take()); // 100\n        bq.put(300);\n        System.out.println("Took: " + bq.take()); // 200\n    }\n}`,
+      solutionHint: 'while (queue.size() == capacity) wait(); queue.offer(item); notifyAll(); and while (queue.isEmpty()) wait(); T val = queue.poll(); notifyAll(); return val;'
+    },
+    {
+      id: 'java-mod-8',
+      title: 'Module 8: Word Ladder Shortest Transformation (Bidirectional BFS)',
+      difficulty: 'Hard',
+      category: 'Java',
+      description: 'Given beginWord, endWord, and wordList, find the length of the shortest transformation sequence from beginWord to endWord such that only one letter changes at a time and each transformed word exists in wordList.',
+      constraints: ['All words have the same length and lowercase English letters', 'Return 0 if no valid transformation path exists', 'Time Complexity: O(M^2 * N)'],
+      sampleInputs: [
+        { input: 'begin = "hit", end = "cog", list = ["hot","dot","dog","lot","log","cog"]', output: '5 ("hit" -> "hot" -> "dot" -> "dog" -> "cog")' }
+      ],
+      starterCode: `import java.util.*;\n\npublic class Solution {\n    public static int ladderLength(String beginWord, String endWord, List<String> wordList) {\n        Set<String> dict = new HashSet<>(wordList);\n        if (!dict.contains(endWord)) return 0;\n        Queue<String> queue = new LinkedList<>();\n        queue.offer(beginWord);\n        int level = 1;\n\n        // TODO: Perform BFS transforming one character at a time\n        \n        return 0;\n    }\n\n    public static void main(String[] args) {\n        List<String> dict = Arrays.asList("hot", "dot", "dog", "lot", "log", "cog");\n        System.out.println("Shortest ladder length: " + ladderLength("hit", "cog", dict)); // Expected: 5\n    }\n}`,
+      solutionHint: 'while (!queue.isEmpty()) { int size = queue.size(); for (int i = 0; i < size; i++) { String word = queue.poll(); if (word.equals(endWord)) return level; char[] chars = word.toCharArray(); for (int j = 0; j < chars.length; j++) { char orig = chars[j]; for (char c = "a"; c <= "z"; c++) { chars[j] = c; String next = new String(chars); if (dict.remove(next)) queue.offer(next); } chars[j] = orig; } } level++; } return 0;'
     }
   ],
 

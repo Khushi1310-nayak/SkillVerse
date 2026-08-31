@@ -201,6 +201,27 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
       timeoutRef.current = null;
     }
   };
+  const getEditorLanguage = (lang?: string): string => {
+    const l = (lang || '').toLowerCase().trim();
+    if (l.includes('python') || l === 'py') return 'python';
+    if (l.includes('java') && !l.includes('script')) return 'java';
+    if (l.includes('typescript') || l === 'ts') return 'typescript';
+    if (l.includes('c++') || l.includes('cpp') || l === 'c') return 'cpp';
+    if (l.includes('html')) return 'html';
+    if (l.includes('css')) return 'css';
+    return 'javascript';
+  };
+
+  const getEditorFilename = (lang?: string): string => {
+    const l = (lang || '').toLowerCase().trim();
+    if (l.includes('python') || l === 'py') return 'main.py';
+    if (l.includes('java') && !l.includes('script')) return 'Solution.java';
+    if (l.includes('typescript') || l === 'ts') return 'index.ts';
+    if (l.includes('c++') || l.includes('cpp') || l === 'c') return 'main.cpp';
+    if (l.includes('html')) return 'index.html';
+    if (l.includes('css')) return 'styles.css';
+    return 'sandbox.js';
+  };
 
   return (
     <div className="bg-glass border border-black/25 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 w-full">
@@ -212,7 +233,9 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
             <div className="w-3 h-3 rounded-full bg-[#eab308] opacity-80" />
             <div className="w-3 h-3 rounded-full bg-[#22c55e] opacity-80" />
           </div>
-          <span className="text-xs font-mono text-textMuted font-semibold tracking-wide select-none">sandbox.js</span>
+          <span className="text-xs font-mono text-textMuted font-semibold tracking-wide select-none">
+            {getEditorFilename(language)}
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -307,8 +330,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
       <div className="relative border-b border-black/10 dark:border-white/5 bg-[#1e1e1e]">
         <Editor
           height={height}
-          defaultLanguage="javascript"
-          language="javascript"
+          defaultLanguage={getEditorLanguage(language)}
+          language={getEditorLanguage(language)}
           value={code}
           onChange={(val) => setCode(val || '')}
           theme={isDark ? 'vs-dark' : 'light'}

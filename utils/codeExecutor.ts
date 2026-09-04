@@ -602,7 +602,7 @@ function transpileCppToJs(cppCode: string): string | null {
       if (['for', 'if', 'while', 'switch', 'catch'].includes(fnName)) return match;
       if (fnName === 'main') return 'function main() {';
 
-      const cleanParams = params.split(',').map((p) => {
+      const cleanParams = params.split(',').map((p: string) => {
         const parts = p.trim().split(/\s+/);
         return parts[parts.length - 1].replace(/[&*]/g, '');
       }).filter(Boolean).join(', ');
@@ -620,7 +620,7 @@ function transpileCppToJs(cppCode: string): string | null {
       const parts = stream
         .replace(/<<\s*std::endl/g, '')
         .split('<<')
-        .map(p => {
+        .map((p: string) => {
           let s = p.trim().replace(/[\r\n]+/g, '');
           return s;
         })

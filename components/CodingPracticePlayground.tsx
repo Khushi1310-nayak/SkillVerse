@@ -342,6 +342,10 @@ export const CodingPracticePlayground: React.FC = () => {
             height="380px"
             onRequestReview={handleRequestReview}
             isReviewSubmitting={isReviewSubmitting}
+            problemTitle={currentProblem.title}
+            problemDescription={currentProblem.description}
+            sampleInputs={currentProblem.sampleInputs}
+            solutionHint={currentSolutionHint}
           />
         </div>
 

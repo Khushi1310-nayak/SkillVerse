@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send, Users, Eye } from 'lucide-react';
+import { Play, RotateCcw, Terminal, AlertTriangle, Save, FolderOpen, Trash2, X, Loader2, Send, Users, Eye, Sparkles } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { firestoreService } from '../services/firestoreService';
+import { codeInspectorService, type CodeInspectionResult } from '../services/codeInspectorService';
+import { AICodeInspectorDrawer } from './playground/AICodeInspectorDrawer';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { SavedSnippet } from '../types';
@@ -18,6 +20,10 @@ interface CodePlaygroundProps {
   height?: string;
   onRequestReview?: (code: string, language: string) => Promise<void>;
   isReviewSubmitting?: boolean;
+  problemTitle?: string;
+  problemDescription?: string;
+  sampleInputs?: { input: string; output: string }[];
+  solutionHint?: string;
 }
 
 interface RuntimeError {
@@ -33,6 +39,10 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   height = '360px',
   onRequestReview,
   isReviewSubmitting = false,
+  problemTitle,
+  problemDescription,
+  sampleInputs,
+  solutionHint,
 }) => {
   const [code, setCode] = useState(initialCode);
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
@@ -55,9 +65,47 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
   const [snippetNameDraft, setSnippetNameDraft] = useState('');
   const [isStartingPairSession, setIsStartingPairSession] = useState(false);
 
+  // AI Inspector state
+  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  const [inspectionResult, setInspectionResult] = useState<CodeInspectionResult | null>(null);
+  const [lastInspectedCode, setLastInspectedCode] = useState<string | null>(null);
+  const [isAnalyzingInspector, setIsAnalyzingInspector] = useState(false);
+
   const navigate = useNavigate();
   const { user, appUser } = useAuthContext();
   const { showToast } = useToast();
+
+  const handleInspectCode = async () => {
+    const trimmedCode = code ? code.trim() : '';
+    if (!trimmedCode) {
+      showToast({ message: 'Please write some code to inspect.', type: 'error' });
+      return;
+    }
+
+    // Reuse existing inspection result if code has not changed since last inspection
+    if (inspectionResult && lastInspectedCode === trimmedCode) {
+      setIsInspectorOpen(true);
+      return;
+    }
+
+    setIsInspectorOpen(true);
+    setIsAnalyzingInspector(true);
+    try {
+      const res = await codeInspectorService.inspectCode(trimmedCode, language, {
+        problemTitle,
+        problemDescription,
+        sampleInputs,
+        solutionHint,
+      });
+      setInspectionResult(res);
+      setLastInspectedCode(trimmedCode);
+    } catch (err) {
+      console.error('Inspection failed:', err);
+      showToast({ message: 'Failed to analyze code.', type: 'error' });
+    } finally {
+      setIsAnalyzingInspector(false);
+    }
+  };
 
   const handleStartPairSession = async () => {
     const effectiveUserId = user?.uid || appUser?.uid;
@@ -157,6 +205,8 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
     setError(null);
     setIsExecuting(false);
     setExecutionTime(null);
+    setInspectionResult(null);
+    setLastInspectedCode(null);
   };
 
   const clampStep = (value: number, total: number) => {
@@ -287,6 +337,22 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
           >
             <Save size={12} />
             Save
+          </button>
+
+          <button
+            type="button"
+            onClick={handleInspectCode}
+            disabled={isAnalyzingInspector || !code.trim()}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-white bg-gradient-main hover:shadow-lg hover:shadow-primary/30 rounded-lg font-bold shadow-sm transition-all border border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaryLight disabled:opacity-50"
+            title="Run AI Code Inspector & Refactoring Engine"
+            aria-label="Inspect & Refactor"
+          >
+            {isAnalyzingInspector ? (
+              <Loader2 size={13} className="animate-spin text-white" />
+            ) : (
+              <Sparkles size={13} className="text-white" />
+            )}
+            Inspect & Refactor
           </button>
 
           <button
@@ -591,6 +657,17 @@ export const CodePlayground: React.FC<CodePlaygroundProps> = ({
           </div>
         </div>
       )}
+
+      {/* AI Code Inspector & Refactoring Drawer */}
+      <AICodeInspectorDrawer
+        isOpen={isInspectorOpen}
+        onClose={() => setIsInspectorOpen(false)}
+        result={inspectionResult}
+        isAnalyzing={isAnalyzingInspector}
+        onApplyRefactoredCode={(refactoredCode) => setCode(refactoredCode)}
+        language={language}
+        problemTitle={problemTitle}
+      />
     </div>
   );
 };

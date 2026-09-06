@@ -4,13 +4,14 @@
 
 ### Technical E-Learning, Interactive Coding & Career Preparation Platform
 
-An open-source single-page web application providing structured technical courses, a multi-language in-browser coding sandbox, an algorithm visualizer, real-time pair programming, and AI-assisted technical mock interviews.
+An open-source single-page web application providing structured technical courses, an in-browser multi-language coding playground, an algorithm visualizer studio, real-time pair programming, and AI-assisted technical mock interviews.
 
 ---
 
 [![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-5.0.0-6E9F18?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4_Runtime-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-12.16.0-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-4.7.0-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://microsoft.github.io/monaco-editor/)
@@ -26,9 +27,9 @@ An open-source single-page web application providing structured technical course
 
 - [Overview](#overview)
 - [Tech Stack & Exact Versions](#tech-stack--exact-versions)
-- [Verified Features](#verified-features)
+- [Implemented Feature Matrix](#implemented-feature-matrix)
   - [1. Course Library & Curriculum](#1-course-library--curriculum)
-  - [2. Interactive Code Playground & Execution Engine](#2-interactive-code-playground--execution-engine)
+  - [2. In-Browser Code Playground & Execution Sandbox](#2-in-browser-code-playground--execution-sandbox)
   - [3. Algorithm Visualizer Studio](#3-algorithm-visualizer-studio)
   - [4. AI Code Inspector & Refactoring Drawer](#4-ai-code-inspector--refactoring-drawer)
   - [5. Real-Time Collaborative Pair Programming](#5-real-time-collaborative-pair-programming)
@@ -39,6 +40,12 @@ An open-source single-page web application providing structured technical course
   - [10. Accessibility & Personalization Suite](#10-accessibility--personalization-suite)
   - [11. PWA & Offline Support](#11-pwa--offline-support)
   - [12. Administration & Data Portability](#12-administration--data-portability)
+- [Testing, Reliability & Security Architecture](#testing-reliability--security-architecture)
+  - [Automated Testing & Quality Assurance](#automated-testing--quality-assurance)
+  - [Client-Side Execution Isolation & Boundary](#client-side-execution-isolation--boundary)
+  - [Defensive Storage & Fault Tolerance](#defensive-storage--fault-tolerance)
+  - [Graceful Service Degradation](#graceful-service-degradation)
+  - [Backend Authorization & Firestore Rules](#backend-authorization--firestore-rules)
 - [System Architecture](#system-architecture)
 - [Application Route Map](#application-route-map)
 - [Project Directory Structure](#project-directory-structure)
@@ -74,6 +81,7 @@ The table below reflects the exact dependency versions declared in [`package.jso
 | **DOM Renderer** | `react-dom` | `^19.2.3` | React DOM rendering and portal mounting |
 | **Language** | `typescript` | `~5.8.2` | Static type checking and interface contracts |
 | **Bundler & Server** | `vite` | `^6.2.0` | Build orchestration, fast HMR, and Rollup chunk splitting |
+| **Testing Framework** | `vitest` | `^5.0.0` | Unit test execution and assertion runner |
 | **Routing** | `react-router-dom` | `^7.12.0` | Client-side HashRouter routing and route guards |
 | **Backend & Auth** | `firebase` | `^12.16.0` | Firebase Authentication, Cloud Firestore, and Cloud Storage |
 | **Code Editor** | `@monaco-editor/react` | `^4.7.0` | In-browser VS Code editing experience |
@@ -94,7 +102,7 @@ The table below reflects the exact dependency versions declared in [`package.jso
 
 ---
 
-## Verified Features
+## Implemented Feature Matrix
 
 ### 1. Course Library & Curriculum
 - **3 Domain Tracks**:
@@ -107,14 +115,14 @@ The table below reflects the exact dependency versions declared in [`package.jso
 - **Course Filters & Bookmarks**: Filter by category, difficulty level (Beginner, Intermediate, Advanced), and duration, with a dedicated saved course repository (`/saved`).
 - **Lesson Notes & Discussions**: Lesson note-taking with PDF export and community discussions with upvoting.
 
-### 2. Interactive Code Playground & Execution Engine
+### 2. In-Browser Code Playground & Execution Sandbox
 - Located at `/playground` (and per-course module links).
 - **Monaco Editor Integration**: Configurable theme, syntax checking, minimap toggle, font resizing, and keyboard controls.
-- **Multi-Language Client Runner (`utils/codeExecutor.ts`)**:
-  - **JavaScript & TypeScript**: Sandboxed `eval`/`Function` execution capturing `console.log`, `console.error`, and `console.warn` stdout.
-  - **Python**: In-browser client interpretation via dynamic parser supporting standard operations, collections, and loops.
-  - **Java**: Transpiled runtime supporting `public class Solution`, static methods, and `System.out.println`.
-  - **C++, Rust, Go, Kotlin**: AST and regex transpilation pipelines for standard input/output and algorithm evaluation.
+- **Client-Side Execution Pipeline (`utils/codeExecutor.ts`)**:
+  - **JavaScript & TypeScript**: Evaluated inside a sandboxed `iframe` with overridden `console` streams and error handlers.
+  - **Python**: In-browser client simulation and parsing supporting standard operations, collections, and control flow.
+  - **Java**: In-browser transpilation supporting `public class Solution`, static methods, and `System.out.println`.
+  - **C++, Rust, Go, Kotlin**: AST and regex transpilation pipelines for standard algorithmic input/output evaluation.
 - **Terminal Output Console**: Standard output stream capture, line-specific runtime error reporting, clear terminal controls, and execution duration metrics.
 
 ### 3. Algorithm Visualizer Studio
@@ -188,6 +196,45 @@ The table below reflects the exact dependency versions declared in [`package.jso
 
 ---
 
+## Testing, Reliability & Security Architecture
+
+### Automated Testing & Quality Assurance
+The codebase includes automated unit test suites using [Vitest](https://vitest.dev/):
+- **Weak-Topic Recommendation Engine Tests (`utils/recommendations.test.ts`)**: Validates topic mistake counting, deduplication, prerequisite course matching, and score filtering.
+- **Defensive Storage Tests (`utils/safeStorage.test.ts`)**: Validates JSON serialization, in-memory session fallback, corrupted entry recovery, and shape predicate guards.
+- **Input & Password Validation Tests (`utils/validators.test.ts`)**: Validates username character constraints, email formatting, and password complexity scoring.
+- **Type Checking**: Strict TypeScript validation via `npm run typecheck` (`tsc --noEmit`).
+
+To execute the test suite:
+```bash
+npm test
+```
+
+### Client-Side Execution Isolation & Boundary
+Code execution in the browser playground is structured as follows:
+- **Sandbox Boundary**: User code executes inside an isolated `<iframe>` configured with `sandbox="allow-scripts"` (strictly omitting `allow-same-origin`). This prevents executing scripts from accessing the parent window's DOM, `localStorage`, session tokens, or cookies.
+- **PostMessage Communication**: Output and error events are serialized and transmitted across the frame boundary using unique per-execution channel identifiers (`exec_${Date.now()}_${nonce}`).
+- **Watchdog Timeout**: A strict 4,000ms watchdog timer aborts execution and unmounts the iframe if an infinite loop or heavy synchronous computation is detected.
+- *Architectural Note*: This setup protects client browser state during interactive practice. For untrusted, multi-tenant enterprise code execution, a remote containerized execution environment (e.g., gVisor, WebAssembly isolation, or Firecracker microVMs) would be utilized.
+
+### Defensive Storage & Fault Tolerance
+Browser storage operations are mediated by `utils/safeStorage.ts`:
+- **In-Memory Fallback**: If browser storage access is blocked (e.g., private browsing restrictions or disabled storage), the app automatically falls back to an in-memory session map to prevent fatal application crashes.
+- **Corrupt Value Recovery**: If stored data fails JSON parsing, the corrupted key is safely purged and replaced with defined default state.
+- **Quota Exceeded Trapping**: `setItem` operations wrap writes in error guards to handle storage quota saturation gracefully without interrupting active user sessions.
+
+### Graceful Service Degradation
+- **AI Service Fallbacks (`services/aiService.ts`, `services/codeInspectorService.ts`)**: If the OpenRouter API key is absent, expired, or rate-limited, AI tutoring drawers and interview feedback components display structured fallback notices rather than failing silently or crashing the UI.
+- **HTML Sanitization (`utils/sanitizeHtml.ts`)**: User-generated markdown notes, comments, and discussion threads are sanitized with DOMPurify prior to DOM insertion to prevent Cross-Site Scripting (XSS).
+
+### Backend Authorization & Firestore Rules
+Cloud Firestore access is governed by strict declarative security rules ([`firestore.rules`](firestore.rules)):
+- **Ownership Verification**: User profile and progress documents can only be mutated by the authenticated document owner (`request.auth.uid == userId`).
+- **Role-Based Access Control (RBAC)**: Administrative routes and moderation actions require verified administrative claims (`request.auth.token.admin == true` or role verification in the database).
+- **Subcollection Isolation**: Notifications, active peer presence, and quest states are protected by path-specific authorization rules.
+
+---
+
 ## System Architecture
 
 ```mermaid
@@ -213,7 +260,7 @@ graph TD
         subgraph CoreServices ["Core Services & State"]
             AuthContext["AuthContext (useAuth)"]
             SafeStorage["safeStorage.ts & dataPortability.ts"]
-            CodeExec["codeExecutor.ts (Multi-Language Engine)"]
+            CodeExec["codeExecutor.ts (Isolated Iframe Sandbox)"]
             ServiceWorker["Workbox Service Worker (PWA Cache)"]
         end
     end
@@ -346,8 +393,12 @@ SkillVerse/
 │   ├── dataPortability.ts       # JSON backup export, import, and schema validation
 │   ├── pdfGenerator.ts          # jsPDF and html2canvas PDF export utilities
 │   ├── playgroundProblems.ts    # Coding problems and test cases database
+│   ├── recommendations.test.ts  # Unit tests for course recommendation engine
+│   ├── safeStorage.test.ts      # Unit tests for defensive storage wrapper
 │   ├── safeStorage.ts           # Quota-safe storage abstraction with memory fallback
 │   ├── sanitizeHtml.ts          # DOMPurify HTML sanitization
+│   ├── validators.test.ts       # Unit tests for password & input validation
+│   ├── validators.ts            # Password strength and input validation helpers
 │   └── visualizerStateParser.ts # Algorithm visualizer dynamic state machine
 ├── constants.ts                 # Course catalog, company questions, themes, and badges
 ├── types.ts                     # TypeScript interfaces and data models
@@ -426,7 +477,13 @@ The following scripts are defined in `package.json`:
 # Start local development server on port 3000
 npm run dev
 
-# Run TypeScript typecheck and compile production bundle into /dist
+# Run automated Vitest unit test suites
+npm test
+
+# Run strict TypeScript typechecking
+npm run typecheck
+
+# Compile production bundle into /dist
 npm run build
 
 # Preview the local production build
@@ -452,7 +509,7 @@ Contributions are welcome. To maintain codebase quality:
 
 1. **Fork and Branch**: Create a feature branch (`git checkout -b feat/your-feature-name`).
 2. **Code Standards**: Adhere to strict TypeScript typing. Ensure no `any` types are introduced without justification.
-3. **Verify Build**: Run `npm run build` to verify 0 build and TypeScript compilation errors prior to opening a pull request.
+3. **Verify Tests & Build**: Run `npm test` and `npm run build` to verify all tests pass with 0 TypeScript compilation errors prior to opening a pull request.
 4. **Pull Request**: Open a pull request against `main` with a clear description of the implemented changes.
 
 Refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for full guidelines.
@@ -489,4 +546,3 @@ This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE)
 <div align="center">
 ⭐ <b>If you find SkillVerse helpful, please give it a Star on GitHub!</b> ⭐
 </div>
-

@@ -66,15 +66,24 @@ function executeJavaScript(code: string, startTime: number): Promise<ExecutionRe
     const logs: ExecutionLog[] = [];
     let runtimeError: ExecutionResult['error'] = null;
 
-    if (typeof window === 'undefined') {
+    const isJSDOM = typeof navigator !== 'undefined' && /jsdom/i.test(navigator.userAgent);
+    if (typeof window === 'undefined' || isJSDOM) {
       try {
         const captured: string[] = [];
-        const customConsole = { log: (...args: any[]) => captured.push(args.map(String).join(' ')) };
+        const customConsole = {
+          log: (...args: any[]) => captured.push(args.map(a => typeof a === 'object' && a !== null ? JSON.stringify(a) : String(a)).join(' ')),
+          warn: (...args: any[]) => captured.push(args.map(a => typeof a === 'object' && a !== null ? JSON.stringify(a) : String(a)).join(' ')),
+          error: (...args: any[]) => captured.push(args.map(a => typeof a === 'object' && a !== null ? JSON.stringify(a) : String(a)).join(' ')),
+        };
         new Function('console', code)(customConsole);
         captured.forEach(msg => logs.push({ type: 'log', message: msg }));
         return resolve({ logs, error: null, durationMs: Math.round(performance.now() - startTime) });
       } catch (err: any) {
-        return resolve({ logs: [{ type: 'error', message: err.message }], error: { message: err.message }, durationMs: 0 });
+        return resolve({
+          logs: [{ type: 'error', message: `Runtime Error: ${err.message}` }],
+          error: { message: err.message },
+          durationMs: 0
+        });
       }
     }
 
@@ -105,7 +114,7 @@ function executeJavaScript(code: string, startTime: number): Promise<ExecutionRe
 
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
-    iframe.sandbox.add('allow-scripts');
+    iframe.setAttribute('sandbox', 'allow-scripts');
 
     const timeout = setTimeout(() => {
       cleanup();
@@ -310,9 +319,9 @@ function executeCpp(code: string, startTime: number): ExecutionResult {
     }
 
     if (!hasPrinted) {
-      const coutMatches = code.matchAll(/std::cout\s*<<\s*([\s\S]*?);/g);
+      const coutMatches = code.matchAll(/(?:std::)?cout\s*<<\s*([\s\S]*?);/g);
       for (const match of coutMatches) {
-        const raw = match[1].replace(/<<\s*(?:std::endl|["']\\n["'])/g, '').trim();
+        const raw = match[1].replace(/<<\s*(?:(?:std::)?endl|["']\\n["'])/g, '').trim();
         const parts = raw.split('<<').map(p => cleanOutputString(p.trim())).join('');
         logs.push({ type: 'log', message: parts });
         hasPrinted = true;

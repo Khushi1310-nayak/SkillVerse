@@ -89,7 +89,7 @@ export const getRecommendedCompanies = (
 
     const targetRoles = settings?.targetRoles ?? [];
     const relevantFocusTags = targetRoles.flatMap(role => ROLE_TO_FOCUS_MAP[role] ?? []);
-    const focusOverlap = company.focus.some(tag => relevantFocusTags.includes(tag));
+    const focusOverlap = Array.isArray(company.focus) && company.focus.some(tag => relevantFocusTags.includes(tag));
     if (focusOverlap) {
       score += 3;
     }

@@ -251,7 +251,8 @@ function analyzeCodeLocally(
       });
     }
 
-    if (loopRegex.test(trimmed) || /^\s*for\s+/i.test(trimmed) || /^\s*while\s+/i.test(trimmed)) {
+    const isLoop = loopRegex.test(trimmed) || /^\s*for\s+/i.test(trimmed) || /^\s*while\s+/i.test(trimmed);
+    if (isLoop) {
       loopDepth++;
       if (loopDepth > maxLoopDepth) maxLoopDepth = loopDepth;
 
@@ -280,8 +281,9 @@ function analyzeCodeLocally(
     }
 
     const closeBraces = (line.match(/\}/g) || []).length;
-    const openBraces = (line.match(/\{/g) || []).length;
-    loopDepth = Math.max(0, loopDepth + openBraces - closeBraces);
+    if (closeBraces > 0 && loopDepth > 0) {
+      loopDepth = Math.max(0, loopDepth - closeBraces);
+    }
   });
 
   // Calculate Big-O metrics

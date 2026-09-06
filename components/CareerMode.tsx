@@ -1080,9 +1080,7 @@ ${transcriptText}`;
       } catch (error) {
         console.error("Error fetching live companies from Firestore:", error);
       } finally {
-        setTimeout(() => {
-          setIsLoadingCompanies(false);
-        }, 1000);
+        setIsLoadingCompanies(false);
       }
     };
     fetchLiveCompanies();

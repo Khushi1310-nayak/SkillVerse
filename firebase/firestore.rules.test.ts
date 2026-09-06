@@ -7,13 +7,37 @@ import {
 } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import net from 'net';
 import { doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const PROJECT_ID = 'skillverse-test-project';
-let testEnv: RulesTestEnvironment;
+let testEnv: RulesTestEnvironment | undefined;
 
-describe('Firestore Security Rules Authorization Suite', () => {
+async function isEmulatorRunning(port = 8080, host = '127.0.0.1'): Promise<boolean> {
+  return new Promise((res) => {
+    const socket = new net.Socket();
+    socket.setTimeout(300);
+    socket.on('connect', () => {
+      socket.destroy();
+      res(true);
+    });
+    socket.on('timeout', () => {
+      socket.destroy();
+      res(false);
+    });
+    socket.on('error', () => {
+      socket.destroy();
+      res(false);
+    });
+    socket.connect(port, host);
+  });
+}
+
+const emulatorActive = await isEmulatorRunning();
+
+describe.skipIf(!emulatorActive)('Firestore Security Rules Authorization Suite', () => {
   beforeAll(async () => {
+    if (!emulatorActive) return;
     // Read the exact firestore.rules file from workspace root
     const rulesPath = resolve(__dirname, '../firestore.rules');
     const rules = readFileSync(rulesPath, 'utf8');

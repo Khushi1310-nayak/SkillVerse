@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build & Verify
+    name: Typecheck, Test & Build
     runs-on: ubuntu-latest
     
     steps:
@@ -25,7 +25,12 @@ jobs:
           
       - name: Install Dependencies
         run: npm ci
-        
-      # Note: Skipped lint, typecheck, and test as those scripts do not exist in package.json
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run Unit Tests
+        run: npm test
+
       - name: Build Project
         run: npm run build

@@ -47,7 +47,9 @@ An open-source single-page web application providing structured technical course
 - [Available Scripts](#available-scripts)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Contributing](#contributing)
+- [Contributors](#contributors)
 - [License](#license)
+- [Author](#author)
 
 ---
 
@@ -457,12 +459,34 @@ Refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF
 
 ---
 
-## License
+## 🌟 Contributors
+
+Thank you to everyone who has contributed to making SkillVerse better!
+
+<a href="https://github.com/Khushi1310-nayak/SkillVerse/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Khushi1310-nayak/SkillVerse" alt="Contributors" />
+</a>
+
+---
+
+## 📜 License
 
 This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
 
 ---
 
+## 👩‍💻 Author
+
+### **Manisa Nayak**
+
+🎓 Student | Full-Stack Developer | AI Product Builder
+
+- **GitHub:** [@Khushi1310-nayak](https://github.com/Khushi1310-nayak)  
+- **LinkedIn:** [Manisa Nayak](https://www.linkedin.com/in/manisa-nayak-185bb5378/)
+
+---
+
 <div align="center">
-  <b>SkillVerse</b> — Open-Source Technical Education & Career Preparation Platform
+⭐ <b>If you find SkillVerse helpful, please give it a Star on GitHub!</b> ⭐
 </div>
+
